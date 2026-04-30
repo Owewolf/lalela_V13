@@ -66,3 +66,4 @@ assets/Lalela Favicon - White on Green.png
 *.apk
 
 /src/generated/prisma
+*.png
