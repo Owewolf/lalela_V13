@@ -1,0 +1,269 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Linking,
+  Alert,
+} from 'react-native';
+import { ArrowRight, Phone, Star, Clock, MessageSquare, Globe, MapPin } from 'lucide-react-native';
+
+interface BusinessCardProps {
+  name: string;
+  distance: string;
+  category: string;
+  status?: 'Open' | 'Closed';
+  image?: string;
+  icon?: React.ReactNode;
+  iconBg?: string;
+  iconColor?: string;
+  label?: string;
+  labelType?: 'top-rated' | 'new';
+  neighbors?: number;
+  closingTime?: string;
+  hasCall?: boolean;
+  onChat?: () => void;
+  isMemberBusiness?: boolean;
+  phone?: string;
+  website?: string;
+  description?: string;
+  address?: string;
+}
+
+const sanitizeUrl = (url: string): string | null => {
+  try {
+    const normalized = url.startsWith('http') ? url : `https://${url}`;
+    const parsed = new URL(normalized);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.href;
+  } catch {
+    /* invalid */
+  }
+  return null;
+};
+
+export const BusinessCard: React.FC<BusinessCardProps> = ({
+  name,
+  distance,
+  category,
+  status,
+  image,
+  icon,
+  iconBg,
+  iconColor,
+  label,
+  labelType,
+  neighbors,
+  closingTime,
+  hasCall,
+  onChat,
+  isMemberBusiness,
+  phone,
+  website,
+  description,
+  address,
+}) => {
+  const [imgError, setImgError] = useState(false);
+  const safeWebsite = website ? sanitizeUrl(website) : null;
+
+  const handleCall = () => {
+    if (!phone) return;
+    const tel = 'tel:' + phone.replace(/[\s\-()]/g, '');
+    Linking.openURL(tel).catch(() =>
+      Alert.alert('Cannot call', 'Unable to open phone dialer.')
+    );
+  };
+
+  const handleWebsite = () => {
+    if (!safeWebsite) return;
+    Linking.openURL(safeWebsite).catch(() =>
+      Alert.alert('Cannot open', 'Unable to open the website.')
+    );
+  };
+
+  return (
+    <View
+      className={[
+        'bg-white rounded-3xl p-4 flex-row gap-4 shadow-sm',
+        isMemberBusiness
+          ? 'border-2 border-purple-400/60'
+          : 'border border-gray-100',
+      ].join(' ')}
+      style={
+        isMemberBusiness
+          ? { shadowColor: '#a855f7', shadowOpacity: 0.12, shadowRadius: 8, elevation: 3 }
+          : { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 }
+      }
+    >
+      {/* Image / Icon area */}
+      <View
+        className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 items-center justify-center"
+        style={{ backgroundColor: iconBg || '#f3f4f6' }}
+      >
+        {image && !imgError ? (
+          <Image
+            className="w-full h-full"
+            source={{ uri: image }}
+            resizeMode="cover"
+            onError={() => setImgError(true)}
+          />
+        ) : icon ? (
+          <View>{icon}</View>
+        ) : (
+          <Text
+            className="text-3xl font-bold"
+            style={{ color: iconColor || '#0d3d47' }}
+          >
+            {name.charAt(0).toUpperCase()}
+          </Text>
+        )}
+        {labelType === 'top-rated' && (
+          <View className="absolute top-1 left-1 bg-amber-400 rounded-full px-1.5 py-0.5 flex-row items-center gap-0.5">
+            <Star size={8} color="#fff" fill="#fff" />
+          </View>
+        )}
+      </View>
+
+      {/* Content */}
+      <View className="flex-1 justify-between py-0.5 min-w-0">
+        <View>
+          {/* Name + distance */}
+          <View className="flex-row justify-between items-start gap-2">
+            <Text
+              className="font-bold text-primary text-base leading-tight flex-1"
+              numberOfLines={1}
+            >
+              {name}
+            </Text>
+            <View className="bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">
+              <Text className="text-[10px] font-bold text-gray-500">{distance}</Text>
+            </View>
+          </View>
+
+          {/* Category + status */}
+          <Text className="text-gray-400 text-xs mt-0.5">
+            {category}
+            {status ? (
+              <>
+                {' • '}
+                <Text
+                  className={status === 'Open' ? 'text-primary font-medium' : 'text-red-500 font-medium'}
+                >
+                  {status}
+                </Text>
+              </>
+            ) : null}
+          </Text>
+
+          {description ? (
+            <Text className="text-gray-400 text-[11px] mt-1 leading-relaxed" numberOfLines={2}>
+              {description}
+            </Text>
+          ) : null}
+
+          {address ? (
+            <View className="flex-row items-center gap-1 mt-1">
+              <MapPin size={10} color="#9ca3af" />
+              <Text className="text-gray-300 text-[10px] flex-1" numberOfLines={1}>
+                {address}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Bottom row */}
+        <View className="flex-row items-center justify-between mt-2">
+          {/* Left: metadata */}
+          <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
+            {neighbors !== undefined ? (
+              <View className="flex-row items-center gap-2">
+                <View className="flex-row">
+                  {[1, 2].map((i) => (
+                    <View
+                      key={i}
+                      className="w-5 h-5 rounded-full border-2 border-white bg-gray-200"
+                      style={{ marginLeft: i > 1 ? -8 : 0 }}
+                    />
+                  ))}
+                </View>
+                <Text className="text-[10px] text-gray-400 font-medium">
+                  {neighbors} neighbors visited
+                </Text>
+              </View>
+            ) : closingTime ? (
+              <View className="flex-row items-center gap-1">
+                <Clock size={12} color="#9ca3af" />
+                <Text className="text-[10px] text-gray-400">Closes {closingTime}</Text>
+              </View>
+            ) : label ? (
+              <View
+                className={[
+                  'px-2 py-0.5 rounded',
+                  labelType === 'top-rated' ? 'bg-amber-50' : 'bg-surface-container-low',
+                ].join(' ')}
+              >
+                <Text
+                  className={[
+                    'text-[10px] font-medium',
+                    labelType === 'top-rated' ? 'text-amber-700' : 'text-primary',
+                  ].join(' ')}
+                >
+                  {label}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+
+          {/* Right: action buttons */}
+          <View className="flex-row items-center gap-1.5 flex-shrink-0">
+            {phone ? (
+              <TouchableOpacity
+                onPress={handleCall}
+                className="w-8 h-8 rounded-full bg-primary items-center justify-center"
+                style={{ shadowColor: '#0d3d47', shadowOpacity: 0.3, shadowRadius: 4, elevation: 2 }}
+                activeOpacity={0.8}
+              >
+                <Phone size={16} color="#fff" />
+              </TouchableOpacity>
+            ) : null}
+
+            {safeWebsite ? (
+              <TouchableOpacity
+                onPress={handleWebsite}
+                className="w-8 h-8 rounded-full bg-blue-50 items-center justify-center"
+                activeOpacity={0.8}
+              >
+                <Globe size={16} color="#2563eb" />
+              </TouchableOpacity>
+            ) : null}
+
+            {onChat ? (
+              <TouchableOpacity
+                onPress={onChat}
+                className="w-8 h-8 rounded-full bg-surface-container-low items-center justify-center"
+                activeOpacity={0.8}
+              >
+                <MessageSquare size={16} color="#0d3d47" />
+              </TouchableOpacity>
+            ) : null}
+
+            {!phone && !safeWebsite && !onChat ? (
+              hasCall ? (
+                <TouchableOpacity
+                  className="w-8 h-8 rounded-full bg-primary items-center justify-center"
+                  activeOpacity={0.8}
+                >
+                  <Phone size={16} color="#fff" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity activeOpacity={0.8}>
+                  <ArrowRight size={20} color="#0d3d47" />
+                </TouchableOpacity>
+              )
+            ) : null}
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};

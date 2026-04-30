@@ -1,0 +1,68 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+.env
+
+# secrets — never commit
+service-account/
+google-services-key.json
+
+# typescript
+*.tsbuildinfo
+
+# local assistant support files
+CLAUDE.md
+.claude
+.skills
+.idea
+.continue
+.agents
+.expo
+.claude
+
+# generated native folders
+/ios
+/android
+/agents
+/claude
+
+# local scratch files
+test-nav.js
+test-summary.md
+file.png
+assets/file.png
+src/components/settings/file.png
+assets/Lalela App UI - Chat Page (Talk With Purpose).png
+assets/Lalela Favicon - White on Green.png
+*.apk
+
+/src/generated/prisma

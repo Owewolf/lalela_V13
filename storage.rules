@@ -1,0 +1,141 @@
+rules_version = '2';
+
+// Firebase Storage security rules.
+// Access model mirrors firestore.rules — same helper logic, same role hierarchy.
+// NOTE: Firestore cross-service lookups use the named database "lalela".
+// Actual file uploads are proxied through the Express server → MinIO;
+// these rules act as a hard security backstop.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ───────────────────────────────────────────────────────────────
+    // Helper Functions
+    // ───────────────────────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isHardcodedAdmin() {
+      return isAuthenticated() &&
+             request.auth.token.email != null &&
+             request.auth.token.email == "admin@lalela.net";
+    }
+
+    function isAdmin() {
+      return isHardcodedAdmin() ||
+             (isAuthenticated() &&
+              firestore.exists(/databases/lalela/documents/users/$(request.auth.uid)) &&
+              firestore.get(/databases/lalela/documents/users/$(request.auth.uid)).data.get('role', 'user') in ['admin', 'Admin']);
+    }
+
+    function isCommunityMember(communityId) {
+      return isAuthenticated() && (
+        isHardcodedAdmin() ||
+        firestore.exists(/databases/lalela/documents/communities/$(communityId)/members/$(request.auth.uid)) ||
+        firestore.get(/databases/lalela/documents/communities/$(communityId)).data.owner_id == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    function isCommunityAdmin(communityId) {
+      return isAuthenticated() && (
+        isHardcodedAdmin() ||
+        (
+          firestore.exists(/databases/lalela/documents/communities/$(communityId)/members/$(request.auth.uid)) &&
+          firestore.get(/databases/lalela/documents/communities/$(communityId)/members/$(request.auth.uid)).data.role in ['ADMIN', 'Admin']
+        ) ||
+        firestore.get(/databases/lalela/documents/communities/$(communityId)).data.owner_id == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    function isCommunityModerator(communityId) {
+      return isCommunityAdmin(communityId) || (
+        isAuthenticated() &&
+        firestore.exists(/databases/lalela/documents/communities/$(communityId)/members/$(request.auth.uid)) &&
+        firestore.get(/databases/lalela/documents/communities/$(communityId)/members/$(request.auth.uid)).data.role in ['MODERATOR', 'Moderator']
+      );
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Profile images   →  profiles/{userId}/...
+    // Only the owner (or admin) may write; all authenticated users may read.
+    // ───────────────────────────────────────────────────────────────
+    match /profiles/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Post / notice images  →  posts/{communityId}/{allPaths=**}
+    // Any community member may upload; moderators & admins may delete.
+    // ───────────────────────────────────────────────────────────────
+    match /posts/{communityId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow create, update: if isCommunityMember(communityId);
+      allow delete: if isCommunityModerator(communityId) || isAdmin();
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Chat images  →  chat/{conversationId}/{allPaths=**}
+    // Full participant verification would require another Firestore lookup;
+    // authenticated-only guard is sufficient as a backstop (server enforces
+    // conversation membership before saving the URL).
+    // ───────────────────────────────────────────────────────────────
+    match /chat/{conversationId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Business images  →  businesses/{ownerId}/{allPaths=**}
+    // Only the business owner (or admin) may write.
+    // ───────────────────────────────────────────────────────────────
+    match /businesses/{ownerId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(ownerId) || isAdmin();
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Charity images  →  charities/{communityId}/{allPaths=**}
+    // Only community moderators/admins may write.
+    // ───────────────────────────────────────────────────────────────
+    match /charities/{communityId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isCommunityModerator(communityId) || isAdmin();
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Community branding  →  community/{communityId}/{allPaths=**}
+    // Only community admins/owners may write.
+    // ───────────────────────────────────────────────────────────────
+    match /community/{communityId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isCommunityAdmin(communityId) || isAdmin();
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Emergency media  →  emergency/{communityId}/{allPaths=**}
+    // Community members may upload; moderators/admins may delete.
+    // ───────────────────────────────────────────────────────────────
+    match /emergency/{communityId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow create, update: if isCommunityMember(communityId);
+      allow delete: if isCommunityModerator(communityId) || isAdmin();
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Deny everything else.
+    // ───────────────────────────────────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

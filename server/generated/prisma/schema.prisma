@@ -1,0 +1,553 @@
+// Lalela Platform — PostgreSQL Schema (replaces Firestore)
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  Member
+  Moderator
+  Admin
+  Liaison
+}
+
+enum CommunityType {
+  TRIAL
+  LICENSED
+}
+
+enum CommunityStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum MemberStatus {
+  Active
+  Inactive
+  Banned
+}
+
+enum PostType {
+  notice
+  listing
+  alert
+  event
+  charity
+}
+
+enum PostStatus {
+  Active
+  Pending
+  Resolved
+  Expired
+  Deleted
+}
+
+enum PostUrgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum BusinessStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum CharityStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum ConversationType {
+  direct
+  listing
+  notice
+  marketplace
+  community
+  emergency
+}
+
+enum MessageType {
+  text
+  image
+  audio
+  video
+  file
+  system
+}
+
+enum MessageStatus {
+  sent
+  delivered
+  read
+}
+
+enum NotificationType {
+  message
+  post
+  emergency
+  invitation
+  system
+  charity
+}
+
+enum LicenseStatus {
+  TRIAL
+  LICENSED
+  EXPIRED
+  SUSPENDED
+}
+
+enum Platform {
+  ios
+  android
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id                   String        @id @default(uuid())
+  email                String        @unique
+  phone                String?       @unique
+  password_hash        String?
+  name                 String
+  profile_image        String?
+  email_verified       Boolean       @default(false)
+  phone_verified       Boolean       @default(false)
+  profile_completed    Boolean       @default(false)
+  community_created    Boolean       @default(false)
+  onboarding_complete  Boolean       @default(false)
+  license_status       LicenseStatus @default(TRIAL)
+  license_expiry       DateTime?
+  license_type         String?
+  auto_renew           Boolean       @default(false)
+  two_factor_enabled   Boolean       @default(false)
+  two_factor_method    String?
+  login_alerts_enabled Boolean       @default(true)
+  fcm_token            String?
+  push_token           String?
+  push_platform        Platform?
+  latitude             Float?
+  longitude            Float?
+  location_sharing     Boolean       @default(false)
+  pending_invite_code  String?
+  created_at           DateTime      @default(now())
+  updated_at           DateTime      @updatedAt
+
+  // relations
+  members               CommunityMember[]
+  notifications         Notification[]
+  businesses            Business[]
+  sent_invitations      CommunityInvitation[]     @relation("InvitedBy")
+  received_invitations  CommunityInvitation[]     @relation("InvitedUser")
+  invite_links          CommunityInviteLink[]
+  conversations         ConversationParticipant[]
+  messages              Message[]
+  sessions              UserSession[]
+  audit_logs            AuditLog[]
+  email_tokens          EmailVerificationToken[]
+  otp_codes             OtpCode[]
+  password_reset_tokens PasswordResetToken[]
+  charity_suggestions   CharitySuggestion[]
+  owned_communities     Community[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+// ─── Auth Tokens ──────────────────────────────────────────────────────────────
+
+model EmailVerificationToken {
+  id         String   @id @default(uuid())
+  user_id    String
+  token      String   @unique @default(uuid())
+  expires_at DateTime
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  user_id    String
+  token      String   @unique @default(uuid())
+  expires_at DateTime
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+model OtpCode {
+  id         String   @id @default(uuid())
+  user_id    String?
+  phone      String
+  code       String
+  expires_at DateTime
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([phone])
+}
+
+model BlacklistedEmail {
+  email        String   @id
+  deleted_at   DateTime @default(now())
+  original_uid String?
+}
+
+// ─── Sessions ─────────────────────────────────────────────────────────────────
+
+model UserSession {
+  id            String   @id @default(uuid())
+  user_id       String
+  refresh_token String   @unique
+  device        String?
+  ip            String?
+  location      String?
+  last_active   DateTime @default(now())
+  expires_at    DateTime
+  created_at    DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([refresh_token])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  user_id   String
+  type      String // login, logout, password_change, 2fa_toggle, session_revoke
+  message   String
+  ip        String?
+  status    String   @default("success")
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+// ─── Communities ──────────────────────────────────────────────────────────────
+
+model Community {
+  id                 String          @id @default(uuid())
+  owner_id           String
+  name               String
+  description        String?
+  type               CommunityType   @default(TRIAL)
+  status             CommunityStatus @default(ACTIVE)
+  is_emergency_mode  Boolean         @default(false)
+  coverage_lat       Float?
+  coverage_lng       Float?
+  coverage_radius    Float? // km
+  coverage_location  String?
+  enabled_categories String[]        @default([])
+  license_expiry     DateTime?
+  created_at         DateTime        @default(now())
+  updated_at         DateTime        @updatedAt
+
+  owner               User                  @relation(fields: [owner_id], references: [id])
+  members             CommunityMember[]
+  posts               Post[]
+  charities           Charity[]
+  charity_suggestions CharitySuggestion[]
+  invitations         CommunityInvitation[]
+  invite_links        CommunityInviteLink[]
+  member_locations    MemberLocation[]
+  security_locations  SecurityLocation[]
+
+  @@index([owner_id])
+  @@index([status])
+}
+
+model CommunityMember {
+  id                       String       @id @default(uuid())
+  community_id             String
+  user_id                  String
+  role                     UserRole     @default(Member)
+  status                   MemberStatus @default(Active)
+  joined_at                DateTime     @default(now())
+  license_expiry           DateTime?
+  latitude                 Float?
+  longitude                Float?
+  location_sharing_enabled Boolean      @default(false)
+  is_security_member       Boolean      @default(false)
+
+  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([community_id, user_id])
+  @@index([user_id])
+}
+
+model MemberLocation {
+  id           String   @id @default(uuid())
+  community_id String
+  user_id      String
+  name         String?
+  image        String?
+  role         UserRole @default(Member)
+  latitude     Float
+  longitude    Float
+  timestamp    DateTime @default(now())
+
+  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+
+  @@unique([community_id, user_id])
+}
+
+model SecurityLocation {
+  id           String   @id @default(uuid())
+  community_id String
+  user_id      String
+  name         String?
+  image        String?
+  latitude     Float
+  longitude    Float
+  timestamp    DateTime @default(now())
+
+  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+
+  @@unique([community_id, user_id])
+}
+
+// ─── Posts / Notices ──────────────────────────────────────────────────────────
+
+model Post {
+  id           String      @id @default(uuid())
+  community_id String
+  author_id    String
+  type         PostType
+  category     String?
+  subtype      String?
+  title        String
+  description  String?
+  image_url    String?
+  status       PostStatus  @default(Active)
+  urgency      PostUrgency @default(LOW)
+  latitude     Float?
+  longitude    Float?
+  price        Float?
+  is_charity   Boolean     @default(false)
+  charity_id   String?
+  expires_at   DateTime?
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+
+  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+
+  @@index([community_id])
+  @@index([author_id])
+  @@index([status])
+  @@index([type])
+}
+
+// ─── Charities ────────────────────────────────────────────────────────────────
+
+model Charity {
+  id               String        @id @default(uuid())
+  community_id     String
+  name             String
+  description      String?
+  category         String?
+  percentage       Float         @default(0)
+  latitude         Float?
+  longitude        Float?
+  urgency          PostUrgency?
+  status           CharityStatus @default(ACTIVE)
+  fundraising_goal Float?
+  raised_amount    Float         @default(0)
+  image_url        String?
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+
+  community           Community           @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  charity_suggestions CharitySuggestion[]
+
+  @@index([community_id])
+}
+
+model CharitySuggestion {
+  id             String   @id @default(uuid())
+  community_id   String
+  charity_id     String?
+  suggested_by   String
+  name           String
+  description    String?
+  status         String   @default("pending") // pending, approved, rejected
+  admin_feedback String?
+  reason         String?
+  created_at     DateTime @default(now())
+
+  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  charity   Charity?  @relation(fields: [charity_id], references: [id])
+  user      User      @relation(fields: [suggested_by], references: [id])
+
+  @@index([community_id])
+}
+
+// ─── Businesses ───────────────────────────────────────────────────────────────
+
+model Business {
+  id            String         @id @default(uuid())
+  owner_id      String
+  name          String
+  description   String?
+  category      String
+  status        BusinessStatus @default(ACTIVE)
+  latitude      Float?
+  longitude     Float?
+  address       String?
+  phone         String?
+  website       String?
+  rating        Float?
+  image_url     String?
+  charity_id    String?
+  community_ids String[]       @default([])
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+
+  owner User @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+
+  @@index([owner_id])
+  @@index([status])
+}
+
+// ─── Invitations ──────────────────────────────────────────────────────────────
+
+model CommunityInvitation {
+  id              String           @id @default(uuid())
+  community_id    String
+  invited_by_id   String
+  invited_user_id String?
+  invited_email   String?
+  role            UserRole         @default(Member)
+  status          InvitationStatus @default(PENDING)
+  created_at      DateTime         @default(now())
+  expires_at      DateTime?
+
+  community    Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  invited_by   User      @relation("InvitedBy", fields: [invited_by_id], references: [id])
+  invited_user User?     @relation("InvitedUser", fields: [invited_user_id], references: [id])
+
+  @@index([community_id])
+  @@index([invited_user_id])
+}
+
+model CommunityInviteLink {
+  id           String    @id @default(uuid())
+  community_id String
+  created_by   String
+  code         String    @unique @default(uuid())
+  role         UserRole  @default(Member)
+  uses         Int       @default(0)
+  max_uses     Int?
+  active       Boolean   @default(true)
+  expires_at   DateTime?
+  created_at   DateTime  @default(now())
+
+  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  creator   User      @relation(fields: [created_by], references: [id])
+
+  @@index([code])
+  @@index([community_id])
+}
+
+// ─── Conversations & Messages ─────────────────────────────────────────────────
+
+model Conversation {
+  id              String           @id @default(uuid())
+  type            ConversationType
+  listing_id      String?
+  notice_id       String?
+  community_id    String?
+  last_message    String?
+  last_message_at DateTime?
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([community_id])
+}
+
+model ConversationParticipant {
+  id              String   @id @default(uuid())
+  conversation_id String
+  user_id         String
+  unread_count    Int      @default(0)
+  joined_at       DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([conversation_id, user_id])
+  @@index([user_id])
+}
+
+model Message {
+  id              String        @id @default(uuid())
+  conversation_id String
+  sender_id       String
+  text            String?
+  type            MessageType   @default(text)
+  attachment_url  String?
+  status          MessageStatus @default(sent)
+  read_by         String[]      @default([])
+  created_at      DateTime      @default(now())
+
+  conversation Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [sender_id], references: [id])
+
+  @@index([conversation_id])
+  @@index([sender_id])
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+model Notification {
+  id         String           @id @default(uuid())
+  user_id    String
+  title      String
+  message    String
+  type       NotificationType
+  read       Boolean          @default(false)
+  metadata   Json?
+  created_at DateTime         @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([read])
+}
