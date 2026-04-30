@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "lalela",
-    "slug": "lalela",
+    "slug": "lalela_native",
     "version": "1.1.0",
     "scheme": "lalela",
     "orientation": "portrait",
@@ -73,8 +73,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "c0a7a9d9-412d-44b1-bbda-3c567934a268"
+        "projectId": "075a724b-6463-4bb4-a0eb-68e5202d91b5"
       }
-    }
+    },
+    "owner": "owenwolf"
   }
 }
