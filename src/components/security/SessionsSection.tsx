@@ -54,7 +54,7 @@ export const SessionsSection: React.FC = () => {
     setIsRevokingAll(true);
     try {
       await accountService.revokeAllOtherSessions();
-      setSessions((prev) => prev.filter((s) => s.is_current));
+      setSessions((prev) => prev.filter((s) => s.isCurrent));
     } catch (error) {
       console.error('Failed to logout all sessions:', error);
     } finally {
@@ -116,7 +116,7 @@ export const SessionsSection: React.FC = () => {
                       <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a1a' }}>
                         {session.device || 'Unknown Device'}
                       </Text>
-                      {session.is_current && (
+                      {session.isCurrent && (
                         <View style={{ backgroundColor: 'rgba(16,185,129,0.1)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(16,185,129,0.2)' }}>
                           <Text style={{ fontSize: 9, fontWeight: '800', color: '#059669', textTransform: 'uppercase' }}>Current</Text>
                         </View>
@@ -132,12 +132,12 @@ export const SessionsSection: React.FC = () => {
                         <Text style={{ fontSize: 10, color: '#9ca3af' }}>{session.ip || '—'}</Text>
                       </View>
                       <Text style={{ fontSize: 10, color: '#9ca3af' }}>
-                        {new Date(session.last_active).toLocaleTimeString()}
+                        {new Date(session.lastActive).toLocaleTimeString()}
                       </Text>
                     </View>
                   </View>
                 </View>
-                {!session.is_current && (
+                {!session.isCurrent && (
                   <TouchableOpacity
                     onPress={() => handleLogoutSession(session.id)}
                     style={{ padding: 10, borderRadius: 12, backgroundColor: 'rgba(239,68,68,0.08)', marginLeft: 8 }}

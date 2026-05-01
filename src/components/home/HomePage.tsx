@@ -181,15 +181,15 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   const handleOpenContextChat = useCallback(
     async (post: CommunityNotice) => {
-      if (!userProfile?.id || !post.author_id) return;
+      if (!userProfile?.id || !post.authorId) return;
 
       try {
-        const participantSet = new Set((members || []).map((m) => m.user_id));
-        if (post.author_id) participantSet.add(post.author_id);
+        const participantSet = new Set((members || []).map((m) => m.userId));
+        if (post.authorId) participantSet.add(post.authorId);
         participantSet.add(userProfile?.id);
         const participants =
           post.type === 'listing'
-            ? Array.from(new Set([userProfile?.id, post.author_id]))
+            ? Array.from(new Set([userProfile?.id, post.authorId]))
             : Array.from(participantSet);
 
         const conversationId = await startConversation({
@@ -200,16 +200,16 @@ export const HomePage: React.FC<HomePageProps> = ({
           noticeId: post.type === 'notice' ? post.id : undefined,
           metadata: {
             title: post.title,
-            image: post.posts_image || undefined,
+            image: post.postsImage || undefined,
             price: post.type === 'listing' ? post.price?.toString() : undefined,
             description: post.description,
             author: post.authorName,
             authorImage: post.authorImage,
-            authorId: post.author_id,
+            authorId: post.authorId,
             authorRole: post.authorRole,
             location: post.locationName,
             urgency: post.urgency,
-            urgencyLevel: post.urgency_level,
+            urgencyLevel: post.urgencyLevel,
           },
         });
 
@@ -258,11 +258,11 @@ export const HomePage: React.FC<HomePageProps> = ({
           (p) =>
             p.type === 'notice' &&
             p.urgency !== 'emergency' &&
-            p.urgency_level !== 'emergency'
+            p.urgencyLevel !== 'emergency'
         )
         .sort((a, b) => {
-          const pA = getUrgencyPriority(a.urgency_level, a.urgency);
-          const pB = getUrgencyPriority(b.urgency_level, b.urgency);
+          const pA = getUrgencyPriority(a.urgencyLevel, a.urgency);
+          const pB = getUrgencyPriority(b.urgencyLevel, b.urgency);
           if (pA !== pB) return pB - pA;
           return (
             new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
@@ -310,20 +310,20 @@ export const HomePage: React.FC<HomePageProps> = ({
   const totalCollectedAmount = useMemo(() => {
     return approvedPublicCharityListings.reduce((sum, listing) => {
       if (
-        typeof listing.charity_amount === 'number' &&
-        Number.isFinite(listing.charity_amount)
+        typeof listing.charityAmount === 'number' &&
+        Number.isFinite(listing.charityAmount)
       ) {
-        return sum + Math.max(0, listing.charity_amount);
+        return sum + Math.max(0, listing.charityAmount);
       }
       const base =
-        typeof listing.community_price === 'number'
-          ? listing.community_price
+        typeof listing.communityPrice === 'number'
+          ? listing.communityPrice
           : typeof listing.price === 'number'
           ? listing.price
           : 0;
       const pub =
-        typeof listing.public_price === 'number'
-          ? listing.public_price
+        typeof listing.publicPrice === 'number'
+          ? listing.publicPrice
           : typeof listing.price === 'number'
           ? listing.price
           : base;
@@ -374,7 +374,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   useEffect(() => {
     const hasEmergencyPost = posts.some(
-      (p) => p.urgency === 'emergency' || p.urgency_level === 'emergency'
+      (p) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
     );
     
     const isEmergency = hasEmergencyPost || !!currentCommunity?.isEmergencyMode;
@@ -383,7 +383,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
     if (isEmergency) {
       const latest = posts.find(
-        (p) => p.urgency === 'emergency' || p.urgency_level === 'emergency'
+        (p) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
       );
       if (latest?.latitude && latest?.longitude) {
         setMapCenter({ latitude: latest.latitude, longitude: latest.longitude });
@@ -479,13 +479,13 @@ export const HomePage: React.FC<HomePageProps> = ({
   const renderNoticeCard = ({ item: notice }: { item: CommunityNotice }) => {
     const isEmergencyOrWarning =
       notice.urgency === 'emergency' ||
-      notice.urgency_level === 'emergency' ||
-      notice.urgency_level === 'warning' ||
+      notice.urgencyLevel === 'emergency' ||
+      notice.urgencyLevel === 'warning' ||
       notice.urgency === 'high';
 
-    const borderColor = urgencyBorderColor(notice.urgency_level, notice.urgency);
-    const bgColor = urgencyBgColor(notice.urgency_level, notice.urgency);
-    const textColor = urgencyTextColor(notice.urgency_level, notice.urgency);
+    const borderColor = urgencyBorderColor(notice.urgencyLevel, notice.urgency);
+    const bgColor = urgencyBgColor(notice.urgencyLevel, notice.urgency);
+    const textColor = urgencyTextColor(notice.urgencyLevel, notice.urgency);
     const dist = calculateDistance(notice.latitude, notice.longitude);
 
     return (
@@ -502,7 +502,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               height={160}
               isEmergencyActive={
                 notice.urgency === 'emergency' ||
-                notice.urgency_level === 'emergency'
+                notice.urgencyLevel === 'emergency'
               }
               showFilters={false}
               showLegend={false}
@@ -516,14 +516,14 @@ export const HomePage: React.FC<HomePageProps> = ({
               style={{
                 backgroundColor:
                   notice.urgency === 'emergency' ||
-                  notice.urgency_level === 'emergency'
+                  notice.urgencyLevel === 'emergency'
                     ? '#dc2626'
                     : '#f59e0b',
               }}
             >
               <Text className="text-white text-[8px] font-bold uppercase tracking-widest">
                 {notice.urgency === 'emergency' ||
-                notice.urgency_level === 'emergency'
+                notice.urgencyLevel === 'emergency'
                   ? 'Live Situation'
                   : 'Warning Zone'}
               </Text>
@@ -532,10 +532,10 @@ export const HomePage: React.FC<HomePageProps> = ({
         )}
 
         {/* Attached image (non-emergency) layout at top */}
-        {notice.posts_image && !isEmergencyOrWarning && (
+        {notice.postsImage && !isEmergencyOrWarning && (
           <View className="w-full aspect-video border-b border-gray-200/30 overflow-hidden">
             <Image
-              source={{ uri: notice.posts_image }}
+              source={{ uri: notice.postsImage }}
               className="w-full h-full"
               resizeMode="cover"
             />
@@ -566,10 +566,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                   className="absolute right-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
                   style={{ top: 36 }}
                 >
-                  {(notice.author_id === userProfile?.id ||
+                  {(notice.authorId === userProfile?.id ||
                     currentCommunity?.userRole === 'Admin') && (
                     <>
-                      {notice.author_id === userProfile?.id && (
+                      {notice.authorId === userProfile?.id && (
                         <TouchableOpacity
                           activeOpacity={0.7}
                           onPress={() => {
@@ -620,7 +620,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               style={{ borderColor, backgroundColor: `${textColor}15` }}
             >
               <UrgencyIcon
-                level={notice.urgency_level}
+                level={notice.urgencyLevel}
                 urgency={notice.urgency}
                 size={10}
               />
@@ -628,7 +628,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 className="text-[9px] font-black uppercase tracking-widest"
                 style={{ color: textColor }}
               >
-                {notice.urgency_level || notice.urgency || 'Info'}
+                {notice.urgencyLevel || notice.urgency || 'Info'}
               </Text>
             </View>
 
@@ -681,7 +681,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </View>
             <View className="flex-row items-center gap-1">
               {(notice.urgency === 'emergency' ||
-                notice.urgency_level === 'emergency' ||
+                notice.urgencyLevel === 'emergency' ||
                 notice.priority === 'emergency') && (
                 <TouchableOpacity
                   activeOpacity={0.7}
@@ -711,10 +711,10 @@ export const HomePage: React.FC<HomePageProps> = ({
       : null;
 
     const localPrice = listing.price ?? 0;
-    const publicPrice = listing.public_price ?? 0;
+    const publicPrice = listing.publicPrice ?? 0;
     const hasPublicPrice =
       listing.isPublic === true &&
-      listing.public_price != null &&
+      listing.publicPrice != null &&
       listing.price != null &&
       publicPrice > localPrice;
 
@@ -725,9 +725,9 @@ export const HomePage: React.FC<HomePageProps> = ({
         key={listing.id}
         className="flex-1 mx-0.5 mb-3 bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden"
       >
-        {typeof listing.posts_image === 'string' && listing.posts_image.trim().length > 0 && (
+        {typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0 && (
           <Image 
-            source={{ uri: listing.posts_image }} 
+            source={{ uri: listing.postsImage }} 
             className="w-full h-24 bg-gray-100" 
             resizeMode="cover" 
           />
@@ -1105,7 +1105,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             onOpenEmergencyHub={() => {
               const latest = posts.find(
                 (p) =>
-                  p.urgency === 'emergency' || p.urgency_level === 'emergency'
+                  p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
               );
               if (latest) openEmergencyHub(latest);
             }}

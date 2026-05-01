@@ -31,7 +31,7 @@ export async function getPublicCommunities() {
   const businessCounts = await Promise.all(
     communities.map((c) =>
       prisma.business
-        .count({ where: { community_ids: { has: c.id }, status: 'ACTIVE' } })
+        .count({ where: { communityIds: { has: c.id }, status: 'ACTIVE' } })
         .then((count) => ({ id: c.id, count }))
     )
   );
@@ -39,17 +39,17 @@ export async function getPublicCommunities() {
   const bizMap = Object.fromEntries(businessCounts.map((b) => [b.id, b.count]));
 
   return communities
-    .filter((c) => c.coverage_lat && c.coverage_lng)
+    .filter((c) => c.coverageLat && c.coverageLng)
     .map((c) => ({
       id: c.id,
       name: c.name,
       type: c.type,
       status: c.status,
       coverageArea: {
-        latitude: c.coverage_lat,
-        longitude: c.coverage_lng,
-        radius: c.coverage_radius,
-        location_name: c.coverage_location,
+        latitude: c.coverageLat,
+        longitude: c.coverageLng,
+        radius: c.coverageRadius,
+        location_name: c.coverageLocation,
       },
       memberCount: c._count.members,
       listingCount: c._count.posts,

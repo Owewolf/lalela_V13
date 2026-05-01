@@ -49,10 +49,10 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
 
   const isChatDisabled =
     userProfile?.status === 'READ-ONLY' ||
-    (userProfile?.license_type === 'COMMUNITY_GRANTED' &&
-      userProfile?.license_status === 'UNLICENSED' &&
-      userProfile?.member_expiry_date &&
-      new Date(userProfile.member_expiry_date) < new Date());
+    (userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
+      userProfile?.licenseStatus === 'UNLICENSED' &&
+      userProfile?.memberExpiryDate &&
+      new Date(userProfile.memberExpiryDate) < new Date());
 
   useEffect(() => {
     setActiveConversation(conversationId);
@@ -64,17 +64,17 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
 
   const otherId = chat?.otherParticipant?.id ?? chat?.participants?.find((p, i) => i === 1);
   const member = useMemo(
-    () => members.find((m) => m.user_id === otherId),
+    () => members.find((m) => m.userId === otherId),
     [members, otherId]
   );
 
   const memberPosts = useMemo(() => {
     if (!otherId) return [];
-    return posts.filter((p) => p.author_id === otherId);
+    return posts.filter((p) => p.authorId === otherId);
   }, [posts, otherId]);
 
   const hasBusiness = useMemo(
-    () => (otherId ? communityBusinesses.some((b) => b.owner_id === otherId) : false),
+    () => (otherId ? communityBusinesses.some((b) => b.ownerId === otherId) : false),
     [communityBusinesses, otherId]
   );
 
@@ -87,9 +87,9 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
     member?.name ||
     chat?.otherParticipant?.name ||
     'Conversation';
-  const image = member?.image || chat?.otherParticipant?.profile_image;
+  const image = member?.image || chat?.otherParticipant?.profileImage;
   const directPhone =
-    chat?.otherParticipant?.mobile_number ||
+    chat?.otherParticipant?.mobileNumber ||
     chat?.otherParticipant?.phone ||
     null;
   const role = member?.role || 'Member';

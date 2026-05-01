@@ -100,7 +100,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
 
     if (currentCommunity?.coverageArea) {
       return {
-        address: currentCommunity.coverageArea.location_name,
+        address: currentCommunity.coverageArea.locationName,
         latitude: String(currentCommunity.coverageArea.latitude),
         longitude: String(currentCommunity.coverageArea.longitude),
       };
@@ -278,7 +278,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
       contactPhone: contactPhone.trim() || undefined,
       contactEmail: contactEmail.trim() || undefined,
       image,
-      owner_id: business?.owner_id ?? userProfile.id,
+      ownerId: business?.ownerId ?? userProfile.id,
       communityIds,
       status: isActive ? 'ACTIVE' as const : 'INACTIVE' as const,
       subcategory: business?.subcategory,

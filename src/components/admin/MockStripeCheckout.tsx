@@ -71,9 +71,8 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
         await licenseCommunity(targetId);
       } else if (type === 'membership') {
         await updateUserProfile({
-          license_type: 'SELF',
-          license_status: 'LICENSED',
-          status: 'ACTIVE',
+          licenseType: 'SELF',
+          licenseStatus: 'LICENSED',
         } as any);
       }
       await accountService.simulateSuccessfulPayment(type, targetId);

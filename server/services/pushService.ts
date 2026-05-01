@@ -190,10 +190,10 @@ export async function sendPushToUser(
   const { default: db } = await import('../db.js') as unknown as { default: import('../generated/prisma/index.js').PrismaClient };
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { push_token: true, push_platform: true },
+    select: { pushToken: true, pushPlatform: true },
   });
 
-  if (!user?.push_token || !user.push_platform) return; // no token registered
+  if (!user?.pushToken || !user.pushPlatform) return; // no token registered
 
-  await sendPush(user.push_token, user.push_platform as 'ios' | 'android', payload);
+  await sendPush(user.pushToken, user.pushPlatform as 'ios' | 'android', payload);
 }

@@ -35,7 +35,7 @@ export default function JoinRoute() {
         return;
       }
 
-      if (user && userProfile?.profile_completed) {
+      if (user && userProfile?.profileCompleted) {
         // Existing onboarded user — join silently, then drop back to tabs
         try {
           await joinViaInviteLink(inviteCode);

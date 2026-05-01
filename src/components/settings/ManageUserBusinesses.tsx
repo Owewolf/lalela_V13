@@ -27,7 +27,7 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
 
   const getCommunityNames = (business: UserBusiness) => {
     return communities
-      .filter((community) => business.communityIds.includes(community.id))
+      .filter((community) => (business.communityIds ?? []).includes(community.id))
       .map((community) => community.name);
   };
 

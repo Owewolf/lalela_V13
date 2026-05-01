@@ -8,7 +8,7 @@ export default function AdminScreen() {
   const { userProfile } = useAuth();
   const AdminDashboard = require('../src/components/admin/AdminDashboard').default;
 
-  const isOwner = currentCommunity?.owner_id === userProfile?.id;
+  const isOwner = currentCommunity?.ownerId === userProfile?.id;
   const canAccess =
     isOwner ||
     currentCommunity?.userRole === 'Admin' ||

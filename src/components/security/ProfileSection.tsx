@@ -32,7 +32,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
     name: userProfile?.name || '',
     phone: userProfile?.phone || '',
     address: userProfile?.address || userProfile?.defaultLocation?.name || '',
-    profile_image: userProfile?.profile_image || '',
+    profileImage: userProfile?.profileImage || '',
     defaultLocation: userProfile?.defaultLocation || { name: '', latitude: 0, longitude: 0 },
   });
 
@@ -42,7 +42,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
         name: userProfile.name || '',
         phone: userProfile.phone || '',
         address: userProfile.address || userProfile.defaultLocation?.name || '',
-        profile_image: userProfile.profile_image || '',
+        profileImage: userProfile.profileImage || '',
         defaultLocation: userProfile.defaultLocation || { name: '', latitude: 0, longitude: 0 },
       });
     }
@@ -65,7 +65,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
       setIsUploading(true);
       try {
         // Store URI directly — upload logic can be added later
-        setFormData((prev) => ({ ...prev, profile_image: uri }));
+        setFormData((prev) => ({ ...prev, profileImage: uri }));
       } finally {
         setIsUploading(false);
       }
@@ -79,7 +79,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
       name: userProfile?.name || '',
       phone: userProfile?.phone || '',
       address: userProfile?.address || userProfile?.defaultLocation?.name || '',
-      profile_image: userProfile?.profile_image || '',
+      profileImage: userProfile?.profileImage || '',
       defaultLocation: userProfile?.defaultLocation || { name: '', latitude: 0, longitude: 0 },
     });
   };
@@ -91,7 +91,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
         name: formData.name,
         phone: formData.phone,
         address: formData.address,
-        profile_image: formData.profile_image,
+        profileImage: formData.profileImage,
         defaultLocation: formData.defaultLocation,
       });
       setIsEditing(false);
@@ -104,8 +104,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
     }
   };
 
-  const avatarUri = formData.profile_image
-    ? formData.profile_image
+  const avatarUri = formData.profileImage
+    ? formData.profileImage
     : `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.id}`;
 
   return (

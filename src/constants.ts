@@ -4,10 +4,10 @@ export const APP_LOGO_PATH = '/images/Lalela Favicon - White on Green.png';
 export const APP_LOGO_ALT_PATH = '/images/Lalela Favicon - Green on Transparent.png';
 
 export const POST_SUBTYPE_CONFIG = {
-  emergency: { urgency: 'emergency' as const, urgency_level: 'emergency' as const },
-  warning: { urgency: 'high' as const, urgency_level: 'warning' as const },
-  normal: { urgency: 'normal' as const, urgency_level: 'general' as const },
-  information: { urgency: 'low' as const, urgency_level: 'info' as const },
+  emergency: { urgency: 'emergency' as const, urgencyLevel: 'emergency' as const },
+  warning: { urgency: 'high' as const, urgencyLevel: 'warning' as const },
+  normal: { urgency: 'normal' as const, urgencyLevel: 'general' as const },
+  information: { urgency: 'low' as const, urgencyLevel: 'info' as const },
 } as const;
 
 export const BUSINESS_CATEGORIES = [

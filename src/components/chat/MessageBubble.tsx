@@ -19,7 +19,7 @@ const AVATAR_GUTTER = 40;
 const SENDER_NAME_COLORS = ['#d81b60', '#00897b', '#5e35b1', '#ef6c00', '#1565c0', '#2e7d32'];
 
 const getSenderNameColor = (message: Message) => {
-  const seed = message.senderId || message.senderName || 'sender';
+  const seed = message.userId || message.senderName || 'sender';
   let hash = 0;
   for (let index = 0; index < seed.length; index += 1) {
     hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
@@ -36,7 +36,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   conversationType,
 }) => {
   const { userProfile } = useAuth();
-  const isMe = message.senderId === userProfile?.id;
+  const isMe = message.userId === userProfile?.id;
   const isDirectConversation = conversationType === 'direct';
   const firstInCluster = isFirstInCluster ?? !isSequential;
   const middleInCluster = isMiddleInCluster ?? false;
@@ -46,7 +46,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const isListingIntro = !!message.isListingIntro;
   const senderInitial = (message.senderName || '?').charAt(0).toUpperCase();
   const senderNameColor = getSenderNameColor(message);
-  const imageCaption = (message.text || '').trim();
+  const imageCaption = (message.content || '').trim();
   const showImageCaption = imageCaption.length > 0 && imageCaption.toLowerCase() !== 'photo';
 
   const rowTopSpacing = firstInCluster ? 6 : 2;
@@ -64,7 +64,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       <View className="flex-row justify-center my-3">
         <View className="bg-[#e9edef] px-4 py-1.5 rounded-full border border-[#d7dde0]">
           <Text className="text-[10px] font-bold text-[#54656f] uppercase tracking-widest">
-            {message.text}
+            {message.content}
           </Text>
         </View>
       </View>
@@ -130,14 +130,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               </View>
             )}
 
-            {message.messageType === 'image' && message.attachment_url ? (
+            {message.messageType === 'image' && message.attachmentUrl ? (
               <>
                 <TouchableOpacity
-                  onPress={() => message.attachment_url && Linking.openURL(message.attachment_url)}
+                  onPress={() => message.attachmentUrl && Linking.openURL(message.attachmentUrl)}
                   activeOpacity={0.85}
                 >
                   <Image
-                    source={{ uri: message.attachment_url }}
+                    source={{ uri: message.attachmentUrl }}
                     className="w-60 h-44"
                     resizeMode="cover"
                   />
@@ -156,7 +156,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                     paddingBottom: 1,
                   }}
                 >
-                  {message.text}
+                  {message.content}
                 </Text>
                 <View
                   className="flex-row items-center justify-end gap-0.5"

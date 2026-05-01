@@ -106,7 +106,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
         longitude: b.longitude,
         rating: b.rating,
         category: b.category || selectedCategories[0],
-        description: null,
+        description: undefined,
         phone: b.phone,
         website: b.website,
         status: 'Open' as const,
@@ -137,12 +137,15 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
       const toImport = results
         .filter(r => selectedIds.has(r.id))
         .map(r => ({
-          ...r,
-          id: `biz_${Math.random().toString(36).substr(2, 9)}`,
-          source: 'GOOGLE',
-          isVerified: true,
-          isFeatured: false,
-          status: 'Open' as const,
+          name: r.name,
+          category: r.category,
+          description: r.description ?? undefined,
+          address: r.address ?? undefined,
+          latitude: r.latitude ?? undefined,
+          longitude: r.longitude ?? undefined,
+          phone: (r as any).phone ?? undefined,
+          website: (r as any).website ?? undefined,
+          image_url: r.image ?? undefined,
         }));
 
       await bulkAddCommunityBusinesses(currentCommunity.id, toImport);

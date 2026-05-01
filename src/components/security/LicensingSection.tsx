@@ -11,10 +11,10 @@ export const LicensingSection: React.FC = () => {
 
   const isOverallLicensed = communities.some((c) => c.type === 'LICENSED');
   const isExpiredInvitedMember =
-    userProfile?.license_type === 'COMMUNITY_GRANTED' &&
-    userProfile?.license_status === 'UNLICENSED' &&
-    userProfile?.member_expiry_date &&
-    new Date(userProfile.member_expiry_date) < new Date();
+    userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
+    userProfile?.licenseStatus === 'UNLICENSED' &&
+    userProfile?.memberExpiryDate &&
+    new Date(userProfile.memberExpiryDate) < new Date();
 
   const overallStatus = isExpiredInvitedMember
     ? 'Expired Member'
@@ -36,9 +36,9 @@ export const LicensingSection: React.FC = () => {
 
   const getCommunityStatus = (community: any) => {
     const now = new Date();
-    const trialEndDate = community.trial_end_date instanceof Date
-      ? community.trial_end_date
-      : new Date(community.trial_end_date);
+    const trialEndDate = community.trialEndDate instanceof Date
+      ? community.trialEndDate
+      : new Date(community.trialEndDate);
 
     if (community.type === 'LICENSED') return { label: 'Licensed', color: '#10b981', bg: 'rgba(16,185,129,0.1)' };
     if (trialEndDate < now) return { label: 'Expired', color: '#ef4444', bg: 'rgba(239,68,68,0.1)' };
@@ -162,7 +162,7 @@ export const LicensingSection: React.FC = () => {
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
                     <Calendar size={12} color="#6b7280" />
                     <Text style={{ fontSize: 10, fontWeight: '700', color: '#6b7280' }}>
-                      Ends: {formatTrialDate(community.trial_end_date)}
+                      Ends: {formatTrialDate(community.trialEndDate)}
                     </Text>
                   </View>
                 )}

@@ -13,22 +13,22 @@ router.get('/me', async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
     select: {
-      id: true, email: true, name: true, first_name: true, last_name: true,
-      phone: true, mobile_number: true, address: true, profile_image: true,
-      email_verified: true, phone_verified: true, status: true, role: true,
-      profile_completed: true, community_created: true, onboarding_complete: true,
-      license_status: true, license_expiry: true, license_type: true, auto_renew: true,
-      access_type: true, expiry_date: true, member_expiry_date: true,
-      two_factor_enabled: true, two_factor_method: true, login_alerts_enabled: true,
-      profile_visibility: true, pii_visibility: true,
-      last_password_changed: true, security_score: true,
-      location_sharing: true, is_security_member: true, emergency_location_opt_in: true,
-      latitude: true, longitude: true, last_community_id: true,
-      agreed_to_terms: true, marketing_consent: true,
-      notification_preferences: true,
-      fcm_token: true, push_token: true, push_platform: true,
-      pending_invite_code: true,
-      created_at: true, updated_at: true,
+      id: true, email: true, name: true, firstName: true, lastName: true,
+      phone: true, mobileNumber: true, address: true, profileImage: true,
+      emailVerified: true, phoneVerified: true, status: true, role: true,
+      profileCompleted: true, communityCreated: true, onboardingComplete: true,
+      licenseStatus: true, licenseExpiry: true, licenseType: true, autoRenew: true,
+      accessType: true, expiryDate: true, memberExpiryDate: true,
+      twoFactorEnabled: true, twoFactorMethod: true, loginAlertsEnabled: true,
+      profileVisibility: true, piiVisibility: true,
+      lastPasswordChanged: true, securityScore: true,
+      locationSharing: true, isSecurityMember: true, emergencyLocationOptIn: true,
+      latitude: true, longitude: true, lastCommunityId: true,
+      agreedToTerms: true, marketingConsent: true,
+      notificationPreferences: true,
+      fcmToken: true, pushToken: true, pushPlatform: true,
+      pendingInviteCode: true,
+      createdAt: true, updatedAt: true,
     },
   });
   if (!user) return res.status(404).json({ error: 'User not found' });
@@ -38,7 +38,7 @@ router.get('/me', async (req, res) => {
       ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
       : undefined;
   // Normalize DB column name (onboarding_complete) to client field name (onboarding_completed)
-  return res.json({ ...user, onboarding_completed: user.onboarding_complete, defaultLocation });
+  return res.json({ ...user, onboardingCompleted: user.onboardingComplete, defaultLocation });
 });
 
 router.put('/me', async (req, res) => {
@@ -50,26 +50,26 @@ router.put('/me', async (req, res) => {
   }
 
   const allowed = [
-    'name', 'first_name', 'last_name', 'phone', 'mobile_number', 'address',
-    'profile_image', 'latitude', 'longitude', 'location_sharing',
-    'is_security_member', 'emergency_location_opt_in', 'last_community_id',
-    'profile_completed', 'onboarding_complete', 'community_created',
-    'two_factor_enabled', 'two_factor_method', 'login_alerts_enabled',
-    'profile_visibility', 'pii_visibility', 'last_password_changed', 'security_score',
-    'agreed_to_terms', 'marketing_consent', 'notification_preferences',
-    'license_status', 'license_expiry', 'license_type', 'auto_renew',
-    'access_type', 'expiry_date', 'member_expiry_date',
-    'pending_invite_code', 'fcm_token',
+    'name', 'firstName', 'lastName', 'phone', 'mobileNumber', 'address',
+    'profileImage', 'latitude', 'longitude', 'locationSharing',
+    'isSecurityMember', 'emergencyLocationOptIn', 'lastCommunityId',
+    'profileCompleted', 'onboardingComplete', 'communityCreated',
+    'twoFactorEnabled', 'twoFactorMethod', 'loginAlertsEnabled',
+    'profileVisibility', 'piiVisibility', 'lastPasswordChanged', 'securityScore',
+    'agreedToTerms', 'marketingConsent', 'notificationPreferences',
+    'licenseStatus', 'licenseExpiry', 'licenseType', 'autoRenew',
+    'accessType', 'expiryDate', 'memberExpiryDate',
+    'pendingInviteCode', 'fcmToken',
   ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in req.body) data[key] = req.body[key];
   }
   // Accept onboarding_completed (client alias) → map to onboarding_complete (DB column)
-  if ('onboarding_completed' in req.body) data['onboarding_complete'] = req.body['onboarding_completed'];
+  if ('onboardingCompleted' in req.body) data['onboardingComplete'] = req.body['onboardingCompleted'];
 
   // Guard: profile_completed can only be set to true if a location is provided
-  if (data['profile_completed'] === true) {
+  if (data['profileCompleted'] === true) {
     const current = await prisma.user.findUnique({ where: { id: req.auth!.userId }, select: { latitude: true, longitude: true, address: true } });
     const hasExistingLocation = current && current.latitude != null && current.longitude != null;
     const hasNewLocation = (req.body.defaultLocation?.latitude && req.body.defaultLocation?.longitude) || (req.body.latitude && req.body.longitude);
@@ -80,11 +80,11 @@ router.put('/me', async (req, res) => {
 
   // Guard: onboarding_complete can only be set to true if profile_completed is already true
   // OR is being set to true in the same request (atomic first-time completion).
-  if (data['onboarding_complete'] === true) {
-    const settingProfileNow = data['profile_completed'] === true;
+  if (data['onboardingComplete'] === true) {
+    const settingProfileNow = data['profileCompleted'] === true;
     if (!settingProfileNow) {
-      const current = await prisma.user.findUnique({ where: { id: req.auth!.userId }, select: { profile_completed: true } });
-      if (!current?.profile_completed) {
+      const current = await prisma.user.findUnique({ where: { id: req.auth!.userId }, select: { profileCompleted: true } });
+      if (!current?.profileCompleted) {
         return res.status(400).json({ error: 'Profile must be completed before finishing onboarding.' });
       }
     }
@@ -97,7 +97,7 @@ router.put('/me', async (req, res) => {
       ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
       : undefined;
   // Normalize the same way GET /me does — client always receives `onboarding_completed`
-  return res.json({ ...user, onboarding_completed: user.onboarding_complete, defaultLocation });
+  return res.json({ ...user, onboardingCompleted: user.onboardingComplete, defaultLocation });
 });
 
 // ─── Push Token ───────────────────────────────────────────────────────────────
@@ -109,7 +109,7 @@ router.put('/me/push-token', async (req, res) => {
   }
   await prisma.user.update({
     where: { id: req.auth!.userId },
-    data: { push_token: token, push_platform: platform as 'ios' | 'android' },
+    data: { pushToken: token, pushPlatform: platform as 'ios' | 'android' },
   });
   return res.json({ message: 'Push token registered' });
 });
@@ -118,16 +118,16 @@ router.put('/me/push-token', async (req, res) => {
 
 router.get('/me/sessions', async (req, res) => {
   const sessions = await prisma.userSession.findMany({
-    where: { user_id: req.auth!.userId },
-    orderBy: { last_active: 'desc' },
-    select: { id: true, device: true, ip: true, location: true, last_active: true, created_at: true },
+    where: { userId: req.auth!.userId },
+    orderBy: { lastActive: 'desc' },
+    select: { id: true, device: true, ip: true, location: true, lastActive: true, createdAt: true },
   });
   return res.json(sessions);
 });
 
 router.delete('/me/sessions/:id', async (req, res) => {
   await prisma.userSession.deleteMany({
-    where: { id: req.params.id, user_id: req.auth!.userId },
+    where: { id: req.params.id, userId: req.auth!.userId },
   });
   return res.json({ message: 'Session revoked' });
 });
@@ -136,7 +136,7 @@ router.delete('/me/sessions', async (req, res) => {
   const { refreshToken } = req.body as { refreshToken?: string };
   // Delete all sessions except the current one (identified by refreshToken)
   await prisma.userSession.deleteMany({
-    where: { user_id: req.auth!.userId, ...(refreshToken ? { refresh_token: { not: refreshToken } } : {}) },
+    where: { userId: req.auth!.userId, ...(refreshToken ? { refreshToken: { not: refreshToken } } : {}) },
   });
   return res.json({ message: 'All other sessions revoked' });
 });
@@ -145,7 +145,7 @@ router.delete('/me/sessions', async (req, res) => {
 
 router.get('/me/security/logs', async (req, res) => {
   const logs = await prisma.auditLog.findMany({
-    where: { user_id: req.auth!.userId },
+    where: { userId: req.auth!.userId },
     orderBy: { timestamp: 'desc' },
     take: 50,
   });
@@ -156,8 +156,8 @@ router.get('/me/security/logs', async (req, res) => {
 
 router.get('/me/notifications', async (req, res) => {
   const notifications = await prisma.notification.findMany({
-    where: { user_id: req.auth!.userId },
-    orderBy: { created_at: 'desc' },
+    where: { userId: req.auth!.userId },
+    orderBy: { createdAt: 'desc' },
     take: 50,
   });
   return res.json(notifications);
@@ -165,7 +165,7 @@ router.get('/me/notifications', async (req, res) => {
 
 router.put('/me/notifications/:id/read', async (req, res) => {
   await prisma.notification.updateMany({
-    where: { id: req.params.id, user_id: req.auth!.userId },
+    where: { id: req.params.id, userId: req.auth!.userId },
     data: { read: true },
   });
   return res.json({ message: 'Marked as read' });
@@ -173,7 +173,7 @@ router.put('/me/notifications/:id/read', async (req, res) => {
 
 router.put('/me/notifications/read-all', async (req, res) => {
   await prisma.notification.updateMany({
-    where: { user_id: req.auth!.userId, read: false },
+    where: { userId: req.auth!.userId, read: false },
     data: { read: true },
   });
   return res.json({ message: 'All notifications marked as read' });

@@ -52,9 +52,9 @@ const SettingsPage: React.FC = () => {
 
   // Sync notification toggle with userProfile changes
   useEffect(() => {
-    const enabled = (userProfile as any)?.notification_preferences?.globalEnabled ?? true;
+    const enabled = (userProfile as any)?.notificationPreferences?.globalEnabled ?? true;
     setGlobalNotificationsEnabled(enabled);
-  }, [(userProfile as any)?.notification_preferences?.globalEnabled]);
+  }, [(userProfile as any)?.notificationPreferences?.globalEnabled]);
 
   const handleNotificationToggle = async (val: boolean) => {
     setGlobalNotificationsEnabled(val);
@@ -66,8 +66,8 @@ const SettingsPage: React.FC = () => {
     }
   };
 
-  const avatarUri = userProfile?.profile_image
-    ? userProfile.profile_image
+  const avatarUri = userProfile?.profileImage
+    ? userProfile.profileImage
     : `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.id}`;
 
   const roleColor = () => {
@@ -79,13 +79,13 @@ const SettingsPage: React.FC = () => {
   };
 
   const hasTrialCommunity = (communities || []).some(
-    (c: any) => c.owner_id === userProfile?.id && c.type === 'TRIAL'
+    (c: any) => c.ownerId === userProfile?.id && c.type === 'TRIAL'
   );
   const canCreateNewCommunity = !hasTrialCommunity;
 
   const rc = roleColor();
 
-  const isLicensed = userProfile?.license_status === 'LICENSED' || currentCommunity?.type === 'LICENSED';
+  const isLicensed = userProfile?.licenseStatus === 'LICENSED' || currentCommunity?.type === 'LICENSED';
   const ringColor = isLicensed ? '#10b981' : '#dc2626';
 
   return (
@@ -197,7 +197,7 @@ const SettingsPage: React.FC = () => {
               <View style={{ backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
                 {(communities || []).map((c, idx) => {
                   const isActive = c.id === currentCommunity?.id;
-                  const isAdminOrMod = c.owner_id === userProfile?.id || c.userRole === 'Admin' || c.userRole === 'Moderator';
+                  const isAdminOrMod = c.ownerId === userProfile?.id || c.userRole === 'Admin' || c.userRole === 'Moderator';
                   return (
                     <TouchableOpacity
                       key={c.id}
@@ -304,7 +304,7 @@ const SettingsPage: React.FC = () => {
         />
 
         {/* ── Community License Card (Only for Trial) ── */}
-        {currentCommunity?.type === 'TRIAL' && (currentCommunity.owner_id === userProfile?.id) && (
+        {currentCommunity?.type === 'TRIAL' && (currentCommunity.ownerId === userProfile?.id) && (
           <View style={{ backgroundColor: '#1e5667', borderRadius: 24, padding: 20, gap: 16 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text style={{ fontSize: 18, fontWeight: '800', color: '#fff', flex: 1 }} numberOfLines={1}>

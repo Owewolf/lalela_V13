@@ -30,14 +30,14 @@ export const Header: React.FC<HeaderProps> = ({
   const { userProfile } = useAuth();
 
   const userRole = currentCommunity?.userRole || 'Member';
-  const isLicensed = userProfile?.license_status === 'LICENSED' || currentCommunity?.type === 'LICENSED';
+  const isLicensed = userProfile?.licenseStatus === 'LICENSED' || currentCommunity?.type === 'LICENSED';
   const ringColor = isLicensed ? '#10b981' : '#dc2626';
   const isReadOnly =
     userProfile?.status === 'READ-ONLY' ||
-    (userProfile?.license_type === 'COMMUNITY_GRANTED' &&
-      userProfile?.license_status === 'UNLICENSED' &&
-      userProfile?.member_expiry_date &&
-      new Date(userProfile.member_expiry_date) < new Date());
+    (userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
+      userProfile?.licenseStatus === 'UNLICENSED' &&
+      userProfile?.memberExpiryDate &&
+      new Date(userProfile.memberExpiryDate) < new Date());
 
   const unreadCount = notifications.filter((n: any) => !n.read).length;
 
@@ -96,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
   const typeBadgeBorder = communityType === 'LICENSED' ? '#ffddb9' : '#fde68a';
 
   const profileImageUri =
-    userProfile?.profile_image ||
+    userProfile?.profileImage ||
     `https://picsum.photos/seed/${userProfile?.id ?? 'user'}/100/100`;
 
   return (

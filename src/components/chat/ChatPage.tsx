@@ -57,16 +57,16 @@ export const ChatPage: React.FC = () => {
 
   // Build enriched member list
   const enrichedMembers = useMemo(() => {
-    const otherMembers = members.filter((m) => m.user_id !== userProfile?.id);
+    const otherMembers = members.filter((m) => m.userId !== userProfile?.id);
 
-    const businessOwnerIds = new Set(communityBusinesses.map((b) => b.owner_id));
-    const responderIds = new Set(securityResponders.map((r) => r.user_id));
+    const businessOwnerIds = new Set(communityBusinesses.map((b) => b.ownerId));
+    const responderIds = new Set(securityResponders.map((r) => r.userId));
     const authorPostMap = new Map<string, string>();
     for (const p of posts) {
-      if (!p.author_id) continue;
-      const existing = authorPostMap.get(p.author_id);
+      if (!p.authorId) continue;
+      const existing = authorPostMap.get(p.authorId);
       if (!existing || p.timestamp > existing) {
-        authorPostMap.set(p.author_id, p.timestamp);
+        authorPostMap.set(p.authorId, p.timestamp);
       }
     }
 
@@ -111,7 +111,7 @@ export const ChatPage: React.FC = () => {
     }
 
     return otherMembers.map((m) => {
-      const info = unreadInfoMap.get(m.user_id) || {
+      const info = unreadInfoMap.get(m.userId) || {
         direct: 0,
         listing: 0,
         notice: 0,
@@ -126,7 +126,7 @@ export const ChatPage: React.FC = () => {
       for (const conv of conversations) {
         if (conv.type === 'community' || conv.type === 'emergency') continue;
         const otherId = conv.participants.find(p => p !== userProfile?.id);
-        if (otherId === m.user_id) {
+        if (otherId === m.userId) {
           if (!lastMessageConv || new Date(conv.lastMessageAt).getTime() > new Date(lastMessageConv.lastMessageAt).getTime()) {
             lastMessageConv = conv;
             lastMessagePreview = conv.lastMessage || '';
@@ -137,11 +137,11 @@ export const ChatPage: React.FC = () => {
 
       return {
         member: m,
-        hasActivePost: authorPostMap.has(m.user_id),
-        hasBusiness: businessOwnerIds.has(m.user_id),
-        isSecurity: m.isSecurityMember || responderIds.has(m.user_id),
-        isEmergencyAuthor: isEmergency && emergencyPost?.author_id === m.user_id,
-        latestActivity: authorPostMap.get(m.user_id) || m.joined_at || '',
+        hasActivePost: authorPostMap.has(m.userId),
+        hasBusiness: businessOwnerIds.has(m.userId),
+        isSecurity: m.isSecurityMember || responderIds.has(m.userId),
+        isEmergencyAuthor: isEmergency && emergencyPost?.authorId === m.userId,
+        latestActivity: authorPostMap.get(m.userId) || m.joinedAt || '',
         emergencyDistance:
           isEmergency &&
           emergencyPost?.latitude &&
@@ -215,7 +215,7 @@ export const ChatPage: React.FC = () => {
     if (!userProfile) return;
     try {
       const convId = await startConversation({
-        participants: [userProfile.id, member.user_id],
+        participants: [userProfile.id, member.userId],
         type: 'direct',
         communityId: currentCommunity?.id,
       });
@@ -495,7 +495,7 @@ export const ChatPage: React.FC = () => {
     <View className="flex-1 bg-white">
       <FlatList
         data={sorted}
-        keyExtractor={(item) => item.member.user_id}
+        keyExtractor={(item) => item.member.userId}
         renderItem={renderItem}
         ListHeaderComponent={ListHeaderComponent}
         ListEmptyComponent={ListEmptyComponent}

@@ -64,7 +64,7 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
   }, [resetTrigger]);
 
   const responderIds = useMemo(
-    () => new Set(securityResponders.map((r) => r.user_id)),
+    () => new Set(securityResponders.map((r) => r.userId)),
     [securityResponders],
   );
 
@@ -80,7 +80,7 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
   const visibleMembers = useMemo(
     () =>
       members.filter((m) => {
-        if (responderIds.has(m.user_id)) return false;
+        if (responderIds.has(m.userId)) return false;
         const hasLocation = Number.isFinite(m.latitude) && Number.isFinite(m.longitude);
         return hasLocation;
       }),
@@ -155,7 +155,7 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
         {/* Security responders */}
         {activeResponders.map((responder) => (
           <Marker
-            key={`resp-${responder.user_id}`}
+            key={`resp-${responder.userId}`}
             coordinate={{
               latitude: responder.latitude,
               longitude: responder.longitude,
@@ -186,7 +186,7 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
         {/* Community members with location */}
         {visibleMembers.map((member) => (
           <Marker
-            key={`mem-${member.user_id}`}
+            key={`mem-${member.userId}`}
             coordinate={{
               latitude: member.latitude!,
               longitude: member.longitude!,

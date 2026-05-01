@@ -53,8 +53,8 @@ const getDefaultExpiryDate = () => {
 
 const getInitialExpiryDate = (postSubtype: NoticeSubtype, postToEdit?: CommunityNotice) => {
   if (postSubtype === 'warning') return '';
-  if (!postToEdit?.expires_at) return getDefaultExpiryDate();
-  const expiryDate = new Date(postToEdit.expires_at);
+  if (!postToEdit?.expiresAt) return getDefaultExpiryDate();
+  const expiryDate = new Date(postToEdit.expiresAt);
   return Number.isNaN(expiryDate.getTime()) ? getDefaultExpiryDate() : formatDateInput(expiryDate);
 };
 
@@ -122,10 +122,10 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
   const { userProfile } = useAuth();
 
   const isReadOnly = userProfile?.status === 'READ-ONLY' || (
-    userProfile?.license_type === 'COMMUNITY_GRANTED' &&
-    userProfile?.license_status === 'UNLICENSED' &&
-    userProfile?.member_expiry_date &&
-    (userProfile.member_expiry_date.toDate ? userProfile.member_expiry_date.toDate() : new Date(userProfile.member_expiry_date)) < new Date()
+    userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
+    userProfile?.licenseStatus === 'UNLICENSED' &&
+    userProfile?.memberExpiryDate &&
+    (userProfile.memberExpiryDate.toDate ? userProfile.memberExpiryDate.toDate() : new Date(userProfile.memberExpiryDate)) < new Date()
   );
 
   const [title, setTitle] = useState(postToEdit?.title || '');
@@ -134,7 +134,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
   const [latitude, setLatitude] = useState<number | undefined>(postToEdit?.latitude);
   const [longitude, setLongitude] = useState<number | undefined>(postToEdit?.longitude);
   const [locationSource, setLocationSource] = useState<'profile_default' | 'user_selected' | 'current_location'>(postToEdit?.source || 'profile_default');
-  const [postsImage, setPostsImage] = useState<string>(postToEdit?.posts_image || '');
+  const [postsImage, setPostsImage] = useState<string>(postToEdit?.postsImage || '');
   const [expiresAt, setExpiresAt] = useState(() => getInitialExpiryDate(postSubtype, postToEdit));
   const [isUploading, setIsUploading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -156,7 +156,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
       if (currentCommunity?.coverageArea) {
         setLatitude(currentCommunity.coverageArea.latitude);
         setLongitude(currentCommunity.coverageArea.longitude);
-        setLocationName(currentCommunity.coverageArea.location_name || 'Community Area');
+        setLocationName(currentCommunity.coverageArea.locationName || 'Community Area');
         setLocationSource('profile_default');
       } else if (userProfile?.defaultLocation) {
         setLatitude(userProfile.defaultLocation.latitude);
@@ -221,17 +221,17 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
         description,
         category: 'Community',
         authorName: postToEdit?.authorName || userProfile?.name || 'Community Member',
-        author_id: postToEdit?.author_id || userProfile?.id,
+        authorId: postToEdit?.authorId || userProfile?.id,
         authorRole: postToEdit?.authorRole || (currentCommunity?.userRole || 'Member'),
-        authorImage: postToEdit?.authorImage || userProfile?.profile_image || `https://picsum.photos/seed/${userProfile?.id}/200/200`,
+        authorImage: postToEdit?.authorImage || userProfile?.profileImage || `https://picsum.photos/seed/${userProfile?.id}/200/200`,
         urgency: config.urgency,
-        urgency_level: config.urgency_level,
+        urgencyLevel: config.urgencyLevel,
         locationName,
         latitude,
         longitude,
         source: locationSource,
-        posts_image: postSubtype !== 'warning' ? postsImage : undefined,
-        expires_at: postSubtype === 'warning' ? undefined : expiresAt,
+        postsImage: postSubtype !== 'warning' ? postsImage : undefined,
+        expiresAt: postSubtype === 'warning' ? undefined : expiresAt,
       };
 
       if (postToEdit) {
@@ -342,7 +342,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
                       onPress={() => {
                         setLatitude(currentCommunity.coverageArea!.latitude);
                         setLongitude(currentCommunity.coverageArea!.longitude);
-                        setLocationName(currentCommunity.coverageArea!.location_name || 'Community Area');
+                        setLocationName(currentCommunity.coverageArea!.locationName || 'Community Area');
                         setLocationSource('profile_default');
                       }}
                     >

@@ -142,7 +142,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         latitude: -26.2041,
         longitude: 28.0473,
         radius: 10,
-        location_name: 'Johannesburg Central',
+        locationName: 'Johannesburg Central',
       }
     );
 
@@ -301,7 +301,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             reason: isPromotion ? 'Promoted to moderator' : 'Moderator privileges removed',
           }).catch(console.error);
         }
-        if (selectedMember?.user_id === userId) {
+        if (selectedMember?.userId === userId) {
           setSelectedMember({ ...selectedMember, role });
         }
       } catch (e) {
@@ -311,7 +311,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
     useEffect(() => {
       const loadMemberInsights = async () => {
-        if (!currentCommunity?.id || !selectedMember?.user_id || memberSubView !== 'details') {
+        if (!currentCommunity?.id || !selectedMember?.userId || memberSubView !== 'details') {
           return;
         }
 
@@ -319,9 +319,9 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         try {
           // Load member profile and stats via REST
           const [profileRes, statsRes, historyRes] = await Promise.all([
-            api.get(`/users/${selectedMember.user_id}/profile`).catch(() => ({ data: null })),
-            api.get(`/communities/${currentCommunity.id}/members/${selectedMember.user_id}/stats`).catch(() => ({ data: null })),
-            api.get(`/communities/${currentCommunity.id}/moderation-logs?target_type=user&target_id=${selectedMember.user_id}&limit=5`).catch(() => ({ data: [] })),
+            api.get(`/users/${selectedMember.userId}/profile`).catch(() => ({ data: null })),
+            api.get(`/communities/${currentCommunity.id}/members/${selectedMember.userId}/stats`).catch(() => ({ data: null })),
+            api.get(`/communities/${currentCommunity.id}/moderation-logs?target_type=user&target_id=${selectedMember.userId}&limit=5`).catch(() => ({ data: [] })),
           ]);
 
           setSelectedMemberProfile(profileRes.data ?? null);
@@ -340,7 +340,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       };
 
       loadMemberInsights();
-    }, [currentCommunity?.id, memberSubView, selectedMember?.user_id]);
+    }, [currentCommunity?.id, memberSubView, selectedMember?.userId]);
 
     const handleDeletePost = async (postId: string) => {
       try {
@@ -348,14 +348,14 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         await removePost(postId);
         if (currentCommunity?.id) {
           await api.post(`/communities/${currentCommunity.id}/moderation-logs`, {
-            community_id: currentCommunity.id,
+            communityId: currentCommunity.id,
             moderator_id: currentUserProfile?.id,
             action: 'delete',
             target_id: postId,
             target_type: 'post',
           }).catch(() => {});
-          if (post?.author_id && post.author_id !== currentUserProfile?.id) {
-            await addNotification(post.author_id, {
+          if (post?.authorId && post.authorId !== currentUserProfile?.id) {
+            await addNotification(post.authorId, {
               title: 'Post Removed',
               message: `Your post "${post.title}" has been removed by an admin.`,
               type: 'system',
@@ -372,8 +372,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       try {
         const newStatus = post.status === 'Pinned' ? 'Active' : 'Pinned';
         await updatePost({ ...post, status: newStatus });
-        if (newStatus === 'Pinned' && post.author_id && currentCommunity?.id) {
-          await addNotification(post.author_id, {
+        if (newStatus === 'Pinned' && post.authorId && currentCommunity?.id) {
+          await addNotification(post.authorId, {
             title: 'Post Pinned',
             message: `Your post "${post.title}" has been pinned by an admin.`,
             type: 'system',
@@ -390,7 +390,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       try {
         await updateCommunityBusiness(currentCommunity.id, { ...business, isVerified: true });
         await api.post(`/communities/${currentCommunity.id}/moderation-logs`, {
-          community_id: currentCommunity.id,
+          communityId: currentCommunity.id,
           moderator_id: currentUserProfile?.id,
           action: 'approve',
           target_id: business.id,
@@ -423,7 +423,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       Alert.prompt('Reject Listing', 'Reason for rejection:', async (reason) => {
         if (!reason) return;
         try {
-          await updatePost({ ...post, status: 'Rejected', rejection_reason: reason });
+          await updatePost({ ...post, status: 'Rejected', rejectionReason: reason });
         } catch (e) { console.error('Failed to reject listing:', e); }
       });
     };
@@ -435,7 +435,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         await handleRemoveMember(pendingRemoveMember.id);
         if (currentCommunity?.id && currentUserProfile?.id) {
           await api.post(`/communities/${currentCommunity.id}/moderation-logs`, {
-            community_id: currentCommunity.id,
+            communityId: currentCommunity.id,
             moderator_id: currentUserProfile.id,
             action: 'deactivate',
             target_id: pendingRemoveMember.id,
@@ -455,7 +455,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         await handleDeleteMember(pendingDeleteMember.id);
         if (currentCommunity?.id && currentUserProfile?.id) {
           await api.post(`/communities/${currentCommunity.id}/moderation-logs`, {
-            community_id: currentCommunity.id,
+            communityId: currentCommunity.id,
             moderator_id: currentUserProfile.id,
             action: 'remove',
             target_id: pendingDeleteMember.id,
@@ -547,7 +547,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           <Text style={styles.fieldLabel}>Location Name</Text>
           <GooglePlacesAutocomplete
             ref={coveragePlacesRef as any}
-            placeholder={tempCoverage.location_name || 'e.g. Johannesburg Central'}
+            placeholder={tempCoverage.locationName || 'e.g. Johannesburg Central'}
             fetchDetails
             // @ts-ignore
             scrollEnabled={false}
@@ -555,7 +555,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               const name = data.description;
               const lat = details?.geometry?.location?.lat ?? tempCoverage.latitude;
               const lng = details?.geometry?.location?.lng ?? tempCoverage.longitude;
-              setTempCoverage({ ...tempCoverage, location_name: name, latitude: lat, longitude: lng });
+              setTempCoverage({ ...tempCoverage, locationName: name, latitude: lat, longitude: lng });
             }}
             query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
             textInputProps={{
@@ -718,13 +718,13 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             {members.length > 0 ? (
               members.map((member: any) => (
                 <TouchableOpacity
-                  key={member.user_id}
+                  key={member.userId}
                   style={styles.memberRow}
                   onPress={() => { setSelectedMember(member); setMemberSubView('details'); }}
                   activeOpacity={0.7}
                 >
                   <Image
-                    source={{ uri: member.image || `https://picsum.photos/seed/${member.user_id}/100/100` }}
+                    source={{ uri: member.image || `https://picsum.photos/seed/${member.userId}/100/100` }}
                     style={styles.memberImg}
                   />
                   <View style={{ flex: 1 }}>
@@ -936,17 +936,17 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
     const renderMemberDetails = () => {
       const memberListings = posts
-        .filter((post: any) => post.author_id === selectedMember.user_id && post.status !== 'deleted')
+        .filter((post: any) => post.authorId === selectedMember.userId && post.status !== 'deleted')
         .slice(0, 5);
       const memberSuggestions = charitySuggestions
-        .filter((suggestion: any) => suggestion.suggested_by_id === selectedMember.user_id)
+        .filter((suggestion: any) => suggestion.suggested_by_id === selectedMember.userId)
         .slice(0, 5);
 
       const fallbackInsights = {
-        totalListings: posts.filter((post: any) => post.author_id === selectedMember.user_id && post.type === 'listing').length,
-        totalNotices: posts.filter((post: any) => post.author_id === selectedMember.user_id && post.type === 'notice').length,
-        totalSuggestions: charitySuggestions.filter((suggestion: any) => suggestion.suggested_by_id === selectedMember.user_id).length,
-        activeListings: posts.filter((post: any) => post.author_id === selectedMember.user_id && post.type === 'listing' && post.status === 'Active').length,
+        totalListings: posts.filter((post: any) => post.authorId === selectedMember.userId && post.type === 'listing').length,
+        totalNotices: posts.filter((post: any) => post.authorId === selectedMember.userId && post.type === 'notice').length,
+        totalSuggestions: charitySuggestions.filter((suggestion: any) => suggestion.suggested_by_id === selectedMember.userId).length,
+        activeListings: posts.filter((post: any) => post.authorId === selectedMember.userId && post.type === 'listing' && post.status === 'Active').length,
       };
 
       const insights = {
@@ -954,8 +954,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         ...(selectedMemberStats || {}),
       };
 
-      const joinedDate = selectedMember?.joined_at
-        ? new Date(selectedMember.joined_at).toLocaleDateString()
+      const joinedDate = selectedMember?.joinedAt
+        ? new Date(selectedMember.joinedAt).toLocaleDateString()
         : 'Unknown';
 
       const formatTimestamp = (value: any) => {
@@ -978,7 +978,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
         <View style={[styles.card, { alignItems: 'center' }]}>
           <Image
-            source={{ uri: selectedMember.image || `https://picsum.photos/seed/${selectedMember.user_id}/200/200` }}
+            source={{ uri: selectedMember.image || `https://picsum.photos/seed/${selectedMember.userId}/200/200` }}
             style={styles.profileImg}
           />
           <Text style={[styles.sectionTitle, { marginTop: 12 }]}>{selectedMember.name}</Text>
@@ -996,13 +996,13 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         <View style={styles.card}>
           <Text style={styles.cardLabel}>AUTHORITY CONTROLS</Text>
           {currentCommunity?.userRole === 'Admin' &&
-            selectedMember.user_id !== currentUserProfile?.id &&
+            selectedMember.userId !== currentUserProfile?.id &&
             selectedMember.role !== 'Admin' && (
               <TouchableOpacity
                 style={[styles.controlBtn, { backgroundColor: selectedMember.role === 'Moderator' ? '#f5f3ff' : '#f8fafc' }]}
                 onPress={() =>
                   setPendingRoleChange({
-                    userId: selectedMember.user_id,
+                    userId: selectedMember.userId,
                     userName: selectedMember.name || 'Member',
                     currentRole: selectedMember.role,
                     nextRole: selectedMember.role === 'Moderator' ? 'Member' : 'Moderator',
@@ -1027,7 +1027,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           ) : (
             <View style={{ gap: 8 }}>
               <View style={styles.infoRow}><Text style={styles.infoLabel}>Email</Text><Text style={styles.infoValue}>{selectedMemberProfile?.email || selectedMember.email || 'Not provided'}</Text></View>
-              <View style={styles.infoRow}><Text style={styles.infoLabel}>Phone</Text><Text style={styles.infoValue}>{selectedMemberProfile?.phone || selectedMemberProfile?.mobile_number || 'Not provided'}</Text></View>
+              <View style={styles.infoRow}><Text style={styles.infoLabel}>Phone</Text><Text style={styles.infoValue}>{selectedMemberProfile?.phone || selectedMemberProfile?.mobileNumber || 'Not provided'}</Text></View>
               <View style={styles.infoRow}><Text style={styles.infoLabel}>Address</Text><Text style={styles.infoValue}>{selectedMemberProfile?.address || 'Not provided'}</Text></View>
               <View style={styles.infoRow}><Text style={styles.infoLabel}>Joined</Text><Text style={styles.infoValue}>{joinedDate}</Text></View>
             </View>
@@ -1071,7 +1071,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.memberName} numberOfLines={1}>{item.name}</Text>
-                  <Text style={styles.memberSub}>{formatTimestamp(item.created_at)}</Text>
+                  <Text style={styles.memberSub}>{formatTimestamp(item.createdAt)}</Text>
                 </View>
               </View>
             ))
@@ -1110,7 +1110,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           )}
         </View>
 
-        {selectedMember.user_id !== currentUserProfile?.id && selectedMember.role !== 'Admin' && (
+        {selectedMember.userId !== currentUserProfile?.id && selectedMember.role !== 'Admin' && (
           <View style={[styles.card, { borderColor: '#fef2f2', backgroundColor: '#fff5f5' }]}>
             <View style={styles.dangerHeader}>
               <UserMinus size={20} color={ERROR} />
@@ -1120,13 +1120,13 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.dangerBtn, { backgroundColor: '#fef2f2' }]}
-                onPress={() => setPendingRemoveMember({ id: selectedMember.user_id, name: selectedMember.name || 'Member' })}
+                onPress={() => setPendingRemoveMember({ id: selectedMember.userId, name: selectedMember.name || 'Member' })}
               >
                 <Text style={[styles.dangerBtnText, { color: ERROR }]}>Deactivate</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.dangerBtn, { backgroundColor: ERROR }]}
-                onPress={() => setPendingDeleteMember({ id: selectedMember.user_id, name: selectedMember.name || 'Member' })}
+                onPress={() => setPendingDeleteMember({ id: selectedMember.userId, name: selectedMember.name || 'Member' })}
               >
                 <Text style={[styles.dangerBtnText, { color: '#fff' }]}>Delete</Text>
               </TouchableOpacity>
@@ -1217,7 +1217,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 <View style={{ flex: 1 }}>
                   <Text style={styles.contentTitle} numberOfLines={1}>{notice.title}</Text>
                   <Text style={styles.contentSub}>
-                    {notice.authorName} • {notice.type} • {notice.urgency_level || ''}
+                    {notice.authorName} • {notice.type} • {notice.urgencyLevel || ''}
                   </Text>
                 </View>
                 <View style={styles.contentActions}>

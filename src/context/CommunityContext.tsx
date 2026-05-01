@@ -27,11 +27,11 @@ const CommunityContext = createContext<CommunityContextType | undefined>(undefin
 const EMPTY_COMMUNITY: Community = {
   id: '',
   name: '',
-  owner_id: '',
+  ownerId: '',
   type: 'TRIAL',
-  trial_end_date: null,
+  trialEndDate: null,
   status: 'ACTIVE',
-  coverageArea: { latitude: 0, longitude: 0, radius: 1, location_name: '' },
+  coverageArea: { latitude: 0, longitude: 0, radius: 1, locationName: '' },
 };
 
 const EMPTY_UNREAD: ChatUnreadTotals = {
@@ -47,7 +47,7 @@ function mapServerCommunity(raw: any): Community {
           latitude: raw.coverage_lat,
           longitude: raw.coverage_lng,
           radius: raw.coverage_radius ?? 1,
-          location_name: raw.coverage_location ?? '',
+          locationName: raw.coverage_location ?? '',
         }
       : raw.coverageArea;
   return { ...raw, coverageArea };
@@ -56,9 +56,9 @@ function mapServerCommunity(raw: any): Community {
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { userProfile } = useAuth();
+  const { userProfile, updateUserProfile } = useAuth();
   const userId = userProfile?.id ?? null;
-  const currentCommunityId = userProfile?.last_community_id ?? null;
+  const currentCommunityId = userProfile?.lastCommunityId ?? null;
 
   // ── State ─────────────────────────────────────────────────────────────────
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -128,7 +128,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     loadRef.current = load;
   }, [userId]);
 
-  // If last_community_id is set but not yet in the communities list (e.g. just
+  // If lastCommunityId is set but not yet in the communities list (e.g. just
   // created), re-fetch once to pick it up with the correct userRole.
   useEffect(() => {
     if (!currentCommunityId) return;
@@ -157,7 +157,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         if (membersRes.status === 'fulfilled') setMembers(membersRes.value.data);
         // Live locations from /locations are used only for security responders
         if (locRes.status === 'fulfilled') {
-          const liveLocations: { user_id: string; name: string; image: string; latitude: number; longitude: number; timestamp: string }[] =
+          const liveLocations: { userId: string; name: string; image: string; latitude: number; longitude: number; timestamp: string }[] =
             locRes.value.data?.security ?? [];
           setSecurityResponders(liveLocations);
         }
@@ -165,8 +165,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         if (charitiesRes.status === 'fulfilled') setCharities(charitiesRes.value.data);
         if (bizRes.status === 'fulfilled') {
           const all: UserBusiness[] = bizRes.value.data;
-          setUserBusinesses(all.filter((b) => b.owner_id === userId));
-          setCommunityBusinesses(all.filter((b) => b.communityIds.includes(currentCommunityId!)));
+          setUserBusinesses(all.filter((b) => b.ownerId === userId));
+          setCommunityBusinesses(all.filter((b) => (b.communityIds ?? []).includes(currentCommunityId!)));
         }
       } catch (err) {
         console.error('CommunityContext community load error:', err);
@@ -204,7 +204,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       socket.on('message:new', (msg: Message) => {
         setMessages((prev) => [...prev, msg]);
         setConversations((prev) =>
-          prev.map((c) => c.id === (msg as any).conversationId ? { ...c, last_message: msg } : c)
+          prev.map((c) => c.id === (msg as any).conversationId ? { ...c, lastMessage: msg.content ?? '' } : c)
         );
       });
 
@@ -215,9 +215,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         if (tId !== userId) setIsTyping(false);
       });
 
-      socket.on('location:update', (loc: { user_id: string; name: string; image: string; latitude: number; longitude: number; timestamp: string }) => {
+      socket.on('location:update', (loc: { userId: string; name: string; image: string; latitude: number; longitude: number; timestamp: string }) => {
         setSecurityResponders((prev) => {
-          const filtered = prev.filter((r) => r.user_id !== loc.user_id);
+          const filtered = prev.filter((r) => r.userId !== loc.userId);
           return [...filtered, loc];
         });
       });
@@ -255,7 +255,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   // ── Context methods ───────────────────────────────────────────────────────
 
   const setCurrentCommunity = useCallback(async (id: string) => {
-    await api.put('/users/me', { last_community_id: id });
+    await api.put('/users/me', { lastCommunityId: id });
     if (socketRef.current) {
       if (currentCommunityId) socketRef.current.emit('leave:community', { communityId: currentCommunityId });
       socketRef.current.emit('join:community', { communityId: id });
@@ -269,9 +269,14 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, []);
 
   const licenseCommunity = useCallback(async (communityId: string) => {
-    await api.put(`/communities/${communityId}`, { status: 'ACTIVE' });
-    setCommunities((prev) => prev.map((c) => c.id === communityId ? { ...c, status: 'ACTIVE' } : c));
-  }, []);
+    const { data } = await api.post(`/communities/${communityId}/license`);
+    setCommunities((prev) => prev.map((c) => c.id === communityId
+      ? { ...c, type: 'LICENSED', status: 'ACTIVE', licenseId: data.licenseId }
+      : c
+    ));
+    // Sync the user's licenseStatus locally so the green ring appears immediately
+    await updateUserProfile({ licenseStatus: 'LICENSED', licenseType: 'SELF' } as any);
+  }, [updateUserProfile]);
 
   const updateCommunityCoverage = useCallback(async (communityId: string, coverage: CoverageArea) => {
     await api.put(`/communities/${communityId}`, { coverageArea: coverage });
@@ -285,7 +290,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   // ── Businesses ────────────────────────────────────────────────────────────
   const addCommunityBusiness = useCallback(async (communityId: string, business: Business) => {
-    const { data } = await api.post('/businesses', { ...business, community_id: communityId });
+    const { data } = await api.post('/businesses', { ...business, communityId: communityId });
     setCommunityBusinesses((prev) => [...prev, data]);
   }, []);
 
@@ -302,17 +307,21 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const bulkAddCommunityBusinesses = useCallback(async (communityId: string, businesses: Business[]) => {
     await api.post('/businesses/import', { communityId, businesses });
     const { data } = await api.get('/businesses');
-    setCommunityBusinesses(data.filter((b: UserBusiness) => b.communityIds.includes(communityId)));
+    setCommunityBusinesses(data.filter((b: UserBusiness) => (b.communityIds ?? []).includes(communityId)));
   }, []);
 
   const addUserBusiness = useCallback(async (business: Omit<UserBusiness, 'id'>) => {
     const { data } = await api.post('/businesses', business);
     setUserBusinesses((prev) => [...prev, data]);
-  }, []);
+    if (currentCommunityId && (data.communityIds ?? []).includes(currentCommunityId)) {
+      setCommunityBusinesses((prev) => [...prev, data]);
+    }
+  }, [currentCommunityId]);
 
   const updateUserBusiness = useCallback(async (business: UserBusiness) => {
     const { data } = await api.put(`/businesses/${business.id}`, business);
     setUserBusinesses((prev) => prev.map((b) => b.id === business.id ? data : b));
+    setCommunityBusinesses((prev) => prev.map((b) => b.id === business.id ? data : b));
   }, []);
 
   const removeUserBusiness = useCallback(async (id: string) => {
@@ -343,7 +352,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const deleteCharity = removeCharity;
 
-  const addCharitySuggestion = useCallback(async (suggestion: Omit<CharitySuggestion, 'id' | 'status' | 'created_at'> & { suggested_donation_amount: number }) => {
+  const addCharitySuggestion = useCallback(async (suggestion: Omit<CharitySuggestion, 'id' | 'status' | 'createdAt'> & { suggestedDonationAmount: number }) => {
     if (!currentCommunityId) return;
     const { data } = await api.post(`/communities/${currentCommunityId}/charity-suggestions`, suggestion);
     setCharitySuggestions((prev) => [...prev, data]);
@@ -384,13 +393,13 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const addMember = useCallback(async (userId: string, role: UserRole, _email?: string) => {
     if (!currentCommunityId) return;
     const { data } = await api.put(`/communities/${currentCommunityId}/members/${userId}`, { role });
-    setMembers((prev) => [...prev.filter((m) => m.user_id !== userId), data]);
+    setMembers((prev) => [...prev.filter((m) => m.userId !== userId), data]);
   }, [currentCommunityId]);
 
   const removeMember = useCallback(async (mUserId: string) => {
     if (!currentCommunityId) return;
     await api.delete(`/communities/${currentCommunityId}/members/${mUserId}`);
-    setMembers((prev) => prev.filter((m) => m.user_id !== mUserId));
+    setMembers((prev) => prev.filter((m) => m.userId !== mUserId));
   }, [currentCommunityId]);
 
   const deleteMember = removeMember;
@@ -398,13 +407,13 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const updateMemberRole = useCallback(async (mUserId: string, role: UserRole) => {
     if (!currentCommunityId) return;
     const { data } = await api.put(`/communities/${currentCommunityId}/members/${mUserId}`, { role });
-    setMembers((prev) => prev.map((m) => m.user_id === mUserId ? data : m));
+    setMembers((prev) => prev.map((m) => m.userId === mUserId ? data : m));
   }, [currentCommunityId]);
 
   // ── Notifications ─────────────────────────────────────────────────────────
-  const addNotification = useCallback(async (toUserId: string, notification: Omit<AppNotification, 'id' | 'user_id' | 'read' | 'created_at'>) => {
+  const addNotification = useCallback(async (toUserId: string, notification: Omit<AppNotification, 'id' | 'userId' | 'read' | 'createdAt'>) => {
     // Server-side push — no local state update needed (socket will deliver it)
-    await api.post('/users/me/notifications', { ...notification, target_user_id: toUserId });
+    await api.post('/users/me/notifications', { ...notification, target_userId: toUserId });
   }, []);
 
   const markNotificationAsRead = useCallback(async (notificationId: string) => {
@@ -474,7 +483,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     fileName?: string,
   ) => {
     if (!activeConversationId) return;
-    const msg = { content: text, type, attachment_url: attachmentUrl, file_name: fileName };
+    const msg = { content: text, type, attachmentUrl: attachmentUrl, file_name: fileName };
     const { data } = await api.post(`/conversations/${activeConversationId}/messages`, msg);
     setMessages((prev) => [...prev, data]);
     socketRef.current?.emit('message:send', { conversationId: activeConversationId, ...msg });
@@ -483,7 +492,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const markAsRead = useCallback(async (conversationId: string) => {
     await api.put(`/conversations/${conversationId}/read`);
     setConversations((prev) => prev.map((c) =>
-      c.id === conversationId ? { ...c, unread_count: 0 } : c
+      c.id === conversationId ? { ...c, unreadCount: {} as Record<string, number> } : c
     ));
   }, []);
 
@@ -502,8 +511,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const joinViaInviteLink = useCallback(async (linkCode: string): Promise<string> => {
     const { data } = await api.post(`/communities/join/${linkCode}`);
-    setCommunities((prev) => prev.find((c) => c.id === data.community_id) ? prev : [...prev, mapServerCommunity(data.community)]);
-    return data.community_id;
+    setCommunities((prev) => prev.find((c) => c.id === data.communityId) ? prev : [...prev, mapServerCommunity(data.community)]);
+    return data.communityId;
   }, []);
 
   // ── Invitations ───────────────────────────────────────────────────────────

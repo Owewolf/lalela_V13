@@ -52,8 +52,8 @@ export const accountService = {
           device: 'Current Device',
           ip: '127.0.0.1',
           location: 'Local',
-          last_active: new Date().toISOString(),
-          is_current: true,
+          lastActive: new Date().toISOString(),
+          isCurrent: true,
         },
       ];
     }

@@ -4,13 +4,13 @@ export type UserRole = 'Member' | 'Moderator' | 'Admin' | 'Liaison';
 
 export interface CommunityNotice {
   id: string;
-  community_id?: string;
+  communityId?: string;
   type: 'listing' | 'notice';
   category: string;
   title: string;
   description: string;
   authorName: string;
-  author_id?: string;
+  authorId?: string;
   authorRole: string;
   authorImage: string;
   timestamp: string;
@@ -21,17 +21,17 @@ export interface CommunityNotice {
   charityPercentage?: number;
   isPublic?: boolean;
   price?: number;
-  community_price?: number;
+  communityPrice?: number;
   status?: 'Active' | 'Pinned' | 'deleted' | 'Archived' | 'PendingPublic' | 'Rejected' | 'ChangesRequested';
-  deleted_at?: string;
-  expires_at?: string;
-  expired_at?: string;
-  rejection_reason?: string;
-  changes_requested_note?: string;
-  public_price?: number;
-  charity_amount?: number;
+  deletedAt?: string;
+  expiresAt?: string;
+  expiredAt?: string;
+  rejectionReason?: string;
+  changesRequestedNote?: string;
+  publicPrice?: number;
+  charityAmount?: number;
   urgency?: 'low' | 'normal' | 'high' | 'emergency';
-  urgency_level?: 'emergency' | 'warning' | 'info' | 'general';
+  urgencyLevel?: 'emergency' | 'warning' | 'info' | 'general';
   priority?: 'normal' | 'emergency';
   postSubtype?: 'emergency' | 'warning' | 'normal' | 'information' | 'listing';
   latitude?: number;
@@ -45,7 +45,7 @@ export interface CommunityNotice {
     longitude: number;
     timestamp: string;
   };
-  posts_image?: string;
+  postsImage?: string;
 }
 
 export interface EmergencyAlert {
@@ -60,7 +60,7 @@ export interface CoverageArea {
   latitude: number;
   longitude: number;
   radius: number; // in km
-  location_name: string;
+  locationName: string;
 }
 
 export interface Business {
@@ -93,12 +93,12 @@ export interface Business {
 
 export interface Message {
   id: string;
-  senderId: string;
-  text: string;
+  userId: string;
+  content: string;
   messageType: 'text' | 'image' | 'file' | 'system';
   isListingIntro?: boolean;
-  attachment_url?: string;
-  file_name?: string;
+  attachmentUrl?: string;
+  fileName?: string;
   createdAt: string;
   readBy: string[];
   status: 'sent' | 'delivered' | 'read';
@@ -178,25 +178,25 @@ export interface ChatRoom {
 export interface UserProfile {
   id: string;
   name: string;
-  first_name?: string;
-  last_name?: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone?: string;
-  mobile_number?: string;
+  mobileNumber?: string;
   address?: string;
-  profile_image?: string;
-  agreed_to_terms?: boolean;
-  marketing_consent?: boolean;
-  license_status: 'UNLICENSED' | 'LICENSED';
+  profileImage?: string;
+  agreedToTerms?: boolean;
+  marketingConsent?: boolean;
+  licenseStatus: 'UNLICENSED' | 'LICENSED';
   status: 'ACTIVE' | 'READ-ONLY';
-  two_factor_enabled?: boolean;
-  two_factor_method?: 'SMS' | 'App';
-  login_alerts_enabled?: boolean;
-  last_password_changed?: any;
-  security_score?: 'Low' | 'Medium' | 'High';
-  access_type?: 'Trial' | '1-Year Member' | 'Lifetime Access';
-  expiry_date?: any;
-  created_at?: any;
+  twoFactorEnabled?: boolean;
+  twoFactorMethod?: 'SMS' | 'App';
+  loginAlertsEnabled?: boolean;
+  lastPasswordChanged?: any;
+  securityScore?: 'Low' | 'Medium' | 'High';
+  accessType?: 'Trial' | '1-Year Member' | 'Lifetime Access';
+  expiryDate?: any;
+  createdAt?: any;
   locationSharingEnabled?: boolean;
   isSecurityMember?: boolean;
   emergencyLocationOptIn?: boolean;
@@ -210,14 +210,15 @@ export interface UserProfile {
     latitude: number;
     longitude: number;
   };
-  last_community_id?: string;
+  lastCommunityId?: string;
   // Onboarding state flags
-  profile_completed?: boolean;
-  onboarding_completed?: boolean;
-  community_created?: boolean;
-  member_expiry_date?: any;
-  license_type?: 'SELF' | 'COMMUNITY_GRANTED';
-  fcm_token?: string;
+  profileCompleted?: boolean;
+  onboardingCompleted?: boolean;
+  communityCreated?: boolean;
+  memberExpiryDate?: any;
+  licenseType?: 'SELF' | 'COMMUNITY_GRANTED';
+  fcmToken?: string;
+  notificationPreferences?: any;
 }
 
 export interface UserSession {
@@ -225,31 +226,31 @@ export interface UserSession {
   device: string;
   ip: string;
   location: string;
-  last_active: string;
-  is_current: boolean;
+  lastActive: string;
+  isCurrent: boolean;
 }
 
 export interface TwoFASetupResponse {
   secret: string;
-  qr_code: string;
+  qrCode: string;
 }
 
 export interface LicensingInfo {
   status: 'UNLICENSED' | 'LICENSED';
   type: string;
-  expiry_date: string;
-  auto_renew: boolean;
-  payment_method: string;
+  expiryDate: string;
+  autoRenew: boolean;
+  paymentMethod: string;
 }
 
 export interface Community {
   id: string;
   name: string;
-  owner_id: string;
+  ownerId: string;
   type: 'TRIAL' | 'LICENSED';
   createdAt?: any;
-  license_id?: string;
-  trial_end_date: any;
+  licenseId?: string;
+  trialEndDate: any;
   status: 'ACTIVE' | 'READ-ONLY' | 'Live' | 'Maintenance' | 'Alert';
   isEmergencyMode?: boolean;
   activeEmergencyId?: string;
@@ -260,9 +261,9 @@ export interface Community {
   businesses?: Business[];
   chats?: ChatRoom[];
   coverageArea?: CoverageArea;
-  enabledCategories?: string[]; // IDs of enabled categories
-  onboarding_steps_completed?: string[]; // Admin setup steps: coverage, categories, businesses, invitations, notifications
-  guided_setup_required?: boolean;
+  enabledCategories?: string[];
+  onboardingStepsCompleted?: string[];
+  guidedSetupRequired?: boolean;
 }
 
 export interface UserBusiness {
@@ -272,16 +273,17 @@ export interface UserBusiness {
   subcategory?: string;
   description: string;
   image?: string;
-  owner_id: string;
-  communityIds: string[]; // Communities where this business is active
+  ownerId: string;
+  communityIds: string[];
   latitude: number;
   longitude: number;
   address: string;
   contactPhone?: string;
   contactEmail?: string;
-  charityId?: string; // Linked charity
+  charityId?: string;
   charityPercentage?: number;
   status?: 'ACTIVE' | 'INACTIVE';
+  source?: 'MEMBER' | 'IMPORT';
 }
 
 export type CharityCategory = 'Community Support' | 'Education' | 'Health' | 'Animal Welfare' | 'Disaster Relief';
@@ -290,67 +292,67 @@ export type CharityStatus = 'Active' | 'Pending' | 'Flagged' | 'Archived';
 
 export interface Charity {
   id: string;
-  community_id: string;
+  communityId: string;
   name: string;
   description: string;
   category: CharityCategory;
-  percentage: number; // Percentage added to the the listing price when listed as public
+  percentage: number;
   latitude: number;
   longitude: number;
-  location_name: string;
+  locationName: string;
   contactPhone?: string;
   contactEmail?: string;
   website?: string;
   logo?: string;
   coverImage?: string;
-  tags: string[]; // "Urgent", "Ongoing", "Verified"
+  tags: string[];
   isVerified: boolean;
   isFeatured: boolean;
   urgency: CharityUrgency;
   status: CharityStatus;
-  linkedBusinessIds?: string[]; // IDs of businesses that support this charity
-  totalRaised?: number; // Total funds raised for this charity
+  linkedBusinessIds?: string[];
+  raisedAmount?: number;
   fundraisingGoal?: number;
   campaignCompleted?: boolean;
   createdAt: any;
   isApprovedSuggestion?: boolean;
-  suggestedBy?: string;
+  suggestedById?: string;
 }
 
 export interface CharitySuggestion {
   id: string;
-  community_id: string;
-  suggested_by_id: string;
-  suggested_by_name: string;
+  communityId: string;
+  suggestedById: string;
+  suggestedByName: string;
   name: string;
   description: string;
-  suggested_donation_amount?: number; // Suggested community donation percentage (1-100). Optional for legacy records.
+  suggestedDonationAmount?: number;
   reason: string;
   website?: string;
   status: 'pending' | 'approved' | 'rejected';
-  admin_feedback?: string;
-  created_at: any;
-  processed_at?: any;
-  processed_by_id?: string;
+  adminFeedback?: string;
+  createdAt: any;
+  processedAt?: any;
+  processedById?: string;
 }
 
 export interface ModerationLog {
   id: string;
-  community_id: string;
-  moderator_id: string;
+  communityId: string;
+  moderatorId: string;
   action: 'approve' | 'reject' | 'delete' | 'warn' | 'ban' | 'create' | 'promote' | 'demote' | 'remove' | 'deactivate';
-  target_id: string;
-  target_type: 'post' | 'user' | 'report' | 'suggestion' | 'business';
+  targetId: string;
+  targetType: 'post' | 'user' | 'report' | 'suggestion' | 'business';
   reason?: string;
   timestamp: any;
 }
 
 export interface CommunityMember {
-  user_id: string;
-  community_id: string;
+  userId: string;
+  communityId: string;
   role: UserRole;
-  joined_at: any;
-  license_expiry: any;
+  joinedAt: any;
+  licenseExpiry: any;
   status: 'ACTIVE' | 'READ-ONLY' | 'UNLICENSED';
   name?: string;
   image?: string;
@@ -363,35 +365,35 @@ export interface CommunityMember {
 
 export interface CommunityInvitation {
   id: string;
-  community_id: string;
-  community_name: string;
-  invited_user_id: string;
-  invited_by_admin_id: string;
+  communityId: string;
+  communityName: string;
+  invitedUserId: string;
+  invitedByAdminId: string;
   role: 'MEMBER' | 'MODERATOR';
   status: 'pending' | 'accepted' | 'declined';
-  created_at: any;
+  createdAt: any;
 }
 
 export interface CommunityInviteLink {
   id: string;
-  community_id: string;
-  community_name: string;
-  created_by: string;
-  created_at: any;
-  expires_at: any;
+  communityId: string;
+  communityName: string;
+  createdBy: string;
+  createdAt: any;
+  expiresAt: any;
   uses: number;
   active: boolean;
 }
 
 export interface AppNotification {
   id: string;
-  user_id: string;
+  userId: string;
   title: string;
   message: string;
   type: 'invitation' | 'system' | 'alert';
   link?: string;
   read: boolean;
-  created_at: any;
+  createdAt: any;
   metadata?: any;
 }
 
@@ -453,14 +455,14 @@ export interface CommunityContextType {
   removeMember: (userId: string) => Promise<void>;
   deleteMember: (userId: string) => Promise<void>;
   updateMemberRole: (userId: string, role: UserRole) => Promise<void>;
-  addNotification: (userId: string, notification: Omit<AppNotification, 'id' | 'user_id' | 'read' | 'created_at'>) => Promise<void>;
+  addNotification: (userId: string, notification: Omit<AppNotification, 'id' | 'userId' | 'read' | 'createdAt'>) => Promise<void>;
   searchUsers: (query: string) => Promise<UserProfile[]>;
   communityBusinesses: UserBusiness[];
   toggleEmergencyMode: (communityId: string, alertId?: string) => Promise<void>;
   toggleCommunityResponder: (communityId: string, isResponder: boolean) => Promise<void>;
   updateLiveLocation: (latitude: number, longitude: number) => Promise<void>;
   securityResponders: {
-    user_id: string;
+    userId: string;
     name: string;
     image: string;
     latitude: number;
@@ -489,7 +491,7 @@ export interface CommunityContextType {
   deleteUserBusiness: (id: string) => Promise<void>;
   deleteReport: (communityId: string, reportId: string) => Promise<void>;
   charitySuggestions: CharitySuggestion[];
-  addCharitySuggestion: (suggestion: Omit<CharitySuggestion, 'id' | 'status' | 'created_at'> & { suggested_donation_amount: number }) => Promise<void>;
+  addCharitySuggestion: (suggestion: Omit<CharitySuggestion, 'id' | 'status' | 'createdAt'> & { suggestedDonationAmount: number }) => Promise<void>;
   approveCharitySuggestion: (suggestionId: string, feedback: string, charityData: Omit<Charity, 'id' | 'createdAt'>) => Promise<void>;
   rejectCharitySuggestion: (suggestionId: string, feedback: string) => Promise<void>;
   syncAllUsersToSearch: () => Promise<void>;

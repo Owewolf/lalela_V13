@@ -50,7 +50,7 @@ export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, act
       conv.metadata?.title || conv.otherParticipant?.name || 'Conversation';
     const image =
       conv.metadata?.image ||
-      conv.otherParticipant?.profile_image ||
+      conv.otherParticipant?.profileImage ||
       `https://picsum.photos/seed/${conv.id}/100/100`;
     const normalizedLastMessage = (conv.lastMessage || '').trim();
     const isPhotoPreview = normalizedLastMessage === '📷 Photo' || normalizedLastMessage === 'Photo';

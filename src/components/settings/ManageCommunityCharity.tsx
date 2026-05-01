@@ -185,8 +185,8 @@ export default function ManageCommunityCharity({
           name: suggestion.name,
           description: suggestion.description,
           percentage:
-            typeof suggestion.suggested_donation_amount === 'number'
-              ? String(suggestion.suggested_donation_amount)
+            typeof suggestion.suggestedDonationAmount === 'number'
+              ? String(suggestion.suggestedDonationAmount)
               : '5',
           website: suggestion.website ?? '',
           tags: 'Verified, Member Suggested',
@@ -232,16 +232,16 @@ export default function ManageCommunityCharity({
         : undefined;
 
       const basePayload: Omit<Charity, 'id' | 'createdAt'> = {
-        community_id: currentCommunity!.id,
+        communityId: currentCommunity!.id,
         name: charityForm.name.trim(),
         description: charityForm.description.trim(),
         category: selectedCharity?.category ?? 'Community Support',
         percentage,
         latitude: selectedCharity?.latitude ?? coverage?.latitude ?? -26.2041,
         longitude: selectedCharity?.longitude ?? coverage?.longitude ?? 28.0473,
-        location_name:
-          selectedCharity?.location_name ??
-          coverage?.location_name ??
+        locationName:
+          selectedCharity?.locationName ??
+          coverage?.locationName ??
           currentCommunity?.name ??
           'Community Coverage Area',
         contactPhone: charityForm.contactPhone.trim(),
@@ -258,7 +258,7 @@ export default function ManageCommunityCharity({
         urgency: selectedCharity?.urgency ?? 'Normal',
         status: 'Active',
         linkedBusinessIds: selectedCharity?.linkedBusinessIds ?? [],
-        totalRaised: selectedCharity?.totalRaised ?? 0,
+        raisedAmount: selectedCharity?.raisedAmount ?? 0,
         fundraisingGoal,
         campaignCompleted: selectedCharity?.campaignCompleted ?? false,
       };
@@ -344,14 +344,14 @@ export default function ManageCommunityCharity({
     setSavingSuggestion(true);
     try {
       await addCharitySuggestion({
-        community_id: currentCommunity!.id,
-        suggested_by_id: userProfile!.id,
-        suggested_by_name: userProfile?.name || 'Community Member',
+        communityId: currentCommunity!.id,
+        suggestedById: userProfile!.id,
+        suggestedByName: userProfile?.name || 'Community Member',
         name: suggestionForm.name.trim(),
         description: suggestionForm.description.trim(),
         reason: suggestionForm.reason.trim(),
         website: suggestionForm.website.trim(),
-        suggested_donation_amount: amount,
+        suggestedDonationAmount: amount,
       });
       closeSuggestModal();
       Alert.alert(
@@ -495,8 +495,8 @@ export default function ManageCommunityCharity({
                           </View>
                           <Text style={styles.listItemMeta}>
                             {charity.percentage}% impact
-                            {typeof charity.totalRaised === 'number'
-                              ? ` • R${charity.totalRaised.toLocaleString()} raised`
+                            {typeof charity.raisedAmount === 'number'
+                              ? ` • R${charity.raisedAmount.toLocaleString()} raised`
                               : ''}
                           </Text>
                         </View>
@@ -533,8 +533,8 @@ export default function ManageCommunityCharity({
                       <View key={suggestion.id} style={styles.suggestionItem}>
                         <Text style={styles.listItemTitle}>{suggestion.name}</Text>
                         <Text style={styles.listItemMeta}>
-                          Suggested by {suggestion.suggested_by_name} at{' '}
-                          {suggestion.suggested_donation_amount ?? 0}%
+                          Suggested by {suggestion.suggestedByName} at{' '}
+                          {suggestion.suggestedDonationAmount ?? 0}%
                         </Text>
                         <Text style={styles.suggestionBody}>{suggestion.description}</Text>
                         <Text style={styles.suggestionReason}>{suggestion.reason}</Text>

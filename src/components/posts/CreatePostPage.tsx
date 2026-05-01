@@ -94,19 +94,19 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
 
   const isReadOnly =
     userProfile?.status === 'READ-ONLY' ||
-    (userProfile?.license_type === 'COMMUNITY_GRANTED' &&
-      userProfile?.license_status === 'UNLICENSED' &&
-      userProfile?.member_expiry_date &&
-      (userProfile.member_expiry_date.toDate
-        ? userProfile.member_expiry_date.toDate()
-        : new Date(userProfile.member_expiry_date)) < new Date());
+    (userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
+      userProfile?.licenseStatus === 'UNLICENSED' &&
+      userProfile?.memberExpiryDate &&
+      (userProfile.memberExpiryDate.toDate
+        ? userProfile.memberExpiryDate.toDate()
+        : new Date(userProfile.memberExpiryDate)) < new Date());
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [postType, setPostType] = useState<PostType>(
     postToEdit?.type || initialType || 'listing',
   );
   const [urgency, setUrgency] = useState<Urgency>(
-    postToEdit?.urgency_level ||
+    postToEdit?.urgencyLevel ||
       initialUrgency ||
       (postToEdit?.urgency === 'high'
         ? 'warning'
@@ -133,7 +133,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const [locationSource, setLocationSource] = useState<
     'profile_default' | 'user_selected' | 'current_location'
   >(postToEdit?.source || 'profile_default');
-  const [postsImage, setPostsImage] = useState<string>(postToEdit?.posts_image || '');
+  const [postsImage, setPostsImage] = useState<string>(postToEdit?.postsImage || '');
   const [emergencyCategory, setEmergencyCategory] = useState<EmergencyCategory | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -263,31 +263,31 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
         postToEdit?.authorName ||
         userProfile?.name ||
         'Community Member',
-      author_id: postToEdit?.author_id || userProfile?.id,
+      authorId: postToEdit?.authorId || userProfile?.id,
       authorRole: postToEdit?.authorRole || currentCommunity?.userRole || 'Member',
       authorImage:
         postToEdit?.authorImage ||
-        userProfile?.profile_image ||
+        userProfile?.profileImage ||
         `https://picsum.photos/seed/${userProfile?.id}/200/200`,
       charityId: isPublic ? selectedCharityId : undefined,
       charityPercentage: isPublic ? charityPercentage : undefined,
-      charity_amount: postType === 'listing' ? (isPublic ? charityAmount : 0) : undefined,
+      charityAmount: postType === 'listing' ? (isPublic ? charityAmount : 0) : undefined,
       isPublic,
       price: postType === 'listing' ? numericPrice : undefined,
-      community_price: postType === 'listing' ? numericPrice : undefined,
-      public_price:
+      communityPrice: postType === 'listing' ? numericPrice : undefined,
+      publicPrice:
         postType === 'listing'
           ? isPublic
             ? numericPrice + charityAmount
             : numericPrice
           : undefined,
       urgency: postType === 'notice' ? urgencyMap[urgency] : undefined,
-      urgency_level: postType === 'notice' ? urgency : undefined,
+      urgencyLevel: postType === 'notice' ? urgency : undefined,
       locationName,
       latitude,
       longitude,
       source: locationSource,
-      posts_image: postsImage,
+      postsImage: postsImage,
     };
 
     setIsSubmitting(true);
@@ -526,7 +526,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       )}
                       {securityResponders.map((r) => (
                         <Marker
-                          key={r.user_id}
+                          key={r.userId}
                           coordinate={{ latitude: r.latitude, longitude: r.longitude }}
                           pinColor="#0D9488"
                         />

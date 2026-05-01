@@ -70,7 +70,7 @@ function getUrgencyColors(level?: string, urgency?: string) {
 function getPostBorderColor(post: CommunityNotice): string {
   if (post.type !== 'notice') return '#e5e7eb';
   const urgency =
-    post.urgency_level ||
+    post.urgencyLevel ||
     (post.urgency === 'high' ? 'warning' : post.urgency === 'normal' ? 'info' : post.urgency === 'low' ? 'general' : post.urgency);
   switch (urgency) {
     case 'emergency': return '#fca5a5';
@@ -148,8 +148,8 @@ export default function PostsPage() {
   const notices = posts
     .filter(p => p.type === 'notice')
     .sort((a, b) => {
-      const pa = getUrgencyPriority(a.urgency_level, a.urgency);
-      const pb = getUrgencyPriority(b.urgency_level, b.urgency);
+      const pa = getUrgencyPriority(a.urgencyLevel, a.urgency);
+      const pb = getUrgencyPriority(b.urgencyLevel, b.urgency);
       if (pa !== pb) return pb - pa;
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     });
@@ -188,7 +188,7 @@ export default function PostsPage() {
       const isEmergencyNotice =
         post.type === 'notice' &&
         (post.urgency === 'emergency' ||
-          post.urgency_level === 'emergency' ||
+          post.urgencyLevel === 'emergency' ||
           post.priority === 'emergency');
 
       if (isEmergencyNotice) {
@@ -196,15 +196,15 @@ export default function PostsPage() {
         return;
       }
 
-      if (!userProfile?.id || !post.author_id) return;
+      if (!userProfile?.id || !post.authorId) return;
 
       try {
-        const participantSet = new Set((members || []).map((m) => m.user_id));
-        if (post.author_id) participantSet.add(post.author_id);
+        const participantSet = new Set((members || []).map((m) => m.userId));
+        if (post.authorId) participantSet.add(post.authorId);
         participantSet.add(userProfile?.id);
         const participants =
           post.type === 'listing'
-            ? Array.from(new Set([userProfile?.id, post.author_id]))
+            ? Array.from(new Set([userProfile?.id, post.authorId]))
             : Array.from(participantSet);
 
         const conversationId = await startConversation({
@@ -216,16 +216,16 @@ export default function PostsPage() {
           metadata: {
             title: post.title,
             type: post.type,
-            image: post.posts_image,
+            image: post.postsImage,
             author: post.authorName,
             authorImage: post.authorImage,
-            authorId: post.author_id,
+            authorId: post.authorId,
             authorRole: post.authorRole,
             location: post.locationName,
             urgency: post.urgency,
-            urgencyLevel: post.urgency_level,
+            urgencyLevel: post.urgencyLevel,
             description: post.description,
-            price: post.type === 'listing' && post.price !== undefined ? `R${(post.community_price || post.price).toLocaleString()}` : undefined,
+            price: post.type === 'listing' && post.price !== undefined ? `R${(post.communityPrice || post.price).toLocaleString()}` : undefined,
           },
         });
         setActiveConversation(conversationId);
@@ -239,15 +239,15 @@ export default function PostsPage() {
 
   const renderNotice = useCallback(
     ({ item: notice }: { item: CommunityNotice }) => {
-      const urgencyColors = getUrgencyColors(notice.urgency_level, notice.urgency);
+      const urgencyColors = getUrgencyColors(notice.urgencyLevel, notice.urgency);
       const borderColor = getPostBorderColor(notice);
       const isEmergency =
-        notice.urgency === 'emergency' || notice.urgency_level === 'emergency';
-      const isWarning = notice.urgency_level === 'warning' || notice.urgency === 'high';
+        notice.urgency === 'emergency' || notice.urgencyLevel === 'emergency';
+      const isWarning = notice.urgencyLevel === 'warning' || notice.urgency === 'high';
       const showMap =
         (isEmergency || isWarning) && notice.latitude && notice.longitude;
       const dist = calculateDistance(notice.latitude, notice.longitude, baseLat, baseLng);
-      const isOwner = notice.author_id === userProfile?.id;
+      const isOwner = notice.authorId === userProfile?.id;
       const isAdmin = currentCommunity?.userRole === 'Admin';
 
       return (
@@ -301,10 +301,10 @@ export default function PostsPage() {
           ) : null}
 
           {/* Image (non-emergency) edge-to-edge layout at top */}
-          {notice.posts_image && !showMap ? (
+          {notice.postsImage && !showMap ? (
             <View className="w-full aspect-video border-b border-gray-100 overflow-hidden">
               <Image
-                source={{ uri: notice.posts_image }}
+                source={{ uri: notice.postsImage }}
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -363,12 +363,12 @@ export default function PostsPage() {
                 borderColor: urgencyColors.border,
               }}
             >
-              <UrgencyIcon level={notice.urgency_level} urgency={notice.urgency} size={9} />
+              <UrgencyIcon level={notice.urgencyLevel} urgency={notice.urgency} size={9} />
               <Text
                 className="text-[9px] font-black uppercase tracking-widest"
                 style={{ color: urgencyColors.text }}
               >
-                {getUrgencyLabel(notice.urgency_level, notice.urgency)}
+                {getUrgencyLabel(notice.urgencyLevel, notice.urgency)}
               </Text>
             </View>
 
@@ -397,7 +397,7 @@ export default function PostsPage() {
                     source={{
                       uri:
                         notice.authorImage ||
-                        `https://picsum.photos/seed/${notice.author_id}/50/50`,
+                        `https://picsum.photos/seed/${notice.authorId}/50/50`,
                     }}
                     className="w-full h-full"
                     resizeMode="cover"
@@ -440,7 +440,7 @@ export default function PostsPage() {
       const urgencyColors = getUrgencyColors(post.urgency);
       const isEmergency = post.urgency === 'emergency';
       const charity = charities.find(c => c.id === post.charityId);
-      const isOwner = post.author_id === userProfile?.id;
+      const isOwner = post.authorId === userProfile?.id;
       const isAdmin = currentCommunity?.userRole === 'Admin';
 
       return (
@@ -470,10 +470,10 @@ export default function PostsPage() {
                 </Text>
               </View>
             </View>
-          ) : post.posts_image ? (
+          ) : post.postsImage ? (
             <View className="w-full aspect-video overflow-hidden border-b border-gray-100">
               <Image
-                source={{ uri: post.posts_image }}
+                source={{ uri: post.postsImage }}
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -570,20 +570,20 @@ export default function PostsPage() {
                       </Text>
                       <View className="flex-row items-baseline gap-0.5">
                         <Text className="text-2xl font-black text-orange-500 leading-none">
-                          R{(post.community_price || post.price).toLocaleString()}
+                          R{(post.communityPrice || post.price).toLocaleString()}
                         </Text>
                         <Text className="text-orange-400 font-bold text-xs">.00</Text>
                       </View>
                     </View>
                     {post.isPublic &&
-                      post.public_price &&
-                      post.public_price > (post.community_price || post.price) ? (
+                      post.publicPrice &&
+                      post.publicPrice > (post.communityPrice || post.price) ? (
                       <View className="opacity-50">
                         <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
                           Public Price
                         </Text>
                         <Text className="text-lg font-bold text-gray-400 leading-none line-through">
-                          R{post.public_price.toLocaleString()}
+                          R{post.publicPrice.toLocaleString()}
                         </Text>
                       </View>
                     ) : null}
@@ -597,7 +597,7 @@ export default function PostsPage() {
                         </Text>
                       </View>
                       <Text className="text-[10px] font-bold text-gray-400">
-                        Contribution: R{post.charity_amount?.toFixed(2) || '0.00'}
+                        Contribution: R{post.charityAmount?.toFixed(2) || '0.00'}
                       </Text>
                     </View>
                   ) : null}
@@ -623,7 +623,7 @@ export default function PostsPage() {
                     source={{
                       uri:
                         post.authorImage ||
-                        `https://picsum.photos/seed/${post.author_id}/100/100`,
+                        `https://picsum.photos/seed/${post.authorId}/100/100`,
                     }}
                     className="w-full h-full"
                     resizeMode="cover"
@@ -853,7 +853,7 @@ export default function PostsPage() {
                 title={mapPost.title}
                 description={mapPost.locationName}
                 pinColor={
-                  mapPost.urgency === 'emergency' || mapPost.urgency_level === 'emergency'
+                  mapPost.urgency === 'emergency' || mapPost.urgencyLevel === 'emergency'
                     ? '#dc2626'
                     : '#d97706'
                 }
@@ -862,12 +862,12 @@ export default function PostsPage() {
                 center={{ latitude: mapPost.latitude, longitude: mapPost.longitude }}
                 radius={10000}
                 strokeColor={
-                  mapPost.urgency === 'emergency' || mapPost.urgency_level === 'emergency'
+                  mapPost.urgency === 'emergency' || mapPost.urgencyLevel === 'emergency'
                     ? '#dc2626'
                     : '#d97706'
                 }
                 fillColor={
-                  mapPost.urgency === 'emergency' || mapPost.urgency_level === 'emergency'
+                  mapPost.urgency === 'emergency' || mapPost.urgencyLevel === 'emergency'
                     ? 'rgba(220,38,38,0.05)'
                     : 'rgba(217,119,6,0.05)'
                 }

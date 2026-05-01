@@ -1,5 +1,5 @@
 // Lalela Platform — PostgreSQL Schema
-// Run: npx prisma db push  (to sync without migrations)
+// Naming convention: Prisma fields = camelCase, DB columns = snake_case via @map/@@map
 
 generator client {
   provider = "prisma-client-js"
@@ -14,74 +14,73 @@ datasource db {
 // USERS
 // =============================================
 model User {
-  id                        String    @id @default(cuid())
-  email                     String    @unique
-  name                      String
-  phone                     String?   @unique
-  password_hash             String?
-  email_verified            Boolean   @default(false)
-  phone_verified            Boolean   @default(false)
-  profile_completed         Boolean   @default(false)
-  community_created         Boolean   @default(false)
-  onboarding_complete       Boolean   @default(false)
-  license_status            String    @default("UNLICENSED")
-  license_expiry            DateTime?
-  license_type              String?
-  auto_renew                Boolean   @default(false)
-  access_type               String? // 'Trial' | '1-Year Member' | 'Lifetime Access'
-  expiry_date               DateTime? // Community membership expiry (alias of license_expiry for app compat)
-  member_expiry_date        DateTime? // Community-granted member expiry
-  status                    String    @default("ACTIVE")
-  role                      String    @default("user")
-  profile_image             String?
-  fcm_token                 String?
-  push_token                String?
-  push_platform             String?
-  first_name                String?
-  last_name                 String?
-  mobile_number             String? // Phone alias used in onboarding
-  address                   String?
-  latitude                  Float?
-  longitude                 Float?
-  location_sharing          Boolean   @default(false)
-  is_security_member        Boolean   @default(false)
-  emergency_location_opt_in Boolean   @default(false)
-  last_community_id         String? // Last selected community
-  agreed_to_terms           Boolean   @default(false)
-  marketing_consent         Boolean   @default(false)
-  profile_visibility        String? // 'Community Only' | 'Private'
-  pii_visibility            String? // 'Admins only' | 'Community members' | 'Nobody'
-  last_password_changed     DateTime?
-  security_score            String? // 'Low' | 'Medium' | 'High'
-  notification_preferences  Json?
-  two_factor_enabled        Boolean   @default(false)
-  two_factor_method         String?
-  login_alerts_enabled      Boolean   @default(true)
-  pending_invite_code       String?
-  deleted                   Boolean   @default(false)
-  deleted_at                DateTime?
-  created_at                DateTime  @default(now())
-  updated_at                DateTime  @updatedAt
+  id                      String    @id @default(cuid())
+  email                   String    @unique
+  name                    String
+  phone                   String?   @unique
+  passwordHash            String?   @map("password_hash")
+  emailVerified           Boolean   @default(false) @map("email_verified")
+  phoneVerified           Boolean   @default(false) @map("phone_verified")
+  profileCompleted        Boolean   @default(false) @map("profile_completed")
+  communityCreated        Boolean   @default(false) @map("community_created")
+  onboardingComplete      Boolean   @default(false) @map("onboarding_complete")
+  licenseStatus           String    @default("UNLICENSED") @map("license_status")
+  licenseExpiry           DateTime? @map("license_expiry")
+  licenseType             String?   @map("license_type")
+  autoRenew               Boolean   @default(false) @map("auto_renew")
+  accessType              String?   @map("access_type")
+  expiryDate              DateTime? @map("expiry_date")
+  memberExpiryDate        DateTime? @map("member_expiry_date")
+  status                  String    @default("ACTIVE")
+  role                    String    @default("user")
+  profileImage            String?   @map("profile_image")
+  fcmToken                String?   @map("fcm_token")
+  pushToken               String?   @map("push_token")
+  pushPlatform            String?   @map("push_platform")
+  firstName               String?   @map("first_name")
+  lastName                String?   @map("last_name")
+  mobileNumber            String?   @map("mobile_number")
+  address                 String?
+  latitude                Float?
+  longitude               Float?
+  locationSharing         Boolean   @default(false) @map("location_sharing")
+  isSecurityMember        Boolean   @default(false) @map("is_security_member")
+  emergencyLocationOptIn  Boolean   @default(false) @map("emergency_location_opt_in")
+  lastCommunityId         String?   @map("last_community_id")
+  agreedToTerms           Boolean   @default(false) @map("agreed_to_terms")
+  marketingConsent        Boolean   @default(false) @map("marketing_consent")
+  profileVisibility       String?   @map("profile_visibility")
+  piiVisibility           String?   @map("pii_visibility")
+  lastPasswordChanged     DateTime? @map("last_password_changed")
+  securityScore           String?   @map("security_score")
+  notificationPreferences Json?     @map("notification_preferences")
+  twoFactorEnabled        Boolean   @default(false) @map("two_factor_enabled")
+  twoFactorMethod         String?   @map("two_factor_method")
+  loginAlertsEnabled      Boolean   @default(true) @map("login_alerts_enabled")
+  pendingInviteCode       String?   @map("pending_invite_code")
+  deleted                 Boolean   @default(false)
+  deletedAt               DateTime? @map("deleted_at")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
 
-  // Relations
-  communities           CommunityMember[]
-  businesses            Business[]
-  posts                 Post[]
-  messages              Message[]
-  reports               Report[]                  @relation("Reporter")
-  owned_communities     Community[]               @relation("CommunityOwner")
-  sessions              UserSession[]
-  audit_logs            AuditLog[]
-  notifications         Notification[]
-  email_tokens          EmailVerificationToken[]
-  otp_codes             OtpCode[]
-  password_reset_tokens PasswordResetToken[]
-  charity_suggestions   CharitySuggestion[]
-  sent_invitations      CommunityInvitation[]     @relation("InvitedBy")
-  received_invitations  CommunityInvitation[]     @relation("InvitedUser")
-  invite_links          CommunityInviteLink[]
-  conversations         ConversationParticipant[]
-  licenses              License[]
+  communities         CommunityMember[]
+  businesses          Business[]
+  posts               Post[]
+  messages            Message[]
+  reports             Report[]                  @relation("Reporter")
+  ownedCommunities    Community[]               @relation("CommunityOwner")
+  sessions            UserSession[]
+  auditLogs           AuditLog[]
+  notifications       Notification[]
+  emailTokens         EmailVerificationToken[]
+  otpCodes            OtpCode[]
+  passwordResetTokens PasswordResetToken[]
+  charitySuggestions  CharitySuggestion[]
+  sentInvitations     CommunityInvitation[]     @relation("InvitedBy")
+  receivedInvitations CommunityInvitation[]     @relation("InvitedUser")
+  inviteLinks         CommunityInviteLink[]
+  conversations       ConversationParticipant[]
+  licenses            License[]
 
   @@index([email])
   @@index([phone])
@@ -92,77 +91,77 @@ model User {
 // AUTH TOKENS
 // =============================================
 model EmailVerificationToken {
-  id         String   @id @default(cuid())
-  user_id    String
-  token      String   @unique @default(cuid())
-  expires_at DateTime
-  used       Boolean  @default(false)
-  created_at DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  token     String   @unique @default(cuid())
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([token])
   @@map("email_verification_tokens")
 }
 
 model PasswordResetToken {
-  id         String   @id @default(cuid())
-  user_id    String
-  token      String   @unique @default(cuid())
-  expires_at DateTime
-  used       Boolean  @default(false)
-  created_at DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  token     String   @unique @default(cuid())
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([token])
   @@map("password_reset_tokens")
 }
 
 model OtpCode {
-  id         String   @id @default(cuid())
-  user_id    String?
-  phone      String
-  code       String
-  expires_at DateTime
-  used       Boolean  @default(false)
-  created_at DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  phone     String
+  code      String
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([phone])
   @@map("otp_codes")
 }
 
 model BlacklistedEmail {
-  email        String   @id
-  deleted_at   DateTime @default(now())
-  original_uid String?
+  email       String   @id
+  deletedAt   DateTime @default(now()) @map("deleted_at")
+  originalUid String?  @map("original_uid")
 
-  @@map("BlacklistedEmail")
+  @@map("blacklisted_emails")
 }
 
 model UserSession {
-  id            String   @id @default(cuid())
-  user_id       String
-  refresh_token String   @unique
-  device        String?
-  ip            String?
-  location      String?
-  last_active   DateTime @default(now())
-  expires_at    DateTime
-  created_at    DateTime @default(now())
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  refreshToken String   @unique @map("refresh_token")
+  device       String?
+  ip           String?
+  location     String?
+  lastActive   DateTime @default(now()) @map("last_active")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([user_id])
-  @@index([refresh_token])
+  @@index([userId])
+  @@index([refreshToken])
   @@map("user_sessions")
 }
 
 model AuditLog {
   id        String   @id @default(cuid())
-  user_id   String
+  userId    String   @map("user_id")
   type      String
   message   String
   ip        String?
@@ -170,9 +169,9 @@ model AuditLog {
   metadata  Json?
   timestamp DateTime @default(now())
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([user_id])
+  @@index([userId])
   @@map("audit_logs")
 }
 
@@ -180,43 +179,44 @@ model AuditLog {
 // COMMUNITIES
 // =============================================
 model Community {
-  id                         String    @id @default(cuid())
-  name                       String
-  description                String?
-  owner_id                   String
-  type                       String    @default("TRIAL")
-  status                     String    @default("ACTIVE")
-  is_emergency_mode          Boolean   @default(false)
-  coverage_lat               Float?
-  coverage_lng               Float?
-  coverage_radius            Float?
-  coverage_location          String?
-  enabled_categories         String[]  @default([])
-  trial_end_date             DateTime?
-  license_id                 String?
-  license_expiry             DateTime?
-  active_emergency_id        String? // ID of active emergency post
-  onboarding_steps_completed String[]  @default([]) // Admin setup steps completed
-  is_public                  Boolean   @default(true)
-  created_at                 DateTime  @default(now())
-  updated_at                 DateTime  @updatedAt
+  id                       String    @id @default(cuid())
+  name                     String
+  description              String?
+  ownerId                  String    @map("owner_id")
+  type                     String    @default("TRIAL")
+  status                   String    @default("ACTIVE")
+  isEmergencyMode          Boolean   @default(false) @map("is_emergency_mode")
+  coverageLat              Float?    @map("coverage_lat")
+  coverageLng              Float?    @map("coverage_lng")
+  coverageRadius           Float?    @map("coverage_radius")
+  coverageLocation         String?   @map("coverage_location")
+  enabledCategories        String[]  @default([]) @map("enabled_categories")
+  trialEndDate             DateTime? @map("trial_end_date")
+  licenseId                String?   @map("license_id")
+  licenseExpiry            DateTime? @map("license_expiry")
+  activeEmergencyId        String?   @map("active_emergency_id")
+  onboardingStepsCompleted String[]  @default([]) @map("onboarding_steps_completed")
+  guidedSetupRequired      Boolean   @default(true) @map("guided_setup_required")
+  isPublic                 Boolean   @default(true) @map("is_public")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
 
-  owner               User                  @relation("CommunityOwner", fields: [owner_id], references: [id])
-  members             CommunityMember[]
-  posts               Post[]
-  messages            Message[]
-  charities           Charity[]
-  charity_suggestions CharitySuggestion[]
-  reports             Report[]
-  invitations         CommunityInvitation[]
-  invite_links        CommunityInviteLink[]
-  member_locations    MemberLocation[]
-  security_locations  SecurityLocation[]
-  moderation_logs     ModerationLog[]
-  security_events     SecurityEvent[]
-  licenses            License[]
+  owner              User                  @relation("CommunityOwner", fields: [ownerId], references: [id])
+  members            CommunityMember[]
+  posts              Post[]
+  messages           Message[]
+  charities          Charity[]
+  charitySuggestions CharitySuggestion[]
+  reports            Report[]
+  invitations        CommunityInvitation[]
+  inviteLinks        CommunityInviteLink[]
+  memberLocations    MemberLocation[]
+  securityLocations  SecurityLocation[]
+  moderationLogs     ModerationLog[]
+  securityEvents     SecurityEvent[]
+  licenses           License[]
 
-  @@index([owner_id])
+  @@index([ownerId])
   @@index([status])
   @@map("communities")
 }
@@ -225,57 +225,57 @@ model Community {
 // COMMUNITY MEMBERS
 // =============================================
 model CommunityMember {
-  community_id              String
-  user_id                   String
-  role                      String    @default("MEMBER")
-  joined_at                 DateTime  @default(now())
-  license_expiry            DateTime?
-  status                    String    @default("ACTIVE")
-  is_security_member        Boolean   @default(false)
-  location_sharing_enabled  Boolean   @default(true)
-  name                      String? // Cached display name
-  image                     String? // Cached avatar URL
-  email                     String? // Cached email
-  emergency_location_opt_in Boolean   @default(false)
+  communityId            String    @map("community_id")
+  userId                 String    @map("user_id")
+  role                   String    @default("MEMBER")
+  joinedAt               DateTime  @default(now()) @map("joined_at")
+  licenseExpiry          DateTime? @map("license_expiry")
+  status                 String    @default("ACTIVE")
+  isSecurityMember       Boolean   @default(false) @map("is_security_member")
+  locationSharingEnabled Boolean   @default(true) @map("location_sharing_enabled")
+  name                   String?
+  image                  String?
+  email                  String?
+  emergencyLocationOptIn Boolean   @default(false) @map("emergency_location_opt_in")
 
-  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([community_id, user_id])
-  @@index([user_id])
+  @@id([communityId, userId])
+  @@index([userId])
   @@map("community_members")
 }
 
 model MemberLocation {
-  id           String   @id @default(cuid())
-  community_id String
-  user_id      String
-  name         String?
-  image        String?
-  role         String   @default("MEMBER")
-  latitude     Float
-  longitude    Float
-  timestamp    DateTime @default(now())
+  id          String   @id @default(cuid())
+  communityId String   @map("community_id")
+  userId      String   @map("user_id")
+  name        String?
+  image       String?
+  role        String   @default("MEMBER")
+  latitude    Float
+  longitude   Float
+  timestamp   DateTime @default(now())
 
-  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
-  @@unique([community_id, user_id])
+  @@unique([communityId, userId])
   @@map("member_locations")
 }
 
 model SecurityLocation {
-  id           String   @id @default(cuid())
-  community_id String
-  user_id      String
-  name         String?
-  image        String?
-  latitude     Float
-  longitude    Float
-  timestamp    DateTime @default(now())
+  id          String   @id @default(cuid())
+  communityId String   @map("community_id")
+  userId      String   @map("user_id")
+  name        String?
+  image       String?
+  latitude    Float
+  longitude   Float
+  timestamp   DateTime @default(now())
 
-  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
-  @@unique([community_id, user_id])
+  @@unique([communityId, userId])
   @@map("security_locations")
 }
 
@@ -283,30 +283,28 @@ model SecurityLocation {
 // MESSAGES (Chat)
 // =============================================
 model Message {
-  id              String   @id @default(cuid())
-  community_id    String?
-  conversation_id String?
-  user_id         String?
-  sender_id       String?
-  content         String?
-  text            String?
-  image_url       String?
-  attachment_url  String?
-  message_type    String   @default("text")
-  type            String   @default("text")
-  reply_to_id     String?
-  status          String   @default("sent")
-  read_by         String[] @default([])
-  created_at      DateTime @default(now())
+  id             String   @id @default(cuid())
+  communityId    String?  @map("community_id")
+  conversationId String?  @map("conversation_id")
+  userId         String?  @map("user_id")
+  content        String?
+  imageUrl       String?  @map("image_url")
+  attachmentUrl  String?  @map("attachment_url")
+  fileName       String?  @map("file_name")
+  messageType    String   @default("text") @map("message_type")
+  replyToId      String?  @map("reply_to_id")
+  status         String   @default("sent")
+  readBy         String[] @default([]) @map("read_by")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  community    Community?    @relation(fields: [community_id], references: [id], onDelete: Cascade)
-  conversation Conversation? @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
-  user         User?         @relation(fields: [user_id], references: [id])
-  reply_to     Message?      @relation("MessageReplies", fields: [reply_to_id], references: [id])
+  community    Community?    @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User?         @relation(fields: [userId], references: [id])
+  replyTo      Message?      @relation("MessageReplies", fields: [replyToId], references: [id])
   replies      Message[]     @relation("MessageReplies")
 
-  @@index([community_id, created_at])
-  @@index([conversation_id])
+  @@index([communityId, createdAt])
+  @@index([conversationId])
   @@map("messages")
 }
 
@@ -314,48 +312,48 @@ model Message {
 // POSTS / LISTINGS / NOTICES
 // =============================================
 model Post {
-  id                     String    @id @default(cuid())
-  community_id           String
-  author_id              String
-  type                   String
-  title                  String
-  description            String
-  category               String
-  subtype                String? // 'emergency' | 'warning' | 'normal' | 'information' | 'listing'
-  urgency                String    @default("LOW")
-  urgency_level          String? // 'emergency' | 'warning' | 'info' | 'general'
-  price                  Float?
-  community_price        Float? // Price shown to community members
-  public_price           Float? // Price shown publicly
-  charity_amount         Float? // Fixed charity contribution amount
-  charity_percentage     Float? // % of price donated to charity
-  image_url              String?
-  posts_image            String? // Alias used in app
-  isPublic               Boolean   @default(false)
-  is_community_pick      Boolean   @default(false)
-  is_charity             Boolean   @default(false)
-  charity_id             String?
-  author_name            String? // Cached author name
-  author_role            String? // Cached author role
-  author_image           String? // Cached author image
-  location_name          String? // Human-readable location
-  latitude               Float?
-  longitude              Float?
-  source                 String? // 'profile_default' | 'user_selected' | 'current_location'
-  status                 String    @default("active")
-  rejection_reason       String?
-  changes_requested_note String?
-  expires_at             DateTime?
-  expired_at             DateTime? // When it actually expired
-  deleted_at             DateTime?
-  created_at             DateTime  @default(now())
-  updated_at             DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  communityId          String    @map("community_id")
+  authorId             String    @map("author_id")
+  type                 String
+  title                String
+  description          String
+  category             String
+  subtype              String?
+  urgency              String    @default("LOW")
+  urgencyLevel         String?   @map("urgency_level")
+  price                Float?
+  communityPrice       Float?    @map("community_price")
+  publicPrice          Float?    @map("public_price")
+  charityAmount        Float?    @map("charity_amount")
+  charityPercentage    Float?    @map("charity_percentage")
+  imageUrl             String?   @map("image_url")
+  postsImage           String?   @map("posts_image")
+  isPublic             Boolean   @default(false) @map("is_public")
+  isCommunityPick      Boolean   @default(false) @map("is_community_pick")
+  isCharity            Boolean   @default(false) @map("is_charity")
+  charityId            String?   @map("charity_id")
+  authorName           String?   @map("author_name")
+  authorRole           String?   @map("author_role")
+  authorImage          String?   @map("author_image")
+  locationName         String?   @map("location_name")
+  latitude             Float?
+  longitude            Float?
+  source               String?
+  status               String    @default("active")
+  rejectionReason      String?   @map("rejection_reason")
+  changesRequestedNote String?   @map("changes_requested_note")
+  expiresAt            DateTime? @map("expires_at")
+  expiredAt            DateTime? @map("expired_at")
+  deletedAt            DateTime? @map("deleted_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
-  author    User      @relation(fields: [author_id], references: [id])
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id])
 
-  @@index([community_id, created_at])
-  @@index([author_id])
+  @@index([communityId, createdAt])
+  @@index([authorId])
   @@index([status])
   @@map("posts")
 }
@@ -364,56 +362,56 @@ model Post {
 // CHARITIES & SUGGESTIONS
 // =============================================
 model Charity {
-  id                     String   @id @default(cuid())
-  community_id           String
-  name                   String
-  description            String?
-  category               String?
-  percentage             Float    @default(0)
-  status                 String   @default("ACTIVE")
-  urgency                String? // 'Normal' | 'High' | 'Critical'
-  fundraising_goal       Float?
-  raised_amount          Float    @default(0)
-  image_url              String?
-  location_name          String?
-  latitude               Float?
-  longitude              Float?
-  is_verified            Boolean  @default(false)
-  is_featured            Boolean  @default(false)
-  tags                   String[] @default([])
-  linked_business_ids    String[] @default([])
-  campaign_completed     Boolean  @default(false)
-  is_approved_suggestion Boolean  @default(false)
-  suggested_by_id        String? // User who suggested this charity
-  created_at             DateTime @default(now())
-  updated_at             DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  communityId          String   @map("community_id")
+  name                 String
+  description          String?
+  category             String?
+  percentage           Float    @default(0)
+  status               String   @default("ACTIVE")
+  urgency              String?
+  fundraisingGoal      Float?   @map("fundraising_goal")
+  raisedAmount         Float    @default(0) @map("raised_amount")
+  imageUrl             String?  @map("image_url")
+  locationName         String?  @map("location_name")
+  latitude             Float?
+  longitude            Float?
+  isVerified           Boolean  @default(false) @map("is_verified")
+  isFeatured           Boolean  @default(false) @map("is_featured")
+  tags                 String[] @default([])
+  linkedBusinessIds    String[] @default([]) @map("linked_business_ids")
+  campaignCompleted    Boolean  @default(false) @map("campaign_completed")
+  isApprovedSuggestion Boolean  @default(false) @map("is_approved_suggestion")
+  suggestedById        String?  @map("suggested_by_id")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
 
-  community           Community           @relation(fields: [community_id], references: [id], onDelete: Cascade)
-  charity_suggestions CharitySuggestion[]
+  community          Community           @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  charitySuggestions CharitySuggestion[]
 
-  @@index([community_id])
+  @@index([communityId])
   @@map("charities")
 }
 
 model CharitySuggestion {
-  id                        String   @id @default(cuid())
-  community_id              String
-  charity_id                String?
-  suggested_by              String
-  name                      String
-  description               String?
-  reason                    String?
-  suggested_donation_amount Float? // Suggested % (1-100)
-  website                   String?
-  status                    String   @default("pending")
-  admin_feedback            String?
-  created_at                DateTime @default(now())
+  id                      String   @id @default(cuid())
+  communityId             String   @map("community_id")
+  charityId               String?  @map("charity_id")
+  suggestedBy             String   @map("suggested_by")
+  name                    String
+  description             String?
+  reason                  String?
+  suggestedDonationAmount Float?   @map("suggested_donation_amount")
+  website                 String?
+  status                  String   @default("pending")
+  adminFeedback           String?  @map("admin_feedback")
+  createdAt               DateTime @default(now()) @map("created_at")
 
-  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
-  charity   Charity?  @relation(fields: [charity_id], references: [id])
-  user      User      @relation(fields: [suggested_by], references: [id])
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  charity   Charity?  @relation(fields: [charityId], references: [id])
+  user      User      @relation(fields: [suggestedBy], references: [id])
 
-  @@index([community_id])
+  @@index([communityId])
   @@map("charity_suggestions")
 }
 
@@ -421,27 +419,28 @@ model CharitySuggestion {
 // BUSINESSES
 // =============================================
 model Business {
-  id            String   @id @default(cuid())
-  owner_id      String
-  name          String
-  category      String
-  description   String?
-  latitude      Float?
-  longitude     Float?
-  address       String?
-  phone         String?
-  website       String?
-  rating        Float?
-  image_url     String?
-  charity_id    String?
-  community_ids String[] @default([])
-  status        String   @default("ACTIVE")
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  id           String   @id @default(cuid())
+  ownerId      String   @map("owner_id")
+  name         String
+  category     String
+  description  String?
+  latitude     Float?
+  longitude    Float?
+  address      String?
+  phone        String?
+  website      String?
+  rating       Float?
+  imageUrl     String?  @map("image_url")
+  charityId    String?  @map("charity_id")
+  communityIds String[] @default([]) @map("community_ids")
+  status       String   @default("ACTIVE")
+  source       String   @default("MEMBER")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  owner User @relation(fields: [owner_id], references: [id])
+  owner User @relation(fields: [ownerId], references: [id])
 
-  @@index([owner_id])
+  @@index([ownerId])
   @@index([status])
   @@map("user_businesses")
 }
@@ -450,17 +449,17 @@ model Business {
 // REPORTS
 // =============================================
 model Report {
-  id           String   @id @default(cuid())
-  community_id String
-  reporter_id  String
-  target_id    String
-  target_type  String
-  reason       String
-  status       String   @default("pending")
-  created_at   DateTime @default(now())
+  id          String   @id @default(cuid())
+  communityId String   @map("community_id")
+  reporterId  String   @map("reporter_id")
+  targetId    String   @map("target_id")
+  targetType  String   @map("target_type")
+  reason      String
+  status      String   @default("pending")
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  community Community @relation(fields: [community_id], references: [id])
-  reporter  User      @relation("Reporter", fields: [reporter_id], references: [id])
+  community Community @relation(fields: [communityId], references: [id])
+  reporter  User      @relation("Reporter", fields: [reporterId], references: [id])
 
   @@map("reports")
 }
@@ -469,43 +468,43 @@ model Report {
 // INVITATIONS
 // =============================================
 model CommunityInvitation {
-  id                  String    @id @default(cuid())
-  community_id        String
-  invited_by_id       String
-  invited_user_id     String?
-  invited_email       String?
-  invited_by_admin_id String?
-  role                String    @default("MEMBER")
-  status              String    @default("pending")
-  created_at          DateTime  @default(now())
-  expires_at          DateTime?
+  id               String    @id @default(cuid())
+  communityId      String    @map("community_id")
+  invitedById      String    @map("invited_by_id")
+  invitedUserId    String?   @map("invited_user_id")
+  invitedEmail     String?   @map("invited_email")
+  invitedByAdminId String?   @map("invited_by_admin_id")
+  role             String    @default("MEMBER")
+  status           String    @default("pending")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  expiresAt        DateTime? @map("expires_at")
 
-  community    Community @relation(fields: [community_id], references: [id])
-  invited_by   User      @relation("InvitedBy", fields: [invited_by_id], references: [id])
-  invited_user User?     @relation("InvitedUser", fields: [invited_user_id], references: [id])
+  community   Community @relation(fields: [communityId], references: [id])
+  invitedBy   User      @relation("InvitedBy", fields: [invitedById], references: [id])
+  invitedUser User?     @relation("InvitedUser", fields: [invitedUserId], references: [id])
 
-  @@index([community_id])
-  @@index([invited_user_id])
+  @@index([communityId])
+  @@index([invitedUserId])
   @@map("community_invitations")
 }
 
 model CommunityInviteLink {
-  id           String    @id @default(cuid())
-  community_id String
-  created_by   String
-  code         String    @unique @default(cuid())
-  role         String    @default("MEMBER")
-  uses         Int       @default(0)
-  max_uses     Int?
-  active       Boolean   @default(true)
-  expires_at   DateTime?
-  created_at   DateTime  @default(now())
+  id          String    @id @default(cuid())
+  communityId String    @map("community_id")
+  createdBy   String    @map("created_by")
+  code        String    @unique @default(cuid())
+  role        String    @default("MEMBER")
+  uses        Int       @default(0)
+  maxUses     Int?      @map("max_uses")
+  active      Boolean   @default(true)
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
 
-  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
-  creator   User      @relation(fields: [created_by], references: [id])
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  creator   User      @relation(fields: [createdBy], references: [id])
 
   @@index([code])
-  @@index([community_id])
+  @@index([communityId])
   @@map("community_invite_links")
 }
 
@@ -513,35 +512,35 @@ model CommunityInviteLink {
 // CONVERSATIONS & MESSAGES
 // =============================================
 model Conversation {
-  id              String    @id @default(cuid())
-  type            String    @default("direct")
-  listing_id      String?
-  notice_id       String?
-  community_id    String?
-  last_message    String?
-  last_message_at DateTime?
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  type          String    @default("direct")
+  listingId     String?   @map("listing_id")
+  noticeId      String?   @map("notice_id")
+  communityId   String?   @map("community_id")
+  lastMessage   String?   @map("last_message")
+  lastMessageAt DateTime? @map("last_message_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
   participants ConversationParticipant[]
   messages     Message[]
 
-  @@index([community_id])
+  @@index([communityId])
   @@map("conversations")
 }
 
 model ConversationParticipant {
-  id              String   @id @default(cuid())
-  conversation_id String
-  user_id         String
-  unread_count    Int      @default(0)
-  joined_at       DateTime @default(now())
+  id             String   @id @default(cuid())
+  conversationId String   @map("conversation_id")
+  userId         String   @map("user_id")
+  unreadCount    Int      @default(0) @map("unread_count")
+  joinedAt       DateTime @default(now()) @map("joined_at")
 
-  conversation Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([conversation_id, user_id])
-  @@index([user_id])
+  @@unique([conversationId, userId])
+  @@index([userId])
   @@map("conversation_participants")
 }
 
@@ -549,18 +548,18 @@ model ConversationParticipant {
 // NOTIFICATIONS
 // =============================================
 model Notification {
-  id         String   @id @default(cuid())
-  user_id    String
-  title      String
-  message    String
-  type       String
-  read       Boolean  @default(false)
-  metadata   Json?
-  created_at DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  title     String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
-  @@index([user_id])
+  @@index([userId])
   @@index([read])
   @@map("notifications")
 }
@@ -569,17 +568,17 @@ model Notification {
 // LICENSES
 // =============================================
 model License {
-  id           String   @id @default(cuid())
-  user_id      String
-  community_id String?
-  type         String // 'PERSONAL' | 'COMMUNITY'
-  status       String   @default("ACTIVE") // 'ACTIVE' | 'USED'
-  created_at   DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  communityId String?  @map("community_id")
+  type        String
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  user      User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  community Community? @relation(fields: [community_id], references: [id])
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community Community? @relation(fields: [communityId], references: [id])
 
-  @@index([user_id])
+  @@index([userId])
   @@map("licenses")
 }
 
@@ -587,18 +586,18 @@ model License {
 // MODERATION LOGS
 // =============================================
 model ModerationLog {
-  id           String   @id @default(cuid())
-  community_id String
-  moderator_id String
-  action       String // 'approve' | 'reject' | 'delete' | 'warn' | 'ban' | etc.
-  target_id    String
-  target_type  String // 'post' | 'user' | 'report'
-  notes        String?
-  timestamp    DateTime @default(now())
+  id          String   @id @default(cuid())
+  communityId String   @map("community_id")
+  moderatorId String   @map("moderator_id")
+  action      String
+  targetId    String   @map("target_id")
+  targetType  String   @map("target_type")
+  notes       String?
+  timestamp   DateTime @default(now())
 
-  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
-  @@index([community_id])
+  @@index([communityId])
   @@map("moderation_logs")
 }
 
@@ -606,17 +605,17 @@ model ModerationLog {
 // SECURITY EVENTS
 // =============================================
 model SecurityEvent {
-  id           String   @id @default(cuid())
-  community_id String
-  type         String // 'unauthorized_access' | 'suspicious_activity' | 'emergency_alert'
-  severity     String // 'low' | 'medium' | 'high' | 'critical'
-  description  String
-  resolved     Boolean  @default(false)
-  metadata     Json?
-  timestamp    DateTime @default(now())
+  id          String   @id @default(cuid())
+  communityId String   @map("community_id")
+  type        String
+  severity    String
+  description String
+  resolved    Boolean  @default(false)
+  metadata    Json?
+  timestamp   DateTime @default(now())
 
-  community Community @relation(fields: [community_id], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
-  @@index([community_id])
+  @@index([communityId])
   @@map("security_events")
 }

@@ -62,7 +62,7 @@ export const SecuritySection: React.FC = () => {
         current_password: passwordData.current,
         new_password: passwordData.new,
       });
-      await updateUserProfile({ last_password_changed: new Date().toISOString() } as any);
+      await updateUserProfile({ lastPasswordChanged: new Date().toISOString() } as any);
       setShowPasswordForm(false);
       setPasswordData({ current: '', new: '', confirm: '' });
       setStatus({ type: 'success', message: 'Password changed successfully' });
@@ -73,7 +73,7 @@ export const SecuritySection: React.FC = () => {
   };
 
   const handleToggle2FA = async () => {
-    if (!userProfile?.two_factor_enabled) {
+    if (!userProfile?.twoFactorEnabled) {
       setLoading2FA(true);
       try {
         const setup = await accountService.setup2FA();
@@ -85,7 +85,7 @@ export const SecuritySection: React.FC = () => {
         setLoading2FA(false);
       }
     } else {
-      await updateUserProfile({ two_factor_enabled: false });
+      await updateUserProfile({ twoFactorEnabled: false });
       setStatus({ type: 'success', message: '2FA disabled' });
       setTimeout(() => setStatus(null), 3000);
     }
@@ -97,7 +97,7 @@ export const SecuritySection: React.FC = () => {
     try {
       const { verified } = await accountService.verify2FA(verificationCode);
       if (verified) {
-        await updateUserProfile({ two_factor_enabled: true, two_factor_method: 'App' });
+        await updateUserProfile({ twoFactorEnabled: true, twoFactorMethod: 'App' });
         setShow2FASetup(false);
         setTwoFASetupData(null);
         setVerificationCode('');
@@ -114,8 +114,8 @@ export const SecuritySection: React.FC = () => {
   };
 
   const lastChangedText = () => {
-    if (!userProfile?.last_password_changed) return 'Never';
-    return new Date(userProfile.last_password_changed as string).toLocaleDateString();
+    if (!userProfile?.lastPasswordChanged) return 'Never';
+    return new Date(userProfile.lastPasswordChanged as string).toLocaleDateString();
   };
 
   return (
@@ -222,7 +222,7 @@ export const SecuritySection: React.FC = () => {
           disabled={loading2FA}
           style={{
             width: 52, height: 28, borderRadius: 14,
-            backgroundColor: userProfile?.two_factor_enabled ? '#10b981' : '#d1d5db',
+            backgroundColor: userProfile?.twoFactorEnabled ? '#10b981' : '#d1d5db',
             justifyContent: 'center',
             opacity: loading2FA ? 0.5 : 1,
           }}
@@ -233,8 +233,8 @@ export const SecuritySection: React.FC = () => {
             <View style={{
               width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff',
               position: 'absolute',
-              left: userProfile?.two_factor_enabled ? undefined : 4,
-              right: userProfile?.two_factor_enabled ? 4 : undefined,
+              left: userProfile?.twoFactorEnabled ? undefined : 4,
+              right: userProfile?.twoFactorEnabled ? 4 : undefined,
             }} />
           )}
         </TouchableOpacity>
@@ -253,8 +253,8 @@ export const SecuritySection: React.FC = () => {
           {/* QR Code */}
           <View style={{ alignItems: 'center', gap: 8 }}>
             <View style={{ padding: 16, backgroundColor: '#fff', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' }}>
-              {twoFASetupData.qr_code ? (
-                <QRCode value={twoFASetupData.qr_code} size={160} />
+              {twoFASetupData.qrCode ? (
+                <QRCode value={twoFASetupData.qrCode} size={160} />
               ) : (
                 <View style={{ width: 160, height: 160, backgroundColor: '#f5f5f5', borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
                   <ActivityIndicator color="#0d3d47" />

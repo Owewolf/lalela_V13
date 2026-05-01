@@ -101,23 +101,23 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
 
   const handleOpenListingChat = useCallback(
     async (listing: (typeof listings)[0]) => {
-      if (!userProfile?.id || !listing.author_id) return;
+      if (!userProfile?.id || !listing.authorId) return;
 
       try {
         const conversationId = await startConversation({
-          participants: Array.from(new Set([userProfile?.id, listing.author_id])),
+          participants: Array.from(new Set([userProfile?.id, listing.authorId])),
           type: 'listing',
           communityId: currentCommunity?.id,
           listingId: listing.id,
           metadata: {
             title: listing.title,
             type: 'listing',
-            image: listing.posts_image,
+            image: listing.postsImage,
             author: listing.authorName,
             authorImage: listing.authorImage,
             location: listing.locationName,
             description: listing.description,
-            price: listing.price !== undefined ? `R${(listing.community_price || listing.price).toLocaleString()}` : undefined,
+            price: listing.price !== undefined ? `R${(listing.communityPrice || listing.price).toLocaleString()}` : undefined,
           },
         });
         setActiveConversation(conversationId);
@@ -168,9 +168,9 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
       website: undefined,
       isExternal: false,
       isVerified: true,
-      isFeatured: true,
-      isMemberBusiness: true,
-      label: b.owner_id === userProfile?.id ? 'My Business' : undefined,
+      isFeatured: false,
+      isMemberBusiness: b.source !== 'IMPORT',
+      label: b.ownerId === userProfile?.id ? 'My Business' : undefined,
       labelType: 'new' as const,
       status: 'Open' as const,
       distance:
@@ -268,14 +268,14 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
   const renderListing = useCallback(
     ({ item: listing }: { item: (typeof listings)[0] }) => {
       const charity = charities.find(c => c.id === listing.charityId);
-      const hasListingImage = typeof listing.posts_image === 'string' && listing.posts_image.trim().length > 0;
+      const hasListingImage = typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0;
       const hasAuthorImage = typeof listing.authorImage === 'string' && listing.authorImage.trim().length > 0;
       return (
         <TouchableOpacity activeOpacity={0.92} onPress={() => setSelectedListing(listing)} className="mb-4 bg-gray-50 rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm">
           {hasListingImage ? (
             <View className="w-full aspect-[4/3] overflow-hidden">
               <Image
-                source={{ uri: listing.posts_image }}
+                source={{ uri: listing.postsImage }}
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -327,18 +327,18 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                 </Text>
                 <View className="flex-row items-baseline gap-1">
                   <Text className="text-primary text-[28px] font-black">
-                    R{(listing.community_price || listing.price || 0).toLocaleString()}
+                    R{(listing.communityPrice || listing.price || 0).toLocaleString()}
                   </Text>
                   <Text className="text-primary/60 font-bold text-sm">.00</Text>
                 </View>
               </View>
-              {listing.isPublic && listing.public_price ? (
+              {listing.isPublic && listing.publicPrice ? (
                 <View className="items-end">
                   <Text className="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">
                     Public Price
                   </Text>
                   <Text className="text-gray-400 font-bold text-lg line-through decoration-orange-400">
-                    R{listing.public_price.toLocaleString()}
+                    R{listing.publicPrice.toLocaleString()}
                   </Text>
                 </View>
               ) : null}
@@ -354,7 +354,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                   <View className="flex-row justify-between items-center mb-1">
                     <Text className="text-primary font-bold text-sm">Charity Impact</Text>
                     <Text className="text-orange-500 font-black text-sm">
-                      R{(listing.charity_amount || 0).toFixed(2)}
+                      R{(listing.charityAmount || 0).toFixed(2)}
                     </Text>
                   </View>
                   <Text className="text-gray-400 text-[11px] leading-relaxed">
@@ -435,7 +435,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
     if (!selectedListing) return null;
 
     const charity = selectedListing.charityId ? charities.find((item) => item.id === selectedListing.charityId) : null;
-    const hasListingImage = typeof selectedListing.posts_image === 'string' && selectedListing.posts_image.trim().length > 0;
+    const hasListingImage = typeof selectedListing.postsImage === 'string' && selectedListing.postsImage.trim().length > 0;
     const hasAuthorImage = typeof selectedListing.authorImage === 'string' && selectedListing.authorImage.trim().length > 0;
 
     return (
@@ -445,7 +445,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
             <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
               {hasListingImage ? (
                 <Image
-                  source={{ uri: selectedListing.posts_image }}
+                  source={{ uri: selectedListing.postsImage }}
                   style={{ width: '100%', height: 240 }}
                   resizeMode="cover"
                 />
@@ -481,11 +481,11 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                 <View style={{ backgroundColor: '#f8fafc', borderRadius: 18, padding: 14, borderWidth: 1, borderColor: 'rgba(79,70,229,0.12)' }}>
                   <Text style={{ fontSize: 10, fontWeight: '800', color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1 }}>Community Price</Text>
                   <Text style={{ fontSize: 28, fontWeight: '900', color: '#4f46e5', marginTop: 6 }}>
-                    R{(selectedListing.community_price || selectedListing.price || 0).toLocaleString()}
+                    R{(selectedListing.communityPrice || selectedListing.price || 0).toLocaleString()}
                   </Text>
-                  {selectedListing.isPublic && selectedListing.public_price ? (
+                  {selectedListing.isPublic && selectedListing.publicPrice ? (
                     <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 8 }}>
-                      Public price: R{selectedListing.public_price.toLocaleString()}
+                      Public price: R{selectedListing.publicPrice.toLocaleString()}
                     </Text>
                   ) : null}
                 </View>
@@ -496,7 +496,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                   <View style={{ backgroundColor: '#fff7ed', borderRadius: 18, padding: 14, borderWidth: 1, borderColor: 'rgba(249,115,22,0.18)' }}>
                     <Text style={{ fontSize: 12, fontWeight: '700', color: '#9a3412' }}>Charity contribution</Text>
                     <Text style={{ fontSize: 12, color: '#7c2d12', marginTop: 6 }}>
-                      This listing supports {charity.name} with R{selectedListing.charity_amount?.toFixed(2) || '0.00'} per sale.
+                      This listing supports {charity.name} with R{selectedListing.charityAmount?.toFixed(2) || '0.00'} per sale.
                     </Text>
                   </View>
                 ) : null}
@@ -554,8 +554,8 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
 
   const subText =
     activeTab === 'businesses'
-      ? `${filteredBusinesses.length} business${filteredBusinesses.length !== 1 ? 'es' : ''} in ${coverageArea?.location_name || currentCommunity?.name || 'your area'}`
-      : `Showing ${activeTab === 'listings' ? listings.length : filteredBusinesses.length} ${activeTab === 'listings' ? 'listings' : 'businesses'} in ${coverageArea?.location_name || currentCommunity?.name || 'your area'}`;
+      ? `${filteredBusinesses.length} business${filteredBusinesses.length !== 1 ? 'es' : ''} in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`
+      : `Showing ${activeTab === 'listings' ? listings.length : filteredBusinesses.length} ${activeTab === 'listings' ? 'listings' : 'businesses'} in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`;
 
   const currentData = activeTab === 'listings' ? listings : filteredBusinesses;
 

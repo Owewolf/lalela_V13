@@ -130,7 +130,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
       return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
     };
 
-    const responderIds = new Set(securityResponders.map((r) => r.user_id));
+    const responderIds = new Set(securityResponders.map((r) => r.userId));
     const fromDedicated = securityResponders.map((r) => ({
       ...r,
       distance: calcDist(r.latitude, r.longitude),
@@ -138,13 +138,13 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
     const fromMembers = members
       .filter(
         (m) =>
-          m.isSecurityMember && m.latitude && m.longitude && !responderIds.has(m.user_id)
+          m.isSecurityMember && m.latitude && m.longitude && !responderIds.has(m.userId)
       )
       .map((m) => ({
-        user_id: m.user_id,
+        userId: m.userId,
         name: m.name || 'Security Member',
         image:
-          m.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.user_id}`,
+          m.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.userId}`,
         latitude: m.latitude!,
         longitude: m.longitude!,
         timestamp: new Date().toISOString(),
@@ -156,7 +156,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
   }, [securityResponders, members, safeCenter.latitude, safeCenter.longitude]);
 
   const emergencyPost = posts.find(
-    (p) => p.urgency === 'emergency' || p.urgency_level === 'emergency'
+    (p) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
   );
 
   const coverageCenter =
@@ -291,7 +291,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                   member.isSecurityMember && isEmergencyActive;
                 return (
                   <Marker
-                    key={member.user_id}
+                    key={member.userId}
                     coordinate={{
                       latitude: member.latitude!,
                       longitude: member.longitude!,
@@ -377,7 +377,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 const isEmergencyNotice =
                   notice.priority === 'emergency' ||
                   notice.urgency === 'emergency' ||
-                  notice.urgency_level === 'emergency';
+                  notice.urgencyLevel === 'emergency';
                 return (
                   <Marker
                     key={notice.id}
@@ -451,7 +451,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
           {isEmergencyActive &&
             securityResponders.map((responder) => (
               <Marker
-                key={`responder-${responder.user_id}`}
+                key={`responder-${responder.userId}`}
                 coordinate={{
                   latitude: responder.latitude,
                   longitude: responder.longitude,
@@ -535,7 +535,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 <View className="border-t border-white/20 pt-2 gap-1.5">
                   {allResponders.slice(0, 3).map((responder) => (
                     <View
-                      key={responder.user_id}
+                      key={responder.userId}
                       className="flex-row items-center gap-2"
                     >
                       <View className="w-5 h-5 rounded-full bg-white/20 items-center justify-center">

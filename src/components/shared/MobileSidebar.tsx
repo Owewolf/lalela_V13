@@ -63,9 +63,9 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   const chevronRotate = useRef(new Animated.Value(0)).current;
   const [visible, setVisible] = useState(false);
 
-  const isLicensed = userProfile?.license_status === 'LICENSED' || currentCommunity?.type === 'LICENSED';
+  const isLicensed = userProfile?.licenseStatus === 'LICENSED' || currentCommunity?.type === 'LICENSED';
   const hasTrialCommunity = (communities || []).some(
-    (c: any) => c.owner_id === userProfile?.id && c.type === 'TRIAL'
+    (c: any) => c.ownerId === userProfile?.id && c.type === 'TRIAL'
   );
   const canCreateNewCommunity = !hasTrialCommunity;
 
@@ -381,7 +381,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 ]}
               >
                 <Image
-                  source={{ uri: userProfile?.profile_image || `https://picsum.photos/seed/${userProfile?.id}/100/100` }}
+                  source={{ uri: userProfile?.profileImage || `https://picsum.photos/seed/${userProfile?.id}/100/100` }}
                   style={styles.avatarImg}
                 />
               </View>

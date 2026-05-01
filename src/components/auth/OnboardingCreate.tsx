@@ -90,21 +90,21 @@ const OnboardingCreate: React.FC = () => {
   const { userProfile, loading, updateUserProfile } = useAuth();
   const { refreshCommunities } = useCommunity();
   // Synthetic `user` for backward-compat with the rest of this component
-  const user = userProfile ? { uid: userProfile.id, email: userProfile.email, displayName: userProfile.name, photoURL: userProfile.profile_image ?? null } : null;
+  const user = userProfile ? { uid: userProfile.id, email: userProfile.email, displayName: userProfile.name, photoURL: userProfile.profileImage ?? null } : null;
   const router = useRouter();
 
   const [step, setStep] = useState<OnboardingStep>('profile');
 
-  // On mount only: if the user already has profile_completed (e.g. re-entering onboarding),
+  // On mount only: if the user already has profileCompleted (e.g. re-entering onboarding),
   // skip straight to the community name step.
-  // A ref prevents this from re-firing when profile_completed is set inside handleSubmit.
+  // A ref prevents this from re-firing when profileCompleted is set inside handleSubmit.
   const movedPastProfile = useRef(false);
   useEffect(() => {
-    if (userProfile?.profile_completed && !movedPastProfile.current) {
+    if (userProfile?.profileCompleted && !movedPastProfile.current) {
       movedPastProfile.current = true;
       setStep('name');
     }
-  }, [userProfile?.profile_completed]);
+  }, [userProfile?.profileCompleted]);
 
   // Profile fields
   const [fullName, setFullName] = useState('');
@@ -157,7 +157,7 @@ const OnboardingCreate: React.FC = () => {
   const [trialBlocked, setTrialBlocked] = useState(false);
 
   // True when the user already has a completed profile (coming from inside the app)
-  const isExistingUser = userProfile?.profile_completed === true;
+  const isExistingUser = userProfile?.profileCompleted === true;
 
   const isProfileValid = fullName.trim().length > 0 && locationName.trim().length > 0 && locationLat !== 0;
 
@@ -223,13 +223,13 @@ const OnboardingCreate: React.FC = () => {
   useEffect(() => {
     if (userProfile) {
       if (!fullName) {
-        const n = `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() || userProfile.name || '';
+        const n = `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.name || '';
         if (n) { setFullName(n); setCommunityName(`${n}'s Community`); }
       }
       if (!email && userProfile.email) setEmail(userProfile.email);
-      if (!phone && (userProfile.mobile_number || userProfile.phone))
-        setPhone(userProfile.mobile_number || userProfile.phone || '');
-      if (!profileImage && userProfile.profile_image) setProfileImage(userProfile.profile_image);
+      if (!phone && (userProfile.mobileNumber || userProfile.phone))
+        setPhone(userProfile.mobileNumber || userProfile.phone || '');
+      if (!profileImage && userProfile.profileImage) setProfileImage(userProfile.profileImage);
       if (!locationName && userProfile.address) setLocationName(userProfile.address);
       if (locationLat === 0 && userProfile.defaultLocation?.latitude) setLocationLat(userProfile.defaultLocation.latitude);
       if (locationLng === 0 && userProfile.defaultLocation?.longitude) setLocationLng(userProfile.defaultLocation.longitude);
@@ -321,11 +321,11 @@ const OnboardingCreate: React.FC = () => {
       try {
         const { data: community } = await api.post('/communities', {
           name: communityName.trim(),
-          coverage_lat: coverageLat || undefined,
-          coverage_lng: coverageLng || undefined,
-          coverage_radius: coverageRadius,
-          coverage_location: coverageName || undefined,
-          enabled_categories: selectedCategories,
+          coverageLat: coverageLat || undefined,
+          coverageLng: coverageLng || undefined,
+          coverageRadius: coverageRadius,
+          coverageLocation: coverageName || undefined,
+          enabledCategories: selectedCategories,
         });
         communityId = community?.id;
       } catch (err: any) {
@@ -337,7 +337,7 @@ const OnboardingCreate: React.FC = () => {
           }
           // New user whose community was created on a previous attempt but whose
           // profile update failed (partial failure recovery). Use the existing community.
-          communityId = err.response.data.community_id;
+          communityId = err.response.data.communityId;
         } else {
           throw err;
         }
@@ -347,8 +347,8 @@ const OnboardingCreate: React.FC = () => {
       movedPastProfile.current = true;
       if (isExistingUser) {
         await updateUserProfile({
-          community_created: true,
-          last_community_id: communityId,
+          communityCreated: true,
+          lastCommunityId: communityId,
         } as any);
       } else {
         const resolvedName = fullName || userProfile?.name || 'Anonymous';
@@ -360,21 +360,21 @@ const OnboardingCreate: React.FC = () => {
         const authEmail = (userProfile?.email || '').trim().toLowerCase();
         const resolvedEmail = emailPattern.test(typedEmail) ? typedEmail : emailPattern.test(authEmail) ? authEmail : '';
         const resolvedPhone = (phone || '').trim();
-        const resolvedImage = profileImage || userProfile?.profile_image || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(resolvedName)}`;
+        const resolvedImage = profileImage || userProfile?.profileImage || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(resolvedName)}`;
         await updateUserProfile({
           name: resolvedName,
-          first_name: resolvedFirstName,
-          last_name: resolvedLastName,
+          firstName: resolvedFirstName,
+          lastName: resolvedLastName,
           email: resolvedEmail,
           phone: resolvedPhone,
-          mobile_number: resolvedPhone,
+          mobileNumber: resolvedPhone,
           address: locationName,
-          profile_image: resolvedImage,
+          profileImage: resolvedImage,
           defaultLocation: { name: locationName, latitude: locationLat, longitude: locationLng },
-          profile_completed: true,
-          community_created: true,
-          onboarding_completed: true,
-          last_community_id: communityId,
+          profileCompleted: true,
+          communityCreated: true,
+          onboardingCompleted: true,
+          lastCommunityId: communityId,
         } as any);
       }
 
@@ -440,7 +440,7 @@ const OnboardingCreate: React.FC = () => {
   const inCommunityPhase = COMMUNITY_STEPS.includes(step);
   const communitySubStep = inCommunityPhase ? COMMUNITY_STEPS.indexOf(step) + 1 : 0;
   // Outer progress bar — 2 phases: Profile | Community
-  const steps = userProfile?.profile_completed
+  const steps = userProfile?.profileCompleted
     ? [{ key: 'name' as OnboardingStep, label: 'Create Community' }]
     : [
         { key: 'profile' as OnboardingStep, label: 'Your Profile' },
@@ -468,7 +468,7 @@ const OnboardingCreate: React.FC = () => {
           {/* Step indicator */}
           <View className="flex-row items-center justify-center gap-2 px-6 py-5">
             {/* Profile phase */}
-            {!userProfile?.profile_completed && (
+            {!userProfile?.profileCompleted && (
               <React.Fragment>
                 <View className="items-center gap-1">
                   <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: step === 'profile' ? '#0d3d47' : '#10b981' }}>
@@ -679,7 +679,7 @@ const OnboardingCreate: React.FC = () => {
                 {error && <View className="bg-red-50 border border-red-100 rounded-2xl p-4"><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
 
                 <View className="flex-row gap-3">
-                  {!userProfile?.profile_completed && (
+                  {!userProfile?.profileCompleted && (
                     <TouchableOpacity onPress={() => { setStep('profile'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
                       <ArrowLeft size={20} color="#374151" />
                     </TouchableOpacity>

@@ -75,13 +75,17 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
   }, [locationName, latitude, longitude, isEditing]);
 
   const reverseGeocodeName = async (lat: number, lng: number) => {
-    const geo = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
-    const place = geo[0];
-    return place
-      ? [place.name, place.street, place.subregion, place.city, place.region]
-          .filter(Boolean)
-          .join(', ')
-      : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    try {
+      const geo = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
+      const place = geo[0];
+      return place
+        ? [place.name, place.street, place.subregion, place.city, place.region]
+            .filter(Boolean)
+            .join(', ')
+        : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    } catch {
+      return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    }
   };
 
   const applyLocationSelection = async (lat: number, lng: number, preferredName?: string) => {
@@ -136,11 +140,7 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
   };
 
   const handleMapSelect = async (lat: number, lng: number) => {
-    try {
-      await applyLocationSelection(lat, lng);
-    } catch {
-      Alert.alert('Error', 'Failed to resolve address for selected pin location.');
-    }
+    await applyLocationSelection(lat, lng);
   };
 
   return (

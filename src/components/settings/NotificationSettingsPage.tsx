@@ -56,10 +56,10 @@ const NotificationSettingsPage: React.FC = () => {
   const [expandedCommunityId, setExpandedCommunityId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (userProfile?.notification_preferences) {
-      setPrefs({ ...defaultPreferences, ...(userProfile.notification_preferences as NotificationPreferences) });
+    if (userProfile?.notificationPreferences) {
+      setPrefs({ ...defaultPreferences, ...(userProfile.notificationPreferences as NotificationPreferences) });
     }
-  }, [userProfile?.notification_preferences]);
+  }, [userProfile?.notificationPreferences]);
 
   const save = async (updated: NotificationPreferences) => {
     setPrefs(updated);

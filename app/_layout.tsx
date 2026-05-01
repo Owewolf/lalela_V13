@@ -107,7 +107,7 @@ function AppGuard() {
 
     if (userProfile === null) return;
 
-    const onboardingComplete = userProfile.profile_completed === true;
+    const onboardingComplete = userProfile.profileCompleted === true;
 
     if (!onboardingComplete && !inOnboarding) {
       // Carry any pending invite code in the URL to avoid AsyncStorage race conditions
@@ -132,7 +132,7 @@ function AppGuard() {
       const code = parseJoinCode(url);
       if (!code) return;
 
-      if (user && userProfile?.profile_completed) {
+      if (user && userProfile?.profileCompleted) {
         // Already onboarded — join immediately
         try {
           await joinViaInviteLink(code);
@@ -222,7 +222,7 @@ function LoadingOverlay() {
   }
 
   // Authenticated but profile not yet complete: hold overlay until an onboarding route is visible
-  if (user && userProfile && !userProfile.profile_completed && segments[0] !== 'onboarding' && segments[0] !== 'onboarding-create') {
+  if (user && userProfile && !userProfile.profileCompleted && segments[0] !== 'onboarding' && segments[0] !== 'onboarding-create') {
     return <View style={styles.overlay} />;
   }
 

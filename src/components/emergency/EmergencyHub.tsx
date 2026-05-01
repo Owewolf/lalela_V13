@@ -71,9 +71,9 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
   // Extract shared locations from chat messages
   const sharedLocations = useMemo(() => {
     return messages
-      .filter((msg) => msg.text.startsWith('Shared Location:'))
+      .filter((msg) => msg.content.startsWith('Shared Location:'))
       .map((msg) => {
-        const coords = msg.text
+        const coords = msg.content
           .replace('Shared Location:', '')
           .split(',')
           .map((c) => parseFloat(c.trim()));
@@ -97,20 +97,20 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
       let senderImage = msg.senderImage;
       let role = msg.senderRole;
 
-      const senderMember = members.find((m) => m.user_id === msg.senderId);
+      const senderMember = members.find((m) => m.userId === msg.userId);
       if (senderMember) {
-        if (!senderName) senderName = senderMember.name || `Member ${msg.senderId.slice(0, 4)}`;
+        if (!senderName) senderName = senderMember.name || `Member ${msg.userId.slice(0, 4)}`;
         if (!senderImage) senderImage = senderMember.image;
       }
 
-      const responder = securityResponders.find((r) => r.user_id === msg.senderId);
+      const responder = securityResponders.find((r) => r.userId === msg.userId);
       if (responder) {
         if (!senderName) senderName = responder.name;
         if (!senderImage) senderImage = responder.image;
         role = 'Responder' as any;
       }
 
-      if (emergencyPost && msg.senderId === emergencyPost.author_id) {
+      if (emergencyPost && msg.userId === emergencyPost.authorId) {
         role = 'Author' as any;
       }
 
@@ -128,11 +128,11 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
     if (!emergencyPost) return;
 
     const initChat = async () => {
-      const allMemberIds = members.map((m) => m.user_id);
+      const allMemberIds = members.map((m) => m.userId);
       const participantSet = new Set(allMemberIds);
-      if (emergencyPost.author_id) participantSet.add(emergencyPost.author_id);
+      if (emergencyPost.authorId) participantSet.add(emergencyPost.authorId);
       if (userProfile?.id) participantSet.add(userProfile.id);
-      securityResponders.forEach((r) => participantSet.add(r.user_id));
+      securityResponders.forEach((r) => participantSet.add(r.userId));
 
       const convId = await startConversation({
         participants: Array.from(participantSet),
@@ -261,7 +261,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
             <View className="flex-row" style={{ marginRight: 4 }}>
               {securityResponders.slice(0, 3).map((r) => (
                 <View
-                  key={r.user_id}
+                  key={r.userId}
                   className="w-6 h-6 rounded-full border-2 border-white bg-gray-100 overflow-hidden"
                   style={{ marginLeft: -6 }}
                 >

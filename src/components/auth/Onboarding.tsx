@@ -75,7 +75,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
 const OnboardingInvite: React.FC = () => {
   const { userProfile, loading, updateUserProfile } = useAuth();
-  const user = userProfile ? { uid: userProfile.id, email: userProfile.email, displayName: userProfile.name, photoURL: userProfile.profile_image } : null;
+  const user = userProfile ? { uid: userProfile.id, email: userProfile.email, displayName: userProfile.name, photoURL: userProfile.profileImage } : null;
   const router = useRouter();
   // Invite code can arrive synchronously as a URL param (from join.tsx deep link)
   // or fall back to AsyncStorage for legacy paths
@@ -140,7 +140,7 @@ const OnboardingInvite: React.FC = () => {
         setInviteCode(code);
         // Fetch community name for the invite link (best-effort)
         api.get(`/communities/join/${code}`).then((res) => {
-          if (res.data?.community_name) setInvitedCommunityName(res.data.community_name);
+          if (res.data?.communityName) setInvitedCommunityName(res.data.communityName);
         }).catch(() => {});
       }
 
@@ -159,13 +159,13 @@ const OnboardingInvite: React.FC = () => {
   useEffect(() => {
     if (userProfile) {
       if (!fullName) {
-        const n = `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() || userProfile.name || '';
+        const n = `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.name || '';
         if (n) setFullName(n);
       }
       if (!email && userProfile.email) setEmail(userProfile.email);
-      if (!phone && (userProfile.mobile_number || userProfile.phone))
-        setPhone(userProfile.mobile_number || userProfile.phone || '');
-      if (!profileImage && userProfile.profile_image) setProfileImage(userProfile.profile_image);
+      if (!phone && (userProfile.mobileNumber || userProfile.phone))
+        setPhone(userProfile.mobileNumber || userProfile.phone || '');
+      if (!profileImage && userProfile.profileImage) setProfileImage(userProfile.profileImage);
       if (!locationName && userProfile.address) setLocationName(userProfile.address);
       if (locationLat === 0 && userProfile.defaultLocation?.latitude) setLocationLat(userProfile.defaultLocation.latitude);
       if (locationLng === 0 && userProfile.defaultLocation?.longitude) setLocationLng(userProfile.defaultLocation.longitude);
@@ -267,18 +267,18 @@ const OnboardingInvite: React.FC = () => {
         await AsyncStorage.removeItem('pending_join_code');
       }
 
-      // Write profile via REST (server sets profile_completed = true)
+      // Write profile via REST (server sets profileCompleted = true)
       await updateUserProfile({
         name: resolvedName,
-        first_name: resolvedFirstName,
-        last_name: resolvedLastName,
+        firstName: resolvedFirstName,
+        lastName: resolvedLastName,
         email: resolvedEmail,
         phone: resolvedPhone,
-        mobile_number: resolvedPhone,
+        mobileNumber: resolvedPhone,
         address: locationName,
-        profile_image: resolvedImage,
-        profile_completed: true,
-        onboarding_completed: true,
+        profileImage: resolvedImage,
+        profileCompleted: true,
+        onboardingCompleted: true,
         defaultLocation: { name: locationName, latitude: locationLat, longitude: locationLng },
       });
 

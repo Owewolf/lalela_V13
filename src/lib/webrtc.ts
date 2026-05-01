@@ -207,8 +207,9 @@ export class WebRTCCall {
   // ── Internals ───────────────────────────────────────────────────────────────
   private _createPeerConnection(onRemoteStream: (stream: MediaStream) => void): RTCPeerConnection {
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS } as any);
+    const pcAny = pc as any;
 
-    pc.addEventListener('icecandidate', (event: any) => {
+    pcAny.addEventListener('icecandidate', (event: any) => {
       if (event.candidate && this.remoteUserId) {
         this.socket.emit('webrtc:ice', {
           target: this.remoteUserId,
@@ -217,7 +218,7 @@ export class WebRTCCall {
       }
     });
 
-    pc.addEventListener('track', (event: any) => {
+    pcAny.addEventListener('track', (event: any) => {
       if (event.streams?.[0]) onRemoteStream(event.streams[0]);
     });
 

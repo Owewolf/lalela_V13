@@ -179,10 +179,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Init completed steps
   React.useEffect(() => {
-    if (currentCommunity?.onboarding_steps_completed) {
-      setCompletedSetupSteps(new Set(currentCommunity.onboarding_steps_completed as SetupStepId[]));
+    if (currentCommunity?.onboardingStepsCompleted) {
+      setCompletedSetupSteps(new Set(currentCommunity.onboardingStepsCompleted as SetupStepId[]));
     }
-  }, [currentCommunity?.onboarding_steps_completed]);
+  }, [currentCommunity?.onboardingStepsCompleted]);
 
   React.useEffect(() => {
     if (!guidedSetup) return;
@@ -213,7 +213,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (currentCommunity?.id) {
       try {
         await api.put(`/communities/${currentCommunity.id}`, {
-          onboarding_steps_completed: Array.from(updated),
+          onboardingStepsCompleted: Array.from(updated),
         });
       } catch (err) { console.error('Failed to save setup step:', err); }
     }
@@ -239,11 +239,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       try {
         // Mark all steps completed on the community record
         await api.put(`/communities/${currentCommunity.id}`, {
-          onboarding_steps_completed: SETUP_STEPS.map(s => s.id),
+          onboardingStepsCompleted: SETUP_STEPS.map(s => s.id),
         });
       } catch (e) { console.error(e); }
     }
-    try { await updateUserProfile({ onboarding_completed: true } as any); } catch (e) { console.error(e); }
+    try { await updateUserProfile({ onboardingCompleted: true } as any); } catch (e) { console.error(e); }
     setShowSetupComplete(false);
     onSetupComplete?.();
   };
@@ -331,15 +331,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <View style={[styles.bentoIcon, { backgroundColor: '#f8fafc' }]}>
             <Map size={20} color={PRIMARY} />
           </View>
-          <View style={[styles.syncBadge, { backgroundColor: currentCommunity?.coverageArea?.location_name ? '#f0fdf4' : '#f8fafc' }]}>
-            <Text style={[styles.syncBadgeText, { color: currentCommunity?.coverageArea?.location_name ? '#1e5667' : '#64748b' }]}>
-              {currentCommunity?.coverageArea?.location_name ? 'Synced' : 'Default'}
+          <View style={[styles.syncBadge, { backgroundColor: currentCommunity?.coverageArea?.locationName ? '#f0fdf4' : '#f8fafc' }]}>
+            <Text style={[styles.syncBadgeText, { color: currentCommunity?.coverageArea?.locationName ? '#1e5667' : '#64748b' }]}>
+              {currentCommunity?.coverageArea?.locationName ? 'Synced' : 'Default'}
             </Text>
           </View>
         </View>
         <Text style={styles.bentoTitle}>Coverage Area</Text>
         <Text style={styles.bentoDesc} numberOfLines={1}>
-          {currentCommunity?.coverageArea?.location_name || 'Active Monitoring Zone'}
+          {currentCommunity?.coverageArea?.locationName || 'Active Monitoring Zone'}
         </Text>
         <View style={styles.mapPreview}>
           <MapView

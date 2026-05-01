@@ -32,13 +32,13 @@ router.post('/register', async (req, res) => {
   const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   if (existing) return res.status(409).json({ error: 'Email already registered' });
 
-  const password_hash = await bcrypt.hash(password, 12);
+  const passwordHash = await bcrypt.hash(password, 12);
 
   const user = await prisma.user.create({
     data: {
       email: email.toLowerCase(),
       phone: phone || null,
-      password_hash,
+      passwordHash,
       name: name.trim(),
     },
   });
@@ -46,9 +46,9 @@ router.post('/register', async (req, res) => {
   // Create verification token (24h expiry)
   const token = await prisma.emailVerificationToken.create({
     data: {
-      user_id: user.id,
+      userId: user.id,
       token: uuidv4(),
-      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
   });
 
@@ -72,13 +72,13 @@ router.get('/verify-email', async (req, res) => {
   if (!token) return res.status(400).json({ error: 'Token is required' });
 
   const record = await prisma.emailVerificationToken.findUnique({ where: { token } });
-  if (!record || record.used || record.expires_at < new Date()) {
+  if (!record || record.used || record.expiresAt < new Date()) {
     return res.status(400).json({ error: 'Invalid or expired verification link' });
   }
 
   await prisma.$transaction([
     prisma.emailVerificationToken.update({ where: { id: record.id }, data: { used: true } }),
-    prisma.user.update({ where: { id: record.user_id }, data: { email_verified: true } }),
+    prisma.user.update({ where: { id: record.userId }, data: { emailVerified: true } }),
   ]);
 
   // Redirect to a deep-link or success page
@@ -93,22 +93,22 @@ router.post('/resend-verification', async (req, res) => {
   if (!email) return res.status(400).json({ error: 'Email is required' });
 
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-  if (!user || user.email_verified) {
+  if (!user || user.emailVerified) {
     // Return 200 regardless to prevent enumeration
     return res.json({ message: 'If that account exists and is unverified, a new link has been sent.' });
   }
 
   // Invalidate previous tokens
   await prisma.emailVerificationToken.updateMany({
-    where: { user_id: user.id, used: false },
+    where: { userId: user.id, used: false },
     data: { used: true },
   });
 
   const token = await prisma.emailVerificationToken.create({
     data: {
-      user_id: user.id,
+      userId: user.id,
       token: uuidv4(),
-      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
   });
 
@@ -131,18 +131,18 @@ router.post('/login', async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-  if (!user || !user.password_hash) return res.status(401).json({ error: 'Invalid email or password' });
+  if (!user || !user.passwordHash) return res.status(401).json({ error: 'Invalid email or password' });
 
-  const valid = await bcrypt.compare(password, user.password_hash);
+  const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
     // Log failed attempt
     await prisma.auditLog.create({
-      data: { user_id: user.id, type: 'login_failed', message: 'Failed login attempt', ip: ip ?? req.ip ?? null, status: 'failure' },
+      data: { userId: user.id, type: 'login_failed', message: 'Failed login attempt', ip: ip ?? req.ip ?? null, status: 'failure' },
     });
     return res.status(401).json({ error: 'Invalid email or password' });
   }
 
-  if (!user.email_verified) {
+  if (!user.emailVerified) {
     return res.status(403).json({ error: 'Please verify your email before logging in', code: 'EMAIL_NOT_VERIFIED' });
   }
 
@@ -152,16 +152,16 @@ router.post('/login', async (req, res) => {
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   await prisma.userSession.create({
     data: {
-      user_id: user.id,
-      refresh_token: refreshToken,
+      userId: user.id,
+      refreshToken: refreshToken,
       device: device ?? req.headers['user-agent'] ?? null,
       ip: ip ?? req.ip ?? null,
-      expires_at: expiresAt,
+      expiresAt: expiresAt,
     },
   });
 
   await prisma.auditLog.create({
-    data: { user_id: user.id, type: 'login', message: 'Successful login', ip: ip ?? req.ip ?? null },
+    data: { userId: user.id, type: 'login', message: 'Successful login', ip: ip ?? req.ip ?? null },
   });
 
   return res.json({
@@ -171,13 +171,13 @@ router.post('/login', async (req, res) => {
       id: user.id,
       email: user.email,
       name: user.name,
-      profile_image: user.profile_image,
-      profile_completed: user.profile_completed,
-      community_created: user.community_created,
-      onboarding_completed: user.onboarding_complete,
-      last_community_id: user.last_community_id,
-      license_status: user.license_status,
-      license_type: user.license_type,
+      profileImage: user.profileImage,
+      profileCompleted: user.profileCompleted,
+      communityCreated: user.communityCreated,
+      onboardingCompleted: user.onboardingComplete,
+      lastCommunityId: user.lastCommunityId,
+      licenseStatus: user.licenseStatus,
+      licenseType: user.licenseType,
       role: user.role,
       status: user.status,
       latitude: user.latitude,
@@ -199,8 +199,8 @@ router.post('/refresh', async (req, res) => {
 
   try {
     const payload = verifyRefreshToken(refreshToken);
-    const session = await prisma.userSession.findUnique({ where: { refresh_token: refreshToken } });
-    if (!session || session.expires_at < new Date()) {
+    const session = await prisma.userSession.findUnique({ where: { refreshToken: refreshToken } });
+    if (!session || session.expiresAt < new Date()) {
       return res.status(401).json({ error: 'Session expired, please log in again' });
     }
 
@@ -209,7 +209,7 @@ router.post('/refresh', async (req, res) => {
     // Rotate refresh token
     await prisma.userSession.update({
       where: { id: session.id },
-      data: { refresh_token: tokens.refreshToken, last_active: new Date(), expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
+      data: { refreshToken: tokens.refreshToken, lastActive: new Date(), expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
     });
 
     return res.json(tokens);
@@ -223,7 +223,7 @@ router.post('/refresh', async (req, res) => {
 router.post('/logout', async (req, res) => {
   const { refreshToken } = req.body as { refreshToken?: string };
   if (refreshToken) {
-    await prisma.userSession.deleteMany({ where: { refresh_token: refreshToken } });
+    await prisma.userSession.deleteMany({ where: { refreshToken: refreshToken } });
   }
   return res.json({ message: 'Logged out' });
 });
@@ -238,13 +238,13 @@ router.post('/forgot-password', async (req, res) => {
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   if (user) {
     // Invalidate previous tokens
-    await prisma.passwordResetToken.updateMany({ where: { user_id: user.id, used: false }, data: { used: true } });
+    await prisma.passwordResetToken.updateMany({ where: { userId: user.id, used: false }, data: { used: true } });
 
     const token = await prisma.passwordResetToken.create({
       data: {
-        user_id: user.id,
+        userId: user.id,
         token: uuidv4(),
-        expires_at: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
       },
     });
 
@@ -266,16 +266,16 @@ router.post('/reset-password', async (req, res) => {
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
 
   const record = await prisma.passwordResetToken.findUnique({ where: { token } });
-  if (!record || record.used || record.expires_at < new Date()) {
+  if (!record || record.used || record.expiresAt < new Date()) {
     return res.status(400).json({ error: 'Invalid or expired reset link' });
   }
 
-  const password_hash = await bcrypt.hash(password, 12);
+  const passwordHash = await bcrypt.hash(password, 12);
   await prisma.$transaction([
     prisma.passwordResetToken.update({ where: { id: record.id }, data: { used: true } }),
-    prisma.user.update({ where: { id: record.user_id }, data: { password_hash } }),
+    prisma.user.update({ where: { id: record.userId }, data: { passwordHash } }),
     // Revoke all sessions on password change
-    prisma.userSession.deleteMany({ where: { user_id: record.user_id } }),
+    prisma.userSession.deleteMany({ where: { userId: record.userId } }),
   ]);
 
   return res.json({ message: 'Password reset successfully. Please log in again.' });
@@ -294,7 +294,7 @@ router.post('/phone/send-otp', async (req, res) => {
 
   // Invalidate previous OTPs for this number
   await prisma.otpCode.updateMany({ where: { phone, used: false }, data: { used: true } });
-  await prisma.otpCode.create({ data: { phone, code, expires_at } });
+  await prisma.otpCode.create({ data: { phone, code, expiresAt: expires_at } });
 
   try {
     await sendSms(phone, `Your Lalela verification code is: ${code}. Valid for 10 minutes.`);
@@ -317,10 +317,10 @@ router.post('/phone/verify-otp', async (req, res) => {
 
   const otp = await prisma.otpCode.findFirst({
     where: { phone, code, used: false },
-    orderBy: { created_at: 'desc' },
+    orderBy: { createdAt: 'desc' },
   });
 
-  if (!otp || otp.expires_at < new Date()) {
+  if (!otp || otp.expiresAt < new Date()) {
     return res.status(400).json({ error: 'Invalid or expired OTP' });
   }
 
@@ -329,9 +329,9 @@ router.post('/phone/verify-otp', async (req, res) => {
   // Find or create user by phone
   let user = await prisma.user.findUnique({ where: { phone } });
   if (!user) {
-    user = await prisma.user.create({ data: { phone, phone_verified: true, name: '', email: `${phone.replace('+', '')}@phone.lalela.net` } });
+    user = await prisma.user.create({ data: { phone, phoneVerified: true, name: '', email: `${phone.replace('+', '')}@phone.lalela.net` } });
   } else {
-    await prisma.user.update({ where: { id: user.id }, data: { phone_verified: true } });
+    await prisma.user.update({ where: { id: user.id }, data: { phoneVerified: true } });
   }
 
   const payload = { userId: user.id, email: user.email };
@@ -339,13 +339,13 @@ router.post('/phone/verify-otp', async (req, res) => {
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
   await prisma.userSession.create({
-    data: { user_id: user.id, refresh_token: refreshToken, device: device ?? null, ip: ip ?? req.ip ?? null, expires_at: expiresAt },
+    data: { userId: user.id, refreshToken: refreshToken, device: device ?? null, ip: ip ?? req.ip ?? null, expiresAt: expiresAt },
   });
 
   return res.json({
     accessToken,
     refreshToken,
-    user: { id: user.id, email: user.email, name: user.name, profile_completed: user.profile_completed },
+    user: { id: user.id, email: user.email, name: user.name, profileCompleted: user.profileCompleted },
   });
 });
 
@@ -359,16 +359,16 @@ router.post('/change-password', requireAuth, async (req, res) => {
   if (newPassword.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters' });
 
   const user = await prisma.user.findUnique({ where: { id: req.auth!.userId } });
-  if (!user?.password_hash) return res.status(400).json({ error: 'No password set on this account' });
+  if (!user?.passwordHash) return res.status(400).json({ error: 'No password set on this account' });
 
-  const valid = await bcrypt.compare(currentPassword, user.password_hash);
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
 
-  const password_hash = await bcrypt.hash(newPassword, 12);
-  await prisma.user.update({ where: { id: user.id }, data: { password_hash } });
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
 
   await prisma.auditLog.create({
-    data: { user_id: user.id, type: 'password_change', message: 'Password changed', ip: req.ip ?? null },
+    data: { userId: user.id, type: 'password_change', message: 'Password changed', ip: req.ip ?? null },
   });
 
   return res.json({ message: 'Password updated successfully' });

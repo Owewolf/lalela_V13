@@ -25,7 +25,7 @@ const CLUSTER_WINDOW_MS = 5 * 60 * 1000;
 
 const isSameClusterMessage = (left?: Message, right?: Message) => {
   if (!left || !right) return false;
-  if (left.senderId !== right.senderId) return false;
+  if (left.userId !== right.userId) return false;
 
   const leftTime = new Date(left.createdAt).getTime();
   const rightTime = new Date(right.createdAt).getTime();
