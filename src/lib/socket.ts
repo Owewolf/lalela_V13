@@ -1,9 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://lalela.net/api';
-// Socket.io connects to the root of the server (same host, no /api prefix)
-const SOCKET_URL = API_URL.replace(/\/api\/?$/, '');
+import { SOCKET_URL } from './config';
 
 let socket: Socket | null = null;
 
@@ -20,8 +17,15 @@ export async function getSocket(): Promise<Socket> {
   socket = io(SOCKET_URL, {
     auth: { token },
     transports: ['websocket'],
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    timeout: 10000,
     autoConnect: false,
   });
+
+  socket.on('connect', () => console.log('✅ Socket connected to backend'));
+  socket.on('disconnect', () => console.log('❌ Socket disconnected'));
 
   socket.connect();
   return socket;

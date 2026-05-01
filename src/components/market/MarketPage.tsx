@@ -26,7 +26,7 @@ import {
 import MapView, { Marker } from 'react-native-maps';
 import { BusinessCard } from './BusinessCard';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { BUSINESS_CATEGORIES } from '../../constants';
 import { calculateDistance } from '../../lib/utils';
 import type { UserBusiness } from '../../types';
@@ -68,7 +68,7 @@ interface MarketPageProps {
 
 export default function MarketPage({ initialListingId }: MarketPageProps) {
   const router = useRouter();
-  const { user, userProfile } = useFirebase();
+  const { userProfile } = useAuth();
   const { currentCommunity, userBusinesses, posts, communityBusinesses, charities, startConversation, setActiveConversation } = useCommunity();
 
   const [activeTab, setActiveTab] = useState<'featured' | 'listings' | 'businesses'>('businesses');
@@ -101,11 +101,11 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
 
   const handleOpenListingChat = useCallback(
     async (listing: (typeof listings)[0]) => {
-      if (!user?.uid || !listing.author_id) return;
+      if (!userProfile?.id || !listing.author_id) return;
 
       try {
         const conversationId = await startConversation({
-          participants: Array.from(new Set([user.uid, listing.author_id])),
+          participants: Array.from(new Set([userProfile?.id, listing.author_id])),
           type: 'listing',
           communityId: currentCommunity?.id,
           listingId: listing.id,
@@ -127,7 +127,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
         Alert.alert('Chat unavailable', 'We could not open the conversation for this listing.');
       }
     },
-    [currentCommunity?.id, router, setActiveConversation, startConversation, user?.uid]
+    [currentCommunity?.id, router, setActiveConversation, startConversation, userProfile?.id]
   );
 
   const enabledCategories = useMemo(() => {
@@ -170,7 +170,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
       isVerified: true,
       isFeatured: true,
       isMemberBusiness: true,
-      label: b.owner_id === user?.uid ? 'My Business' : undefined,
+      label: b.owner_id === userProfile?.id ? 'My Business' : undefined,
       labelType: 'new' as const,
       status: 'Open' as const,
       distance:
@@ -228,7 +228,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
     selectedCategory,
     searchQuery,
     enabledCategories,
-    user?.uid,
+    userProfile?.id,
   ]);
 
   const renderBusiness = useCallback(

@@ -11,8 +11,9 @@ import {
 import { MapPin } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { GOOGLE_PLACES_API_KEY } from '../../constants';
 import MapView, { Marker, MapPressEvent, Region } from 'react-native-maps';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 
 interface LocationSettingsProps {
@@ -30,7 +31,7 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
   longitude,
   onLocationChange,
 }) => {
-  const { userProfile, updateUserProfile } = useFirebase();
+  const { userProfile, updateUserProfile } = useAuth();
   const { currentCommunity } = useCommunity();
 
   const [localLocationName, setLocalLocationName] = useState(
@@ -215,7 +216,7 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
               const lng = details?.geometry?.location?.lng ?? localLongitude;
               applyLocationSelection(lat, lng, name);
             }}
-            query={{ key: 'AIzaSyBU4dNVUvlEd-bOjdxBF4_1XnS7VibDHrY', language: 'en' }}
+            query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
             textInputProps={{
               placeholderTextColor: '#9ca3af',
               returnKeyType: 'search',

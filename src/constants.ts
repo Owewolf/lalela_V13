@@ -1,3 +1,5 @@
+export const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY ?? '';
+
 export const APP_LOGO_PATH = '/images/Lalela Favicon - White on Green.png';
 export const APP_LOGO_ALT_PATH = '/images/Lalela Favicon - Green on Transparent.png';
 

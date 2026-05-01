@@ -41,7 +41,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import api from '../../lib/api';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { ModerationCenter, ModerationCenterHandle } from './ModerationCenter';
 
 const PRIMARY = '#0d3d47';
@@ -78,7 +78,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { user, userProfile, updateUserProfile } = useFirebase();
+  const { userProfile, updateUserProfile } = useAuth();
   const { currentCommunity, updateCommunityCoverage, posts, members, securityResponders } = useCommunity();
 
   const [activeView, setActiveView] = React.useState<'dashboard' | 'moderation' | 'members'>(

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Shield, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 
 const APP_LOGO_PATH = require('../../../assets/icon.png');
 const PRIMARY = '#0d3d47';
@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { currentCommunity, notifications } = useCommunity();
-  const { user, userProfile } = useFirebase();
+  const { userProfile } = useAuth();
 
   const userRole = currentCommunity?.userRole || 'Member';
   const isLicensed = userProfile?.license_status === 'LICENSED' || currentCommunity?.type === 'LICENSED';
@@ -37,9 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
     (userProfile?.license_type === 'COMMUNITY_GRANTED' &&
       userProfile?.license_status === 'UNLICENSED' &&
       userProfile?.member_expiry_date &&
-      (userProfile.member_expiry_date.toDate
-        ? userProfile.member_expiry_date.toDate()
-        : new Date(userProfile.member_expiry_date)) < new Date());
+      new Date(userProfile.member_expiry_date) < new Date());
 
   const unreadCount = notifications.filter((n: any) => !n.read).length;
 
@@ -99,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const profileImageUri =
     userProfile?.profile_image ||
-    `https://picsum.photos/seed/${user?.uid ?? 'user'}/100/100`;
+    `https://picsum.photos/seed/${userProfile?.id ?? 'user'}/100/100`;
 
   return (
     <View style={[styles.header, { paddingTop: insets.top }]}>

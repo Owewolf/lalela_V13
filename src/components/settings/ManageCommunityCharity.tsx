@@ -21,7 +21,7 @@ import {
   Trash2,
 } from 'lucide-react-native';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import type { Charity, CharitySuggestion } from '../../types';
 
 type CharityEntryMode = 'manage' | 'suggest' | null;
@@ -101,7 +101,7 @@ export default function ManageCommunityCharity({
   initialMode = null,
   clearInitialMode,
 }: ManageCommunityCharityProps) {
-  const { userProfile, user } = useFirebase();
+  const { userProfile } = useAuth();
   const {
     currentCommunity,
     charities,
@@ -322,7 +322,7 @@ export default function ManageCommunityCharity({
   };
 
   const handleSubmitSuggestion = async () => {
-    if (!hasCommunity || !user) {
+    if (!hasCommunity || !userProfile) {
       Alert.alert('No community selected', 'Join or select a community before suggesting a charity.');
       return;
     }
@@ -345,8 +345,8 @@ export default function ManageCommunityCharity({
     try {
       await addCharitySuggestion({
         community_id: currentCommunity!.id,
-        suggested_by_id: user.uid,
-        suggested_by_name: userProfile?.name || user.displayName || 'Community Member',
+        suggested_by_id: userProfile!.id,
+        suggested_by_name: userProfile?.name || 'Community Member',
         name: suggestionForm.name.trim(),
         description: suggestionForm.description.trim(),
         reason: suggestionForm.reason.trim(),

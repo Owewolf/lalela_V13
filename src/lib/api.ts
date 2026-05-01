@@ -1,9 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from './config';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://lalela.net/api';
-
-const api = axios.create({ baseURL: API_URL });
+const api = axios.create({ baseURL: API_BASE_URL });
 
 // Attach access token to every request
 api.interceptors.request.use(async (config) => {
@@ -23,7 +22,7 @@ api.interceptors.response.use(
         const refreshToken = await AsyncStorage.getItem('refresh_token');
         if (!refreshToken) throw new Error('No refresh token');
 
-        const { data } = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
+        const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
         await AsyncStorage.setItem('access_token', data.accessToken);
         await AsyncStorage.setItem('refresh_token', data.refreshToken);
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { Camera } from 'lucide-react-native';
 import { Conversation } from '../../types';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface ChatListProps {
   conversations: Conversation[];
@@ -21,7 +21,7 @@ function formatRelativeTime(dateStr: string): string {
 }
 
 export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, activeId }) => {
-  const { user } = useFirebase();
+  const { userProfile } = useAuth();
 
   if (conversations.length === 0) {
     return (
@@ -40,7 +40,7 @@ export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, act
   }
 
   const renderItem = ({ item: conv }: { item: Conversation }) => {
-    const unreadCount = conv.unreadCount[user?.uid || ''] || 0;
+    const unreadCount = conv.unreadCount[userProfile?.id || ''] || 0;
     const isEmergency = conv.type === 'emergency';
     const isListing = conv.type === 'listing';
     const isNotice = conv.type === 'notice';

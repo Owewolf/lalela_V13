@@ -21,13 +21,13 @@ import {
   Info,
 } from 'lucide-react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 import { accountService } from '../../services/accountService';
 import { TwoFASetupResponse } from '../../types';
 
 export const SecuritySection: React.FC = () => {
-  const { userProfile, updateUserProfile } = useFirebase();
+  const { userProfile, updateUserProfile } = useAuth();
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [twoFASetupData, setTwoFASetupData] = useState<TwoFASetupResponse | null>(null);

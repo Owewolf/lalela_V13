@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { Phone, KeyRound, ArrowLeft } from 'lucide-react-native';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface PhoneAuthProps {
   onSuccess?: (user: any) => Promise<void> | void;
@@ -63,9 +63,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 );
 
 export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
-  const { signInWithPhone, verifySmsCode, confirmationResult, clearPhoneAuth } = useFirebase();
+  const { sendPhoneOtp, verifyPhoneOtp, userProfile } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('+27');
   const [otpCode, setOtpCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -75,8 +76,8 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
     setLocalError(null);
     setIsLoading(true);
     try {
-      // TODO: expo-firebase-recaptcha integration for production. For now using signInWithPhoneNumber directly.
-      await signInWithPhone(phoneNumber);
+      await sendPhoneOtp(phoneNumber);
+      setOtpSent(true);
     } catch (err: any) {
       console.error('Phone auth error:', err);
       const msg = err.message || 'Failed to send code';
@@ -99,8 +100,8 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
     setLocalError(null);
     setIsLoading(true);
     try {
-      const result = await verifySmsCode(otpCode);
-      await onSuccess?.(result.user);
+      await verifyPhoneOtp(phoneNumber, otpCode);
+      await onSuccess?.(userProfile);
     } catch (err: any) {
       console.error('OTP verify error:', err);
       const msg = err.message || 'Failed to verify code';
@@ -131,7 +132,7 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
           </View>
         )}
 
-        {!confirmationResult ? (
+        {!otpSent ? (
           <View className="space-y-4">
             <View className="space-y-2">
               <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">
@@ -209,7 +210,7 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
 
             <TouchableOpacity
               onPress={() => {
-                clearPhoneAuth();
+                setOtpSent(false);
                 setOtpCode('');
               }}
               disabled={isLoading}

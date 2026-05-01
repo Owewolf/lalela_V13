@@ -10,7 +10,7 @@ import {
 import { CreditCard, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { accountService } from '../../services/accountService';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -34,7 +34,7 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { licenseCommunity } = useCommunity();
-  const { updateUserProfile } = useFirebase();
+  const { updateUserProfile } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 

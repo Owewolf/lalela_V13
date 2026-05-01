@@ -1,10 +1,12 @@
 import 'dotenv/config';
+import 'express-async-errors'; // must be imported before express — auto-forwards async errors to next(err)
 import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import apiRouter from './api.js';
+import { sendPushToUser } from './services/pushService.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -45,6 +47,9 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   const userId = (socket as typeof socket & { userId: string }).userId;
   console.log(`[socket] connected: ${userId} (${socket.id})`);
+
+  // Join a personal room so peers can signal this user by userId
+  socket.join(`user:${userId}`);
 
   // ── Room membership ──────────────────────────────────────────────────────
 
@@ -122,17 +127,46 @@ io.on('connection', (socket) => {
   });
 
   // ── WebRTC signaling ─────────────────────────────────────────────────────
+  // All targets are userId strings; peers join `user:<userId>` on connect.
 
-  socket.on('webrtc:offer', (data: { target: string; offer: unknown }) => {
-    socket.to(data.target).emit('webrtc:offer', { from: socket.id, offer: data.offer });
+  socket.on('call:ring', (data: { target: string; callerName: string; type: string }) => {
+    socket.to(`user:${data.target}`).emit('call:ring', {
+      from: userId,
+      callerName: data.callerName,
+      type: data.type,
+    });
+    // Push notification for backgrounded/offline callee
+    sendPushToUser(data.target, {
+      title: `${data.callerName} is calling…`,
+      body: data.type === 'video' ? 'Incoming video call' : 'Incoming voice call',
+      data: { type: 'incoming-call', callerId: userId, callerName: data.callerName, callType: data.type },
+    }).catch(() => { /* non-critical */ });
   });
 
-  socket.on('webrtc:answer', (data: { target: string; answer: unknown }) => {
-    socket.to(data.target).emit('webrtc:answer', { from: socket.id, answer: data.answer });
+  socket.on('webrtc:offer', (data: { target: string; caller: string; callerName: string; sdp: unknown; type: string }) => {
+    socket.to(`user:${data.target}`).emit('webrtc:offer', {
+      from: userId,
+      caller: data.caller,
+      callerName: data.callerName,
+      sdp: data.sdp,
+      type: data.type,
+    });
+  });
+
+  socket.on('webrtc:answer', (data: { target: string; sdp: unknown }) => {
+    socket.to(`user:${data.target}`).emit('webrtc:answer', { from: userId, sdp: data.sdp });
   });
 
   socket.on('webrtc:ice', (data: { target: string; candidate: unknown }) => {
-    socket.to(data.target).emit('webrtc:ice', { from: socket.id, candidate: data.candidate });
+    socket.to(`user:${data.target}`).emit('webrtc:ice', { from: userId, candidate: data.candidate });
+  });
+
+  socket.on('call:ended', (data: { target: string }) => {
+    socket.to(`user:${data.target}`).emit('call:ended', { from: userId });
+  });
+
+  socket.on('call:rejected', (data: { target: string }) => {
+    socket.to(`user:${data.target}`).emit('call:rejected', { from: userId });
   });
 
   socket.on('disconnect', () => {
@@ -145,7 +179,15 @@ export { io };
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 
-const PORT = Number(process.env.PORT ?? 3001);
+// ─── Keep alive on unhandled errors ─────────────────────────────────────────
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err);
+});
+
+const PORT = Number(process.env.PORT ?? 4000);
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`Lalela API + Socket.io running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV ?? 'development'}`);

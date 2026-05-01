@@ -20,7 +20,7 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { NotificationPreferences, CommunityNotificationOverride } from '../../types';
 
 const defaultPreferences: NotificationPreferences = {
@@ -50,7 +50,7 @@ const NOTIFICATION_TYPES: {
 const NotificationSettingsPage: React.FC = () => {
   const router = useRouter();
   const { communities, updateNotificationPreferences } = useCommunity();
-  const { user, userProfile } = useFirebase();
+  const { userProfile } = useAuth();
   const [prefs, setPrefs] = useState<NotificationPreferences>(defaultPreferences);
   const [saving, setSaving] = useState(false);
   const [expandedCommunityId, setExpandedCommunityId] = useState<string | null>(null);

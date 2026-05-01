@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { Client as MinioClient } from 'minio';
 import { v4 as uuidv4 } from 'uuid';
@@ -213,6 +214,15 @@ router.post('/stripe/webhook-mock', (req, res) => {
   const { type, targetId } = req.body;
   console.log(`[Stripe Mock] ${type} ${targetId ?? ''}`);
   return res.json({ message: 'Webhook processed', status: 'LICENSED' });
+});
+
+// ─── Global error handler (must be last, 4-arg signature) ────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+router.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err?.status ?? err?.statusCode ?? 500;
+  const message = err?.message ?? 'Internal server error';
+  console.error(`[API Error] ${status}:`, err);
+  if (!res.headersSent) res.status(status).json({ error: message });
 });
 
 export default router;

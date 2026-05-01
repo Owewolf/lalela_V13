@@ -28,7 +28,7 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
 import { InteractiveCoverageMap } from './InteractiveCoverageMap';
 import { CommunityNotice } from '../../types';
@@ -177,19 +177,19 @@ export const HomePage: React.FC<HomePageProps> = ({
     setActiveConversation,
   } = useCommunity();
 
-  const { user } = useFirebase();
+  const { userProfile } = useAuth();
 
   const handleOpenContextChat = useCallback(
     async (post: CommunityNotice) => {
-      if (!user?.uid || !post.author_id) return;
+      if (!userProfile?.id || !post.author_id) return;
 
       try {
         const participantSet = new Set((members || []).map((m) => m.user_id));
         if (post.author_id) participantSet.add(post.author_id);
-        participantSet.add(user.uid);
+        participantSet.add(userProfile?.id);
         const participants =
           post.type === 'listing'
-            ? Array.from(new Set([user.uid, post.author_id]))
+            ? Array.from(new Set([userProfile?.id, post.author_id]))
             : Array.from(participantSet);
 
         const conversationId = await startConversation({
@@ -219,7 +219,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         console.error('Failed to open contextual chat:', error);
       }
     },
-    [currentCommunity?.id, router, setActiveConversation, startConversation, user?.uid, members]
+    [currentCommunity?.id, router, setActiveConversation, startConversation, userProfile?.id, members]
   );
 
   // ─── local state ──────────────────────────────────────────────────────────
@@ -566,10 +566,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                   className="absolute right-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
                   style={{ top: 36 }}
                 >
-                  {(notice.author_id === user?.uid ||
+                  {(notice.author_id === userProfile?.id ||
                     currentCommunity?.userRole === 'Admin') && (
                     <>
-                      {notice.author_id === user?.uid && (
+                      {notice.author_id === userProfile?.id && (
                         <TouchableOpacity
                           activeOpacity={0.7}
                           onPress={() => {

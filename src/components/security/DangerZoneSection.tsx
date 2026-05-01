@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { ShieldAlert, Trash2, LogOut } from 'lucide-react-native';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 
 export const DangerZoneSection: React.FC = () => {
-  const { signOut, deleteAccount } = useFirebase();
+  const { signOut, deleteAccount } = useAuth();
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);

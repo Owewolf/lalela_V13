@@ -29,7 +29,7 @@ import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { cn } from '../../lib/utils';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { POST_SUBTYPE_CONFIG } from '../../constants';
 import { uploadImage } from '../../lib/uploadImage';
 import type { CommunityNotice } from '../../types';
@@ -119,7 +119,7 @@ interface CreateNoticeFormProps {
 export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype, onBack, postToEdit }) => {
   const router = useRouter();
   const { currentCommunity, addPost, updatePost } = useCommunity();
-  const { user, userProfile } = useFirebase();
+  const { userProfile } = useAuth();
 
   const isReadOnly = userProfile?.status === 'READ-ONLY' || (
     userProfile?.license_type === 'COMMUNITY_GRANTED' &&
@@ -201,7 +201,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
     const asset = result.assets[0];
     setIsUploading(true);
     try {
-      const url = await uploadImage(asset.uri, 'posts', user?.uid ?? 'anon', postsImage);
+      const url = await uploadImage(asset.uri, 'posts', userProfile?.id ?? 'anon', postsImage);
       setPostsImage(url);
     } catch {
       Alert.alert('Upload failed', 'Image upload failed. Please try again.');
@@ -220,10 +220,10 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
         title,
         description,
         category: 'Community',
-        authorName: postToEdit?.authorName || userProfile?.name || user?.displayName || 'Community Member',
-        author_id: postToEdit?.author_id || user?.uid,
+        authorName: postToEdit?.authorName || userProfile?.name || 'Community Member',
+        author_id: postToEdit?.author_id || userProfile?.id,
         authorRole: postToEdit?.authorRole || (currentCommunity?.userRole || 'Member'),
-        authorImage: postToEdit?.authorImage || userProfile?.profile_image || user?.photoURL || `https://picsum.photos/seed/${user?.uid}/200/200`,
+        authorImage: postToEdit?.authorImage || userProfile?.profile_image || `https://picsum.photos/seed/${userProfile?.id}/200/200`,
         urgency: config.urgency,
         urgency_level: config.urgency_level,
         locationName,

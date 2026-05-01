@@ -32,6 +32,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { GOOGLE_PLACES_API_KEY } from '../../constants';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -237,7 +238,7 @@ const OnboardingCreate: React.FC = () => {
         profile_image: resolvedImage,
         profile_completed: true,
         community_created: true,
-        onboarding_completed: false,
+        // onboarding_completed is set to true only after all 5 guided admin setup steps
       };
 
       if (locationName && locationLat && locationLng) {
@@ -248,7 +249,7 @@ const OnboardingCreate: React.FC = () => {
       await updateUserProfile(profileData);
 
       // Create/find TRIAL community via REST
-      const { data: community } = await api.post('/communities/onboarding', {
+      const { data: community } = await api.post('/communities', {
         name: communityName.trim(),
       });
 
@@ -397,7 +398,7 @@ const OnboardingCreate: React.FC = () => {
                         setLocationName(data.description);
                         if (details?.geometry?.location) { setLocationLat(details.geometry.location.lat); setLocationLng(details.geometry.location.lng); }
                       }}
-                      query={{ key: 'AIzaSyBU4dNVUvlEd-bOjdxBF4_1XnS7VibDHrY', language: 'en' }}
+                      query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
                       ref={placesRef as any}
                       textInputProps={{
                         placeholderTextColor: '#9ca3af',

@@ -32,6 +32,7 @@ import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { GOOGLE_PLACES_API_KEY } from '../../constants';
 
 // ─── Confirm Modal ────────────────────────────────────────────────────────────
 
@@ -425,7 +426,7 @@ const OnboardingInvite: React.FC = () => {
                       setLocationLng(details.geometry.location.lng);
                     }
                   }}
-                  query={{ key: 'AIzaSyBU4dNVUvlEd-bOjdxBF4_1XnS7VibDHrY', language: 'en' }}
+                  query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
                   ref={placesRef as any}
                   textInputProps={{
                     placeholderTextColor: '#9ca3af',

@@ -29,7 +29,7 @@ const EMPTY_COMMUNITY: Community = {
   name: '',
   type: 'RESIDENTIAL',
   status: 'ACTIVE',
-  coverageArea: { type: 'circle', center: { lat: 0, lng: 0 }, radius: 500 },
+  coverageArea: { latitude: 0, longitude: 0, radius: 1, location_name: '' },
   categories: [],
   members: [],
   posts: [],
@@ -38,6 +38,20 @@ const EMPTY_COMMUNITY: Community = {
 };
 
 const EMPTY_UNREAD: ChatUnreadTotals = { total: 0, byConversation: {} };
+
+/** Map raw Prisma/REST response to the client-side Community shape. */
+function mapServerCommunity(raw: any): Community {
+  const coverageArea: CoverageArea | undefined =
+    raw.coverage_lat != null && raw.coverage_lng != null
+      ? {
+          latitude: raw.coverage_lat,
+          longitude: raw.coverage_lng,
+          radius: raw.coverage_radius ?? 1,
+          location_name: raw.coverage_location ?? '',
+        }
+      : raw.coverageArea;
+  return { ...raw, coverageArea };
+}
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
@@ -95,7 +109,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
           api.get('/conversations'),
           api.get('/users/me/notifications'),
         ]);
-        if (commRes.status === 'fulfilled') setCommunities(commRes.value.data);
+        if (commRes.status === 'fulfilled') setCommunities(commRes.value.data.map(mapServerCommunity));
         if (convRes.status === 'fulfilled') setConversations(convRes.value.data);
         if (notifRes.status === 'fulfilled') setNotifications(notifRes.value.data);
       } catch (err) {
@@ -223,7 +237,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const createCommunity = useCallback(async (name: string): Promise<string> => {
     const { data } = await api.post('/communities', { name });
-    setCommunities((prev) => [...prev, data]);
+    setCommunities((prev) => [...prev, mapServerCommunity(data)]);
     return data.id;
   }, []);
 
@@ -461,7 +475,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const joinViaInviteLink = useCallback(async (linkCode: string): Promise<string> => {
     const { data } = await api.post(`/communities/join/${linkCode}`);
-    setCommunities((prev) => prev.find((c) => c.id === data.community_id) ? prev : [...prev, data.community]);
+    setCommunities((prev) => prev.find((c) => c.id === data.community_id) ? prev : [...prev, mapServerCommunity(data.community)]);
     return data.community_id;
   }, []);
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, Linking, Platform } from 'react-native';
 import { Check, CheckCheck } from 'lucide-react-native';
 import { Conversation, Message } from '../../types';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface MessageBubbleProps {
   message: Message;
@@ -35,8 +35,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   isLastInCluster,
   conversationType,
 }) => {
-  const { user } = useFirebase();
-  const isMe = message.senderId === user?.uid;
+  const { userProfile } = useAuth();
+  const isMe = message.senderId === userProfile?.id;
   const isDirectConversation = conversationType === 'direct';
   const firstInCluster = isFirstInCluster ?? !isSequential;
   const middleInCluster = isMiddleInCluster ?? false;

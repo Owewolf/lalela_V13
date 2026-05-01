@@ -14,12 +14,12 @@ import {
   MapPin,
   Globe,
 } from 'lucide-react-native';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { accountService } from '../../services/accountService';
 import { UserSession } from '../../types';
 
 export const SessionsSection: React.FC = () => {
-  const { user } = useFirebase();
+  const { userProfile } = useAuth();
   const [sessions, setSessions] = useState<UserSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRevokingAll, setIsRevokingAll] = useState(false);
@@ -36,9 +36,9 @@ export const SessionsSection: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!user) return;
+    if (!userProfile) return;
     fetchSessions();
-  }, [user]);
+  }, [userProfile]);
 
   const handleLogoutSession = async (sessionId: string) => {
     try {

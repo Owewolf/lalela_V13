@@ -16,7 +16,8 @@ import { Conversation } from '../../types';
 import { ChatWindow } from './ChatWindow';
 import { ChatComposer } from './ChatComposer';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
+import { useCall } from '../../context/CallContext';
 
 interface ChatDetailPageProps {
   conversationId: string;
@@ -24,7 +25,8 @@ interface ChatDetailPageProps {
 
 export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }) => {
   const router = useRouter();
-  const { userProfile } = useFirebase();
+  const { userProfile } = useAuth();
+  const { startCall } = useCall();
   const {
     messages,
     sendMessage,
@@ -50,9 +52,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
     (userProfile?.license_type === 'COMMUNITY_GRANTED' &&
       userProfile?.license_status === 'UNLICENSED' &&
       userProfile?.member_expiry_date &&
-      (userProfile.member_expiry_date.toDate
-        ? userProfile.member_expiry_date.toDate()
-        : new Date(userProfile.member_expiry_date)) < new Date());
+      new Date(userProfile.member_expiry_date) < new Date());
 
   useEffect(() => {
     setActiveConversation(conversationId);
@@ -162,28 +162,11 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
 
   const handleVideoPress = async () => {
     if (!isDirectConversation) return;
-
-    const roomSlug = [
-      'lalela',
-      currentCommunity?.id || 'community',
-      conversationId,
-    ]
-      .join('-')
-      .replace(/[^a-zA-Z0-9-]/g, '')
-      .slice(0, 90);
-
-    const jitsiUrl = `https://meet.jit.si/${roomSlug}`;
-
-    try {
-      const canOpen = await Linking.canOpenURL(jitsiUrl);
-      if (!canOpen) {
-        Alert.alert('Video unavailable', 'Unable to open Jitsi meeting link on this device.');
-        return;
-      }
-      await Linking.openURL(jitsiUrl);
-    } catch {
-      Alert.alert('Video call failed', 'Unable to start the video call. Please try again.');
+    if (!otherId) {
+      Alert.alert('Cannot start call', 'Unable to identify the other participant.');
+      return;
     }
+    await startCall(otherId as string, name, 'video', conversationId);
   };
 
   const roleBadgeBg = (r: string) => {

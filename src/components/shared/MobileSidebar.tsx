@@ -28,7 +28,7 @@ import {
   Check,
 } from 'lucide-react-native';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 
 const PRIMARY = '#0d3d47';
 const APP_LOGO = require('../../../assets/icon.png');
@@ -54,7 +54,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 }) => {
   const router = useRouter();
   const { currentCommunity, communities, setCurrentCommunity, createCommunity } = useCommunity();
-  const { user, userProfile, signOut } = useFirebase();
+  const { userProfile, signOut } = useAuth();
   const [communitiesExpanded, setCommunitiesExpanded] = useState(false);
 
   // Animations
@@ -65,7 +65,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 
   const isLicensed = userProfile?.license_status === 'LICENSED' || currentCommunity?.type === 'LICENSED';
   const hasTrialCommunity = (communities || []).some(
-    (c: any) => c.owner_id === user?.uid && c.type === 'TRIAL'
+    (c: any) => c.owner_id === userProfile?.id && c.type === 'TRIAL'
   );
   const canCreateNewCommunity = !hasTrialCommunity;
 
@@ -372,7 +372,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 
         {/* Footer */}
         <View style={styles.footer}>
-          {user && (
+          {userProfile && (
             <TouchableOpacity style={styles.settingsBtn} onPress={handleOpenSettings} activeOpacity={0.7}>
               <View
                 style={[
@@ -381,7 +381,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 ]}
               >
                 <Image
-                  source={{ uri: userProfile?.profile_image || `https://picsum.photos/seed/${user.uid}/100/100` }}
+                  source={{ uri: userProfile?.profile_image || `https://picsum.photos/seed/${userProfile?.id}/100/100` }}
                   style={styles.avatarImg}
                 />
               </View>
@@ -398,7 +398,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
             </TouchableOpacity>
           )}
 
-          {user ? (
+          {userProfile ? (
             <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut} activeOpacity={0.7}>
               <LogOut size={20} color="#dc2626" />
               <Text style={styles.signOutText}>Logout</Text>

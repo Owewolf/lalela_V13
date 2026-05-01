@@ -22,7 +22,7 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { EmergencyMap } from './EmergencyMap';
 import { ChatWindow } from '../chat/ChatWindow';
 import { ChatComposer } from '../chat/ChatComposer';
@@ -46,7 +46,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
     sendMessage,
     activeConversation,
   } = useCommunity();
-  const { user, userProfile } = useFirebase();
+  const { userProfile } = useAuth();
 
   const [isMapExpanded, setIsMapExpanded] = useState(true);
   const [resetTrigger, setResetTrigger] = useState(0);
@@ -131,7 +131,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
       const allMemberIds = members.map((m) => m.user_id);
       const participantSet = new Set(allMemberIds);
       if (emergencyPost.author_id) participantSet.add(emergencyPost.author_id);
-      if (user?.uid) participantSet.add(user.uid);
+      if (userProfile?.id) participantSet.add(userProfile.id);
       securityResponders.forEach((r) => participantSet.add(r.user_id));
 
       const convId = await startConversation({

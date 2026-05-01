@@ -13,6 +13,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { CommunityProvider, useCommunity } from '../src/context/CommunityContext';
 import { GoogleMapsProvider } from '../src/context/GoogleMapsContext';
+import { CallProvider } from '../src/context/CallContext';
+import { IncomingCallOverlay } from '../src/components/call/IncomingCallOverlay';
 
 
 // ─── Parse lalela://join?join=<code> ────────────────────────────────────────
@@ -114,10 +116,9 @@ function AppGuard() {
         .then((pendingCode) => {
           router.replace(pendingCode ? (`/onboarding?join=${pendingCode}` as any) : '/onboarding');
         });
-    } else if (onboardingComplete && userProfile.community_created && userProfile.onboarding_completed === false && segments[0] !== 'admin') {
+    } else if (onboardingComplete && userProfile.community_created && !userProfile.onboarding_completed && segments[0] !== 'admin') {
       // Community creator finished profile onboarding — route to guided admin setup.
-      // AppGuard owns this navigation to avoid a race condition where router.replace
-      // fires before userProfile updates via onSnapshot.
+      // Only redirects when onboarding_completed is explicitly false or undefined (not yet done).
       router.replace('/admin?guided=true' as any);
     } else if (onboardingComplete && (inLanding || segments[0] === 'onboarding')) {
       router.replace('/(tabs)');
@@ -185,7 +186,9 @@ function AppGuard() {
     responseListener.current = Notifications.addNotificationResponseReceivedListener(
       (response: any) => {
         const data = response.notification.request.content.data as Record<string, any>;
-        if (data?.route) {
+        if (data?.type === 'incoming-call') {
+          router.push('/(tabs)' as any);
+        } else if (data?.route) {
           router.push(data.route as any);
         } else if (data?.chatId) {
           router.push(`/chat/${data.chatId}` as any);
@@ -251,23 +254,27 @@ export default function RootLayout() {
         <AuthProvider>
           <CommunityProvider>
             <GoogleMapsProvider>
-              <AppGuard />
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="landing" />
-                <Stack.Screen name="onboarding" />
-                <Stack.Screen name="onboarding-create" />
-                <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="security" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="notifications-settings" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="join" options={{ headerShown: false }} />
-                <Stack.Screen name="chat/[id]" />
-                <Stack.Screen name="emergency/[id]" />
-              </Stack>
-              <LoadingOverlay />
+              <CallProvider>
+                <AppGuard />
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="landing" />
+                  <Stack.Screen name="onboarding" />
+                  <Stack.Screen name="onboarding-create" />
+                  <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="security" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="notifications-settings" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="join" options={{ headerShown: false }} />
+                  <Stack.Screen name="chat/[id]" />
+                  <Stack.Screen name="emergency/[id]" />
+                  <Stack.Screen name="call/[id]" options={{ animation: 'fade' }} />
+                </Stack>
+                <IncomingCallOverlay />
+                <LoadingOverlay />
+              </CallProvider>
             </GoogleMapsProvider>
           </CommunityProvider>
         </AuthProvider>

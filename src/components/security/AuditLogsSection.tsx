@@ -16,7 +16,7 @@ import {
   Clock,
   History,
 } from 'lucide-react-native';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { accountService } from '../../services/accountService';
 
 const getLogIcon = (type: string) => {
@@ -31,18 +31,18 @@ const getLogIcon = (type: string) => {
 };
 
 export const AuditLogsSection: React.FC = () => {
-  const { user } = useFirebase();
+  const { userProfile } = useAuth();
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!userProfile) return;
     accountService
       .getAuditLogs()
       .then(setLogs)
       .catch((e) => console.error('Failed to fetch audit logs:', e))
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [userProfile]);
 
   return (
     <View style={{ backgroundColor: '#fff', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', padding: 24, gap: 16 }}>

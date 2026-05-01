@@ -61,7 +61,7 @@ import {
 } from 'lucide-react-native';
 import MapView, { Circle } from 'react-native-maps';
 import { useCommunity } from '../../context/CommunityContext';
-import { BUSINESS_CATEGORIES, POST_SUBTYPE_CONFIG } from '../../constants';
+import { BUSINESS_CATEGORIES, GOOGLE_PLACES_API_KEY, POST_SUBTYPE_CONFIG } from '../../constants';
 import { PostConfirmationModal } from '../shared/PostConfirmationModal';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
@@ -557,7 +557,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               const lng = details?.geometry?.location?.lng ?? tempCoverage.longitude;
               setTempCoverage({ ...tempCoverage, location_name: name, latitude: lat, longitude: lng });
             }}
-            query={{ key: 'AIzaSyBU4dNVUvlEd-bOjdxBF4_1XnS7VibDHrY', language: 'en' }}
+            query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
             textInputProps={{
               placeholderTextColor: '#94a3b8',
             }}

@@ -18,9 +18,9 @@ import * as Location from 'expo-location';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import MapView, { MapPressEvent, Marker, Region } from 'react-native-maps';
 import { Camera, ImagePlus, Mail, MapPin, Phone, X } from 'lucide-react-native';
-import { BUSINESS_CATEGORIES } from '../../constants';
+import { BUSINESS_CATEGORIES, GOOGLE_PLACES_API_KEY } from '../../constants';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/uploadImage';
 import { Community, UserBusiness } from '../../types';
 
@@ -59,7 +59,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
   currentCommunity,
   onClose,
 }) => {
-  const { user, userProfile } = useFirebase();
+  const { userProfile } = useAuth();
   const { addUserBusiness, updateUserBusiness } = useCommunity();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
@@ -215,7 +215,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
   };
 
   const handlePickImage = async () => {
-    if (!user) {
+    if (!userProfile) {
       Alert.alert('Sign in required', 'You need to be signed in to upload an image.');
       return;
     }
@@ -235,7 +235,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
 
     setIsUploadingImage(true);
     try {
-      const uploadedUrl = await uploadImage(result.assets[0].uri, 'businesses', user.uid, image);
+      const uploadedUrl = await uploadImage(result.assets[0].uri, 'businesses', userProfile!.id, image);
       setImage(uploadedUrl);
     } catch {
       Alert.alert('Upload failed', 'Image upload failed. Please try again.');
@@ -245,7 +245,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!user) {
+    if (!userProfile) {
       Alert.alert('Sign in required', 'You need to be signed in to manage businesses.');
       return;
     }
@@ -278,7 +278,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
       contactPhone: contactPhone.trim() || undefined,
       contactEmail: contactEmail.trim() || undefined,
       image,
-      owner_id: business?.owner_id ?? user.uid,
+      owner_id: business?.owner_id ?? userProfile.id,
       communityIds,
       status: isActive ? 'ACTIVE' as const : 'INACTIVE' as const,
       subcategory: business?.subcategory,
@@ -409,7 +409,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                     if (typeof lat !== 'number' || typeof lng !== 'number') return;
                     applyBusinessLocation(lat, lng, data.description);
                   }}
-                  query={{ key: 'AIzaSyBU4dNVUvlEd-bOjdxBF4_1XnS7VibDHrY', language: 'en' }}
+                  query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
                   textInputProps={{
                     placeholderTextColor: '#9ca3af',
                     returnKeyType: 'search',

@@ -25,7 +25,7 @@ import {
 } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { NotificationPreferences } from '../../types';
 import ManageUserBusinesses from './ManageUserBusinesses';
 import ManageCommunityCharity from './ManageCommunityCharity';
@@ -33,7 +33,7 @@ import ManageCommunityCharity from './ManageCommunityCharity';
 const SettingsPage: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams<{ charityMode?: string | string[] }>();
-  const { userProfile, updateUserProfile } = useFirebase();
+  const { userProfile, updateUserProfile } = useAuth();
   const { currentCommunity, communities, setCurrentCommunity } = useCommunity();
 
   const routeCharityMode = Array.isArray(params.charityMode)

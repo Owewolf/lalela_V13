@@ -31,7 +31,7 @@ import {
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import type { CommunityNotice } from '../../types';
 
 const PRIMARY = '#0d3d47';
@@ -135,7 +135,7 @@ function calculateDistance(lat?: number, lng?: number, baseLat?: number, baseLng
 export default function PostsPage() {
   const router = useRouter();
     const { posts, currentCommunity, removePost, charities, startConversation, setActiveConversation, members } = useCommunity();
-    const { user } = useFirebase();
+    const { userProfile } = useAuth();
   const [filter, setFilter] = useState<'all' | 'listing' | 'notice'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
@@ -196,15 +196,15 @@ export default function PostsPage() {
         return;
       }
 
-      if (!user?.uid || !post.author_id) return;
+      if (!userProfile?.id || !post.author_id) return;
 
       try {
         const participantSet = new Set((members || []).map((m) => m.user_id));
         if (post.author_id) participantSet.add(post.author_id);
-        participantSet.add(user.uid);
+        participantSet.add(userProfile?.id);
         const participants =
           post.type === 'listing'
-            ? Array.from(new Set([user.uid, post.author_id]))
+            ? Array.from(new Set([userProfile?.id, post.author_id]))
             : Array.from(participantSet);
 
         const conversationId = await startConversation({
@@ -234,7 +234,7 @@ export default function PostsPage() {
         console.error('Failed to open contextual chat:', error);
       }
     },
-    [currentCommunity?.id, router, setActiveConversation, startConversation, user?.uid, members]
+    [currentCommunity?.id, router, setActiveConversation, startConversation, userProfile?.id, members]
   );
 
   const renderNotice = useCallback(
@@ -247,7 +247,7 @@ export default function PostsPage() {
       const showMap =
         (isEmergency || isWarning) && notice.latitude && notice.longitude;
       const dist = calculateDistance(notice.latitude, notice.longitude, baseLat, baseLng);
-      const isOwner = notice.author_id === user?.uid;
+      const isOwner = notice.author_id === userProfile?.id;
       const isAdmin = currentCommunity?.userRole === 'Admin';
 
       return (
@@ -432,7 +432,7 @@ export default function PostsPage() {
         </View>
       );
     },
-    [activeMenuId, user?.uid, currentCommunity?.userRole, baseLat, baseLng]
+    [activeMenuId, userProfile?.id, currentCommunity?.userRole, baseLat, baseLng]
   );
 
   const renderListing = useCallback(
@@ -440,7 +440,7 @@ export default function PostsPage() {
       const urgencyColors = getUrgencyColors(post.urgency);
       const isEmergency = post.urgency === 'emergency';
       const charity = charities.find(c => c.id === post.charityId);
-      const isOwner = post.author_id === user?.uid;
+      const isOwner = post.author_id === userProfile?.id;
       const isAdmin = currentCommunity?.userRole === 'Admin';
 
       return (
@@ -652,7 +652,7 @@ export default function PostsPage() {
         </View>
       );
     },
-    [activeMenuId, user?.uid, currentCommunity?.userRole, charities, handleOpenContextChat]
+    [activeMenuId, userProfile?.id, currentCommunity?.userRole, charities, handleOpenContextChat]
   );
 
   const filterTabs = [

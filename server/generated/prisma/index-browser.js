@@ -123,10 +123,9 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
+  name: 'name',
   phone: 'phone',
   password_hash: 'password_hash',
-  name: 'name',
-  profile_image: 'profile_image',
   email_verified: 'email_verified',
   phone_verified: 'phone_verified',
   profile_completed: 'profile_completed',
@@ -136,16 +135,38 @@ exports.Prisma.UserScalarFieldEnum = {
   license_expiry: 'license_expiry',
   license_type: 'license_type',
   auto_renew: 'auto_renew',
-  two_factor_enabled: 'two_factor_enabled',
-  two_factor_method: 'two_factor_method',
-  login_alerts_enabled: 'login_alerts_enabled',
+  access_type: 'access_type',
+  expiry_date: 'expiry_date',
+  member_expiry_date: 'member_expiry_date',
+  status: 'status',
+  role: 'role',
+  profile_image: 'profile_image',
   fcm_token: 'fcm_token',
   push_token: 'push_token',
   push_platform: 'push_platform',
+  first_name: 'first_name',
+  last_name: 'last_name',
+  mobile_number: 'mobile_number',
+  address: 'address',
   latitude: 'latitude',
   longitude: 'longitude',
   location_sharing: 'location_sharing',
+  is_security_member: 'is_security_member',
+  emergency_location_opt_in: 'emergency_location_opt_in',
+  last_community_id: 'last_community_id',
+  agreed_to_terms: 'agreed_to_terms',
+  marketing_consent: 'marketing_consent',
+  profile_visibility: 'profile_visibility',
+  pii_visibility: 'pii_visibility',
+  last_password_changed: 'last_password_changed',
+  security_score: 'security_score',
+  notification_preferences: 'notification_preferences',
+  two_factor_enabled: 'two_factor_enabled',
+  two_factor_method: 'two_factor_method',
+  login_alerts_enabled: 'login_alerts_enabled',
   pending_invite_code: 'pending_invite_code',
+  deleted: 'deleted',
+  deleted_at: 'deleted_at',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
@@ -209,9 +230,9 @@ exports.Prisma.AuditLogScalarFieldEnum = {
 
 exports.Prisma.CommunityScalarFieldEnum = {
   id: 'id',
-  owner_id: 'owner_id',
   name: 'name',
   description: 'description',
+  owner_id: 'owner_id',
   type: 'type',
   status: 'status',
   is_emergency_mode: 'is_emergency_mode',
@@ -220,23 +241,29 @@ exports.Prisma.CommunityScalarFieldEnum = {
   coverage_radius: 'coverage_radius',
   coverage_location: 'coverage_location',
   enabled_categories: 'enabled_categories',
+  trial_end_date: 'trial_end_date',
+  license_id: 'license_id',
   license_expiry: 'license_expiry',
+  active_emergency_id: 'active_emergency_id',
+  onboarding_steps_completed: 'onboarding_steps_completed',
+  is_public: 'is_public',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
 
 exports.Prisma.CommunityMemberScalarFieldEnum = {
-  id: 'id',
   community_id: 'community_id',
   user_id: 'user_id',
   role: 'role',
-  status: 'status',
   joined_at: 'joined_at',
   license_expiry: 'license_expiry',
-  latitude: 'latitude',
-  longitude: 'longitude',
+  status: 'status',
+  is_security_member: 'is_security_member',
   location_sharing_enabled: 'location_sharing_enabled',
-  is_security_member: 'is_security_member'
+  name: 'name',
+  image: 'image',
+  email: 'email',
+  emergency_location_opt_in: 'emergency_location_opt_in'
 };
 
 exports.Prisma.MemberLocationScalarFieldEnum = {
@@ -262,24 +289,59 @@ exports.Prisma.SecurityLocationScalarFieldEnum = {
   timestamp: 'timestamp'
 };
 
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  community_id: 'community_id',
+  conversation_id: 'conversation_id',
+  user_id: 'user_id',
+  sender_id: 'sender_id',
+  content: 'content',
+  text: 'text',
+  image_url: 'image_url',
+  attachment_url: 'attachment_url',
+  message_type: 'message_type',
+  type: 'type',
+  reply_to_id: 'reply_to_id',
+  status: 'status',
+  read_by: 'read_by',
+  created_at: 'created_at'
+};
+
 exports.Prisma.PostScalarFieldEnum = {
   id: 'id',
   community_id: 'community_id',
   author_id: 'author_id',
   type: 'type',
-  category: 'category',
-  subtype: 'subtype',
   title: 'title',
   description: 'description',
-  image_url: 'image_url',
-  status: 'status',
+  category: 'category',
+  subtype: 'subtype',
   urgency: 'urgency',
-  latitude: 'latitude',
-  longitude: 'longitude',
+  urgency_level: 'urgency_level',
   price: 'price',
+  community_price: 'community_price',
+  public_price: 'public_price',
+  charity_amount: 'charity_amount',
+  charity_percentage: 'charity_percentage',
+  image_url: 'image_url',
+  posts_image: 'posts_image',
+  isPublic: 'isPublic',
+  is_community_pick: 'is_community_pick',
   is_charity: 'is_charity',
   charity_id: 'charity_id',
+  author_name: 'author_name',
+  author_role: 'author_role',
+  author_image: 'author_image',
+  location_name: 'location_name',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  source: 'source',
+  status: 'status',
+  rejection_reason: 'rejection_reason',
+  changes_requested_note: 'changes_requested_note',
   expires_at: 'expires_at',
+  expired_at: 'expired_at',
+  deleted_at: 'deleted_at',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
@@ -291,13 +353,21 @@ exports.Prisma.CharityScalarFieldEnum = {
   description: 'description',
   category: 'category',
   percentage: 'percentage',
-  latitude: 'latitude',
-  longitude: 'longitude',
-  urgency: 'urgency',
   status: 'status',
+  urgency: 'urgency',
   fundraising_goal: 'fundraising_goal',
   raised_amount: 'raised_amount',
   image_url: 'image_url',
+  location_name: 'location_name',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  is_verified: 'is_verified',
+  is_featured: 'is_featured',
+  tags: 'tags',
+  linked_business_ids: 'linked_business_ids',
+  campaign_completed: 'campaign_completed',
+  is_approved_suggestion: 'is_approved_suggestion',
+  suggested_by_id: 'suggested_by_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
@@ -309,9 +379,11 @@ exports.Prisma.CharitySuggestionScalarFieldEnum = {
   suggested_by: 'suggested_by',
   name: 'name',
   description: 'description',
+  reason: 'reason',
+  suggested_donation_amount: 'suggested_donation_amount',
+  website: 'website',
   status: 'status',
   admin_feedback: 'admin_feedback',
-  reason: 'reason',
   created_at: 'created_at'
 };
 
@@ -319,9 +391,8 @@ exports.Prisma.BusinessScalarFieldEnum = {
   id: 'id',
   owner_id: 'owner_id',
   name: 'name',
-  description: 'description',
   category: 'category',
-  status: 'status',
+  description: 'description',
   latitude: 'latitude',
   longitude: 'longitude',
   address: 'address',
@@ -331,8 +402,20 @@ exports.Prisma.BusinessScalarFieldEnum = {
   image_url: 'image_url',
   charity_id: 'charity_id',
   community_ids: 'community_ids',
+  status: 'status',
   created_at: 'created_at',
   updated_at: 'updated_at'
+};
+
+exports.Prisma.ReportScalarFieldEnum = {
+  id: 'id',
+  community_id: 'community_id',
+  reporter_id: 'reporter_id',
+  target_id: 'target_id',
+  target_type: 'target_type',
+  reason: 'reason',
+  status: 'status',
+  created_at: 'created_at'
 };
 
 exports.Prisma.CommunityInvitationScalarFieldEnum = {
@@ -341,6 +424,7 @@ exports.Prisma.CommunityInvitationScalarFieldEnum = {
   invited_by_id: 'invited_by_id',
   invited_user_id: 'invited_user_id',
   invited_email: 'invited_email',
+  invited_by_admin_id: 'invited_by_admin_id',
   role: 'role',
   status: 'status',
   created_at: 'created_at',
@@ -380,18 +464,6 @@ exports.Prisma.ConversationParticipantScalarFieldEnum = {
   joined_at: 'joined_at'
 };
 
-exports.Prisma.MessageScalarFieldEnum = {
-  id: 'id',
-  conversation_id: 'conversation_id',
-  sender_id: 'sender_id',
-  text: 'text',
-  type: 'type',
-  attachment_url: 'attachment_url',
-  status: 'status',
-  read_by: 'read_by',
-  created_at: 'created_at'
-};
-
 exports.Prisma.NotificationScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
@@ -401,6 +473,37 @@ exports.Prisma.NotificationScalarFieldEnum = {
   read: 'read',
   metadata: 'metadata',
   created_at: 'created_at'
+};
+
+exports.Prisma.LicenseScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  community_id: 'community_id',
+  type: 'type',
+  status: 'status',
+  created_at: 'created_at'
+};
+
+exports.Prisma.ModerationLogScalarFieldEnum = {
+  id: 'id',
+  community_id: 'community_id',
+  moderator_id: 'moderator_id',
+  action: 'action',
+  target_id: 'target_id',
+  target_type: 'target_type',
+  notes: 'notes',
+  timestamp: 'timestamp'
+};
+
+exports.Prisma.SecurityEventScalarFieldEnum = {
+  id: 'id',
+  community_id: 'community_id',
+  type: 'type',
+  severity: 'severity',
+  description: 'description',
+  resolved: 'resolved',
+  metadata: 'metadata',
+  timestamp: 'timestamp'
 };
 
 exports.Prisma.SortOrder = {
@@ -418,126 +521,17 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
-exports.LicenseStatus = exports.$Enums.LicenseStatus = {
-  TRIAL: 'TRIAL',
-  LICENSED: 'LICENSED',
-  EXPIRED: 'EXPIRED',
-  SUSPENDED: 'SUSPENDED'
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 
-exports.Platform = exports.$Enums.Platform = {
-  ios: 'ios',
-  android: 'android'
-};
-
-exports.CommunityType = exports.$Enums.CommunityType = {
-  TRIAL: 'TRIAL',
-  LICENSED: 'LICENSED'
-};
-
-exports.CommunityStatus = exports.$Enums.CommunityStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  SUSPENDED: 'SUSPENDED'
-};
-
-exports.UserRole = exports.$Enums.UserRole = {
-  Member: 'Member',
-  Moderator: 'Moderator',
-  Admin: 'Admin',
-  Liaison: 'Liaison'
-};
-
-exports.MemberStatus = exports.$Enums.MemberStatus = {
-  Active: 'Active',
-  Inactive: 'Inactive',
-  Banned: 'Banned'
-};
-
-exports.PostType = exports.$Enums.PostType = {
-  notice: 'notice',
-  listing: 'listing',
-  alert: 'alert',
-  event: 'event',
-  charity: 'charity'
-};
-
-exports.PostStatus = exports.$Enums.PostStatus = {
-  Active: 'Active',
-  Pending: 'Pending',
-  Resolved: 'Resolved',
-  Expired: 'Expired',
-  Deleted: 'Deleted'
-};
-
-exports.PostUrgency = exports.$Enums.PostUrgency = {
-  LOW: 'LOW',
-  MEDIUM: 'MEDIUM',
-  HIGH: 'HIGH',
-  CRITICAL: 'CRITICAL'
-};
-
-exports.CharityStatus = exports.$Enums.CharityStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  PENDING: 'PENDING'
-};
-
-exports.BusinessStatus = exports.$Enums.BusinessStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  PENDING: 'PENDING'
-};
-
-exports.InvitationStatus = exports.$Enums.InvitationStatus = {
-  PENDING: 'PENDING',
-  ACCEPTED: 'ACCEPTED',
-  DECLINED: 'DECLINED',
-  EXPIRED: 'EXPIRED'
-};
-
-exports.ConversationType = exports.$Enums.ConversationType = {
-  direct: 'direct',
-  listing: 'listing',
-  notice: 'notice',
-  marketplace: 'marketplace',
-  community: 'community',
-  emergency: 'emergency'
-};
-
-exports.MessageType = exports.$Enums.MessageType = {
-  text: 'text',
-  image: 'image',
-  audio: 'audio',
-  video: 'video',
-  file: 'file',
-  system: 'system'
-};
-
-exports.MessageStatus = exports.$Enums.MessageStatus = {
-  sent: 'sent',
-  delivered: 'delivered',
-  read: 'read'
-};
-
-exports.NotificationType = exports.$Enums.NotificationType = {
-  message: 'message',
-  post: 'post',
-  emergency: 'emergency',
-  invitation: 'invitation',
-  system: 'system',
-  charity: 'charity'
-};
 
 exports.Prisma.ModelName = {
   User: 'User',
@@ -551,16 +545,20 @@ exports.Prisma.ModelName = {
   CommunityMember: 'CommunityMember',
   MemberLocation: 'MemberLocation',
   SecurityLocation: 'SecurityLocation',
+  Message: 'Message',
   Post: 'Post',
   Charity: 'Charity',
   CharitySuggestion: 'CharitySuggestion',
   Business: 'Business',
+  Report: 'Report',
   CommunityInvitation: 'CommunityInvitation',
   CommunityInviteLink: 'CommunityInviteLink',
   Conversation: 'Conversation',
   ConversationParticipant: 'ConversationParticipant',
-  Message: 'Message',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  License: 'License',
+  ModerationLog: 'ModerationLog',
+  SecurityEvent: 'SecurityEvent'
 };
 
 /**

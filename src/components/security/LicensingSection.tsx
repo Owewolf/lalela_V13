@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Linking, Alert } from 'react-native';
 import { CreditCard, ShieldAlert, Star, Calendar } from 'lucide-react-native';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 import { accountService } from '../../services/accountService';
 
 export const LicensingSection: React.FC = () => {
-  const { userProfile } = useFirebase();
+  const { userProfile } = useAuth();
   const { communities, setCurrentCommunity } = useCommunity();
 
   const isOverallLicensed = communities.some((c) => c.type === 'LICENSED');

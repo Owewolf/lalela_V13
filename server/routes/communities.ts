@@ -14,7 +14,7 @@ router.use(requireAuth);
 
 router.get('/', async (req, res) => {
   const memberships = await prisma.communityMember.findMany({
-    where: { user_id: req.auth!.userId, status: 'Active' },
+    where: { user_id: req.auth!.userId, status: 'ACTIVE' },
     include: { community: true },
   });
   return res.json(memberships.map((m) => ({ ...m.community, userRole: m.role })));
@@ -56,10 +56,20 @@ router.post('/', async (req, res) => {
     data: { community_id: community.id, user_id: req.auth!.userId, role: 'Admin' },
   });
 
-  // Mark community_created on user
-  await prisma.user.update({ where: { id: req.auth!.userId }, data: { community_created: true } });
+  // Set 14-day trial expiry and mark community_created on user
+  const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  await prisma.$transaction([
+    prisma.community.update({
+      where: { id: community.id },
+      data: { trial_end_date: trialEnd, type: 'TRIAL' },
+    }),
+    prisma.user.update({
+      where: { id: req.auth!.userId },
+      data: { community_created: true, access_type: 'Trial', expiry_date: trialEnd },
+    }),
+  ]);
 
-  return res.status(201).json(community);
+  return res.status(201).json({ ...community, trial_end_date: trialEnd, type: 'TRIAL' });
 });
 
 // ─── Update community ─────────────────────────────────────────────────────────

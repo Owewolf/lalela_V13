@@ -28,7 +28,7 @@ import MapView, { Marker, Circle } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/uploadImage';
 import { BUSINESS_CATEGORIES } from '../../constants';
 import CreateWarningNotice from './CreateWarningNotice';
@@ -86,7 +86,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
 }) => {
   const router = useRouter();
   const { currentCommunity, charities, addPost, updatePost, securityResponders } = useCommunity();
-  const { user, userProfile } = useFirebase();
+  const { userProfile } = useAuth();
 
   const handleBack = () => {
     router.back();
@@ -226,7 +226,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
     const asset = result.assets[0];
     setIsUploading(true);
     try {
-      const url = await uploadImage(asset.uri, 'posts', user?.uid ?? 'anon', postsImage);
+      const url = await uploadImage(asset.uri, 'posts', userProfile?.id ?? 'anon', postsImage);
       setPostsImage(url);
     } catch {
       Alert.alert('Upload failed', 'Image upload failed. Please try again.');
@@ -262,15 +262,13 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
       authorName:
         postToEdit?.authorName ||
         userProfile?.name ||
-        user?.displayName ||
         'Community Member',
-      author_id: postToEdit?.author_id || user?.uid,
+      author_id: postToEdit?.author_id || userProfile?.id,
       authorRole: postToEdit?.authorRole || currentCommunity?.userRole || 'Member',
       authorImage:
         postToEdit?.authorImage ||
         userProfile?.profile_image ||
-        user?.photoURL ||
-        `https://picsum.photos/seed/${user?.uid}/200/200`,
+        `https://picsum.photos/seed/${userProfile?.id}/200/200`,
       charityId: isPublic ? selectedCharityId : undefined,
       charityPercentage: isPublic ? charityPercentage : undefined,
       charity_amount: postType === 'listing' ? (isPublic ? charityAmount : 0) : undefined,

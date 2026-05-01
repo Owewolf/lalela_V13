@@ -13,29 +13,48 @@ router.get('/me', async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
     select: {
-      id: true, email: true, phone: true, name: true, profile_image: true,
+      id: true, email: true, name: true, first_name: true, last_name: true,
+      phone: true, mobile_number: true, address: true, profile_image: true,
+      email_verified: true, phone_verified: true, status: true, role: true,
       profile_completed: true, community_created: true, onboarding_complete: true,
       license_status: true, license_expiry: true, license_type: true, auto_renew: true,
+      access_type: true, expiry_date: true, member_expiry_date: true,
       two_factor_enabled: true, two_factor_method: true, login_alerts_enabled: true,
-      location_sharing: true, latitude: true, longitude: true,
+      profile_visibility: true, pii_visibility: true,
+      last_password_changed: true, security_score: true,
+      location_sharing: true, is_security_member: true, emergency_location_opt_in: true,
+      latitude: true, longitude: true, last_community_id: true,
+      agreed_to_terms: true, marketing_consent: true,
+      notification_preferences: true,
+      fcm_token: true, push_token: true, push_platform: true,
+      pending_invite_code: true,
       created_at: true, updated_at: true,
     },
   });
   if (!user) return res.status(404).json({ error: 'User not found' });
-  return res.json(user);
+  // Normalize DB column name (onboarding_complete) to client field name (onboarding_completed)
+  return res.json({ ...user, onboarding_completed: user.onboarding_complete });
 });
 
 router.put('/me', async (req, res) => {
   const allowed = [
-    'name', 'profile_image', 'latitude', 'longitude', 'location_sharing',
+    'name', 'first_name', 'last_name', 'phone', 'mobile_number', 'address',
+    'profile_image', 'latitude', 'longitude', 'location_sharing',
+    'is_security_member', 'emergency_location_opt_in', 'last_community_id',
     'profile_completed', 'onboarding_complete', 'community_created',
     'two_factor_enabled', 'two_factor_method', 'login_alerts_enabled',
-    'pending_invite_code',
+    'profile_visibility', 'pii_visibility', 'last_password_changed', 'security_score',
+    'agreed_to_terms', 'marketing_consent', 'notification_preferences',
+    'license_status', 'license_expiry', 'license_type', 'auto_renew',
+    'access_type', 'expiry_date', 'member_expiry_date',
+    'pending_invite_code', 'fcm_token',
   ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in req.body) data[key] = req.body[key];
   }
+  // Accept onboarding_completed (client alias) → map to onboarding_complete (DB column)
+  if ('onboarding_completed' in req.body) data['onboarding_complete'] = req.body['onboarding_completed'];
 
   const user = await prisma.user.update({ where: { id: req.auth!.userId }, data });
   return res.json(user);

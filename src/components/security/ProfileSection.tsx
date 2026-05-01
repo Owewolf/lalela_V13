@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { User, CheckCircle2, Smartphone, Camera, Siren, ShieldCheck } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 import { LocationSettings } from './LocationSettings';
 
@@ -20,7 +20,7 @@ interface ProfileSectionProps {
 }
 
 export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = false }) => {
-  const { userProfile, updateUserProfile } = useFirebase();
+  const { userProfile, updateUserProfile } = useAuth();
   const { communities, toggleCommunityResponder } = useCommunity();
   const [isEditing, setIsEditing] = useState(initialEdit);
   const [isSaving, setIsSaving] = useState(false);

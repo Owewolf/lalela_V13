@@ -16,7 +16,7 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import { useAuth } from '../../context/AuthContext';
 import { calculateDistance } from '../../lib/utils';
 import { CommunityMember, Conversation } from '../../types';
 
@@ -44,7 +44,7 @@ export const ChatPage: React.FC = () => {
     markAsRead,
     chatUnreadTotals,
   } = useCommunity();
-  const { user } = useFirebase();
+  const { userProfile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'unread' | 'notices' | 'listings'>('all');
 
@@ -57,7 +57,7 @@ export const ChatPage: React.FC = () => {
 
   // Build enriched member list
   const enrichedMembers = useMemo(() => {
-    const otherMembers = members.filter((m) => m.user_id !== user?.uid);
+    const otherMembers = members.filter((m) => m.user_id !== userProfile?.id);
 
     const businessOwnerIds = new Set(communityBusinesses.map((b) => b.owner_id));
     const responderIds = new Set(securityResponders.map((r) => r.user_id));
@@ -83,11 +83,11 @@ export const ChatPage: React.FC = () => {
     const unreadInfoMap = new Map<string, UnreadInfo>();
 
     for (const conv of conversations) {
-      if (!user) continue;
+      if (!userProfile) continue;
       if (conv.type === 'community' || conv.type === 'emergency') continue;
-      const otherId = conv.participants.find((p) => p !== user.uid);
+      const otherId = conv.participants.find((p) => p !== userProfile.id);
       if (!otherId) continue;
-      const myUnread = conv.unreadCount?.[user.uid] || 0;
+      const myUnread = conv.unreadCount?.[userProfile.id] || 0;
       const info = unreadInfoMap.get(otherId) || {
         direct: 0,
         listing: 0,
@@ -125,7 +125,7 @@ export const ChatPage: React.FC = () => {
 
       for (const conv of conversations) {
         if (conv.type === 'community' || conv.type === 'emergency') continue;
-        const otherId = conv.participants.find(p => p !== user?.uid);
+        const otherId = conv.participants.find(p => p !== userProfile?.id);
         if (otherId === m.user_id) {
           if (!lastMessageConv || new Date(conv.lastMessageAt).getTime() > new Date(lastMessageConv.lastMessageAt).getTime()) {
             lastMessageConv = conv;
@@ -161,7 +161,7 @@ export const ChatPage: React.FC = () => {
         lastMessageConv,
       };
     });
-  }, [members, user, posts, communityBusinesses, securityResponders, isEmergency, emergencyPost, conversations]);
+  }, [members, userProfile, posts, communityBusinesses, securityResponders, isEmergency, emergencyPost, conversations]);
 
   // Filter by search first
   const searchFiltered = useMemo(() => {
@@ -212,10 +212,10 @@ export const ChatPage: React.FC = () => {
   );
 
   const handleMemberTap = async (member: CommunityMember) => {
-    if (!user) return;
+    if (!userProfile) return;
     try {
       const convId = await startConversation({
-        participants: [user.uid, member.user_id],
+        participants: [userProfile.id, member.user_id],
         type: 'direct',
         communityId: currentCommunity?.id,
       });
