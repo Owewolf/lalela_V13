@@ -32,11 +32,23 @@ router.get('/me', async (req, res) => {
     },
   });
   if (!user) return res.status(404).json({ error: 'User not found' });
+  // Reconstruct defaultLocation from flat lat/lng columns
+  const defaultLocation =
+    user.latitude != null && user.longitude != null
+      ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
+      : undefined;
   // Normalize DB column name (onboarding_complete) to client field name (onboarding_completed)
-  return res.json({ ...user, onboarding_completed: user.onboarding_complete });
+  return res.json({ ...user, onboarding_completed: user.onboarding_complete, defaultLocation });
 });
 
 router.put('/me', async (req, res) => {
+  // Map defaultLocation object → flat lat/lng columns
+  if (req.body.defaultLocation?.latitude != null) {
+    req.body.latitude = req.body.defaultLocation.latitude;
+    req.body.longitude = req.body.defaultLocation.longitude;
+    if (!req.body.address && req.body.defaultLocation.name) req.body.address = req.body.defaultLocation.name;
+  }
+
   const allowed = [
     'name', 'first_name', 'last_name', 'phone', 'mobile_number', 'address',
     'profile_image', 'latitude', 'longitude', 'location_sharing',
@@ -56,8 +68,36 @@ router.put('/me', async (req, res) => {
   // Accept onboarding_completed (client alias) → map to onboarding_complete (DB column)
   if ('onboarding_completed' in req.body) data['onboarding_complete'] = req.body['onboarding_completed'];
 
+  // Guard: profile_completed can only be set to true if a location is provided
+  if (data['profile_completed'] === true) {
+    const current = await prisma.user.findUnique({ where: { id: req.auth!.userId }, select: { latitude: true, longitude: true, address: true } });
+    const hasExistingLocation = current && current.latitude != null && current.longitude != null;
+    const hasNewLocation = (req.body.defaultLocation?.latitude && req.body.defaultLocation?.longitude) || (req.body.latitude && req.body.longitude);
+    if (!hasExistingLocation && !hasNewLocation) {
+      return res.status(400).json({ error: 'Location must be set before completing onboarding.' });
+    }
+  }
+
+  // Guard: onboarding_complete can only be set to true if profile_completed is already true
+  // OR is being set to true in the same request (atomic first-time completion).
+  if (data['onboarding_complete'] === true) {
+    const settingProfileNow = data['profile_completed'] === true;
+    if (!settingProfileNow) {
+      const current = await prisma.user.findUnique({ where: { id: req.auth!.userId }, select: { profile_completed: true } });
+      if (!current?.profile_completed) {
+        return res.status(400).json({ error: 'Profile must be completed before finishing onboarding.' });
+      }
+    }
+  }
+
   const user = await prisma.user.update({ where: { id: req.auth!.userId }, data });
-  return res.json(user);
+  // Reconstruct defaultLocation from flat lat/lng columns
+  const defaultLocation =
+    user.latitude != null && user.longitude != null
+      ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
+      : undefined;
+  // Normalize the same way GET /me does — client always receives `onboarding_completed`
+  return res.json({ ...user, onboarding_completed: user.onboarding_complete, defaultLocation });
 });
 
 // ─── Push Token ───────────────────────────────────────────────────────────────

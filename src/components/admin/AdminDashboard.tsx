@@ -59,13 +59,15 @@ interface AdminDashboardProps {
   onSetupComplete?: () => void;
 }
 
+// Step 1 (community name) is completed in OnboardingCreate — guided admin setup covers steps 2–5.
 const SETUP_STEPS = [
-  { id: 'coverage' as const, label: 'Coverage Area', description: "Define your community's geographic scope" },
-  { id: 'categories' as const, label: 'Categories', description: 'Select which business categories are visible' },
-  { id: 'businesses' as const, label: 'Import Businesses', description: 'Add local businesses to your community' },
-  { id: 'invitations' as const, label: 'Invite Members', description: 'Invite users and assign roles' },
-  { id: 'rules' as const, label: 'Community Rules', description: 'Set posting limits and access controls' },
+  { id: 'coverage' as const,    label: 'Coverage Area',     description: "Define your community's geographic scope" },
+  { id: 'categories' as const,  label: 'Categories',        description: 'Select which business categories are visible' },
+  { id: 'businesses' as const,  label: 'Import Businesses', description: 'Add local businesses to your community' },
+  { id: 'rules' as const,       label: 'Community Rules',   description: 'Set posting limits and access controls' },
 ];
+// Total steps in the full onboarding narrative (step 1 = community name, already done)
+const TOTAL_ONBOARDING_STEPS = SETUP_STEPS.length + 1;
 type SetupStepId = typeof SETUP_STEPS[number]['id'];
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({
@@ -130,13 +132,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Derive member/volunteer counts from CommunityContext state
   React.useEffect(() => {
-    setMemberCount(currentCommunity?.members?.length ?? 0);
+    setMemberCount(members.length);
     setActiveVolunteersCount(
-      (currentCommunity?.members ?? []).filter(
+      members.filter(
         (m: any) => m.role === 'Liaison' || m.role === 'Moderator'
       ).length
     );
-  }, [currentCommunity?.members]);
+  }, [members]);
 
   // Derive charity totals from CommunityContext state
   React.useEffect(() => {
@@ -196,11 +198,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setActiveView('dashboard');
       return;
     }
-    if (stepId === 'coverage') { setModerationTab('coverage'); setActiveView('moderation'); }
-    else if (stepId === 'categories') { setModerationTab('categories'); setActiveView('moderation'); }
-    else if (stepId === 'businesses') { setModerationTab('businesses'); setActiveView('moderation'); }
-    else if (stepId === 'invitations') { setActiveView('members'); }
-    else if (stepId === 'rules') { setModerationTab('rules'); setActiveView('moderation'); }
+    // Each step maps to a tab inside ModerationCenter
+    setModerationTab(stepId);
+    setActiveView('moderation');
   };
 
   const currentSetupStep = SETUP_STEPS[setupStepIndex];
@@ -237,7 +237,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleFinishSetup = async () => {
     if (currentCommunity?.id) {
       try {
-        await api.put(`/communities/${currentCommunity.id}`, { guided_setup_required: false });
+        // Mark all steps completed on the community record
+        await api.put(`/communities/${currentCommunity.id}`, {
+          onboarding_steps_completed: SETUP_STEPS.map(s => s.id),
+        });
       } catch (e) { console.error(e); }
     }
     try { await updateUserProfile({ onboarding_completed: true } as any); } catch (e) { console.error(e); }
@@ -591,7 +594,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <View style={styles.setupProgress}>
             <View
               style={[styles.setupProgressFill, {
-                width: `${(completedSetupSteps.size / SETUP_STEPS.length) * 100}%`
+                // Step 1 (name) already done → start at 1/5, end at 5/5
+                width: `${((completedSetupSteps.size + 1) / TOTAL_ONBOARDING_STEPS) * 100}%`
               }]}
             />
           </View>
@@ -600,7 +604,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <View style={styles.setupStepRow}>
                 <Text style={styles.setupStepLabel}>{currentSetupStep.label}</Text>
                 <Text style={styles.setupStepCount}>
-                  {completedSetupSteps.size + 1} of {SETUP_STEPS.length}
+                  {completedSetupSteps.size + 2} of {TOTAL_ONBOARDING_STEPS}
                 </Text>
               </View>
               <Text style={styles.setupStepDesc}>{currentSetupStep.description}</Text>

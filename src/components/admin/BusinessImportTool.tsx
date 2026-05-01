@@ -91,8 +91,13 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
     });
 
     try {
-      const { data } = await api.post('/gemini-search', { categories: selectedTypes, coverageArea });
-      
+      const { data } = await api.post('/places-search', {
+        categoryTypes: selectedTypes,
+        lat: coverageArea.latitude,
+        lng: coverageArea.longitude,
+        radius: coverageArea.radius,
+      });
+
       const businesses: Business[] = (data as any[]).map(b => ({
         id: `google_${Math.random().toString(36).substr(2, 9)}`,
         name: b.name,
@@ -101,7 +106,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
         longitude: b.longitude,
         rating: b.rating,
         category: b.category || selectedCategories[0],
-        description: b.description,
+        description: null,
         phone: b.phone,
         website: b.website,
         status: 'Open' as const,

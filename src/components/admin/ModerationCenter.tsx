@@ -74,7 +74,7 @@ import Slider from '@react-native-community/slider';
 const PRIMARY = '#0d3d47';
 const SECONDARY = '#7c3aed';
 const ERROR = '#dc2626';
-const INVITE_WEB_BASE_URL = 'https://lalela.net';
+const INVITE_WEB_BASE_URL = 'https://api.wolfslair.cc';
 
 export interface ModerationCenterHandle {
   saveCurrentTab: () => Promise<void>;

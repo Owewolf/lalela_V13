@@ -507,6 +507,7 @@ export interface CommunityContextType {
   activeCommunityLink: CommunityInviteLink | null;
   generateInviteLink: () => Promise<string>;
   joinViaInviteLink: (linkCode: string) => Promise<string>;
+  refreshCommunities: () => Promise<void>;
 }
 
 // --- Public API Types (for unauthenticated landing page map) ---

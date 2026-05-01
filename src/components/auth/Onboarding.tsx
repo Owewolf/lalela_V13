@@ -242,6 +242,11 @@ const OnboardingInvite: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!user) return;
+    // Location is mandatory before onboarding can complete.
+    if (!locationLat || !locationLng || !locationName.trim()) {
+      setError('Please set your location to continue.');
+      return;
+    }
     setIsSubmitting(true);
     setError(null);
     try {

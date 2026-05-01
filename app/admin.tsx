@@ -1,21 +1,32 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useCommunity } from '../src/context/CommunityContext';
+import { useAuth } from '../src/context/AuthContext';
 
 export default function AdminScreen() {
-  const { guided } = useLocalSearchParams<{ guided?: string }>();
   const router = useRouter();
   const { currentCommunity } = useCommunity();
+  const { userProfile } = useAuth();
   const AdminDashboard = require('../src/components/admin/AdminDashboard').default;
-  const canAccessModerationCenter =
+
+  const isOwner = currentCommunity?.owner_id === userProfile?.id;
+  const canAccess =
+    isOwner ||
     currentCommunity?.userRole === 'Admin' ||
     currentCommunity?.userRole === 'Moderator';
 
   return (
     <AdminDashboard
-      guidedSetup={guided === 'true' && canAccessModerationCenter}
-      readOnly={!canAccessModerationCenter}
+      guidedSetup={false}
+      readOnly={!canAccess}
       onSetupComplete={() => router.replace('/(tabs)')}
-      onBack={() => router.back()}
+      onBack={() => {
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace('/(tabs)');
+        }
+      }}
     />
   );
 }
+

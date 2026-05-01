@@ -38,38 +38,66 @@ router.post('/', async (req, res) => {
 
   if (!name?.trim()) return res.status(400).json({ error: 'Community name is required' });
 
-  const community = await prisma.community.create({
-    data: {
-      owner_id: req.auth!.userId,
-      name: name.trim(),
-      description,
-      coverage_lat,
-      coverage_lng,
-      coverage_radius,
-      coverage_location,
-      enabled_categories: enabled_categories ?? [],
-    },
-  });
+  try {
+    // A user may only own one TRIAL community at a time.
+    const existingTrial = await prisma.community.findFirst({
+      where: { owner_id: req.auth!.userId, type: 'TRIAL' },
+    });
+    if (existingTrial) {
+      return res.status(409).json({
+        error: 'TRIAL_EXISTS',
+        message: 'You already have an active trial community. Upgrade your licence to create additional communities.',
+        community_id: existingTrial.id,
+      });
+    }
 
-  // Add creator as Admin member
-  await prisma.communityMember.create({
-    data: { community_id: community.id, user_id: req.auth!.userId, role: 'Admin' },
-  });
+    const community = await prisma.community.create({
+      data: {
+        owner_id: req.auth!.userId,
+        name: name.trim(),
+        description,
+        coverage_lat,
+        coverage_lng,
+        coverage_radius,
+        coverage_location,
+        enabled_categories: enabled_categories ?? [],
+      },
+    });
 
-  // Set 14-day trial expiry and mark community_created on user
-  const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
-  await prisma.$transaction([
-    prisma.community.update({
-      where: { id: community.id },
-      data: { trial_end_date: trialEnd, type: 'TRIAL' },
-    }),
-    prisma.user.update({
+    // Add creator as Admin member — populate cached display fields immediately
+    const creator = await prisma.user.findUnique({
       where: { id: req.auth!.userId },
-      data: { community_created: true, access_type: 'Trial', expiry_date: trialEnd },
-    }),
-  ]);
+      select: { name: true, profile_image: true, email: true },
+    });
+    await prisma.communityMember.create({
+      data: {
+        community_id: community.id,
+        user_id: req.auth!.userId,
+        role: 'Admin',
+        name: creator?.name ?? null,
+        image: creator?.profile_image ?? null,
+        email: creator?.email ?? null,
+      },
+    });
 
-  return res.status(201).json({ ...community, trial_end_date: trialEnd, type: 'TRIAL' });
+    // 30-day trial
+    const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    await prisma.$transaction([
+      prisma.community.update({
+        where: { id: community.id },
+        data: { trial_end_date: trialEnd, type: 'TRIAL' },
+      }),
+      prisma.user.update({
+        where: { id: req.auth!.userId },
+        data: { community_created: true, access_type: 'Trial', expiry_date: trialEnd },
+      }),
+    ]);
+
+    return res.status(201).json({ ...community, trial_end_date: trialEnd, type: 'TRIAL' });
+  } catch (err: any) {
+    console.error('[POST /communities] error:', err);
+    return res.status(500).json({ error: err?.message ?? 'Failed to create community' });
+  }
 });
 
 // ─── Update community ─────────────────────────────────────────────────────────
@@ -83,7 +111,7 @@ router.put('/:id', async (req, res) => {
     return res.status(403).json({ error: 'Insufficient permissions' });
   }
 
-  const allowed = ['name', 'description', 'coverage_lat', 'coverage_lng', 'coverage_radius', 'coverage_location', 'enabled_categories', 'is_emergency_mode', 'status'];
+  const allowed = ['name', 'description', 'coverage_lat', 'coverage_lng', 'coverage_radius', 'coverage_location', 'enabled_categories', 'is_emergency_mode', 'status', 'onboarding_steps_completed'];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in req.body) data[key] = req.body[key];
@@ -98,9 +126,20 @@ router.put('/:id', async (req, res) => {
 router.get('/:id/members', async (req, res) => {
   const members = await prisma.communityMember.findMany({
     where: { community_id: req.params.id },
-    include: { user: { select: { id: true, name: true, profile_image: true, email: true } } },
+    include: { user: { select: { id: true, name: true, profile_image: true, email: true, latitude: true, longitude: true, is_security_member: true, location_sharing: true } } },
   });
-  return res.json(members);
+  // Flatten: cached member fields take priority; fall back to live user fields
+  // Always include the user's default location so map pins are always visible
+  return res.json(members.map(({ user, ...m }) => ({
+    ...m,
+    name: m.name || user?.name || null,
+    image: m.image || user?.profile_image || null,
+    email: m.email || user?.email || null,
+    latitude: user?.latitude ?? null,
+    longitude: user?.longitude ?? null,
+    isSecurityMember: user?.is_security_member ?? false,
+    locationSharingEnabled: user?.location_sharing ?? false,
+  })));
 });
 
 router.put('/:id/members/:userId', async (req, res) => {
@@ -135,9 +174,21 @@ router.post('/join/:code', async (req, res) => {
   });
   if (existing) return res.status(409).json({ error: 'Already a member of this community' });
 
+  const joiner = await prisma.user.findUnique({
+    where: { id: req.auth!.userId },
+    select: { name: true, profile_image: true, email: true },
+  });
+
   await prisma.$transaction([
     prisma.communityMember.create({
-      data: { community_id: link.community_id, user_id: req.auth!.userId, role: link.role },
+      data: {
+        community_id: link.community_id,
+        user_id: req.auth!.userId,
+        role: link.role,
+        name: joiner?.name ?? null,
+        image: joiner?.profile_image ?? null,
+        email: joiner?.email ?? null,
+      },
     }),
     prisma.communityInviteLink.update({
       where: { id: link.id },
@@ -228,13 +279,31 @@ router.get('/:id/posts', async (req, res) => {
     },
     orderBy: { created_at: 'desc' },
     take: Number(limit ?? 50),
+    include: { author: { select: { name: true, profile_image: true } } },
   });
-  return res.json(posts);
+  // Flatten author fields — cached columns take priority, fall back to live user data
+  return res.json(posts.map(({ author, ...p }) => ({
+    ...p,
+    authorName: p.author_name || author?.name || null,
+    authorImage: p.author_image || author?.profile_image || null,
+    authorRole: p.author_role || null,
+  })));
 });
 
 router.post('/:id/posts', async (req, res) => {
   const { type, category, subtype, title, description, image_url, urgency, latitude, longitude, price, is_charity, charity_id, expires_at } = req.body;
   if (!type || !title?.trim()) return res.status(400).json({ error: 'type and title are required' });
+
+  // Fetch author info to populate cached columns
+  const authorUser = await prisma.user.findUnique({
+    where: { id: req.auth!.userId },
+    select: { name: true, profile_image: true },
+  });
+  // Resolve the author's role in this community
+  const authorMembership = await prisma.communityMember.findUnique({
+    where: { community_id_user_id: { community_id: req.params.id, user_id: req.auth!.userId } },
+    select: { role: true },
+  });
 
   const post = await prisma.post.create({
     data: {
@@ -253,9 +322,17 @@ router.post('/:id/posts', async (req, res) => {
       is_charity: is_charity ?? false,
       charity_id,
       expires_at: expires_at ? new Date(expires_at) : null,
+      author_name: authorUser?.name ?? null,
+      author_image: authorUser?.profile_image ?? null,
+      author_role: authorMembership?.role ?? null,
     },
   });
-  return res.status(201).json(post);
+  return res.status(201).json({
+    ...post,
+    authorName: post.author_name,
+    authorImage: post.author_image,
+    authorRole: post.author_role,
+  });
 });
 
 router.put('/:id/posts/:postId', async (req, res) => {
@@ -325,6 +402,18 @@ router.post('/:id/charities', async (req, res) => {
 router.put('/:id/charities/:charityId', async (req, res) => {
   const charity = await prisma.charity.update({ where: { id: req.params.charityId }, data: req.body });
   return res.json(charity);
+});
+
+// ─── Moderation logs (stub — returns empty list until moderation is built) ────
+
+router.get('/:id/moderation-logs', async (_req, res) => {
+  return res.json([]);
+});
+
+// ─── Security events (stub — returns empty list until security is built) ──────
+
+router.get('/:id/security-events', async (_req, res) => {
+  return res.json([]);
 });
 
 // ─── Charity suggestions ──────────────────────────────────────────────────────

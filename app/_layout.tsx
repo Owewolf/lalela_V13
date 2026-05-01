@@ -116,11 +116,7 @@ function AppGuard() {
         .then((pendingCode) => {
           router.replace(pendingCode ? (`/onboarding?join=${pendingCode}` as any) : '/onboarding');
         });
-    } else if (onboardingComplete && userProfile.community_created && !userProfile.onboarding_completed && segments[0] !== 'admin') {
-      // Community creator finished profile onboarding — route to guided admin setup.
-      // Only redirects when onboarding_completed is explicitly false or undefined (not yet done).
-      router.replace('/admin?guided=true' as any);
-    } else if (onboardingComplete && (inLanding || segments[0] === 'onboarding')) {
+    } else if (onboardingComplete && inAuthGroup) {
       router.replace('/(tabs)');
     }
   }, [user, userProfile, loading, segments]);

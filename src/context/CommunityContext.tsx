@@ -27,17 +27,17 @@ const CommunityContext = createContext<CommunityContextType | undefined>(undefin
 const EMPTY_COMMUNITY: Community = {
   id: '',
   name: '',
-  type: 'RESIDENTIAL',
+  owner_id: '',
+  type: 'TRIAL',
+  trial_end_date: null,
   status: 'ACTIVE',
   coverageArea: { latitude: 0, longitude: 0, radius: 1, location_name: '' },
-  categories: [],
-  members: [],
-  posts: [],
-  businesses: [],
-  charities: [],
 };
 
-const EMPTY_UNREAD: ChatUnreadTotals = { total: 0, byConversation: {} };
+const EMPTY_UNREAD: ChatUnreadTotals = {
+  direct: 0, listing: 0, notice: 0, marketplace: 0,
+  community: 0, emergency: 0, totalMessages: 0, unreadFilterTotal: 0,
+};
 
 /** Map raw Prisma/REST response to the client-side Community shape. */
 function mapServerCommunity(raw: any): Community {
@@ -80,6 +80,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [chatUnreadTotals, setChatUnreadTotals] = useState<ChatUnreadTotals>(EMPTY_UNREAD);
 
   const socketRef = useRef<Awaited<ReturnType<typeof getSocket>> | null>(null);
+  // Holds the latest `load` function so it can be called outside the useEffect.
+  const loadRef = useRef<(() => Promise<void>) | null>(null);
+
+  const refreshCommunities = useCallback(async () => {
+    if (loadRef.current) await loadRef.current();
+  }, []);
 
   const currentCommunity = useMemo(
     () => communities.find((c) => c.id === currentCommunityId) ?? EMPTY_COMMUNITY,
@@ -118,7 +124,20 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     };
 
     load();
+    // Expose load so callers can trigger a re-fetch (e.g. after community creation).
+    loadRef.current = load;
   }, [userId]);
+
+  // If last_community_id is set but not yet in the communities list (e.g. just
+  // created), re-fetch once to pick it up with the correct userRole.
+  useEffect(() => {
+    if (!currentCommunityId) return;
+    const alreadyLoaded = communities.some((c) => c.id === currentCommunityId);
+    if (!alreadyLoaded && loadRef.current) {
+      loadRef.current();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCommunityId]);
 
   // Load community-specific data when current community changes
   useEffect(() => {
@@ -126,20 +145,28 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     const loadCommunity = async () => {
       try {
-        const [membersRes, postsRes, charitiesRes, bizRes, invRes] = await Promise.allSettled([
+        const [membersRes, postsRes, charitiesRes, bizRes, invRes, locRes] = await Promise.allSettled([
           api.get(`/communities/${currentCommunityId}/members`),
           api.get(`/communities/${currentCommunityId}/posts`),
           api.get(`/communities/${currentCommunityId}/charities`),
           api.get('/businesses'),
           api.get('/communities'),   // refresh to get invites embedded
+          api.get(`/communities/${currentCommunityId}/locations`),
         ]);
+        // Members always use their default location (lat/lng from user profile)
         if (membersRes.status === 'fulfilled') setMembers(membersRes.value.data);
+        // Live locations from /locations are used only for security responders
+        if (locRes.status === 'fulfilled') {
+          const liveLocations: { user_id: string; name: string; image: string; latitude: number; longitude: number; timestamp: string }[] =
+            locRes.value.data?.security ?? [];
+          setSecurityResponders(liveLocations);
+        }
         if (postsRes.status === 'fulfilled') setPosts(postsRes.value.data);
         if (charitiesRes.status === 'fulfilled') setCharities(charitiesRes.value.data);
         if (bizRes.status === 'fulfilled') {
           const all: UserBusiness[] = bizRes.value.data;
           setUserBusinesses(all.filter((b) => b.owner_id === userId));
-          setCommunityBusinesses(all.filter((b) => b.community_id === currentCommunityId));
+          setCommunityBusinesses(all.filter((b) => b.communityIds.includes(currentCommunityId!)));
         }
       } catch (err) {
         console.error('CommunityContext community load error:', err);
@@ -177,7 +204,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       socket.on('message:new', (msg: Message) => {
         setMessages((prev) => [...prev, msg]);
         setConversations((prev) =>
-          prev.map((c) => c.id === msg.conversation_id ? { ...c, last_message: msg } : c)
+          prev.map((c) => c.id === (msg as any).conversationId ? { ...c, last_message: msg } : c)
         );
       });
 
@@ -275,7 +302,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const bulkAddCommunityBusinesses = useCallback(async (communityId: string, businesses: Business[]) => {
     await api.post('/businesses/import', { communityId, businesses });
     const { data } = await api.get('/businesses');
-    setCommunityBusinesses(data.filter((b: UserBusiness) => b.community_id === communityId));
+    setCommunityBusinesses(data.filter((b: UserBusiness) => b.communityIds.includes(communityId)));
   }, []);
 
   const addUserBusiness = useCallback(async (business: Omit<UserBusiness, 'id'>) => {
@@ -442,7 +469,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const sendMessage = useCallback(async (
     text: string,
-    type: Message['type'] = 'text',
+    type: Message['messageType'] = 'text',
     attachmentUrl?: string,
     fileName?: string,
   ) => {
@@ -569,6 +596,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         generateInviteLink,
         joinViaInviteLink,
         syncAllUsersToSearch,
+        refreshCommunities,
       }}
     >
       {children}

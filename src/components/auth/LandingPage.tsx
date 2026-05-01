@@ -44,8 +44,8 @@ const LandingPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [marketingConsent, setMarketingConsent] = useState(false);
+  const agreedToTerms = true;
+  const marketingConsent = false;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -517,26 +517,14 @@ const LandingPage: React.FC = () => {
                       </View>
                     )}
 
-                    {/* Terms */}
+                    {/* Terms note — implicit agreement on account creation */}
                     {joinMode === 'start' && (
-                      <View className="gap-3 pt-1">
-                        <TouchableOpacity onPress={() => setAgreedToTerms(!agreedToTerms)} className="flex-row items-start gap-2">
-                          <Checkbox checked={agreedToTerms} onChange={setAgreedToTerms} />
-                          <Text className="flex-1 text-xs text-gray-500 leading-relaxed">
-                            I agree to the{' '}
-                            <Text className="font-bold text-[#0d3d47]">Terms & Conditions</Text>
-                            {' '}and{' '}
-                            <Text className="font-bold text-[#0d3d47]">Privacy Policy</Text>
-                            {' *'}
-                          </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setMarketingConsent(!marketingConsent)} className="flex-row items-start gap-2">
-                          <Checkbox checked={marketingConsent} onChange={setMarketingConsent} />
-                          <Text className="flex-1 text-xs text-gray-500 leading-relaxed">
-                            I'd like to receive community updates and promotional emails
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
+                      <Text className="text-[10px] text-gray-400 text-center leading-relaxed">
+                        By creating an account you agree to our{' '}
+                        <Text className="text-[#0d3d47]">Terms & Conditions</Text>
+                        {' '}and{' '}
+                        <Text className="text-[#0d3d47]">Privacy Policy</Text>.
+                      </Text>
                     )}
 
                     {/* Submit */}

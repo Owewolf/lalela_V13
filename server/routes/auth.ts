@@ -174,6 +174,19 @@ router.post('/login', async (req, res) => {
       profile_image: user.profile_image,
       profile_completed: user.profile_completed,
       community_created: user.community_created,
+      onboarding_completed: user.onboarding_complete,
+      last_community_id: user.last_community_id,
+      license_status: user.license_status,
+      license_type: user.license_type,
+      role: user.role,
+      status: user.status,
+      latitude: user.latitude,
+      longitude: user.longitude,
+      address: user.address,
+      defaultLocation:
+        user.latitude != null && user.longitude != null
+          ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
+          : undefined,
     },
   });
 });

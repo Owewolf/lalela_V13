@@ -127,60 +127,79 @@ router.get('/og-image', async (req, res) => {
   }
 });
 
-// ─── Gemini Search (server-side proxy) ───────────────────────────────────────
+// ─── Google Places Nearby Search (server-side proxy) ─────────────────────────
 
-router.post('/gemini-search', async (req, res) => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(503).json({ error: 'Gemini API key not configured' });
+router.post('/places-search', async (req, res) => {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) return res.status(503).json({ error: 'Google Maps API key not configured' });
 
-  const { categories, coverageArea } = req.body as {
-    categories: string[];
-    coverageArea: { location_name: string; latitude: number; longitude: number; radius: number };
+  const { categoryTypes, lat, lng, radius } = req.body as {
+    categoryTypes: string[]; // flat array of Google Places type strings
+    lat: number;
+    lng: number;
+    radius: number; // km
   };
 
-  if (!categories?.length || !coverageArea) {
-    return res.status(400).json({ error: 'Missing categories or coverageArea' });
+  if (!categoryTypes?.length || lat == null || lng == null) {
+    return res.status(400).json({ error: 'Missing required fields: categoryTypes, lat, lng' });
   }
 
+  // Places API v1 supports up to 50 includedTypes per request; cap radius at 50 km
+  const radiusMeters = Math.min((radius || 5) * 1000, 50000);
+  const includedTypes = categoryTypes.slice(0, 50);
+
   try {
-    const { GoogleGenAI, Type } = await import('@google/genai');
-    const ai = new GoogleGenAI({ apiKey });
-
-    const prompt = `Search for real, popular, and highly-rated businesses in the following categories: ${categories.join(', ')}.
-The search area is ${coverageArea.location_name} (Latitude: ${coverageArea.latitude}, Longitude: ${coverageArea.longitude}) within a ${coverageArea.radius}km radius.
-Return a list of businesses with their real names, verified addresses, coordinates, ratings, and descriptions.`;
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              name: { type: Type.STRING },
-              address: { type: Type.STRING },
-              latitude: { type: Type.NUMBER },
-              longitude: { type: Type.NUMBER },
-              rating: { type: Type.NUMBER },
-              description: { type: Type.STRING },
-              category: { type: Type.STRING },
-              phone: { type: Type.STRING },
-              website: { type: Type.STRING },
-            },
-            required: ['name', 'address', 'latitude', 'longitude'],
+    const response = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': [
+          'places.id',
+          'places.displayName',
+          'places.formattedAddress',
+          'places.location',
+          'places.rating',
+          'places.nationalPhoneNumber',
+          'places.websiteUri',
+          'places.primaryType',
+        ].join(','),
+      },
+      body: JSON.stringify({
+        includedTypes,
+        locationRestriction: {
+          circle: {
+            center: { latitude: lat, longitude: lng },
+            radius: radiusMeters,
           },
         },
-      },
+        maxResultCount: 20,
+      }),
     });
 
-    return res.json(JSON.parse(response.text || '[]'));
+    const payload = await response.json() as any;
+
+    if (!response.ok) {
+      console.error('[places-search]', payload);
+      return res.status(502).json({ error: payload?.error?.message || 'Google Places API error' });
+    }
+
+    const places = (payload.places || []).map((p: any) => ({
+      name: p.displayName?.text ?? '',
+      address: p.formattedAddress ?? '',
+      latitude: p.location?.latitude ?? 0,
+      longitude: p.location?.longitude ?? 0,
+      rating: p.rating ?? null,
+      phone: p.nationalPhoneNumber ?? null,
+      website: p.websiteUri ?? null,
+      category: p.primaryType ?? includedTypes[0],
+      placeId: p.id ?? null,
+    }));
+
+    return res.json(places);
   } catch (err) {
-    console.error('[gemini-search]', err);
-    return res.status(500).json({ error: 'Gemini search failed' });
+    console.error('[places-search]', err);
+    return res.status(500).json({ error: 'Places search failed' });
   }
 });
 
