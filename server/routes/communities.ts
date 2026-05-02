@@ -35,7 +35,7 @@ router.get('/:id', async (req, res) => {
 // ─── Create community ─────────────────────────────────────────────────────────
 
 router.post('/', async (req, res) => {
-  const { name, description, coverageLat, coverageLng, coverageRadius, coverageLocation, enabledCategories, enabled_categories } = req.body;
+  const { name, description, coverageLat, coverageLng, coverageRadius, coverageLocation, enabledCategories } = req.body;
 
   if (!name?.trim()) return res.status(400).json({ error: 'Community name is required' });
 
@@ -61,7 +61,7 @@ router.post('/', async (req, res) => {
         coverageLng,
         coverageRadius,
         coverageLocation,
-        enabledCategories: enabledCategories ?? enabled_categories ?? [],
+        enabledCategories: enabledCategories ?? [],
       },
     });
 
@@ -74,7 +74,7 @@ router.post('/', async (req, res) => {
       data: {
         communityId: community.id,
         userId: req.auth!.userId,
-        role: 'Admin',
+        role: 'ADMIN',
         name: creator?.name ?? null,
         image: creator?.profileImage ?? null,
         email: creator?.email ?? null,
@@ -110,7 +110,7 @@ router.post('/:id/license', async (req, res) => {
   const member = await prisma.communityMember.findFirst({
     where: { communityId, userId },
   });
-  if (!member || !['Admin', 'Owner'].includes(member.role)) {
+  if (!member || !['ADMIN', 'OWNER'].includes(member.role)) {
     return res.status(403).json({ error: 'Only community admins can license a community' });
   }
 
@@ -143,7 +143,7 @@ router.put('/:id', async (req, res) => {
   const member = await prisma.communityMember.findFirst({
     where: { communityId: req.params.id, userId: req.auth!.userId },
   });
-  if (!member || !['Admin', 'Moderator'].includes(member.role)) {
+  if (!member || !['ADMIN', 'MODERATOR'].includes(member.role)) {
     return res.status(403).json({ error: 'Insufficient permissions' });
   }
 
@@ -246,15 +246,15 @@ router.get('/:id/invite-links', async (req, res) => {
 });
 
 router.post('/:id/invite-links', async (req, res) => {
-  const { role, max_uses, expires_at } = req.body;
+  const { role, maxUses, expiresAt } = req.body;
   const link = await prisma.communityInviteLink.create({
     data: {
       communityId: req.params.id,
       createdBy: req.auth!.userId,
       code: uuidv4(),
       role: role ?? 'Member',
-      maxUses: max_uses ?? null,
-      expiresAt: expires_at ? new Date(expires_at) : null,
+      maxUses: maxUses ?? null,
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
     },
   });
   return res.status(201).json(link);
@@ -320,6 +320,7 @@ router.get('/:id/posts', async (req, res) => {
   // Flatten author fields — cached columns take priority, fall back to live user data
   return res.json(posts.map(({ author, ...p }) => ({
     ...p,
+    timestamp: p.createdAt,
     authorName: p.authorName || author?.name || null,
     authorImage: p.authorImage || author?.profileImage || null,
     authorRole: p.authorRole || null,
@@ -365,6 +366,7 @@ router.post('/:id/posts', async (req, res) => {
   });
   return res.status(201).json({
     ...post,
+    timestamp: post.createdAt,
     authorName: post.authorName,
     authorImage: post.authorImage,
     authorRole: post.authorRole,
@@ -378,7 +380,7 @@ router.put('/:id/posts/:postId', async (req, res) => {
     if (key in req.body) data[key] = key === 'expires_at' && req.body[key] ? new Date(req.body[key]) : req.body[key];
   }
   const post = await prisma.post.update({ where: { id: req.params.postId }, data });
-  return res.json(post);
+  return res.json({ ...post, timestamp: post.createdAt });
 });
 
 router.delete('/:id/posts/:postId', async (req, res) => {
