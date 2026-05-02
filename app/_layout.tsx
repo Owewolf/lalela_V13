@@ -1,6 +1,6 @@
 import '../global.css';
-import { useEffect, useRef } from 'react';
-import { Platform, Alert, View, StyleSheet, LogBox } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Platform, Alert, View, StyleSheet, LogBox, Animated } from 'react-native';
 
 // GooglePlacesAutocomplete uses a FlatList internally (nestedScrollEnabled is already set).
 // This warning is a false positive in the form layout context.
@@ -76,7 +76,10 @@ function AppGuard() {
   const notificationListener = useRef<any>(null);
   const responseListener = useRef<any>(null);
   const inLanding = segments[0] === 'landing';
-  const inOnboarding = segments[0] === 'onboarding' || segments[0] === 'onboarding-create';
+  const inOnboarding = segments[0] === 'onboarding';
+  // onboarding-create is accessible by both new users AND authenticated users
+  // creating a second community — do NOT treat it as an auth-only group
+  const inOnboardingCreate = segments[0] === 'onboarding-create';
   const inAuthGroup = inLanding || inOnboarding;
 
   // Set notification handler once on mount
@@ -99,7 +102,7 @@ function AppGuard() {
     if (loading) return;
 
     if (!user) {
-      if (!inAuthGroup) router.replace('/landing');
+      if (!inAuthGroup && !inOnboardingCreate) router.replace('/landing');
       return;
     }
 
@@ -109,9 +112,9 @@ function AppGuard() {
 
     const onboardingComplete = userProfile.profileCompleted === true;
 
-    if (!onboardingComplete && !inOnboarding) {
+    if (!onboardingComplete && !inOnboarding && !inOnboardingCreate) {
       // Carry any pending invite code in the URL to avoid AsyncStorage race conditions
-      AsyncStorage.getItem('pending_onboarding_invite')
+      AsyncStorage.getItem('pendingOnboardingInvite')
         .catch(() => null)
         .then((pendingCode) => {
           router.replace(pendingCode ? (`/onboarding?join=${pendingCode}` as any) : '/onboarding');
@@ -136,13 +139,13 @@ function AppGuard() {
         // Already onboarded — join immediately
         try {
           await joinViaInviteLink(code);
-          await AsyncStorage.removeItem('pending_onboarding_invite');
+          await AsyncStorage.removeItem('pendingOnboardingInvite');
           Alert.alert('Joined!', 'You have successfully joined the community.');
         } catch (e: any) {
           Alert.alert('Could not join', e?.message ?? 'Invalid or expired invite link.');
         }
       } else {
-        await AsyncStorage.setItem('pending_onboarding_invite', code);
+        await AsyncStorage.setItem('pendingOnboardingInvite', code);
         if (user) {
           router.replace('/onboarding');
         }
@@ -211,22 +214,29 @@ function LoadingOverlay() {
   const { loading, userProfile } = useAuth();
   const user = userProfile ? { uid: userProfile.id } : null;
   const segments = useSegments();
+  const opacity = useRef(new Animated.Value(1)).current;
+  const [hidden, setHidden] = useState(false);
 
-  // While Firebase is reading auth state or Firestore profile
-  if (loading) return <View style={styles.overlay} />;
+  const shouldShow =
+    loading ||
+    (!user && segments[0] !== 'landing' && segments[0] !== 'onboarding' && segments[0] !== 'join') ||
+    (!!user && !!userProfile && !userProfile.profileCompleted &&
+      segments[0] !== 'onboarding' && segments[0] !== 'onboarding-create');
 
-  // Unauthenticated: hold overlay until /landing is visible
-  // Also allow /join so the invite link handler can redirect before the overlay blocks
-  if (!user && segments[0] !== 'landing' && segments[0] !== 'onboarding' && segments[0] !== 'join') {
-    return <View style={styles.overlay} />;
-  }
+  useEffect(() => {
+    if (!shouldShow) {
+      // Fade out once, then permanently hide — never flash back in
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setHidden(true));
+    }
+  }, [shouldShow]);
 
-  // Authenticated but profile not yet complete: hold overlay until an onboarding route is visible
-  if (user && userProfile && !userProfile.profileCompleted && segments[0] !== 'onboarding' && segments[0] !== 'onboarding-create') {
-    return <View style={styles.overlay} />;
-  }
+  if (hidden) return null;
 
-  return null;
+  return <Animated.View style={[styles.overlay, { opacity }]} />;
 }
 
 const styles = StyleSheet.create({
