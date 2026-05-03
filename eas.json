@@ -1,7 +1,6 @@
 {
   "cli": {
-    "version": ">= 16.0.0",
-    "requireCommit": true
+    "version": ">= 16.0.0"
   },
   "build": {
     "development": {
@@ -19,6 +18,12 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      }
+    },
+    "ios-ipa": {
+      "distribution": "internal",
+      "ios": {
+        "buildConfiguration": "Release"
       }
     },
     "production": {

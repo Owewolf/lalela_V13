@@ -4,6 +4,11 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
+    "start:lan": "expo start --dev-client --host lan",
+    "start:localhost": "expo start --dev-client --host localhost",
+    "dev:iphone": "bash -lc 'bash start-dev.sh >/tmp/lalela-start-dev.log 2>&1 & sleep 8; EXPO_PUBLIC_API_URL=https://api.wolfslair.cc/api expo start --dev-client --host lan'",
+    "dev:stop": "bash -lc 'pkill -f \"expo start\" 2>/dev/null || true; pkill -f \"tsx watch server/index.ts\" 2>/dev/null || true; pkill -f \"cloudflared tunnel run\" 2>/dev/null || true'",
+    "dev:iphone:clean": "bash -lc 'npm run -s dev:stop; bash start-dev.sh >/tmp/lalela-start-dev.log 2>&1 & sleep 8; EXPO_PUBLIC_API_URL=https://api.wolfslair.cc/api expo start --dev-client --host lan'",
     "tunnel": "expo start --dev-client --tunnel",
     "android": "JAVA_HOME=/var/lib/snapd/snap/android-studio/209/jbr BROWSER=none expo run:android --port 8070",
     "ios": "expo run:ios",
@@ -11,9 +16,15 @@
     "server": "tsx server/index.ts",
     "server:dev": "tsx watch server/index.ts",
     "build": "npx expo export --platform web",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@expo-google-fonts/epilogue": "^0.4.2",
+    "@expo-google-fonts/manrope": "^0.4.2",
     "@expo/metro-runtime": "~6.1.2",
     "@google/genai": "^1.29.0",
     "@parse/node-apn": "^8.1.0",
@@ -34,6 +45,7 @@
     "expo-dev-client": "~6.0.21",
     "expo-document-picker": "~14.0.8",
     "expo-file-system": "~19.0.21",
+    "expo-font": "~14.0.11",
     "expo-image-picker": "~17.0.11",
     "expo-linking": "~8.0.12",
     "expo-location": "~19.0.8",
@@ -91,6 +103,15 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "expo-location": "~19.0.8"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-webrtc"
+        ]
+      }
+    }
   },
   "private": true
 }

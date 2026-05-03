@@ -18,14 +18,19 @@
  *   call.endCall();
  */
 
-import {
-  RTCPeerConnection,
-  RTCIceCandidate,
-  RTCSessionDescription,
-  mediaDevices,
-  MediaStream,
+import type {
+  RTCPeerConnection as RTCPeerConnectionType,
+  RTCIceCandidate as RTCIceCandidateType,
+  RTCSessionDescription as RTCSessionDescriptionType,
+  MediaStream as MediaStreamType,
 } from 'react-native-webrtc';
 import type { Socket } from 'socket.io-client';
+
+// Lazy-load react-native-webrtc so the module doesn't crash at import time on
+// Expo Go (which lacks native WebRTC modules). The require only executes when
+// a call is actually started or answered — i.e., inside class methods.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const getWebRTC = () => require('react-native-webrtc') as typeof import('react-native-webrtc');
 
 // ICE servers — STUN (public) + TURN (self-hosted Coturn on VPS)
 const ICE_SERVERS = [
@@ -40,8 +45,8 @@ const ICE_SERVERS = [
 export type CallType = 'audio' | 'video';
 
 export class WebRTCCall {
-  private pc: RTCPeerConnection | null = null;
-  private localStream: MediaStream | null = null;
+  private pc: RTCPeerConnectionType | null = null;
+  private localStream: MediaStreamType | null = null;
   private socket: Socket;
   private localUserId: string;
   private remoteUserId: string | null = null;
@@ -55,8 +60,8 @@ export class WebRTCCall {
   async startCall(
     remoteUserId: string,
     callerName: string,
-    onLocalStream: (stream: MediaStream) => void,
-    onRemoteStream: (stream: MediaStream) => void,
+    onLocalStream: (stream: MediaStreamType) => void,
+    onRemoteStream: (stream: MediaStreamType) => void,
     type: CallType = 'audio',
   ) {
     this.remoteUserId = remoteUserId;
@@ -72,7 +77,7 @@ export class WebRTCCall {
     this.localStream = await this._getLocalStream(type);
     onLocalStream(this.localStream);
     this.localStream.getTracks().forEach((track) =>
-      (this.pc as RTCPeerConnection).addTrack(track, this.localStream as MediaStream)
+      (this.pc as RTCPeerConnectionType).addTrack(track, this.localStream as MediaStreamType)
     );
 
     const offer = await this.pc.createOffer({
@@ -94,8 +99,8 @@ export class WebRTCCall {
   async answerCall(
     callerUserId: string,
     offerSdp: any,
-    onLocalStream: (stream: MediaStream) => void,
-    onRemoteStream: (stream: MediaStream) => void,
+    onLocalStream: (stream: MediaStreamType) => void,
+    onRemoteStream: (stream: MediaStreamType) => void,
     type: CallType = 'audio',
   ) {
     this.remoteUserId = callerUserId;
@@ -104,10 +109,10 @@ export class WebRTCCall {
     this.localStream = await this._getLocalStream(type);
     onLocalStream(this.localStream);
     this.localStream.getTracks().forEach((track) =>
-      (this.pc as RTCPeerConnection).addTrack(track, this.localStream as MediaStream)
+      (this.pc as RTCPeerConnectionType).addTrack(track, this.localStream as MediaStreamType)
     );
 
-    await this.pc.setRemoteDescription(new RTCSessionDescription(offerSdp));
+    await this.pc.setRemoteDescription(new (getWebRTC().RTCSessionDescription)(offerSdp));
     const answer = await this.pc.createAnswer();
     await this.pc.setLocalDescription(answer);
 
@@ -120,14 +125,14 @@ export class WebRTCCall {
   // ── Handle incoming answer ──────────────────────────────────────────────────
   async handleAnswer(answerSdp: any) {
     if (!this.pc) return;
-    await this.pc.setRemoteDescription(new RTCSessionDescription(answerSdp));
+    await this.pc.setRemoteDescription(new (getWebRTC().RTCSessionDescription)(answerSdp));
   }
 
   // ── Handle incoming ICE candidate ───────────────────────────────────────────
   async handleIceCandidate(candidate: any) {
     if (!this.pc) return;
     try {
-      await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
+      await this.pc.addIceCandidate(new (getWebRTC().RTCIceCandidate)(candidate));
     } catch (e) {
       console.error('Error adding ICE candidate:', e);
     }
@@ -205,7 +210,8 @@ export class WebRTCCall {
   }
 
   // ── Internals ───────────────────────────────────────────────────────────────
-  private _createPeerConnection(onRemoteStream: (stream: MediaStream) => void): RTCPeerConnection {
+  private _createPeerConnection(onRemoteStream: (stream: MediaStreamType) => void): RTCPeerConnectionType {
+    const { RTCPeerConnection } = getWebRTC();
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS } as any);
     const pcAny = pc as any;
 
@@ -225,11 +231,12 @@ export class WebRTCCall {
     return pc;
   }
 
-  private async _getLocalStream(type: CallType): Promise<MediaStream> {
+  private async _getLocalStream(type: CallType): Promise<MediaStreamType> {
+    const { mediaDevices } = getWebRTC();
     const stream = await mediaDevices.getUserMedia({
       audio: true,
       video: type === 'video' ? { facingMode: 'user' } : false,
     });
-    return stream as MediaStream;
+    return stream as MediaStreamType;
   }
 }
