@@ -55,6 +55,11 @@ CLAUDE.md
 /agents
 /claude
 
+# local server & device config — never commit
+nginx.conf
+minio.license
+*.mobileconfig
+
 # local scratch files
 test-nav.js
 test-summary.md
