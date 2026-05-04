@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/lalela_logo_transparent.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -22,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/lalela_logo_transparent.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -52,8 +52,9 @@
       }
     },
     "web": {
-      "output": "static",
-      "bundler": "metro"
+      "output": "single",
+      "bundler": "metro",
+      "favicon": "./assets/favicon_full.png"
     },
     "platforms": [
       "ios",
