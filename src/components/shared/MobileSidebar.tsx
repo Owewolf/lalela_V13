@@ -40,8 +40,6 @@ interface MobileSidebarProps {
   onClose: () => void;
   activeTab: string;
   onNavigate: (tab: string) => void;
-  onOpenAdmin: (communityId: string, role: string) => void;
-  onOpenSettings: () => void;
 }
 
 export const MobileSidebar: React.FC<MobileSidebarProps> = ({
@@ -49,8 +47,8 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   onClose,
   activeTab,
   onNavigate,
-  onOpenAdmin,
-  onOpenSettings,
+
+
 }) => {
   const router = useRouter();
   const { currentCommunity, communities, setCurrentCommunity, createCommunity } = useCommunity();
@@ -133,12 +131,12 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 
   const handleOpenAdmin = () => {
     if (!currentCommunity) return;
-    onOpenAdmin(currentCommunity.id, currentCommunity.userRole ?? 'Member');
+    router.push("/admin");
     onClose();
   };
 
   const handleOpenSettings = () => {
-    onOpenSettings();
+    router.push("/(tabs)/settings");
     onClose();
   };
 
@@ -267,9 +265,9 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                               styles.smallBadge,
                               {
                                 backgroundColor:
-                                  c.userRole === 'Admin'
+                                  c.userRole === "ADMIN"
                                     ? '#fef2f2'
-                                    : c.userRole === 'Moderator'
+                                    : c.userRole === "MODERATOR"
                                     ? '#f5f3ff'
                                     : '#f0fdf4',
                               },
@@ -280,9 +278,9 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                                 styles.smallBadgeText,
                                 {
                                   color:
-                                    c.userRole === 'Admin'
+                                    c.userRole === "ADMIN"
                                       ? '#dc2626'
-                                      : c.userRole === 'Moderator'
+                                      : c.userRole === "MODERATOR"
                                       ? '#6750a4'
                                       : PRIMARY,
                                 },
@@ -352,9 +350,9 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                         styles.adminRole,
                         {
                           color:
-                            currentCommunity.userRole === 'Admin'
+                            currentCommunity.userRole === "ADMIN"
                               ? '#dc2626'
-                              : currentCommunity.userRole === 'Moderator'
+                              : currentCommunity.userRole === "MODERATOR"
                               ? '#6750a4'
                               : '#94a3b8',
                         },

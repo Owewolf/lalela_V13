@@ -101,6 +101,8 @@ function AppGuard() {
   useEffect(() => {
     if (loading) return;
 
+    const inTabs = segments[0] === '(tabs)';
+
     if (!user) {
       if (!inAuthGroup && !inOnboardingCreate) router.replace('/landing');
       return;
@@ -119,7 +121,11 @@ function AppGuard() {
         .then((pendingCode) => {
           router.replace(pendingCode ? (`/onboarding?join=${pendingCode}` as any) : '/onboarding');
         });
-    } else if (onboardingComplete && inAuthGroup) {
+    } else if (onboardingComplete && !['(tabs)', 'admin', 'checkout', 'pricing', 'create-post', 'chat', 'emergency', 'call', 'notifications-settings', 'security'].includes(segments[0] as string)) {
+      // Navigate to tabs whenever authenticated+onboarded and not already there.
+      // Do NOT gate on inAuthGroup — on web, segments may not reflect the current
+      // URL at the exact moment setUserProfile fires (static rendering hydration),
+      // causing silent navigation failure.
       router.replace('/(tabs)');
     }
   }, [user, userProfile, loading, segments]);
@@ -159,7 +165,7 @@ function AppGuard() {
 
   // ── Push notifications ────────────────────────────────────────────────────
   useEffect(() => {
-    if (!user || inAuthGroup) return;
+    if (!user || inAuthGroup || Platform.OS === 'web') return;
 
     const Notifications = getNotificationsModule();
 
@@ -246,7 +252,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#0d3d47',
+    backgroundColor: '#17341D',
     zIndex: 999,
   },
 });
