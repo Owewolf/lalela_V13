@@ -24,7 +24,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
 
         {/* Web Favicons and Apple Touch Icon for Bookmarks */}
         <link rel="icon" type="image/png" href="/favicon_full.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
         <link rel="manifest" href="/manifest.json" />
 
         {/* Google Maps JS API — key is baked in at build time from EXPO_PUBLIC_GOOGLE_MAPS_WEB_API_KEY */}
