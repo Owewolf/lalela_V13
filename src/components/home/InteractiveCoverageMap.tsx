@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import MapView, { Marker, Circle, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Circle, Callout } from 'react-native-maps';
 import {
   Siren,
   Shield,
@@ -12,6 +12,7 @@ import {
   MapPin,
 } from 'lucide-react-native';
 import { cn } from '../../lib/utils';
+import { defaultMapViewProps } from '../../lib/mapViewProps';
 import { useCommunity } from '../../context/CommunityContext';
 
 type MapFilter = 'members' | 'listings' | 'notices' | 'businesses';
@@ -94,6 +95,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
 
   // Fly to new center when reset is triggered
   useEffect(() => {
+    
     if (mapRef.current && mapRef.current.animateToRegion) {
       try {
         mapRef.current.animateToRegion(
@@ -191,8 +193,8 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
         style={{ height }}
       >
         <MapView
+          {...defaultMapViewProps}
           ref={mapRef}
-          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
           style={{ flex: 1 }}
           initialRegion={initialRegion}
           scrollEnabled={!isLocked}

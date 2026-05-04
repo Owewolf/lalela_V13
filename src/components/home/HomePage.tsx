@@ -249,7 +249,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   // ─── derived data ─────────────────────────────────────────────────────────
 
-  const userRole = currentCommunity?.userRole || 'Member';
+  const userRole = currentCommunity?.userRole || 'MEMBER';
 
   const notices = useMemo(
     () =>
@@ -365,12 +365,19 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   useEffect(() => {
     if (currentCommunity?.coverageArea) {
+      const { latitude, longitude, radius } = currentCommunity.coverageArea;
+      const latDelta = (radius * 2.2) / 111;
+      const latRad = latitude * (Math.PI / 180);
+      const lonDelta = (radius * 2.2) / (111 * Math.cos(latRad));
+      
       setMapCenter({
-        latitude: currentCommunity.coverageArea.latitude,
-        longitude: currentCommunity.coverageArea.longitude,
+        latitude,
+        longitude,
+        latitudeDelta: latDelta,
+        longitudeDelta: lonDelta,
       });
     }
-  }, [currentCommunity?.id]);
+  }, [currentCommunity?.id, currentCommunity?.coverageArea]);
 
   useEffect(() => {
     const hasEmergencyPost = posts.some(
@@ -386,7 +393,12 @@ export const HomePage: React.FC<HomePageProps> = ({
         (p) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
       );
       if (latest?.latitude && latest?.longitude) {
-        setMapCenter({ latitude: latest.latitude, longitude: latest.longitude });
+        setMapCenter({
+          latitude: latest.latitude,
+          longitude: latest.longitude,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02
+        });
       }
     }
   }, [currentCommunity?.isEmergencyMode, posts]);
@@ -430,11 +442,11 @@ export const HomePage: React.FC<HomePageProps> = ({
       
       // Calculate delta to fit the entire diameter (radius * 2) precisely.
       // 1 degree latitude ~= 111km
-      const latDelta = (radius * 2) / 111;
+      const latDelta = (radius * 2.2) / 111;
       
       // 1 degree longitude ~= 111km * cos(latitude)
       const latRad = latitude * (Math.PI / 180);
-      const lonDelta = (radius * 2) / (111 * Math.cos(latRad));
+      const lonDelta = (radius * 2.2) / (111 * Math.cos(latRad));
 
       setMapCenter({
         latitude,
@@ -567,7 +579,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   style={{ top: 36 }}
                 >
                   {(notice.authorId === userProfile?.id ||
-                    currentCommunity?.userRole === 'Admin') && (
+                    currentCommunity?.userRole === 'ADMIN') && (
                     <>
                       {notice.authorId === userProfile?.id && (
                         <TouchableOpacity
