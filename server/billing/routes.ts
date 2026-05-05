@@ -17,94 +17,12 @@
 import { Router } from 'express';
 import prisma from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
-import {
-  generateInvoiceNumber,
-  createInvoicePdf,
-  uploadInvoicePdf,
-  saveInvoiceRecord,
-} from './invoiceService.js';
-import { getOrCreateCommunityInviteLink } from './inviteService.js';
-import { sendPaymentConfirmationEmail } from '../services/emailService.js';
+import { handlePaymentSuccess } from './paymentService.js';
 
 const router = Router();
 
 // All billing routes require auth
 router.use(requireAuth);
-
-// ─── Internal: handle successful payment ─────────────────────────────────────
-// Called after both simulate-payment and (future) real Stripe webhook.
-
-async function handlePaymentSuccess(
-  userId: string,
-  type: 'COMMUNITY' | 'MEMBERSHIP',
-  communityId?: string,
-) {
-  const amount = type === 'COMMUNITY' ? 99900 : 9900;
-
-  // 1. Create billing record
-  await prisma.billingRecord.create({
-    data: {
-      userId,
-      type,
-      amount,
-      status: 'PAID',
-      communityId: communityId ?? null,
-    },
-  });
-
-  // 2. Fetch user for email
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { name: true, email: true, subscriptionRenewalDate: true },
-  });
-  if (!user) return; // safety — user should always exist
-
-  // 3. Generate invoice
-  const invoiceNumber = await generateInvoiceNumber(prisma);
-  let pdfUrl = '';
-  try {
-    const pdfBuffer = await createInvoicePdf({
-      invoiceNumber,
-      createdAt: new Date(),
-      userName: user.name,
-      userEmail: user.email,
-      type,
-      amount,
-    });
-    pdfUrl = await uploadInvoicePdf(pdfBuffer, invoiceNumber);
-  } catch (err) {
-    console.error('[billing] invoice PDF generation failed:', err);
-    pdfUrl = '#'; // fallback — email still sent, download link will be a placeholder
-  }
-
-  await saveInvoiceRecord(prisma, userId, invoiceNumber, amount, type, pdfUrl);
-
-  // 4. Get invite link for community payments
-  let inviteLink: string | undefined;
-  if (type === 'COMMUNITY' && communityId) {
-    try {
-      inviteLink = await getOrCreateCommunityInviteLink(prisma, communityId, userId);
-    } catch (err) {
-      console.error('[billing] invite link generation failed:', err);
-    }
-  }
-
-  // 5. Send confirmation email
-  try {
-    await sendPaymentConfirmationEmail({
-      to: user.email,
-      name: user.name,
-      type,
-      amount,
-      invoiceUrl: pdfUrl,
-      invoiceNumber,
-      nextBillingDate: type === 'MEMBERSHIP' ? (user.subscriptionRenewalDate ?? undefined) : undefined,
-      inviteLink,
-    });
-  } catch (err) {
-    console.error('[billing] confirmation email failed:', err);
-  }
-}
 
 // ─── Create checkout session (mock) ──────────────────────────────────────────
 // Returns a mock session object consumed by MockStripeCheckout.

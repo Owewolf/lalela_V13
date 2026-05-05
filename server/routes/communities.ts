@@ -2,7 +2,12 @@ import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
-import { sendInviteEmail } from '../services/emailService.js';
+import {
+  sendCommunityCreatedEmail,
+  sendInviteEmail,
+  sendMemberJoinedEmail,
+} from '../services/emailService.js';
+import { handlePaymentSuccess } from '../billing/paymentService.js';
 // UserRole is a string enum in Prisma schema; reference it as a string literal type
 type UserRole = 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER';
 
@@ -94,6 +99,12 @@ router.post('/', async (req, res) => {
       }),
     ]);
 
+    if (creator?.email && creator.name) {
+      sendCommunityCreatedEmail(creator.email, creator.name, community.name, trialEnd).catch(
+        (err) => console.error('[communities] community created email failed:', err),
+      );
+    }
+
     return res.status(201).json({
       ...community,
       trialExpiresAt: trialEnd,
@@ -136,6 +147,10 @@ router.post('/:id/license', async (req, res) => {
       },
     }),
   ]);
+
+  handlePaymentSuccess(userId, 'COMMUNITY', communityId).catch(
+    (err) => console.error('[communities] handlePaymentSuccess error:', err),
+  );
 
   return res.json(community);
 });
@@ -236,7 +251,14 @@ router.get('/join/:code', async (req, res) => {
 });
 
 router.post('/join/:code', async (req, res) => {
-  const link = await prisma.communityInviteLink.findUnique({ where: { code: req.params.code } });
+  const link = await prisma.communityInviteLink.findUnique({
+    where: { code: req.params.code },
+    include: {
+      community: {
+        select: { name: true },
+      },
+    },
+  });
   if (!link || !link.active || (link.expiresAt && link.expiresAt < new Date())) {
     return res.status(400).json({ error: 'Invalid or expired invite link' });
   }
@@ -251,8 +273,10 @@ router.post('/join/:code', async (req, res) => {
 
   const joiner = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
-    select: { name: true, profileImage: true, email: true, licenseStatus: true },
+    select: { name: true, profileImage: true, email: true, licenseStatus: true, trialExpiresAt: true },
   });
+
+  let memberTrialExpiresAt = joiner?.trialExpiresAt ?? null;
 
   await prisma.$transaction([
     prisma.communityMember.create({
@@ -273,13 +297,20 @@ router.post('/join/:code', async (req, res) => {
 
   // Grant the joining user a 1-year trial if they don't already have a license
   if (!joiner?.licenseStatus || joiner.licenseStatus === 'NONE') {
+    memberTrialExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
     await prisma.user.update({
       where: { id: req.auth!.userId },
       data: {
         licenseStatus: 'TRIAL',
-        trialExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        trialExpiresAt: memberTrialExpiresAt,
       },
     });
+  }
+
+  if (joiner?.email && joiner.name && memberTrialExpiresAt) {
+    sendMemberJoinedEmail(joiner.email, joiner.name, link.community.name, memberTrialExpiresAt).catch(
+      (err) => console.error('[communities] member joined email failed:', err),
+    );
   }
 
   return res.json({ message: 'Joined community successfully', communityId: link.communityId });
