@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'; // still used for invite link codes
 import prisma from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { sendInviteEmail } from '../services/emailService.js';
@@ -65,11 +65,12 @@ router.post('/', async (req, res) => {
       },
     });
 
-    // Add creator as Admin member — populate cached display fields immediately
+    // Fetch creator once — used for both member record and trial logic
     const creator = await prisma.user.findUnique({
       where: { id: req.auth!.userId },
-      select: { name: true, profileImage: true, email: true },
+      select: { name: true, profileImage: true, email: true, trialExpiresAt: true, licenseStatus: true },
     });
+
     await prisma.communityMember.create({
       data: {
         communityId: community.id,
@@ -81,20 +82,27 @@ router.post('/', async (req, res) => {
       },
     });
 
-    // 30-day trial
-    const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    // 30-day community trial; creator gets a 1-year platform trial
+    const communityTrialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const userTrialEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+    const userUpdate: Record<string, unknown> = { communityCreated: true };
+    if (!creator?.trialExpiresAt) {
+      userUpdate.trialExpiresAt = userTrialEnd;
+      userUpdate.licenseStatus = 'TRIAL';
+    }
+
     await prisma.$transaction([
       prisma.community.update({
         where: { id: community.id },
-        data: { trialEndDate: trialEnd, type: 'TRIAL' },
+        data: { trialExpiresAt: communityTrialEnd, type: 'TRIAL', isPaid: false },
       }),
       prisma.user.update({
         where: { id: req.auth!.userId },
-        data: { communityCreated: true, accessType: 'Trial', expiryDate: trialEnd },
+        data: userUpdate,
       }),
     ]);
 
-    return res.status(201).json({ ...community, trialEndDate: trialEnd, type: 'TRIAL' });
+    return res.status(201).json({ ...community, trialExpiresAt: communityTrialEnd, type: 'TRIAL', isPaid: false });
   } catch (err: any) {
     console.error('[POST /communities] error:', err);
     return res.status(500).json({ error: err?.message ?? 'Failed to create community' });
@@ -114,22 +122,28 @@ router.post('/:id/license', async (req, res) => {
     return res.status(403).json({ error: 'Only community admins can license a community' });
   }
 
-  const licenseId = `LIC_${uuidv4().replace(/-/g, '').substring(0, 12).toUpperCase()}`;
-  const licenseExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+  // R999 once-off — community is permanently ACTIVE (no expiry date)
+  const activatedAt = new Date();
+  // Creator also gets a fresh 1-year platform trial if they don't yet have one
+  const userTrialEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+  const owner = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { trialExpiresAt: true },
+  });
+  const userUpdate: Record<string, unknown> = {};
+  if (!owner?.trialExpiresAt) {
+    userUpdate.trialExpiresAt = userTrialEnd;
+    userUpdate.licenseStatus = 'TRIAL';
+  }
 
   const [community] = await prisma.$transaction([
     prisma.community.update({
       where: { id: communityId },
-      data: { type: 'LICENSED', licenseId, licenseExpiry, status: 'ACTIVE' },
+      data: { type: 'ACTIVE', isPaid: true, activatedAt, status: 'ACTIVE' },
     }),
     prisma.user.update({
       where: { id: userId },
-      data: {
-        licenseStatus: 'LICENSED',
-        licenseType: 'SELF',
-        accessType: 'Licensed',
-        licenseExpiry,
-      },
+      data: userUpdate,
     }),
   ]);
 
@@ -195,6 +209,41 @@ router.delete('/:id/members/:userId', async (req, res) => {
 });
 
 // ─── Join via invite code ─────────────────────────────────────────────────────
+
+// Preview: return community name for the invite code (used by onboarding screen)
+router.get('/join/:code', async (req, res) => {
+  const link = await prisma.communityInviteLink.findUnique({
+    where: { code: req.params.code },
+    include: {
+      community: {
+        select: {
+          name: true,
+          coverageLat: true,
+          coverageLng: true,
+          coverageRadius: true,
+          coverageLocation: true,
+        },
+      },
+    },
+  });
+  if (!link || !link.active || (link.expiresAt && link.expiresAt < new Date())) {
+    return res.status(400).json({ error: 'Invalid or expired invite link' });
+  }
+
+  const coverageArea =
+    link.community.coverageLat != null &&
+    link.community.coverageLng != null &&
+    link.community.coverageLocation
+      ? {
+          latitude: link.community.coverageLat,
+          longitude: link.community.coverageLng,
+          radius: link.community.coverageRadius ?? 1,
+          locationName: link.community.coverageLocation,
+        }
+      : null;
+
+  return res.json({ communityName: link.community.name, coverageArea });
+});
 
 router.post('/join/:code', async (req, res) => {
   const link = await prisma.communityInviteLink.findUnique({ where: { code: req.params.code } });
@@ -328,7 +377,10 @@ router.get('/:id/posts', async (req, res) => {
 });
 
 router.post('/:id/posts', async (req, res) => {
-  const { type, category, subtype, title, description, image_url, urgency, latitude, longitude, price, is_charity, charity_id, expires_at } = req.body;
+  const { type, category, subtype, title, description, image_url, imageUrl, postsImage, urgency, urgencyLevel,
+    latitude, longitude, price, communityPrice, publicPrice, charityAmount, charityPercentage,
+    is_charity, charity_id, charityId, expires_at, isPublic, locationName, source,
+    authorName: bodyAuthorName, authorRole: bodyAuthorRole, authorImage: bodyAuthorImage } = req.body;
   if (!type || !title?.trim()) return res.status(400).json({ error: 'type and title are required' });
 
   // Fetch author info to populate cached columns
@@ -351,13 +403,22 @@ router.post('/:id/posts', async (req, res) => {
       subtype,
       title: title.trim(),
       description,
-      imageUrl: image_url,
+      imageUrl: imageUrl ?? image_url ?? null,
+      postsImage: postsImage ?? null,
       urgency: urgency ?? 'LOW',
+      urgencyLevel: urgencyLevel ?? null,
       latitude,
       longitude,
+      locationName: locationName ?? null,
       price,
+      communityPrice: communityPrice ?? null,
+      publicPrice: publicPrice ?? null,
+      isPublic: isPublic ?? false,
       isCharity: is_charity ?? false,
-      charityId: charity_id,
+      charityId: charityId ?? charity_id ?? null,
+      charityPercentage: charityPercentage ?? null,
+      charityAmount: charityAmount ?? null,
+      source: source ?? null,
       expiresAt: expires_at ? new Date(expires_at) : null,
       authorName: authorUser?.name ?? null,
       authorImage: authorUser?.profileImage ?? null,
@@ -374,10 +435,14 @@ router.post('/:id/posts', async (req, res) => {
 });
 
 router.put('/:id/posts/:postId', async (req, res) => {
-  const allowed = ['title', 'description', 'image_url', 'status', 'urgency', 'price', 'expires_at'];
+  const allowed = [
+    'title', 'description', 'imageUrl', 'postsImage', 'status', 'urgency', 'urgencyLevel',
+    'price', 'communityPrice', 'publicPrice', 'charityId', 'charityPercentage', 'charityAmount',
+    'isPublic', 'category', 'locationName', 'latitude', 'longitude', 'source', 'expiresAt',
+  ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
-    if (key in req.body) data[key] = key === 'expires_at' && req.body[key] ? new Date(req.body[key]) : req.body[key];
+    if (key in req.body) data[key] = key === 'expiresAt' && req.body[key] ? new Date(req.body[key]) : req.body[key];
   }
   const post = await prisma.post.update({ where: { id: req.params.postId }, data });
   return res.json({ ...post, timestamp: post.createdAt });
@@ -426,20 +491,35 @@ router.get('/:id/locations', async (req, res) => {
 // ─── Charities ────────────────────────────────────────────────────────────────
 
 router.get('/:id/charities', async (req, res) => {
-  const charities = await prisma.charity.findMany({ where: { communityId: req.params.id } });
-  return res.json(charities);
+  try {
+    const charities = await prisma.charity.findMany({ where: { communityId: req.params.id } });
+    return res.json(charities);
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to fetch charities' });
+  }
 });
 
 router.post('/:id/charities', async (req, res) => {
-  const charity = await prisma.charity.create({
-    data: { communityId: req.params.id, ...req.body },
-  });
-  return res.status(201).json(charity);
+  try {
+    const charity = await prisma.charity.create({
+      data: { communityId: req.params.id, ...req.body },
+    });
+    return res.status(201).json(charity);
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to create charity' });
+  }
 });
 
 router.put('/:id/charities/:charityId', async (req, res) => {
-  const charity = await prisma.charity.update({ where: { id: req.params.charityId }, data: req.body });
-  return res.json(charity);
+  try {
+    const charity = await prisma.charity.update({ where: { id: req.params.charityId }, data: req.body });
+    return res.json(charity);
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to update charity' });
+  }
 });
 
 // ─── Moderation logs (stub — returns empty list until moderation is built) ────
@@ -456,11 +536,65 @@ router.get('/:id/security-events', async (_req, res) => {
 
 // ─── Charity suggestions ──────────────────────────────────────────────────────
 
+router.get('/:id/charity-suggestions', async (req, res) => {
+  try {
+    const suggestions = await prisma.charitySuggestion.findMany({ where: { communityId: req.params.id } });
+    return res.json(suggestions);
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to fetch suggestions' });
+  }
+});
+
 router.post('/:id/charity-suggestions', async (req, res) => {
-  const suggestion = await prisma.charitySuggestion.create({
-    data: { communityId: req.params.id, suggestedBy: req.auth!.userId, ...req.body },
-  });
-  return res.status(201).json(suggestion);
+  try {
+    const suggestion = await prisma.charitySuggestion.create({
+      data: { communityId: req.params.id, suggestedBy: req.auth!.userId, ...req.body },
+    });
+    return res.status(201).json(suggestion);
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to create charity suggestion' });
+  }
+});
+
+// Delete/Archive charity
+router.delete('/:id/charities/:charityId', async (req, res) => {
+  try {
+    const charity = await prisma.charity.delete({ where: { id: req.params.charityId } });
+    return res.json({ message: 'Charity deleted', charity });
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to delete charity' });
+  }
+});
+
+// Approve charity suggestion
+router.patch('/:id/charity-suggestions/:suggestionId/approve', async (req, res) => {
+  try {
+    const suggestion = await prisma.charitySuggestion.update({
+      where: { id: req.params.suggestionId },
+      data: { status: 'approved', adminFeedback: req.body.feedback },
+    });
+    return res.json(suggestion);
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to approve suggestion' });
+  }
+});
+
+// Reject charity suggestion
+router.patch('/:id/charity-suggestions/:suggestionId/reject', async (req, res) => {
+  try {
+    const suggestion = await prisma.charitySuggestion.update({
+      where: { id: req.params.suggestionId },
+      data: { status: 'rejected', adminFeedback: req.body.feedback },
+    });
+    return res.json(suggestion);
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to reject suggestion' });
+  }
 });
 
 export default router;

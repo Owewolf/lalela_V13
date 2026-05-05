@@ -23,14 +23,12 @@ model User {
   phoneVerified           Boolean   @default(false) @map("phone_verified")
   profileCompleted        Boolean   @default(false) @map("profile_completed")
   communityCreated        Boolean   @default(false) @map("community_created")
-  onboardingComplete      Boolean   @default(false) @map("onboarding_complete")
-  licenseStatus           String    @default("UNLICENSED") @map("license_status")
-  licenseExpiry           DateTime? @map("license_expiry")
-  licenseType             String?   @map("license_type")
+  onboardingCompleted     Boolean   @default(false) @map("onboarding_complete")
+  licenseStatus           String    @default("TRIAL") @map("license_status")
+  trialExpiresAt          DateTime? @map("trial_expires_at")
+  subscriptionActive      Boolean   @default(false) @map("subscription_active")
+  subscriptionRenewalDate DateTime? @map("subscription_renewal_date")
   autoRenew               Boolean   @default(false) @map("auto_renew")
-  accessType              String?   @map("access_type")
-  expiryDate              DateTime? @map("expiry_date")
-  memberExpiryDate        DateTime? @map("member_expiry_date")
   status                  String    @default("ACTIVE")
   role                    String    @default("user")
   profileImage            String?   @map("profile_image")
@@ -191,9 +189,9 @@ model Community {
   coverageRadius           Float?    @map("coverage_radius")
   coverageLocation         String?   @map("coverage_location")
   enabledCategories        String[]  @default([]) @map("enabled_categories")
-  trialEndDate             DateTime? @map("trial_end_date")
-  licenseId                String?   @map("license_id")
-  licenseExpiry            DateTime? @map("license_expiry")
+  trialExpiresAt           DateTime? @map("trial_expires_at")
+  isPaid                   Boolean   @default(false) @map("is_paid")
+  activatedAt              DateTime? @map("activated_at")
   activeEmergencyId        String?   @map("active_emergency_id")
   onboardingStepsCompleted String[]  @default([]) @map("onboarding_steps_completed")
   guidedSetupRequired      Boolean   @default(true) @map("guided_setup_required")
@@ -229,7 +227,7 @@ model CommunityMember {
   userId                 String    @map("user_id")
   role                   String    @default("MEMBER")
   joinedAt               DateTime  @default(now()) @map("joined_at")
-  licenseExpiry          DateTime? @map("license_expiry")
+  trialExpiresAt         DateTime? @map("trial_expires_at")
   status                 String    @default("ACTIVE")
   isSecurityMember       Boolean   @default(false) @map("is_security_member")
   locationSharingEnabled Boolean   @default(true) @map("location_sharing_enabled")
@@ -373,6 +371,11 @@ model Charity {
   fundraisingGoal      Float?   @map("fundraising_goal")
   raisedAmount         Float    @default(0) @map("raised_amount")
   imageUrl             String?  @map("image_url")
+  logo                 String?  @map("logo")
+  coverImage           String?  @map("cover_image")
+  contactPhone         String?  @map("contact_phone")
+  contactEmail         String?  @map("contact_email")
+  website              String?  @map("website")
   locationName         String?  @map("location_name")
   latitude             Float?
   longitude            Float?
@@ -419,24 +422,26 @@ model CharitySuggestion {
 // BUSINESSES
 // =============================================
 model Business {
-  id           String   @id @default(cuid())
-  ownerId      String   @map("owner_id")
-  name         String
-  category     String
-  description  String?
-  latitude     Float?
-  longitude    Float?
-  address      String?
-  phone        String?
-  website      String?
-  rating       Float?
-  imageUrl     String?  @map("image_url")
-  charityId    String?  @map("charity_id")
-  communityIds String[] @default([]) @map("community_ids")
-  status       String   @default("ACTIVE")
-  source       String   @default("MEMBER")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(cuid())
+  ownerId           String   @map("owner_id")
+  name              String
+  category          String
+  description       String?
+  latitude          Float?
+  longitude         Float?
+  address           String?
+  phone             String?
+  website           String?
+  rating            Float?
+  imageUrl          String?  @map("image_url")
+  charityId         String?  @map("charity_id")
+  communityIds      String[] @default([]) @map("community_ids")
+  subcategory       String?  @map("subcategory")
+  charityPercentage Float?   @map("charity_percentage")
+  status            String   @default("ACTIVE")
+  source            String   @default("MEMBER")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   owner User @relation(fields: [ownerId], references: [id])
 

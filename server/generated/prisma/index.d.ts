@@ -3506,14 +3506,12 @@ export namespace Prisma {
     phoneVerified: boolean | null
     profileCompleted: boolean | null
     communityCreated: boolean | null
-    onboardingComplete: boolean | null
+    onboardingCompleted: boolean | null
     licenseStatus: string | null
-    licenseExpiry: Date | null
-    licenseType: string | null
+    trialExpiresAt: Date | null
+    subscriptionActive: boolean | null
+    subscriptionRenewalDate: Date | null
     autoRenew: boolean | null
-    accessType: string | null
-    expiryDate: Date | null
-    memberExpiryDate: Date | null
     status: string | null
     role: string | null
     profileImage: string | null
@@ -3556,14 +3554,12 @@ export namespace Prisma {
     phoneVerified: boolean | null
     profileCompleted: boolean | null
     communityCreated: boolean | null
-    onboardingComplete: boolean | null
+    onboardingCompleted: boolean | null
     licenseStatus: string | null
-    licenseExpiry: Date | null
-    licenseType: string | null
+    trialExpiresAt: Date | null
+    subscriptionActive: boolean | null
+    subscriptionRenewalDate: Date | null
     autoRenew: boolean | null
-    accessType: string | null
-    expiryDate: Date | null
-    memberExpiryDate: Date | null
     status: string | null
     role: string | null
     profileImage: string | null
@@ -3606,14 +3602,12 @@ export namespace Prisma {
     phoneVerified: number
     profileCompleted: number
     communityCreated: number
-    onboardingComplete: number
+    onboardingCompleted: number
     licenseStatus: number
-    licenseExpiry: number
-    licenseType: number
+    trialExpiresAt: number
+    subscriptionActive: number
+    subscriptionRenewalDate: number
     autoRenew: number
-    accessType: number
-    expiryDate: number
-    memberExpiryDate: number
     status: number
     role: number
     profileImage: number
@@ -3669,14 +3663,12 @@ export namespace Prisma {
     phoneVerified?: true
     profileCompleted?: true
     communityCreated?: true
-    onboardingComplete?: true
+    onboardingCompleted?: true
     licenseStatus?: true
-    licenseExpiry?: true
-    licenseType?: true
+    trialExpiresAt?: true
+    subscriptionActive?: true
+    subscriptionRenewalDate?: true
     autoRenew?: true
-    accessType?: true
-    expiryDate?: true
-    memberExpiryDate?: true
     status?: true
     role?: true
     profileImage?: true
@@ -3719,14 +3711,12 @@ export namespace Prisma {
     phoneVerified?: true
     profileCompleted?: true
     communityCreated?: true
-    onboardingComplete?: true
+    onboardingCompleted?: true
     licenseStatus?: true
-    licenseExpiry?: true
-    licenseType?: true
+    trialExpiresAt?: true
+    subscriptionActive?: true
+    subscriptionRenewalDate?: true
     autoRenew?: true
-    accessType?: true
-    expiryDate?: true
-    memberExpiryDate?: true
     status?: true
     role?: true
     profileImage?: true
@@ -3769,14 +3759,12 @@ export namespace Prisma {
     phoneVerified?: true
     profileCompleted?: true
     communityCreated?: true
-    onboardingComplete?: true
+    onboardingCompleted?: true
     licenseStatus?: true
-    licenseExpiry?: true
-    licenseType?: true
+    trialExpiresAt?: true
+    subscriptionActive?: true
+    subscriptionRenewalDate?: true
     autoRenew?: true
-    accessType?: true
-    expiryDate?: true
-    memberExpiryDate?: true
     status?: true
     role?: true
     profileImage?: true
@@ -3907,14 +3895,12 @@ export namespace Prisma {
     phoneVerified: boolean
     profileCompleted: boolean
     communityCreated: boolean
-    onboardingComplete: boolean
+    onboardingCompleted: boolean
     licenseStatus: string
-    licenseExpiry: Date | null
-    licenseType: string | null
+    trialExpiresAt: Date | null
+    subscriptionActive: boolean
+    subscriptionRenewalDate: Date | null
     autoRenew: boolean
-    accessType: string | null
-    expiryDate: Date | null
-    memberExpiryDate: Date | null
     status: string
     role: string
     profileImage: string | null
@@ -3977,14 +3963,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: boolean
-    licenseExpiry?: boolean
-    licenseType?: boolean
+    trialExpiresAt?: boolean
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: boolean
     autoRenew?: boolean
-    accessType?: boolean
-    expiryDate?: boolean
-    memberExpiryDate?: boolean
     status?: boolean
     role?: boolean
     profileImage?: boolean
@@ -4047,14 +4031,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: boolean
-    licenseExpiry?: boolean
-    licenseType?: boolean
+    trialExpiresAt?: boolean
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: boolean
     autoRenew?: boolean
-    accessType?: boolean
-    expiryDate?: boolean
-    memberExpiryDate?: boolean
     status?: boolean
     role?: boolean
     profileImage?: boolean
@@ -4098,14 +4080,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: boolean
-    licenseExpiry?: boolean
-    licenseType?: boolean
+    trialExpiresAt?: boolean
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: boolean
     autoRenew?: boolean
-    accessType?: boolean
-    expiryDate?: boolean
-    memberExpiryDate?: boolean
     status?: boolean
     role?: boolean
     profileImage?: boolean
@@ -4149,14 +4129,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: boolean
-    licenseExpiry?: boolean
-    licenseType?: boolean
+    trialExpiresAt?: boolean
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: boolean
     autoRenew?: boolean
-    accessType?: boolean
-    expiryDate?: boolean
-    memberExpiryDate?: boolean
     status?: boolean
     role?: boolean
     profileImage?: boolean
@@ -4190,7 +4168,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "phone" | "passwordHash" | "emailVerified" | "phoneVerified" | "profileCompleted" | "communityCreated" | "onboardingComplete" | "licenseStatus" | "licenseExpiry" | "licenseType" | "autoRenew" | "accessType" | "expiryDate" | "memberExpiryDate" | "status" | "role" | "profileImage" | "fcmToken" | "pushToken" | "pushPlatform" | "firstName" | "lastName" | "mobileNumber" | "address" | "latitude" | "longitude" | "locationSharing" | "isSecurityMember" | "emergencyLocationOptIn" | "lastCommunityId" | "agreedToTerms" | "marketingConsent" | "profileVisibility" | "piiVisibility" | "lastPasswordChanged" | "securityScore" | "notificationPreferences" | "twoFactorEnabled" | "twoFactorMethod" | "loginAlertsEnabled" | "pendingInviteCode" | "deleted" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "phone" | "passwordHash" | "emailVerified" | "phoneVerified" | "profileCompleted" | "communityCreated" | "onboardingCompleted" | "licenseStatus" | "trialExpiresAt" | "subscriptionActive" | "subscriptionRenewalDate" | "autoRenew" | "status" | "role" | "profileImage" | "fcmToken" | "pushToken" | "pushPlatform" | "firstName" | "lastName" | "mobileNumber" | "address" | "latitude" | "longitude" | "locationSharing" | "isSecurityMember" | "emergencyLocationOptIn" | "lastCommunityId" | "agreedToTerms" | "marketingConsent" | "profileVisibility" | "piiVisibility" | "lastPasswordChanged" | "securityScore" | "notificationPreferences" | "twoFactorEnabled" | "twoFactorMethod" | "loginAlertsEnabled" | "pendingInviteCode" | "deleted" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     communities?: boolean | User$communitiesArgs<ExtArgs>
     businesses?: boolean | User$businessesArgs<ExtArgs>
@@ -4247,14 +4225,12 @@ export namespace Prisma {
       phoneVerified: boolean
       profileCompleted: boolean
       communityCreated: boolean
-      onboardingComplete: boolean
+      onboardingCompleted: boolean
       licenseStatus: string
-      licenseExpiry: Date | null
-      licenseType: string | null
+      trialExpiresAt: Date | null
+      subscriptionActive: boolean
+      subscriptionRenewalDate: Date | null
       autoRenew: boolean
-      accessType: string | null
-      expiryDate: Date | null
-      memberExpiryDate: Date | null
       status: string
       role: string
       profileImage: string | null
@@ -4736,14 +4712,12 @@ export namespace Prisma {
     readonly phoneVerified: FieldRef<"User", 'Boolean'>
     readonly profileCompleted: FieldRef<"User", 'Boolean'>
     readonly communityCreated: FieldRef<"User", 'Boolean'>
-    readonly onboardingComplete: FieldRef<"User", 'Boolean'>
+    readonly onboardingCompleted: FieldRef<"User", 'Boolean'>
     readonly licenseStatus: FieldRef<"User", 'String'>
-    readonly licenseExpiry: FieldRef<"User", 'DateTime'>
-    readonly licenseType: FieldRef<"User", 'String'>
+    readonly trialExpiresAt: FieldRef<"User", 'DateTime'>
+    readonly subscriptionActive: FieldRef<"User", 'Boolean'>
+    readonly subscriptionRenewalDate: FieldRef<"User", 'DateTime'>
     readonly autoRenew: FieldRef<"User", 'Boolean'>
-    readonly accessType: FieldRef<"User", 'String'>
-    readonly expiryDate: FieldRef<"User", 'DateTime'>
-    readonly memberExpiryDate: FieldRef<"User", 'DateTime'>
     readonly status: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'String'>
     readonly profileImage: FieldRef<"User", 'String'>
@@ -12101,9 +12075,9 @@ export namespace Prisma {
     coverageLng: number | null
     coverageRadius: number | null
     coverageLocation: string | null
-    trialEndDate: Date | null
-    licenseId: string | null
-    licenseExpiry: Date | null
+    trialExpiresAt: Date | null
+    isPaid: boolean | null
+    activatedAt: Date | null
     activeEmergencyId: string | null
     guidedSetupRequired: boolean | null
     isPublic: boolean | null
@@ -12123,9 +12097,9 @@ export namespace Prisma {
     coverageLng: number | null
     coverageRadius: number | null
     coverageLocation: string | null
-    trialEndDate: Date | null
-    licenseId: string | null
-    licenseExpiry: Date | null
+    trialExpiresAt: Date | null
+    isPaid: boolean | null
+    activatedAt: Date | null
     activeEmergencyId: string | null
     guidedSetupRequired: boolean | null
     isPublic: boolean | null
@@ -12146,9 +12120,9 @@ export namespace Prisma {
     coverageRadius: number
     coverageLocation: number
     enabledCategories: number
-    trialEndDate: number
-    licenseId: number
-    licenseExpiry: number
+    trialExpiresAt: number
+    isPaid: number
+    activatedAt: number
     activeEmergencyId: number
     onboardingStepsCompleted: number
     guidedSetupRequired: number
@@ -12183,9 +12157,9 @@ export namespace Prisma {
     coverageLng?: true
     coverageRadius?: true
     coverageLocation?: true
-    trialEndDate?: true
-    licenseId?: true
-    licenseExpiry?: true
+    trialExpiresAt?: true
+    isPaid?: true
+    activatedAt?: true
     activeEmergencyId?: true
     guidedSetupRequired?: true
     isPublic?: true
@@ -12205,9 +12179,9 @@ export namespace Prisma {
     coverageLng?: true
     coverageRadius?: true
     coverageLocation?: true
-    trialEndDate?: true
-    licenseId?: true
-    licenseExpiry?: true
+    trialExpiresAt?: true
+    isPaid?: true
+    activatedAt?: true
     activeEmergencyId?: true
     guidedSetupRequired?: true
     isPublic?: true
@@ -12228,9 +12202,9 @@ export namespace Prisma {
     coverageRadius?: true
     coverageLocation?: true
     enabledCategories?: true
-    trialEndDate?: true
-    licenseId?: true
-    licenseExpiry?: true
+    trialExpiresAt?: true
+    isPaid?: true
+    activatedAt?: true
     activeEmergencyId?: true
     onboardingStepsCompleted?: true
     guidedSetupRequired?: true
@@ -12339,9 +12313,9 @@ export namespace Prisma {
     coverageRadius: number | null
     coverageLocation: string | null
     enabledCategories: string[]
-    trialEndDate: Date | null
-    licenseId: string | null
-    licenseExpiry: Date | null
+    trialExpiresAt: Date | null
+    isPaid: boolean
+    activatedAt: Date | null
     activeEmergencyId: string | null
     onboardingStepsCompleted: string[]
     guidedSetupRequired: boolean
@@ -12382,9 +12356,9 @@ export namespace Prisma {
     coverageRadius?: boolean
     coverageLocation?: boolean
     enabledCategories?: boolean
-    trialEndDate?: boolean
-    licenseId?: boolean
-    licenseExpiry?: boolean
+    trialExpiresAt?: boolean
+    isPaid?: boolean
+    activatedAt?: boolean
     activeEmergencyId?: boolean
     onboardingStepsCompleted?: boolean
     guidedSetupRequired?: boolean
@@ -12421,9 +12395,9 @@ export namespace Prisma {
     coverageRadius?: boolean
     coverageLocation?: boolean
     enabledCategories?: boolean
-    trialEndDate?: boolean
-    licenseId?: boolean
-    licenseExpiry?: boolean
+    trialExpiresAt?: boolean
+    isPaid?: boolean
+    activatedAt?: boolean
     activeEmergencyId?: boolean
     onboardingStepsCompleted?: boolean
     guidedSetupRequired?: boolean
@@ -12446,9 +12420,9 @@ export namespace Prisma {
     coverageRadius?: boolean
     coverageLocation?: boolean
     enabledCategories?: boolean
-    trialEndDate?: boolean
-    licenseId?: boolean
-    licenseExpiry?: boolean
+    trialExpiresAt?: boolean
+    isPaid?: boolean
+    activatedAt?: boolean
     activeEmergencyId?: boolean
     onboardingStepsCompleted?: boolean
     guidedSetupRequired?: boolean
@@ -12471,9 +12445,9 @@ export namespace Prisma {
     coverageRadius?: boolean
     coverageLocation?: boolean
     enabledCategories?: boolean
-    trialEndDate?: boolean
-    licenseId?: boolean
-    licenseExpiry?: boolean
+    trialExpiresAt?: boolean
+    isPaid?: boolean
+    activatedAt?: boolean
     activeEmergencyId?: boolean
     onboardingStepsCompleted?: boolean
     guidedSetupRequired?: boolean
@@ -12482,7 +12456,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type CommunityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "ownerId" | "type" | "status" | "isEmergencyMode" | "coverageLat" | "coverageLng" | "coverageRadius" | "coverageLocation" | "enabledCategories" | "trialEndDate" | "licenseId" | "licenseExpiry" | "activeEmergencyId" | "onboardingStepsCompleted" | "guidedSetupRequired" | "isPublic" | "createdAt" | "updatedAt", ExtArgs["result"]["community"]>
+  export type CommunityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "ownerId" | "type" | "status" | "isEmergencyMode" | "coverageLat" | "coverageLng" | "coverageRadius" | "coverageLocation" | "enabledCategories" | "trialExpiresAt" | "isPaid" | "activatedAt" | "activeEmergencyId" | "onboardingStepsCompleted" | "guidedSetupRequired" | "isPublic" | "createdAt" | "updatedAt", ExtArgs["result"]["community"]>
   export type CommunityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     members?: boolean | Community$membersArgs<ExtArgs>
@@ -12538,9 +12512,9 @@ export namespace Prisma {
       coverageRadius: number | null
       coverageLocation: string | null
       enabledCategories: string[]
-      trialEndDate: Date | null
-      licenseId: string | null
-      licenseExpiry: Date | null
+      trialExpiresAt: Date | null
+      isPaid: boolean
+      activatedAt: Date | null
       activeEmergencyId: string | null
       onboardingStepsCompleted: string[]
       guidedSetupRequired: boolean
@@ -12996,9 +12970,9 @@ export namespace Prisma {
     readonly coverageRadius: FieldRef<"Community", 'Float'>
     readonly coverageLocation: FieldRef<"Community", 'String'>
     readonly enabledCategories: FieldRef<"Community", 'String[]'>
-    readonly trialEndDate: FieldRef<"Community", 'DateTime'>
-    readonly licenseId: FieldRef<"Community", 'String'>
-    readonly licenseExpiry: FieldRef<"Community", 'DateTime'>
+    readonly trialExpiresAt: FieldRef<"Community", 'DateTime'>
+    readonly isPaid: FieldRef<"Community", 'Boolean'>
+    readonly activatedAt: FieldRef<"Community", 'DateTime'>
     readonly activeEmergencyId: FieldRef<"Community", 'String'>
     readonly onboardingStepsCompleted: FieldRef<"Community", 'String[]'>
     readonly guidedSetupRequired: FieldRef<"Community", 'Boolean'>
@@ -13751,7 +13725,7 @@ export namespace Prisma {
     userId: string | null
     role: string | null
     joinedAt: Date | null
-    licenseExpiry: Date | null
+    trialExpiresAt: Date | null
     status: string | null
     isSecurityMember: boolean | null
     locationSharingEnabled: boolean | null
@@ -13766,7 +13740,7 @@ export namespace Prisma {
     userId: string | null
     role: string | null
     joinedAt: Date | null
-    licenseExpiry: Date | null
+    trialExpiresAt: Date | null
     status: string | null
     isSecurityMember: boolean | null
     locationSharingEnabled: boolean | null
@@ -13781,7 +13755,7 @@ export namespace Prisma {
     userId: number
     role: number
     joinedAt: number
-    licenseExpiry: number
+    trialExpiresAt: number
     status: number
     isSecurityMember: number
     locationSharingEnabled: number
@@ -13798,7 +13772,7 @@ export namespace Prisma {
     userId?: true
     role?: true
     joinedAt?: true
-    licenseExpiry?: true
+    trialExpiresAt?: true
     status?: true
     isSecurityMember?: true
     locationSharingEnabled?: true
@@ -13813,7 +13787,7 @@ export namespace Prisma {
     userId?: true
     role?: true
     joinedAt?: true
-    licenseExpiry?: true
+    trialExpiresAt?: true
     status?: true
     isSecurityMember?: true
     locationSharingEnabled?: true
@@ -13828,7 +13802,7 @@ export namespace Prisma {
     userId?: true
     role?: true
     joinedAt?: true
-    licenseExpiry?: true
+    trialExpiresAt?: true
     status?: true
     isSecurityMember?: true
     locationSharingEnabled?: true
@@ -13916,7 +13890,7 @@ export namespace Prisma {
     userId: string
     role: string
     joinedAt: Date
-    licenseExpiry: Date | null
+    trialExpiresAt: Date | null
     status: string
     isSecurityMember: boolean
     locationSharingEnabled: boolean
@@ -13948,7 +13922,7 @@ export namespace Prisma {
     userId?: boolean
     role?: boolean
     joinedAt?: boolean
-    licenseExpiry?: boolean
+    trialExpiresAt?: boolean
     status?: boolean
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -13965,7 +13939,7 @@ export namespace Prisma {
     userId?: boolean
     role?: boolean
     joinedAt?: boolean
-    licenseExpiry?: boolean
+    trialExpiresAt?: boolean
     status?: boolean
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -13982,7 +13956,7 @@ export namespace Prisma {
     userId?: boolean
     role?: boolean
     joinedAt?: boolean
-    licenseExpiry?: boolean
+    trialExpiresAt?: boolean
     status?: boolean
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -13999,7 +13973,7 @@ export namespace Prisma {
     userId?: boolean
     role?: boolean
     joinedAt?: boolean
-    licenseExpiry?: boolean
+    trialExpiresAt?: boolean
     status?: boolean
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -14009,7 +13983,7 @@ export namespace Prisma {
     emergencyLocationOptIn?: boolean
   }
 
-  export type CommunityMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"communityId" | "userId" | "role" | "joinedAt" | "licenseExpiry" | "status" | "isSecurityMember" | "locationSharingEnabled" | "name" | "image" | "email" | "emergencyLocationOptIn", ExtArgs["result"]["communityMember"]>
+  export type CommunityMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"communityId" | "userId" | "role" | "joinedAt" | "trialExpiresAt" | "status" | "isSecurityMember" | "locationSharingEnabled" | "name" | "image" | "email" | "emergencyLocationOptIn", ExtArgs["result"]["communityMember"]>
   export type CommunityMemberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14034,7 +14008,7 @@ export namespace Prisma {
       userId: string
       role: string
       joinedAt: Date
-      licenseExpiry: Date | null
+      trialExpiresAt: Date | null
       status: string
       isSecurityMember: boolean
       locationSharingEnabled: boolean
@@ -14471,7 +14445,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"CommunityMember", 'String'>
     readonly role: FieldRef<"CommunityMember", 'String'>
     readonly joinedAt: FieldRef<"CommunityMember", 'DateTime'>
-    readonly licenseExpiry: FieldRef<"CommunityMember", 'DateTime'>
+    readonly trialExpiresAt: FieldRef<"CommunityMember", 'DateTime'>
     readonly status: FieldRef<"CommunityMember", 'String'>
     readonly isSecurityMember: FieldRef<"CommunityMember", 'Boolean'>
     readonly locationSharingEnabled: FieldRef<"CommunityMember", 'Boolean'>
@@ -20056,6 +20030,11 @@ export namespace Prisma {
     fundraisingGoal: number | null
     raisedAmount: number | null
     imageUrl: string | null
+    logo: string | null
+    coverImage: string | null
+    contactPhone: string | null
+    contactEmail: string | null
+    website: string | null
     locationName: string | null
     latitude: number | null
     longitude: number | null
@@ -20080,6 +20059,11 @@ export namespace Prisma {
     fundraisingGoal: number | null
     raisedAmount: number | null
     imageUrl: string | null
+    logo: string | null
+    coverImage: string | null
+    contactPhone: string | null
+    contactEmail: string | null
+    website: string | null
     locationName: string | null
     latitude: number | null
     longitude: number | null
@@ -20104,6 +20088,11 @@ export namespace Prisma {
     fundraisingGoal: number
     raisedAmount: number
     imageUrl: number
+    logo: number
+    coverImage: number
+    contactPhone: number
+    contactEmail: number
+    website: number
     locationName: number
     latitude: number
     longitude: number
@@ -20148,6 +20137,11 @@ export namespace Prisma {
     fundraisingGoal?: true
     raisedAmount?: true
     imageUrl?: true
+    logo?: true
+    coverImage?: true
+    contactPhone?: true
+    contactEmail?: true
+    website?: true
     locationName?: true
     latitude?: true
     longitude?: true
@@ -20172,6 +20166,11 @@ export namespace Prisma {
     fundraisingGoal?: true
     raisedAmount?: true
     imageUrl?: true
+    logo?: true
+    coverImage?: true
+    contactPhone?: true
+    contactEmail?: true
+    website?: true
     locationName?: true
     latitude?: true
     longitude?: true
@@ -20196,6 +20195,11 @@ export namespace Prisma {
     fundraisingGoal?: true
     raisedAmount?: true
     imageUrl?: true
+    logo?: true
+    coverImage?: true
+    contactPhone?: true
+    contactEmail?: true
+    website?: true
     locationName?: true
     latitude?: true
     longitude?: true
@@ -20309,6 +20313,11 @@ export namespace Prisma {
     fundraisingGoal: number | null
     raisedAmount: number
     imageUrl: string | null
+    logo: string | null
+    coverImage: string | null
+    contactPhone: string | null
+    contactEmail: string | null
+    website: string | null
     locationName: string | null
     latitude: number | null
     longitude: number | null
@@ -20354,6 +20363,11 @@ export namespace Prisma {
     fundraisingGoal?: boolean
     raisedAmount?: boolean
     imageUrl?: boolean
+    logo?: boolean
+    coverImage?: boolean
+    contactPhone?: boolean
+    contactEmail?: boolean
+    website?: boolean
     locationName?: boolean
     latitude?: boolean
     longitude?: boolean
@@ -20383,6 +20397,11 @@ export namespace Prisma {
     fundraisingGoal?: boolean
     raisedAmount?: boolean
     imageUrl?: boolean
+    logo?: boolean
+    coverImage?: boolean
+    contactPhone?: boolean
+    contactEmail?: boolean
+    website?: boolean
     locationName?: boolean
     latitude?: boolean
     longitude?: boolean
@@ -20410,6 +20429,11 @@ export namespace Prisma {
     fundraisingGoal?: boolean
     raisedAmount?: boolean
     imageUrl?: boolean
+    logo?: boolean
+    coverImage?: boolean
+    contactPhone?: boolean
+    contactEmail?: boolean
+    website?: boolean
     locationName?: boolean
     latitude?: boolean
     longitude?: boolean
@@ -20437,6 +20461,11 @@ export namespace Prisma {
     fundraisingGoal?: boolean
     raisedAmount?: boolean
     imageUrl?: boolean
+    logo?: boolean
+    coverImage?: boolean
+    contactPhone?: boolean
+    contactEmail?: boolean
+    website?: boolean
     locationName?: boolean
     latitude?: boolean
     longitude?: boolean
@@ -20451,7 +20480,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type CharityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "name" | "description" | "category" | "percentage" | "status" | "urgency" | "fundraisingGoal" | "raisedAmount" | "imageUrl" | "locationName" | "latitude" | "longitude" | "isVerified" | "isFeatured" | "tags" | "linkedBusinessIds" | "campaignCompleted" | "isApprovedSuggestion" | "suggestedById" | "createdAt" | "updatedAt", ExtArgs["result"]["charity"]>
+  export type CharityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "name" | "description" | "category" | "percentage" | "status" | "urgency" | "fundraisingGoal" | "raisedAmount" | "imageUrl" | "logo" | "coverImage" | "contactPhone" | "contactEmail" | "website" | "locationName" | "latitude" | "longitude" | "isVerified" | "isFeatured" | "tags" | "linkedBusinessIds" | "campaignCompleted" | "isApprovedSuggestion" | "suggestedById" | "createdAt" | "updatedAt", ExtArgs["result"]["charity"]>
   export type CharityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     charitySuggestions?: boolean | Charity$charitySuggestionsArgs<ExtArgs>
@@ -20482,6 +20511,11 @@ export namespace Prisma {
       fundraisingGoal: number | null
       raisedAmount: number
       imageUrl: string | null
+      logo: string | null
+      coverImage: string | null
+      contactPhone: string | null
+      contactEmail: string | null
+      website: string | null
       locationName: string | null
       latitude: number | null
       longitude: number | null
@@ -20930,6 +20964,11 @@ export namespace Prisma {
     readonly fundraisingGoal: FieldRef<"Charity", 'Float'>
     readonly raisedAmount: FieldRef<"Charity", 'Float'>
     readonly imageUrl: FieldRef<"Charity", 'String'>
+    readonly logo: FieldRef<"Charity", 'String'>
+    readonly coverImage: FieldRef<"Charity", 'String'>
+    readonly contactPhone: FieldRef<"Charity", 'String'>
+    readonly contactEmail: FieldRef<"Charity", 'String'>
+    readonly website: FieldRef<"Charity", 'String'>
     readonly locationName: FieldRef<"Charity", 'String'>
     readonly latitude: FieldRef<"Charity", 'Float'>
     readonly longitude: FieldRef<"Charity", 'Float'>
@@ -22624,12 +22663,14 @@ export namespace Prisma {
     latitude: number | null
     longitude: number | null
     rating: number | null
+    charityPercentage: number | null
   }
 
   export type BusinessSumAggregateOutputType = {
     latitude: number | null
     longitude: number | null
     rating: number | null
+    charityPercentage: number | null
   }
 
   export type BusinessMinAggregateOutputType = {
@@ -22646,6 +22687,8 @@ export namespace Prisma {
     rating: number | null
     imageUrl: string | null
     charityId: string | null
+    subcategory: string | null
+    charityPercentage: number | null
     status: string | null
     source: string | null
     createdAt: Date | null
@@ -22666,6 +22709,8 @@ export namespace Prisma {
     rating: number | null
     imageUrl: string | null
     charityId: string | null
+    subcategory: string | null
+    charityPercentage: number | null
     status: string | null
     source: string | null
     createdAt: Date | null
@@ -22687,6 +22732,8 @@ export namespace Prisma {
     imageUrl: number
     charityId: number
     communityIds: number
+    subcategory: number
+    charityPercentage: number
     status: number
     source: number
     createdAt: number
@@ -22699,12 +22746,14 @@ export namespace Prisma {
     latitude?: true
     longitude?: true
     rating?: true
+    charityPercentage?: true
   }
 
   export type BusinessSumAggregateInputType = {
     latitude?: true
     longitude?: true
     rating?: true
+    charityPercentage?: true
   }
 
   export type BusinessMinAggregateInputType = {
@@ -22721,6 +22770,8 @@ export namespace Prisma {
     rating?: true
     imageUrl?: true
     charityId?: true
+    subcategory?: true
+    charityPercentage?: true
     status?: true
     source?: true
     createdAt?: true
@@ -22741,6 +22792,8 @@ export namespace Prisma {
     rating?: true
     imageUrl?: true
     charityId?: true
+    subcategory?: true
+    charityPercentage?: true
     status?: true
     source?: true
     createdAt?: true
@@ -22762,6 +22815,8 @@ export namespace Prisma {
     imageUrl?: true
     charityId?: true
     communityIds?: true
+    subcategory?: true
+    charityPercentage?: true
     status?: true
     source?: true
     createdAt?: true
@@ -22870,6 +22925,8 @@ export namespace Prisma {
     imageUrl: string | null
     charityId: string | null
     communityIds: string[]
+    subcategory: string | null
+    charityPercentage: number | null
     status: string
     source: string
     createdAt: Date
@@ -22910,6 +22967,8 @@ export namespace Prisma {
     imageUrl?: boolean
     charityId?: boolean
     communityIds?: boolean
+    subcategory?: boolean
+    charityPercentage?: boolean
     status?: boolean
     source?: boolean
     createdAt?: boolean
@@ -22932,6 +22991,8 @@ export namespace Prisma {
     imageUrl?: boolean
     charityId?: boolean
     communityIds?: boolean
+    subcategory?: boolean
+    charityPercentage?: boolean
     status?: boolean
     source?: boolean
     createdAt?: boolean
@@ -22954,6 +23015,8 @@ export namespace Prisma {
     imageUrl?: boolean
     charityId?: boolean
     communityIds?: boolean
+    subcategory?: boolean
+    charityPercentage?: boolean
     status?: boolean
     source?: boolean
     createdAt?: boolean
@@ -22976,13 +23039,15 @@ export namespace Prisma {
     imageUrl?: boolean
     charityId?: boolean
     communityIds?: boolean
+    subcategory?: boolean
+    charityPercentage?: boolean
     status?: boolean
     source?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type BusinessOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "name" | "category" | "description" | "latitude" | "longitude" | "address" | "phone" | "website" | "rating" | "imageUrl" | "charityId" | "communityIds" | "status" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
+  export type BusinessOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "name" | "category" | "description" | "latitude" | "longitude" | "address" | "phone" | "website" | "rating" | "imageUrl" | "charityId" | "communityIds" | "subcategory" | "charityPercentage" | "status" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
   export type BusinessInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -23013,6 +23078,8 @@ export namespace Prisma {
       imageUrl: string | null
       charityId: string | null
       communityIds: string[]
+      subcategory: string | null
+      charityPercentage: number | null
       status: string
       source: string
       createdAt: Date
@@ -23455,6 +23522,8 @@ export namespace Prisma {
     readonly imageUrl: FieldRef<"Business", 'String'>
     readonly charityId: FieldRef<"Business", 'String'>
     readonly communityIds: FieldRef<"Business", 'String[]'>
+    readonly subcategory: FieldRef<"Business", 'String'>
+    readonly charityPercentage: FieldRef<"Business", 'Float'>
     readonly status: FieldRef<"Business", 'String'>
     readonly source: FieldRef<"Business", 'String'>
     readonly createdAt: FieldRef<"Business", 'DateTime'>
@@ -34010,14 +34079,12 @@ export namespace Prisma {
     phoneVerified: 'phoneVerified',
     profileCompleted: 'profileCompleted',
     communityCreated: 'communityCreated',
-    onboardingComplete: 'onboardingComplete',
+    onboardingCompleted: 'onboardingCompleted',
     licenseStatus: 'licenseStatus',
-    licenseExpiry: 'licenseExpiry',
-    licenseType: 'licenseType',
+    trialExpiresAt: 'trialExpiresAt',
+    subscriptionActive: 'subscriptionActive',
+    subscriptionRenewalDate: 'subscriptionRenewalDate',
     autoRenew: 'autoRenew',
-    accessType: 'accessType',
-    expiryDate: 'expiryDate',
-    memberExpiryDate: 'memberExpiryDate',
     status: 'status',
     role: 'role',
     profileImage: 'profileImage',
@@ -34142,9 +34209,9 @@ export namespace Prisma {
     coverageRadius: 'coverageRadius',
     coverageLocation: 'coverageLocation',
     enabledCategories: 'enabledCategories',
-    trialEndDate: 'trialEndDate',
-    licenseId: 'licenseId',
-    licenseExpiry: 'licenseExpiry',
+    trialExpiresAt: 'trialExpiresAt',
+    isPaid: 'isPaid',
+    activatedAt: 'activatedAt',
     activeEmergencyId: 'activeEmergencyId',
     onboardingStepsCompleted: 'onboardingStepsCompleted',
     guidedSetupRequired: 'guidedSetupRequired',
@@ -34161,7 +34228,7 @@ export namespace Prisma {
     userId: 'userId',
     role: 'role',
     joinedAt: 'joinedAt',
-    licenseExpiry: 'licenseExpiry',
+    trialExpiresAt: 'trialExpiresAt',
     status: 'status',
     isSecurityMember: 'isSecurityMember',
     locationSharingEnabled: 'locationSharingEnabled',
@@ -34276,6 +34343,11 @@ export namespace Prisma {
     fundraisingGoal: 'fundraisingGoal',
     raisedAmount: 'raisedAmount',
     imageUrl: 'imageUrl',
+    logo: 'logo',
+    coverImage: 'coverImage',
+    contactPhone: 'contactPhone',
+    contactEmail: 'contactEmail',
+    website: 'website',
     locationName: 'locationName',
     latitude: 'latitude',
     longitude: 'longitude',
@@ -34326,6 +34398,8 @@ export namespace Prisma {
     imageUrl: 'imageUrl',
     charityId: 'charityId',
     communityIds: 'communityIds',
+    subcategory: 'subcategory',
+    charityPercentage: 'charityPercentage',
     status: 'status',
     source: 'source',
     createdAt: 'createdAt',
@@ -34600,14 +34674,12 @@ export namespace Prisma {
     phoneVerified?: BoolFilter<"User"> | boolean
     profileCompleted?: BoolFilter<"User"> | boolean
     communityCreated?: BoolFilter<"User"> | boolean
-    onboardingComplete?: BoolFilter<"User"> | boolean
+    onboardingCompleted?: BoolFilter<"User"> | boolean
     licenseStatus?: StringFilter<"User"> | string
-    licenseExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
-    licenseType?: StringNullableFilter<"User"> | string | null
+    trialExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    subscriptionActive?: BoolFilter<"User"> | boolean
+    subscriptionRenewalDate?: DateTimeNullableFilter<"User"> | Date | string | null
     autoRenew?: BoolFilter<"User"> | boolean
-    accessType?: StringNullableFilter<"User"> | string | null
-    expiryDate?: DateTimeNullableFilter<"User"> | Date | string | null
-    memberExpiryDate?: DateTimeNullableFilter<"User"> | Date | string | null
     status?: StringFilter<"User"> | string
     role?: StringFilter<"User"> | string
     profileImage?: StringNullableFilter<"User"> | string | null
@@ -34669,14 +34741,12 @@ export namespace Prisma {
     phoneVerified?: SortOrder
     profileCompleted?: SortOrder
     communityCreated?: SortOrder
-    onboardingComplete?: SortOrder
+    onboardingCompleted?: SortOrder
     licenseStatus?: SortOrder
-    licenseExpiry?: SortOrderInput | SortOrder
-    licenseType?: SortOrderInput | SortOrder
+    trialExpiresAt?: SortOrderInput | SortOrder
+    subscriptionActive?: SortOrder
+    subscriptionRenewalDate?: SortOrderInput | SortOrder
     autoRenew?: SortOrder
-    accessType?: SortOrderInput | SortOrder
-    expiryDate?: SortOrderInput | SortOrder
-    memberExpiryDate?: SortOrderInput | SortOrder
     status?: SortOrder
     role?: SortOrder
     profileImage?: SortOrderInput | SortOrder
@@ -34741,14 +34811,12 @@ export namespace Prisma {
     phoneVerified?: BoolFilter<"User"> | boolean
     profileCompleted?: BoolFilter<"User"> | boolean
     communityCreated?: BoolFilter<"User"> | boolean
-    onboardingComplete?: BoolFilter<"User"> | boolean
+    onboardingCompleted?: BoolFilter<"User"> | boolean
     licenseStatus?: StringFilter<"User"> | string
-    licenseExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
-    licenseType?: StringNullableFilter<"User"> | string | null
+    trialExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    subscriptionActive?: BoolFilter<"User"> | boolean
+    subscriptionRenewalDate?: DateTimeNullableFilter<"User"> | Date | string | null
     autoRenew?: BoolFilter<"User"> | boolean
-    accessType?: StringNullableFilter<"User"> | string | null
-    expiryDate?: DateTimeNullableFilter<"User"> | Date | string | null
-    memberExpiryDate?: DateTimeNullableFilter<"User"> | Date | string | null
     status?: StringFilter<"User"> | string
     role?: StringFilter<"User"> | string
     profileImage?: StringNullableFilter<"User"> | string | null
@@ -34810,14 +34878,12 @@ export namespace Prisma {
     phoneVerified?: SortOrder
     profileCompleted?: SortOrder
     communityCreated?: SortOrder
-    onboardingComplete?: SortOrder
+    onboardingCompleted?: SortOrder
     licenseStatus?: SortOrder
-    licenseExpiry?: SortOrderInput | SortOrder
-    licenseType?: SortOrderInput | SortOrder
+    trialExpiresAt?: SortOrderInput | SortOrder
+    subscriptionActive?: SortOrder
+    subscriptionRenewalDate?: SortOrderInput | SortOrder
     autoRenew?: SortOrder
-    accessType?: SortOrderInput | SortOrder
-    expiryDate?: SortOrderInput | SortOrder
-    memberExpiryDate?: SortOrderInput | SortOrder
     status?: SortOrder
     role?: SortOrder
     profileImage?: SortOrderInput | SortOrder
@@ -34869,14 +34935,12 @@ export namespace Prisma {
     phoneVerified?: BoolWithAggregatesFilter<"User"> | boolean
     profileCompleted?: BoolWithAggregatesFilter<"User"> | boolean
     communityCreated?: BoolWithAggregatesFilter<"User"> | boolean
-    onboardingComplete?: BoolWithAggregatesFilter<"User"> | boolean
+    onboardingCompleted?: BoolWithAggregatesFilter<"User"> | boolean
     licenseStatus?: StringWithAggregatesFilter<"User"> | string
-    licenseExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-    licenseType?: StringNullableWithAggregatesFilter<"User"> | string | null
+    trialExpiresAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    subscriptionActive?: BoolWithAggregatesFilter<"User"> | boolean
+    subscriptionRenewalDate?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     autoRenew?: BoolWithAggregatesFilter<"User"> | boolean
-    accessType?: StringNullableWithAggregatesFilter<"User"> | string | null
-    expiryDate?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-    memberExpiryDate?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     status?: StringWithAggregatesFilter<"User"> | string
     role?: StringWithAggregatesFilter<"User"> | string
     profileImage?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -35298,9 +35362,9 @@ export namespace Prisma {
     coverageRadius?: FloatNullableFilter<"Community"> | number | null
     coverageLocation?: StringNullableFilter<"Community"> | string | null
     enabledCategories?: StringNullableListFilter<"Community">
-    trialEndDate?: DateTimeNullableFilter<"Community"> | Date | string | null
-    licenseId?: StringNullableFilter<"Community"> | string | null
-    licenseExpiry?: DateTimeNullableFilter<"Community"> | Date | string | null
+    trialExpiresAt?: DateTimeNullableFilter<"Community"> | Date | string | null
+    isPaid?: BoolFilter<"Community"> | boolean
+    activatedAt?: DateTimeNullableFilter<"Community"> | Date | string | null
     activeEmergencyId?: StringNullableFilter<"Community"> | string | null
     onboardingStepsCompleted?: StringNullableListFilter<"Community">
     guidedSetupRequired?: BoolFilter<"Community"> | boolean
@@ -35336,9 +35400,9 @@ export namespace Prisma {
     coverageRadius?: SortOrderInput | SortOrder
     coverageLocation?: SortOrderInput | SortOrder
     enabledCategories?: SortOrder
-    trialEndDate?: SortOrderInput | SortOrder
-    licenseId?: SortOrderInput | SortOrder
-    licenseExpiry?: SortOrderInput | SortOrder
+    trialExpiresAt?: SortOrderInput | SortOrder
+    isPaid?: SortOrder
+    activatedAt?: SortOrderInput | SortOrder
     activeEmergencyId?: SortOrderInput | SortOrder
     onboardingStepsCompleted?: SortOrder
     guidedSetupRequired?: SortOrder
@@ -35377,9 +35441,9 @@ export namespace Prisma {
     coverageRadius?: FloatNullableFilter<"Community"> | number | null
     coverageLocation?: StringNullableFilter<"Community"> | string | null
     enabledCategories?: StringNullableListFilter<"Community">
-    trialEndDate?: DateTimeNullableFilter<"Community"> | Date | string | null
-    licenseId?: StringNullableFilter<"Community"> | string | null
-    licenseExpiry?: DateTimeNullableFilter<"Community"> | Date | string | null
+    trialExpiresAt?: DateTimeNullableFilter<"Community"> | Date | string | null
+    isPaid?: BoolFilter<"Community"> | boolean
+    activatedAt?: DateTimeNullableFilter<"Community"> | Date | string | null
     activeEmergencyId?: StringNullableFilter<"Community"> | string | null
     onboardingStepsCompleted?: StringNullableListFilter<"Community">
     guidedSetupRequired?: BoolFilter<"Community"> | boolean
@@ -35415,9 +35479,9 @@ export namespace Prisma {
     coverageRadius?: SortOrderInput | SortOrder
     coverageLocation?: SortOrderInput | SortOrder
     enabledCategories?: SortOrder
-    trialEndDate?: SortOrderInput | SortOrder
-    licenseId?: SortOrderInput | SortOrder
-    licenseExpiry?: SortOrderInput | SortOrder
+    trialExpiresAt?: SortOrderInput | SortOrder
+    isPaid?: SortOrder
+    activatedAt?: SortOrderInput | SortOrder
     activeEmergencyId?: SortOrderInput | SortOrder
     onboardingStepsCompleted?: SortOrder
     guidedSetupRequired?: SortOrder
@@ -35447,9 +35511,9 @@ export namespace Prisma {
     coverageRadius?: FloatNullableWithAggregatesFilter<"Community"> | number | null
     coverageLocation?: StringNullableWithAggregatesFilter<"Community"> | string | null
     enabledCategories?: StringNullableListFilter<"Community">
-    trialEndDate?: DateTimeNullableWithAggregatesFilter<"Community"> | Date | string | null
-    licenseId?: StringNullableWithAggregatesFilter<"Community"> | string | null
-    licenseExpiry?: DateTimeNullableWithAggregatesFilter<"Community"> | Date | string | null
+    trialExpiresAt?: DateTimeNullableWithAggregatesFilter<"Community"> | Date | string | null
+    isPaid?: BoolWithAggregatesFilter<"Community"> | boolean
+    activatedAt?: DateTimeNullableWithAggregatesFilter<"Community"> | Date | string | null
     activeEmergencyId?: StringNullableWithAggregatesFilter<"Community"> | string | null
     onboardingStepsCompleted?: StringNullableListFilter<"Community">
     guidedSetupRequired?: BoolWithAggregatesFilter<"Community"> | boolean
@@ -35466,7 +35530,7 @@ export namespace Prisma {
     userId?: StringFilter<"CommunityMember"> | string
     role?: StringFilter<"CommunityMember"> | string
     joinedAt?: DateTimeFilter<"CommunityMember"> | Date | string
-    licenseExpiry?: DateTimeNullableFilter<"CommunityMember"> | Date | string | null
+    trialExpiresAt?: DateTimeNullableFilter<"CommunityMember"> | Date | string | null
     status?: StringFilter<"CommunityMember"> | string
     isSecurityMember?: BoolFilter<"CommunityMember"> | boolean
     locationSharingEnabled?: BoolFilter<"CommunityMember"> | boolean
@@ -35483,7 +35547,7 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     joinedAt?: SortOrder
-    licenseExpiry?: SortOrderInput | SortOrder
+    trialExpiresAt?: SortOrderInput | SortOrder
     status?: SortOrder
     isSecurityMember?: SortOrder
     locationSharingEnabled?: SortOrder
@@ -35504,7 +35568,7 @@ export namespace Prisma {
     userId?: StringFilter<"CommunityMember"> | string
     role?: StringFilter<"CommunityMember"> | string
     joinedAt?: DateTimeFilter<"CommunityMember"> | Date | string
-    licenseExpiry?: DateTimeNullableFilter<"CommunityMember"> | Date | string | null
+    trialExpiresAt?: DateTimeNullableFilter<"CommunityMember"> | Date | string | null
     status?: StringFilter<"CommunityMember"> | string
     isSecurityMember?: BoolFilter<"CommunityMember"> | boolean
     locationSharingEnabled?: BoolFilter<"CommunityMember"> | boolean
@@ -35521,7 +35585,7 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     joinedAt?: SortOrder
-    licenseExpiry?: SortOrderInput | SortOrder
+    trialExpiresAt?: SortOrderInput | SortOrder
     status?: SortOrder
     isSecurityMember?: SortOrder
     locationSharingEnabled?: SortOrder
@@ -35542,7 +35606,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"CommunityMember"> | string
     role?: StringWithAggregatesFilter<"CommunityMember"> | string
     joinedAt?: DateTimeWithAggregatesFilter<"CommunityMember"> | Date | string
-    licenseExpiry?: DateTimeNullableWithAggregatesFilter<"CommunityMember"> | Date | string | null
+    trialExpiresAt?: DateTimeNullableWithAggregatesFilter<"CommunityMember"> | Date | string | null
     status?: StringWithAggregatesFilter<"CommunityMember"> | string
     isSecurityMember?: BoolWithAggregatesFilter<"CommunityMember"> | boolean
     locationSharingEnabled?: BoolWithAggregatesFilter<"CommunityMember"> | boolean
@@ -36040,6 +36104,11 @@ export namespace Prisma {
     fundraisingGoal?: FloatNullableFilter<"Charity"> | number | null
     raisedAmount?: FloatFilter<"Charity"> | number
     imageUrl?: StringNullableFilter<"Charity"> | string | null
+    logo?: StringNullableFilter<"Charity"> | string | null
+    coverImage?: StringNullableFilter<"Charity"> | string | null
+    contactPhone?: StringNullableFilter<"Charity"> | string | null
+    contactEmail?: StringNullableFilter<"Charity"> | string | null
+    website?: StringNullableFilter<"Charity"> | string | null
     locationName?: StringNullableFilter<"Charity"> | string | null
     latitude?: FloatNullableFilter<"Charity"> | number | null
     longitude?: FloatNullableFilter<"Charity"> | number | null
@@ -36068,6 +36137,11 @@ export namespace Prisma {
     fundraisingGoal?: SortOrderInput | SortOrder
     raisedAmount?: SortOrder
     imageUrl?: SortOrderInput | SortOrder
+    logo?: SortOrderInput | SortOrder
+    coverImage?: SortOrderInput | SortOrder
+    contactPhone?: SortOrderInput | SortOrder
+    contactEmail?: SortOrderInput | SortOrder
+    website?: SortOrderInput | SortOrder
     locationName?: SortOrderInput | SortOrder
     latitude?: SortOrderInput | SortOrder
     longitude?: SortOrderInput | SortOrder
@@ -36099,6 +36173,11 @@ export namespace Prisma {
     fundraisingGoal?: FloatNullableFilter<"Charity"> | number | null
     raisedAmount?: FloatFilter<"Charity"> | number
     imageUrl?: StringNullableFilter<"Charity"> | string | null
+    logo?: StringNullableFilter<"Charity"> | string | null
+    coverImage?: StringNullableFilter<"Charity"> | string | null
+    contactPhone?: StringNullableFilter<"Charity"> | string | null
+    contactEmail?: StringNullableFilter<"Charity"> | string | null
+    website?: StringNullableFilter<"Charity"> | string | null
     locationName?: StringNullableFilter<"Charity"> | string | null
     latitude?: FloatNullableFilter<"Charity"> | number | null
     longitude?: FloatNullableFilter<"Charity"> | number | null
@@ -36127,6 +36206,11 @@ export namespace Prisma {
     fundraisingGoal?: SortOrderInput | SortOrder
     raisedAmount?: SortOrder
     imageUrl?: SortOrderInput | SortOrder
+    logo?: SortOrderInput | SortOrder
+    coverImage?: SortOrderInput | SortOrder
+    contactPhone?: SortOrderInput | SortOrder
+    contactEmail?: SortOrderInput | SortOrder
+    website?: SortOrderInput | SortOrder
     locationName?: SortOrderInput | SortOrder
     latitude?: SortOrderInput | SortOrder
     longitude?: SortOrderInput | SortOrder
@@ -36161,6 +36245,11 @@ export namespace Prisma {
     fundraisingGoal?: FloatNullableWithAggregatesFilter<"Charity"> | number | null
     raisedAmount?: FloatWithAggregatesFilter<"Charity"> | number
     imageUrl?: StringNullableWithAggregatesFilter<"Charity"> | string | null
+    logo?: StringNullableWithAggregatesFilter<"Charity"> | string | null
+    coverImage?: StringNullableWithAggregatesFilter<"Charity"> | string | null
+    contactPhone?: StringNullableWithAggregatesFilter<"Charity"> | string | null
+    contactEmail?: StringNullableWithAggregatesFilter<"Charity"> | string | null
+    website?: StringNullableWithAggregatesFilter<"Charity"> | string | null
     locationName?: StringNullableWithAggregatesFilter<"Charity"> | string | null
     latitude?: FloatNullableWithAggregatesFilter<"Charity"> | number | null
     longitude?: FloatNullableWithAggregatesFilter<"Charity"> | number | null
@@ -36291,6 +36380,8 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"Business"> | string | null
     charityId?: StringNullableFilter<"Business"> | string | null
     communityIds?: StringNullableListFilter<"Business">
+    subcategory?: StringNullableFilter<"Business"> | string | null
+    charityPercentage?: FloatNullableFilter<"Business"> | number | null
     status?: StringFilter<"Business"> | string
     source?: StringFilter<"Business"> | string
     createdAt?: DateTimeFilter<"Business"> | Date | string
@@ -36313,6 +36404,8 @@ export namespace Prisma {
     imageUrl?: SortOrderInput | SortOrder
     charityId?: SortOrderInput | SortOrder
     communityIds?: SortOrder
+    subcategory?: SortOrderInput | SortOrder
+    charityPercentage?: SortOrderInput | SortOrder
     status?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -36338,6 +36431,8 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"Business"> | string | null
     charityId?: StringNullableFilter<"Business"> | string | null
     communityIds?: StringNullableListFilter<"Business">
+    subcategory?: StringNullableFilter<"Business"> | string | null
+    charityPercentage?: FloatNullableFilter<"Business"> | number | null
     status?: StringFilter<"Business"> | string
     source?: StringFilter<"Business"> | string
     createdAt?: DateTimeFilter<"Business"> | Date | string
@@ -36360,6 +36455,8 @@ export namespace Prisma {
     imageUrl?: SortOrderInput | SortOrder
     charityId?: SortOrderInput | SortOrder
     communityIds?: SortOrder
+    subcategory?: SortOrderInput | SortOrder
+    charityPercentage?: SortOrderInput | SortOrder
     status?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -36389,6 +36486,8 @@ export namespace Prisma {
     imageUrl?: StringNullableWithAggregatesFilter<"Business"> | string | null
     charityId?: StringNullableWithAggregatesFilter<"Business"> | string | null
     communityIds?: StringNullableListFilter<"Business">
+    subcategory?: StringNullableWithAggregatesFilter<"Business"> | string | null
+    charityPercentage?: FloatNullableWithAggregatesFilter<"Business"> | number | null
     status?: StringWithAggregatesFilter<"Business"> | string
     source?: StringWithAggregatesFilter<"Business"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Business"> | Date | string
@@ -37061,14 +37160,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -37130,14 +37227,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -37199,14 +37294,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37268,14 +37361,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37337,14 +37428,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -37388,14 +37477,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37439,14 +37526,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37886,9 +37971,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -37924,9 +38009,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -37960,9 +38045,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -37998,9 +38083,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -38035,9 +38120,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -38058,9 +38143,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -38082,9 +38167,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -38096,7 +38181,7 @@ export namespace Prisma {
   export type CommunityMemberCreateInput = {
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -38113,7 +38198,7 @@ export namespace Prisma {
     userId: string
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -38126,7 +38211,7 @@ export namespace Prisma {
   export type CommunityMemberUpdateInput = {
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -38143,7 +38228,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -38158,7 +38243,7 @@ export namespace Prisma {
     userId: string
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -38171,7 +38256,7 @@ export namespace Prisma {
   export type CommunityMemberUpdateManyMutationInput = {
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -38186,7 +38271,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -38749,6 +38834,11 @@ export namespace Prisma {
     fundraisingGoal?: number | null
     raisedAmount?: number
     imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
     locationName?: string | null
     latitude?: number | null
     longitude?: number | null
@@ -38777,6 +38867,11 @@ export namespace Prisma {
     fundraisingGoal?: number | null
     raisedAmount?: number
     imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
     locationName?: string | null
     latitude?: number | null
     longitude?: number | null
@@ -38803,6 +38898,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -38831,6 +38931,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -38858,6 +38963,11 @@ export namespace Prisma {
     fundraisingGoal?: number | null
     raisedAmount?: number
     imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
     locationName?: string | null
     latitude?: number | null
     longitude?: number | null
@@ -38883,6 +38993,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -38909,6 +39024,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -39039,6 +39159,8 @@ export namespace Prisma {
     imageUrl?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
+    subcategory?: string | null
+    charityPercentage?: number | null
     status?: string
     source?: string
     createdAt?: Date | string
@@ -39061,6 +39183,8 @@ export namespace Prisma {
     imageUrl?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
+    subcategory?: string | null
+    charityPercentage?: number | null
     status?: string
     source?: string
     createdAt?: Date | string
@@ -39081,6 +39205,8 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39103,6 +39229,8 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39124,6 +39252,8 @@ export namespace Prisma {
     imageUrl?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
+    subcategory?: string | null
+    charityPercentage?: number | null
     status?: string
     source?: string
     createdAt?: Date | string
@@ -39144,6 +39274,8 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39165,6 +39297,8 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -40134,14 +40268,12 @@ export namespace Prisma {
     phoneVerified?: SortOrder
     profileCompleted?: SortOrder
     communityCreated?: SortOrder
-    onboardingComplete?: SortOrder
+    onboardingCompleted?: SortOrder
     licenseStatus?: SortOrder
-    licenseExpiry?: SortOrder
-    licenseType?: SortOrder
+    trialExpiresAt?: SortOrder
+    subscriptionActive?: SortOrder
+    subscriptionRenewalDate?: SortOrder
     autoRenew?: SortOrder
-    accessType?: SortOrder
-    expiryDate?: SortOrder
-    memberExpiryDate?: SortOrder
     status?: SortOrder
     role?: SortOrder
     profileImage?: SortOrder
@@ -40190,14 +40322,12 @@ export namespace Prisma {
     phoneVerified?: SortOrder
     profileCompleted?: SortOrder
     communityCreated?: SortOrder
-    onboardingComplete?: SortOrder
+    onboardingCompleted?: SortOrder
     licenseStatus?: SortOrder
-    licenseExpiry?: SortOrder
-    licenseType?: SortOrder
+    trialExpiresAt?: SortOrder
+    subscriptionActive?: SortOrder
+    subscriptionRenewalDate?: SortOrder
     autoRenew?: SortOrder
-    accessType?: SortOrder
-    expiryDate?: SortOrder
-    memberExpiryDate?: SortOrder
     status?: SortOrder
     role?: SortOrder
     profileImage?: SortOrder
@@ -40240,14 +40370,12 @@ export namespace Prisma {
     phoneVerified?: SortOrder
     profileCompleted?: SortOrder
     communityCreated?: SortOrder
-    onboardingComplete?: SortOrder
+    onboardingCompleted?: SortOrder
     licenseStatus?: SortOrder
-    licenseExpiry?: SortOrder
-    licenseType?: SortOrder
+    trialExpiresAt?: SortOrder
+    subscriptionActive?: SortOrder
+    subscriptionRenewalDate?: SortOrder
     autoRenew?: SortOrder
-    accessType?: SortOrder
-    expiryDate?: SortOrder
-    memberExpiryDate?: SortOrder
     status?: SortOrder
     role?: SortOrder
     profileImage?: SortOrder
@@ -40649,9 +40777,9 @@ export namespace Prisma {
     coverageRadius?: SortOrder
     coverageLocation?: SortOrder
     enabledCategories?: SortOrder
-    trialEndDate?: SortOrder
-    licenseId?: SortOrder
-    licenseExpiry?: SortOrder
+    trialExpiresAt?: SortOrder
+    isPaid?: SortOrder
+    activatedAt?: SortOrder
     activeEmergencyId?: SortOrder
     onboardingStepsCompleted?: SortOrder
     guidedSetupRequired?: SortOrder
@@ -40678,9 +40806,9 @@ export namespace Prisma {
     coverageLng?: SortOrder
     coverageRadius?: SortOrder
     coverageLocation?: SortOrder
-    trialEndDate?: SortOrder
-    licenseId?: SortOrder
-    licenseExpiry?: SortOrder
+    trialExpiresAt?: SortOrder
+    isPaid?: SortOrder
+    activatedAt?: SortOrder
     activeEmergencyId?: SortOrder
     guidedSetupRequired?: SortOrder
     isPublic?: SortOrder
@@ -40700,9 +40828,9 @@ export namespace Prisma {
     coverageLng?: SortOrder
     coverageRadius?: SortOrder
     coverageLocation?: SortOrder
-    trialEndDate?: SortOrder
-    licenseId?: SortOrder
-    licenseExpiry?: SortOrder
+    trialExpiresAt?: SortOrder
+    isPaid?: SortOrder
+    activatedAt?: SortOrder
     activeEmergencyId?: SortOrder
     guidedSetupRequired?: SortOrder
     isPublic?: SortOrder
@@ -40731,7 +40859,7 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     joinedAt?: SortOrder
-    licenseExpiry?: SortOrder
+    trialExpiresAt?: SortOrder
     status?: SortOrder
     isSecurityMember?: SortOrder
     locationSharingEnabled?: SortOrder
@@ -40746,7 +40874,7 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     joinedAt?: SortOrder
-    licenseExpiry?: SortOrder
+    trialExpiresAt?: SortOrder
     status?: SortOrder
     isSecurityMember?: SortOrder
     locationSharingEnabled?: SortOrder
@@ -40761,7 +40889,7 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     joinedAt?: SortOrder
-    licenseExpiry?: SortOrder
+    trialExpiresAt?: SortOrder
     status?: SortOrder
     isSecurityMember?: SortOrder
     locationSharingEnabled?: SortOrder
@@ -41107,6 +41235,11 @@ export namespace Prisma {
     fundraisingGoal?: SortOrder
     raisedAmount?: SortOrder
     imageUrl?: SortOrder
+    logo?: SortOrder
+    coverImage?: SortOrder
+    contactPhone?: SortOrder
+    contactEmail?: SortOrder
+    website?: SortOrder
     locationName?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
@@ -41141,6 +41274,11 @@ export namespace Prisma {
     fundraisingGoal?: SortOrder
     raisedAmount?: SortOrder
     imageUrl?: SortOrder
+    logo?: SortOrder
+    coverImage?: SortOrder
+    contactPhone?: SortOrder
+    contactEmail?: SortOrder
+    website?: SortOrder
     locationName?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
@@ -41165,6 +41303,11 @@ export namespace Prisma {
     fundraisingGoal?: SortOrder
     raisedAmount?: SortOrder
     imageUrl?: SortOrder
+    logo?: SortOrder
+    coverImage?: SortOrder
+    contactPhone?: SortOrder
+    contactEmail?: SortOrder
+    website?: SortOrder
     locationName?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
@@ -41258,6 +41401,8 @@ export namespace Prisma {
     imageUrl?: SortOrder
     charityId?: SortOrder
     communityIds?: SortOrder
+    subcategory?: SortOrder
+    charityPercentage?: SortOrder
     status?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -41268,6 +41413,7 @@ export namespace Prisma {
     latitude?: SortOrder
     longitude?: SortOrder
     rating?: SortOrder
+    charityPercentage?: SortOrder
   }
 
   export type BusinessMaxOrderByAggregateInput = {
@@ -41284,6 +41430,8 @@ export namespace Prisma {
     rating?: SortOrder
     imageUrl?: SortOrder
     charityId?: SortOrder
+    subcategory?: SortOrder
+    charityPercentage?: SortOrder
     status?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -41304,6 +41452,8 @@ export namespace Prisma {
     rating?: SortOrder
     imageUrl?: SortOrder
     charityId?: SortOrder
+    subcategory?: SortOrder
+    charityPercentage?: SortOrder
     status?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -41314,6 +41464,7 @@ export namespace Prisma {
     latitude?: SortOrder
     longitude?: SortOrder
     rating?: SortOrder
+    charityPercentage?: SortOrder
   }
 
   export type ReportCountOrderByAggregateInput = {
@@ -44032,7 +44183,7 @@ export namespace Prisma {
   export type CommunityMemberCreateWithoutUserInput = {
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -44047,7 +44198,7 @@ export namespace Prisma {
     communityId: string
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -44081,6 +44232,8 @@ export namespace Prisma {
     imageUrl?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
+    subcategory?: string | null
+    charityPercentage?: number | null
     status?: string
     source?: string
     createdAt?: Date | string
@@ -44101,6 +44254,8 @@ export namespace Prisma {
     imageUrl?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
+    subcategory?: string | null
+    charityPercentage?: number | null
     status?: string
     source?: string
     createdAt?: Date | string
@@ -44287,9 +44442,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -44323,9 +44478,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -44743,7 +44898,7 @@ export namespace Prisma {
     userId?: StringFilter<"CommunityMember"> | string
     role?: StringFilter<"CommunityMember"> | string
     joinedAt?: DateTimeFilter<"CommunityMember"> | Date | string
-    licenseExpiry?: DateTimeNullableFilter<"CommunityMember"> | Date | string | null
+    trialExpiresAt?: DateTimeNullableFilter<"CommunityMember"> | Date | string | null
     status?: StringFilter<"CommunityMember"> | string
     isSecurityMember?: BoolFilter<"CommunityMember"> | boolean
     locationSharingEnabled?: BoolFilter<"CommunityMember"> | boolean
@@ -44787,6 +44942,8 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"Business"> | string | null
     charityId?: StringNullableFilter<"Business"> | string | null
     communityIds?: StringNullableListFilter<"Business">
+    subcategory?: StringNullableFilter<"Business"> | string | null
+    charityPercentage?: FloatNullableFilter<"Business"> | number | null
     status?: StringFilter<"Business"> | string
     source?: StringFilter<"Business"> | string
     createdAt?: DateTimeFilter<"Business"> | Date | string
@@ -44948,9 +45105,9 @@ export namespace Prisma {
     coverageRadius?: FloatNullableFilter<"Community"> | number | null
     coverageLocation?: StringNullableFilter<"Community"> | string | null
     enabledCategories?: StringNullableListFilter<"Community">
-    trialEndDate?: DateTimeNullableFilter<"Community"> | Date | string | null
-    licenseId?: StringNullableFilter<"Community"> | string | null
-    licenseExpiry?: DateTimeNullableFilter<"Community"> | Date | string | null
+    trialExpiresAt?: DateTimeNullableFilter<"Community"> | Date | string | null
+    isPaid?: BoolFilter<"Community"> | boolean
+    activatedAt?: DateTimeNullableFilter<"Community"> | Date | string | null
     activeEmergencyId?: StringNullableFilter<"Community"> | string | null
     onboardingStepsCompleted?: StringNullableListFilter<"Community">
     guidedSetupRequired?: BoolFilter<"Community"> | boolean
@@ -45314,14 +45471,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -45382,14 +45537,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -45466,14 +45619,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45534,14 +45685,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45602,14 +45751,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -45670,14 +45817,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -45754,14 +45899,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45822,14 +45965,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45890,14 +46031,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -45958,14 +46097,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -46042,14 +46179,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46110,14 +46245,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46178,14 +46311,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -46246,14 +46377,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -46330,14 +46459,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46398,14 +46525,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46466,14 +46591,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -46534,14 +46657,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -46618,14 +46739,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46686,14 +46805,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46754,14 +46871,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -46822,14 +46937,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -46888,7 +47001,7 @@ export namespace Prisma {
   export type CommunityMemberCreateWithoutCommunityInput = {
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -46903,7 +47016,7 @@ export namespace Prisma {
     userId: string
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -47062,6 +47175,11 @@ export namespace Prisma {
     fundraisingGoal?: number | null
     raisedAmount?: number
     imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
     locationName?: string | null
     latitude?: number | null
     longitude?: number | null
@@ -47088,6 +47206,11 @@ export namespace Prisma {
     fundraisingGoal?: number | null
     raisedAmount?: number
     imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
     locationName?: string | null
     latitude?: number | null
     longitude?: number | null
@@ -47418,14 +47541,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47486,14 +47607,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47623,6 +47742,11 @@ export namespace Prisma {
     fundraisingGoal?: FloatNullableFilter<"Charity"> | number | null
     raisedAmount?: FloatFilter<"Charity"> | number
     imageUrl?: StringNullableFilter<"Charity"> | string | null
+    logo?: StringNullableFilter<"Charity"> | string | null
+    coverImage?: StringNullableFilter<"Charity"> | string | null
+    contactPhone?: StringNullableFilter<"Charity"> | string | null
+    contactEmail?: StringNullableFilter<"Charity"> | string | null
+    website?: StringNullableFilter<"Charity"> | string | null
     locationName?: StringNullableFilter<"Charity"> | string | null
     latitude?: FloatNullableFilter<"Charity"> | number | null
     longitude?: FloatNullableFilter<"Charity"> | number | null
@@ -47850,9 +47974,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -47887,9 +48011,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -47925,14 +48049,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -47993,14 +48115,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -48079,9 +48199,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -48116,9 +48236,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -48160,14 +48280,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48228,14 +48346,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48298,9 +48414,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -48335,9 +48451,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -48386,9 +48502,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -48423,9 +48539,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -48458,9 +48574,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -48495,9 +48611,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -48546,9 +48662,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -48583,9 +48699,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -48618,9 +48734,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -48655,9 +48771,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -48724,14 +48840,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -48792,14 +48906,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -48957,9 +49069,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -48994,9 +49106,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -49075,14 +49187,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49143,14 +49253,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49272,9 +49380,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -49309,9 +49417,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -49347,14 +49455,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -49415,14 +49521,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -49501,9 +49605,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -49538,9 +49642,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -49582,14 +49686,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49650,14 +49752,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49720,9 +49820,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -49757,9 +49857,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -49846,9 +49946,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -49883,9 +49983,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -49934,9 +50034,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -49971,9 +50071,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -50010,6 +50110,11 @@ export namespace Prisma {
     fundraisingGoal?: number | null
     raisedAmount?: number
     imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
     locationName?: string | null
     latitude?: number | null
     longitude?: number | null
@@ -50037,6 +50142,11 @@ export namespace Prisma {
     fundraisingGoal?: number | null
     raisedAmount?: number
     imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
     locationName?: string | null
     latitude?: number | null
     longitude?: number | null
@@ -50066,14 +50176,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -50134,14 +50242,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -50220,9 +50326,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -50257,9 +50363,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -50302,6 +50408,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -50329,6 +50440,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -50364,14 +50480,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50432,14 +50546,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50500,14 +50612,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -50568,14 +50678,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -50652,14 +50760,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50720,14 +50826,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50790,9 +50894,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -50827,9 +50931,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -50865,14 +50969,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -50933,14 +51035,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -51019,9 +51119,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -51056,9 +51156,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -51100,14 +51200,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51168,14 +51266,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51238,9 +51334,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -51275,9 +51371,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -51313,14 +51409,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -51381,14 +51475,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -51454,14 +51546,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -51522,14 +51612,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -51608,9 +51696,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -51645,9 +51733,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -51689,14 +51777,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51757,14 +51843,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51836,14 +51920,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51904,14 +51986,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51974,9 +52054,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -52011,9 +52091,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -52049,14 +52129,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -52117,14 +52195,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -52203,9 +52279,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -52240,9 +52316,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -52284,14 +52360,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -52352,14 +52426,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -52549,14 +52621,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -52617,14 +52687,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -52738,14 +52806,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -52806,14 +52872,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -52874,14 +52938,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -52942,14 +53004,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -53026,14 +53086,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53094,14 +53152,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53162,14 +53218,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -53230,14 +53284,12 @@ export namespace Prisma {
     phoneVerified?: boolean
     profileCompleted?: boolean
     communityCreated?: boolean
-    onboardingComplete?: boolean
+    onboardingCompleted?: boolean
     licenseStatus?: string
-    licenseExpiry?: Date | string | null
-    licenseType?: string | null
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
     autoRenew?: boolean
-    accessType?: string | null
-    expiryDate?: Date | string | null
-    memberExpiryDate?: Date | string | null
     status?: string
     role?: string
     profileImage?: string | null
@@ -53305,9 +53357,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -53342,9 +53394,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -53391,14 +53443,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53459,14 +53509,12 @@ export namespace Prisma {
     phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     communityCreated?: BoolFieldUpdateOperationsInput | boolean
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     licenseStatus?: StringFieldUpdateOperationsInput | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseType?: NullableStringFieldUpdateOperationsInput | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     autoRenew?: BoolFieldUpdateOperationsInput | boolean
-    accessType?: NullableStringFieldUpdateOperationsInput | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberExpiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53540,9 +53588,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -53577,9 +53625,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -53612,9 +53660,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -53649,9 +53697,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -53700,9 +53748,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -53737,9 +53785,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -53772,9 +53820,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -53809,9 +53857,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -53860,9 +53908,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -53897,9 +53945,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -53924,7 +53972,7 @@ export namespace Prisma {
     communityId: string
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -53948,6 +53996,8 @@ export namespace Prisma {
     imageUrl?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
+    subcategory?: string | null
+    charityPercentage?: number | null
     status?: string
     source?: string
     createdAt?: Date | string
@@ -54029,9 +54079,9 @@ export namespace Prisma {
     coverageRadius?: number | null
     coverageLocation?: string | null
     enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
-    trialEndDate?: Date | string | null
-    licenseId?: string | null
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
     activeEmergencyId?: string | null
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
@@ -54164,7 +54214,7 @@ export namespace Prisma {
   export type CommunityMemberUpdateWithoutUserInput = {
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -54179,7 +54229,7 @@ export namespace Prisma {
     communityId?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -54193,7 +54243,7 @@ export namespace Prisma {
     communityId?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -54217,6 +54267,8 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -54237,6 +54289,8 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -54257,6 +54311,8 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -54466,9 +54522,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -54502,9 +54558,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -54538,9 +54594,9 @@ export namespace Prisma {
     coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
     coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
     enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
-    trialEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
@@ -54916,7 +54972,7 @@ export namespace Prisma {
     userId: string
     role?: string
     joinedAt?: Date | string
-    licenseExpiry?: Date | string | null
+    trialExpiresAt?: Date | string | null
     status?: string
     isSecurityMember?: boolean
     locationSharingEnabled?: boolean
@@ -54990,6 +55046,11 @@ export namespace Prisma {
     fundraisingGoal?: number | null
     raisedAmount?: number
     imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
     locationName?: string | null
     latitude?: number | null
     longitude?: number | null
@@ -55104,7 +55165,7 @@ export namespace Prisma {
   export type CommunityMemberUpdateWithoutCommunityInput = {
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -55119,7 +55180,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -55133,7 +55194,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    licenseExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
     locationSharingEnabled?: BoolFieldUpdateOperationsInput | boolean
@@ -55315,6 +55376,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -55341,6 +55407,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -55367,6 +55438,11 @@ export namespace Prisma {
     fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
     raisedAmount?: FloatFieldUpdateOperationsInput | number
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
     locationName?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null

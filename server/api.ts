@@ -11,6 +11,7 @@ import usersRouter from './routes/users.js';
 import communitiesRouter from './routes/communities.js';
 import conversationsRouter from './routes/conversations.js';
 import businessesRouter from './routes/businesses.js';
+import billingRouter from './billing/routes.js';
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.use('/users', usersRouter);
 router.use('/communities', communitiesRouter);
 router.use('/conversations', conversationsRouter);
 router.use('/businesses', businessesRouter);
+router.use('/billing', billingRouter);
 
 // ─── Health ───────────────────────────────────────────────────────────────────
 
@@ -58,7 +60,7 @@ router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
   const minio = getMinioClient();
   if (!minio) return res.status(503).json({ error: 'Storage not configured (MINIO_ENDPOINT missing)' });
 
-  const bucket = (req.body.bucket as string) || 'uploads';
+  const bucket = process.env.MINIO_BUCKET ?? 'lalela';
   const ext = path.extname(req.file.originalname) || '.bin';
   const objectName = `${req.auth!.userId}/${uuidv4()}${ext}`;
 
@@ -225,14 +227,6 @@ router.post('/reports', requireAuth, async (req, res) => {
 
 router.get('/admin/reports', requireAuth, async (_req, res) => {
   return res.json([]);
-});
-
-// ─── Stripe mock ──────────────────────────────────────────────────────────────
-
-router.post('/stripe/webhook-mock', (req, res) => {
-  const { type, targetId } = req.body;
-  console.log(`[Stripe Mock] ${type} ${targetId ?? ''}`);
-  return res.json({ message: 'Webhook processed', status: 'LICENSED' });
 });
 
 // ─── Global error handler (must be last, 4-arg signature) ────────────────────

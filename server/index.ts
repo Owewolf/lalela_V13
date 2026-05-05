@@ -7,6 +7,8 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import apiRouter from './api.js';
 import { sendPushToUser } from './services/pushService.js';
+import prisma from './db.js';
+import { startCronJobs } from './billing/cronService.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -75,13 +77,13 @@ io.on('connection', (socket) => {
     conversationId: string;
     text?: string;
     type?: string;
-    attachment_url?: string;
+    attachmentUrl?: string;
   }) => {
     // Broadcast to all participants in the conversation room (excluding sender)
     socket.to(`conversation:${data.conversationId}`).emit('message:new', {
       ...data,
       senderId: userId,
-      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     });
   });
 
@@ -191,5 +193,6 @@ const PORT = Number(process.env.PORT ?? 4000);
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`Lalela API + Socket.io running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV ?? 'development'}`);
+  startCronJobs(prisma);
 });
 
