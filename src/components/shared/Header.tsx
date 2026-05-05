@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, Animated, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Shield, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 
-const APP_LOGO_PATH = require('../../../assets/icon.png');
+const APP_LOGO_PATH = require('../../../assets/lalela_logo.png');
 const PRIMARY = '#0d3d47';
 
 interface HeaderProps {
@@ -30,14 +30,30 @@ export const Header: React.FC<HeaderProps> = ({
   const { userProfile } = useAuth();
 
   const userRole = currentCommunity?.userRole || 'Member';
-  const isLicensed = userProfile?.licenseStatus === 'LICENSED' || currentCommunity?.type === 'LICENSED';
+  const now = new Date();
+  const licenseStatus = userProfile?.licenseStatus;
+  const trialExpiresAt = userProfile?.trialExpiresAt ? new Date(userProfile.trialExpiresAt) : null;
+  const renewalDate = userProfile?.subscriptionRenewalDate ? new Date(userProfile.subscriptionRenewalDate) : null;
+  const isActive = licenseStatus === 'ACTIVE' && userProfile?.subscriptionActive && renewalDate && renewalDate > now;
+  const isTrial = licenseStatus === 'TRIAL' && trialExpiresAt && trialExpiresAt > now;
+  // Community is licensed once it has been paid (R999 once-off) or is in an active trial
+  const communityTrialActive =
+    currentCommunity?.type === 'TRIAL' &&
+    currentCommunity?.trialExpiresAt &&
+    new Date(currentCommunity.trialExpiresAt) > now;
+  const communityActive =
+    currentCommunity?.isPaid === true ||
+    currentCommunity?.type === 'ACTIVE' ||
+    !!communityTrialActive;
+  const isLicensed = isActive || isTrial || communityActive;
   const ringColor = isLicensed ? '#10b981' : '#dc2626';
-  const isReadOnly =
-    userProfile?.status === 'READ-ONLY' ||
-    (userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
-      userProfile?.licenseStatus === 'UNLICENSED' &&
-      userProfile?.memberExpiryDate &&
-      new Date(userProfile.memberExpiryDate) < new Date());
+  // Read-only only if the user's own license is expired AND the community itself is not active
+  const isReadOnly = licenseStatus === 'EXPIRED' || ((!isActive && !isTrial) && !communityActive);
+  // Warn when trial expires within 5 days
+  const daysUntilTrialExpiry = trialExpiresAt && isTrial
+    ? Math.ceil((trialExpiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : null;
+  const showTrialWarning = daysUntilTrialExpiry !== null && daysUntilTrialExpiry <= 5;
 
   const unreadCount = notifications.filter((n: any) => !n.read).length;
 
@@ -50,12 +66,12 @@ export const Header: React.FC<HeaderProps> = ({
           Animated.timing(pulseAnim, {
             toValue: 1,
             duration: 1500,
-            useNativeDriver: true,
+            useNativeDriver: Platform.OS !== 'web',
           }),
           Animated.timing(pulseAnim, {
             toValue: 0,
             duration: 0,
-            useNativeDriver: true,
+            useNativeDriver: Platform.OS !== 'web',
           }),
         ])
       ).start();
@@ -79,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
     if (onBack) {
       onBack();
     } else {
-      router.back();
+      if (router.canGoBack()) router.back(); else router.replace("/");
     }
   };
 
@@ -91,9 +107,9 @@ export const Header: React.FC<HeaderProps> = ({
   const roleColor = roleColors[userRole] ?? roleColors.Member;
 
   const communityType = currentCommunity?.type;
-  const typeBadgeBg = communityType === 'LICENSED' ? '#ecfdf5' : '#fffbeb';
-  const typeBadgeText = communityType === 'LICENSED' ? '#1e5667' : '#b45309';
-  const typeBadgeBorder = communityType === 'LICENSED' ? '#ffddb9' : '#fde68a';
+  const typeBadgeBg = communityActive ? '#ecfdf5' : '#fffbeb';
+  const typeBadgeText = communityActive ? '#1e5667' : '#b45309';
+  const typeBadgeBorder = communityActive ? '#ffddb9' : '#fde68a';
 
   const profileImageUri =
     userProfile?.profileImage ||
@@ -132,13 +148,13 @@ export const Header: React.FC<HeaderProps> = ({
                   { backgroundColor: typeBadgeBg, borderColor: typeBadgeBorder },
                 ]}
               >
-                {communityType === 'LICENSED' ? (
+                {communityActive ? (
                   <ShieldCheck size={9} color={typeBadgeText} />
                 ) : (
                   <AlertCircle size={9} color={typeBadgeText} />
                 )}
                 <Text style={[styles.badgeText, { color: typeBadgeText }]}>
-                  {communityType === 'LICENSED' ? 'Licensed' : 'Unlicensed'}
+                  {communityActive ? 'Active' : communityType === 'TRIAL' ? 'Trial' : 'Inactive'}
                 </Text>
               </View>
               {/* Role badge */}

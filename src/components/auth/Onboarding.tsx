@@ -1,6 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useRef } from 'react';
-import { GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from 'react-native-google-places-autocomplete';
 import {
   View,
   Text,
@@ -32,7 +31,13 @@ import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { GOOGLE_PLACES_API_KEY } from '../../constants';
+
+interface InviteCoverageArea {
+  latitude: number;
+  longitude: number;
+  radius: number;
+  locationName: string;
+}
 
 // ─── Confirm Modal ────────────────────────────────────────────────────────────
 
@@ -91,9 +96,9 @@ const OnboardingInvite: React.FC = () => {
   const [locationLat, setLocationLat] = useState(0);
   const [locationLng, setLocationLng] = useState(0);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
-  const placesRef = useRef<GooglePlacesAutocompleteRef | null>(null);
   const [inviteCode, setInviteCode] = useState('');
   const [invitedCommunityName, setInvitedCommunityName] = useState<string | null>(null);
+  const [inviteCoverageArea, setInviteCoverageArea] = useState<InviteCoverageArea | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -107,9 +112,9 @@ const OnboardingInvite: React.FC = () => {
     if (urlInviteCode) return; // URL param present = invited user, skip this check
     const check = async () => {
       const [mode, storedInvite, joinCode] = await Promise.all([
-        AsyncStorage.getItem('pending_onboarding_mode'),
-        AsyncStorage.getItem('pending_onboarding_invite'),
-        AsyncStorage.getItem('pending_join_code'),
+        AsyncStorage.getItem('pendingOnboardingMode'),
+        AsyncStorage.getItem('pendingOnboardingInvite'),
+        AsyncStorage.getItem('pendingJoinCode'),
       ]);
       const hasInvite = !!(storedInvite || joinCode);
       if (mode === 'start' || (!hasInvite && mode !== 'join')) {
@@ -126,21 +131,22 @@ const OnboardingInvite: React.FC = () => {
         pendingName, pendingEmail, pendingPhone, pendingContact,
         pendingInvite, pendingJoinCode,
       ] = await Promise.all([
-        AsyncStorage.getItem('pending_onboarding_name'),
-        AsyncStorage.getItem('pending_onboarding_email'),
-        AsyncStorage.getItem('pending_onboarding_phone'),
-        AsyncStorage.getItem('pending_onboarding_contact'),
-        AsyncStorage.getItem('pending_onboarding_invite'),
-        AsyncStorage.getItem('pending_join_code'),
+        AsyncStorage.getItem('pendingOnboardingName'),
+        AsyncStorage.getItem('pendingOnboardingEmail'),
+        AsyncStorage.getItem('pendingOnboardingPhone'),
+        AsyncStorage.getItem('pendingOnboardingContact'),
+        AsyncStorage.getItem('pendingOnboardingInvite'),
+        AsyncStorage.getItem('pendingJoinCode'),
       ]);
 
       // URL param is the most reliable source (no async race); fall back to AsyncStorage
       const code = urlInviteCode || pendingJoinCode || pendingInvite || '';
       if (code) {
         setInviteCode(code);
-        // Fetch community name for the invite link (best-effort)
+        // Fetch community name and coverage for the invite link (best-effort)
         api.get(`/communities/join/${code}`).then((res) => {
           if (res.data?.communityName) setInvitedCommunityName(res.data.communityName);
+          if (res.data?.coverageArea) setInviteCoverageArea(res.data.coverageArea);
         }).catch(() => {});
       }
 
@@ -176,6 +182,15 @@ const OnboardingInvite: React.FC = () => {
     }
   }, [user, userProfile]);
 
+  useEffect(() => {
+    if (!inviteCoverageArea) return;
+    if (locationLat !== 0 || locationLng !== 0 || locationName.trim()) return;
+
+    setLocationName(inviteCoverageArea.locationName);
+    setLocationLat(inviteCoverageArea.latitude);
+    setLocationLng(inviteCoverageArea.longitude);
+  }, [inviteCoverageArea, locationLat, locationLng, locationName]);
+
   const handlePickImage = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -184,7 +199,7 @@ const OnboardingInvite: React.FC = () => {
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
@@ -227,14 +242,12 @@ const OnboardingInvite: React.FC = () => {
         const parts = [place.streetNumber, place.street, place.district || place.subregion, place.city, place.region, place.country].filter(Boolean);
         const addr = parts.join(', ');
         setLocationName(addr);
-        placesRef.current?.setAddressText(addr);
       } else {
         const coords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
         setLocationName(coords);
-        placesRef.current?.setAddressText(coords);
       }
     } catch {
-      setError('Failed to get current location. Please type your address manually.');
+      setError('Failed to get current location. Please try again or continue with the community default location.');
     } finally {
       setIsFetchingLocation(false);
     }
@@ -242,9 +255,8 @@ const OnboardingInvite: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!user) return;
-    // Location is mandatory before onboarding can complete.
     if (!locationLat || !locationLng || !locationName.trim()) {
-      setError('Please set your location to continue.');
+      setError('We could not determine a default location for your profile yet. Use current location or ask the community admin to set the coverage area.');
       return;
     }
     setIsSubmitting(true);
@@ -264,7 +276,7 @@ const OnboardingInvite: React.FC = () => {
       // Join community via invite code if present (server validates + adds member)
       if (inviteCode.trim()) {
         await api.post(`/communities/join/${inviteCode.trim()}`);
-        await AsyncStorage.removeItem('pending_join_code');
+        await AsyncStorage.removeItem('pendingJoinCode');
       }
 
       // Write profile via REST (server sets profileCompleted = true)
@@ -283,15 +295,23 @@ const OnboardingInvite: React.FC = () => {
       });
 
       await Promise.all([
-        AsyncStorage.removeItem('pending_onboarding_name'),
-        AsyncStorage.removeItem('pending_onboarding_email'),
-        AsyncStorage.removeItem('pending_onboarding_phone'),
-        AsyncStorage.removeItem('pending_onboarding_contact'),
-        AsyncStorage.removeItem('pending_onboarding_mode'),
-        AsyncStorage.removeItem('pending_onboarding_invite'),
+        AsyncStorage.removeItem('pendingOnboardingName'),
+        AsyncStorage.removeItem('pendingOnboardingEmail'),
+        AsyncStorage.removeItem('pendingOnboardingPhone'),
+        AsyncStorage.removeItem('pendingOnboardingContact'),
+        AsyncStorage.removeItem('pendingOnboardingMode'),
+        AsyncStorage.removeItem('pendingOnboardingInvite'),
       ]);
 
-      router.replace('/(tabs)');
+      if (invitedCommunityName) {
+        Alert.alert(
+          `Welcome to ${invitedCommunityName}! 🎉`,
+          `Your profile is ready and you've been added to ${invitedCommunityName}. Enjoy your community!`,
+          [{ text: 'Get Started', onPress: () => router.replace('/(tabs)') }]
+        );
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (err: any) {
       const msg: string = err?.response?.data?.error ?? err.message ?? 'An error occurred.';
       setError(msg);
@@ -342,7 +362,7 @@ const OnboardingInvite: React.FC = () => {
             {/* Title */}
             <View className="flex-row items-center gap-3">
               <View className="w-12 h-12 bg-orange-50 rounded-2xl items-center justify-center">
-                <UserIcon size={24} color="#f97316" />
+                <UserIcon size={24} color="#fc7127" />
               </View>
               <View className="flex-1">
                 <Text className="text-2xl font-black text-[#0d3d47]">Complete Your Profile</Text>
@@ -413,48 +433,27 @@ const OnboardingInvite: React.FC = () => {
               />
             </View>
 
-            {/* Location */}
+            {/* Default Location */}
             <View className="gap-1" style={{ zIndex: 10, elevation: 10 }}>
               <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
-                Location <Text className="text-red-500">*</Text>
+                Default Location <Text className="text-red-500">*</Text>
               </Text>
-              <View style={{ zIndex: 10, elevation: 10, position: 'relative' }}>
-                <GooglePlacesAutocomplete
-                  placeholder="e.g. 123 Main St, Cape Town"
-                  fetchDetails
-                  // @ts-ignore
-                  scrollEnabled={false}
-                  onPress={(data, details) => {
-                    setLocationName(data.description);
-                    if (details?.geometry?.location) {
-                      setLocationLat(details.geometry.location.lat);
-                      setLocationLng(details.geometry.location.lng);
-                    }
-                  }}
-                  query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
-                  ref={placesRef as any}
-                  textInputProps={{
-                    placeholderTextColor: '#9ca3af',
-                    onBlur: () => {
-                      const currentText = placesRef.current?.getAddressText() || '';
-                      if (currentText !== locationName) {
-                        setLocationName(currentText);
-                        setLocationLat(0);
-                        setLocationLng(0);
-                      }
-                    }
-                  }}
-                  styles={{
-                    container: { flex: 0 },
-                    textInput: { backgroundColor: '#f3f4f6', borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14, fontWeight: 'bold', color: '#0d3d47', height: 52, margin: 0 },
-                    listView: { position: 'absolute', top: 56, left: 0, right: 0, zIndex: 9999, elevation: 9999, backgroundColor: '#fff', borderRadius: 12, marginTop: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8 },
-                    row: { paddingVertical: 12, paddingHorizontal: 16, zIndex: 9999 },
-                    description: { fontSize: 13, color: '#374151' },
-                  }}
-                  enablePoweredByContainer={false}
-                  keyboardShouldPersistTaps="handled"
-                  listUnderlayColor="transparent"
-                />
+              <View className="bg-gray-100 rounded-2xl px-4 py-4 gap-2">
+                <View className="flex-row items-start gap-3">
+                  <View className="w-9 h-9 rounded-xl bg-white items-center justify-center">
+                    <MapPin size={16} color="#0d3d47" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm font-bold text-[#0d3d47]">
+                      {locationName || inviteCoverageArea?.locationName || 'Waiting for community coverage'}
+                    </Text>
+                    <Text className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+                      {inviteCoverageArea
+                        ? 'Your profile starts with the community coverage area. You can update this later in settings or use your current device location now.'
+                        : 'Your community needs a coverage area before we can set a default location automatically.'}
+                    </Text>
+                  </View>
+                </View>
               </View>
               <TouchableOpacity
                 onPress={handleGetCurrentLocation}
@@ -463,25 +462,18 @@ const OnboardingInvite: React.FC = () => {
               >
                 {isFetchingLocation ? <ActivityIndicator size="small" color="#0d3d47" /> : <MapPin size={16} color="#0d3d47" />}
                 <Text className="text-xs font-bold text-[#0d3d47]">
-                  {isFetchingLocation ? 'Getting location...' : 'Use current location'}
+                  {isFetchingLocation ? 'Getting location...' : 'Use current location instead'}
                 </Text>
               </TouchableOpacity>
               {locationName && locationLat !== 0 ? (
                 <View className="flex-row items-center gap-1 mt-1 ml-1">
                   <CheckCircle2 size={12} color="#10b981" />
-                  <Text className="text-[10px] text-emerald-600 font-medium">Location set</Text>
-                </View>
-              ) : locationName ? (
-                <View className="flex-row items-center gap-1 mt-1 ml-1">
-                  <AlertCircle size={12} color="#f59e0b" />
-                  <Text className="text-[10px] text-amber-600 font-medium">
-                    Tap "Use current location" to confirm coordinates, or type your full address
-                  </Text>
+                  <Text className="text-[10px] text-emerald-600 font-medium">Default location ready</Text>
                 </View>
               ) : (
                 <View className="flex-row items-center gap-1 mt-1 ml-1">
                   <AlertCircle size={12} color="#f59e0b" />
-                  <Text className="text-[10px] text-amber-600 font-medium">Set your location to continue</Text>
+                  <Text className="text-[10px] text-amber-600 font-medium">Waiting for a community coverage default or your current location</Text>
                 </View>
               )}
             </View>

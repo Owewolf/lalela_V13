@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,9 @@ import {
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import api from '../../lib/api';
+import { Users } from 'lucide-react-native';
 
 
 // Simple checkbox component
@@ -33,8 +35,19 @@ type JoinMode = 'start' | 'login';
 
 const LandingPage: React.FC = () => {
   const router = useRouter();
+  const { verified, join } = useLocalSearchParams<{ verified?: string; join?: string }>();
   const scrollRef = useRef<ScrollView>(null);
-  const [joinMode, setJoinMode] = useState<JoinMode>('login');
+  const [invitedCommunityName, setInvitedCommunityName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!join) return;
+    api.get(`/communities/join/${join}`)
+      .then((res) => { if (res.data?.communityName) setInvitedCommunityName(res.data.communityName); })
+      .catch(() => {});
+  }, [join]);
+  // Auto-switch to login and show success banner if arriving from email verification link
+  const [joinMode, setJoinMode] = useState<JoinMode>(verified === '1' ? 'login' : 'login');
+  const [emailJustVerified, setEmailJustVerified] = useState(verified === '1');
 
   // Form fields
   const [email, setEmail] = useState('');
@@ -128,18 +141,18 @@ const LandingPage: React.FC = () => {
       } else {
         if (password !== confirmPassword) throw new Error('Passwords do not match.');
         if (!agreedToTerms) throw new Error('You must agree to the Terms & Conditions.');
-        if (password.length < 6) throw new Error('Password must be at least 6 characters.');
+        if (password.length < 8) throw new Error('Password must be at least 8 characters.');
 
         await register(email, password, `${name} ${lastName}`.trim(), undefined);
 
         await AsyncStorage.multiSet([
-          ['pending_reg_name', `${name} ${lastName}`.trim()],
-          ['pending_reg_first_name', name],
-          ['pending_reg_last_name', lastName],
-          ['pending_reg_agreed', agreedToTerms ? 'true' : 'false'],
-          ['pending_reg_marketing', marketingConsent ? 'true' : 'false'],
-          ['pending_reg_email', email],
-          ['pending_onboarding_mode', 'start'],
+          ['pendingRegName', `${name} ${lastName}`.trim()],
+          ['pendingRegFirstName', name],
+          ['pendingRegLastName', lastName],
+          ['pendingRegAgreed', agreedToTerms ? 'true' : 'false'],
+          ['pendingRegMarketing', marketingConsent ? 'true' : 'false'],
+          ['pendingRegEmail', email],
+          ['pendingOnboardingMode', 'start'],
         ]);
 
         setVerificationEmailSent(true);
@@ -200,9 +213,9 @@ const LandingPage: React.FC = () => {
         <View className="px-6 py-4 flex-row items-center justify-between border-b border-gray-100">
           <View className="flex-row items-center gap-2">
             <Image 
-              source={require('../../../assets/icon.png')} 
-              className="w-10 h-10 rounded-xl"
-              resizeMode="cover"
+              source={require('../../../assets/lalela_logo.png')} 
+              style={{ width: 40, height: 40, borderRadius: 12 }}
+              resizeMode="contain"
             />
             <Text className="text-2xl font-black text-[#0d3d47] tracking-tight">lalela</Text>
           </View>
@@ -224,9 +237,9 @@ const LandingPage: React.FC = () => {
 
         {/* ── Hero ── */}
         <View className="px-6 pt-10 pb-8">
-          <Text className="text-5xl font-black text-[#0d3d47] leading-tight mb-4">
+          <Text style={{ fontSize: Platform.OS === 'web' ? 36 : 48, fontWeight: '900', color: '#0d3d47', lineHeight: Platform.OS === 'web' ? 42 : 54, marginBottom: 16 }}>
             no more talk talk —{'\n'}
-            <Text className="text-orange-500">it's listen, listen, do.</Text>
+            <Text style={{ color: '#f97316' }}>it's listen, listen, do.</Text>
           </Text>
           <Text className="text-base text-gray-500 font-medium leading-relaxed mb-8">
             join your community. trade safely.{'\n'}give back with every deal.
@@ -235,7 +248,7 @@ const LandingPage: React.FC = () => {
             <TouchableOpacity
               onPress={() => switchTab('start')}
               className="px-6 py-4 rounded-2xl flex-row items-center gap-2"
-              style={{ backgroundColor: '#f97316' }}
+              style={{ backgroundColor: '#fc7127' }}
             >
               <Text className="text-white font-black uppercase tracking-widest text-sm">Get Started</Text>
             </TouchableOpacity>
@@ -268,7 +281,7 @@ const LandingPage: React.FC = () => {
               </View>
               <View className="flex-row items-center gap-3">
                 <View className="w-10 h-10 rounded-2xl bg-orange-50 items-center justify-center">
-                  <Text className="text-[#f97316] text-base font-black">+ +</Text>
+                  <Text className="text-[#fc7127] text-base font-black">+ +</Text>
                 </View>
                 <Text className="font-bold text-[#0d3d47] text-sm">Unlimited member invites</Text>
               </View>
@@ -320,7 +333,7 @@ const LandingPage: React.FC = () => {
                   {(['start', 'login'] as JoinMode[]).map((m) => (
                     <TouchableOpacity
                       key={m}
-                      onPress={() => switchTab(m)}
+                      onPress={() => { switchTab(m); setEmailJustVerified(false); }}
                       className="flex-1 py-3 rounded-2xl items-center"
                       style={{ backgroundColor: joinMode === m ? 'white' : 'transparent' }}
                     >
@@ -334,14 +347,42 @@ const LandingPage: React.FC = () => {
                   ))}
                 </View>
 
+                {/* Invite banner */}
+                {invitedCommunityName && (
+                  <View className="bg-teal-50 border border-teal-100 rounded-2xl p-4 mb-4 flex-row items-center gap-3">
+                    <Users size={18} color="#0d3d47" />
+                    <View className="flex-1">
+                      <Text className="text-sm font-black text-[#0d3d47]">
+                        You've been invited to join {invitedCommunityName}
+                      </Text>
+                      <Text className="text-xs text-gray-500 mt-0.5">
+                        Sign in or create an account to continue
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* Email-just-verified success banner */}
+                {emailJustVerified && (
+                  <View className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-4">
+                    <Text className="text-sm font-bold text-green-800 text-center">
+                      ✅ Email verified! Sign in below to get started.
+                    </Text>
+                  </View>
+                )}
+
                 <View className="mb-4 gap-1">
                   <Text className="text-2xl font-black text-[#0d3d47] text-center leading-tight">
-                    {joinMode === 'start' ? 'Create Your Account' : 'Welcome Back'}
+                    {invitedCommunityName && joinMode === 'login'
+                      ? `Join ${invitedCommunityName}`
+                      : joinMode === 'start' ? 'Create Your Account' : 'Welcome Back'}
                   </Text>
                   <Text className="text-sm text-gray-500 text-center">
-                    {joinMode === 'start'
-                      ? 'Start or join a community — set up in minutes'
-                      : 'Sign in to access your communities'}
+                    {invitedCommunityName
+                      ? `Sign in or sign up to join ${invitedCommunityName}`
+                      : joinMode === 'start'
+                        ? 'Start or join a community — set up in minutes'
+                        : 'Sign in to access your communities'}
                   </Text>
                 </View>
 
@@ -372,7 +413,7 @@ const LandingPage: React.FC = () => {
                       onPress={handleVerifyOtp}
                       disabled={isSubmitting || otpCode.length !== 6}
                       className="py-4 rounded-2xl items-center"
-                      style={{ backgroundColor: '#f97316', opacity: isSubmitting || otpCode.length !== 6 ? 0.5 : 1 }}
+                      style={{ backgroundColor: '#fc7127', opacity: isSubmitting || otpCode.length !== 6 ? 0.5 : 1 }}
                     >
                       {isSubmitting
                         ? <ActivityIndicator color="white" size="small" />
@@ -532,7 +573,7 @@ const LandingPage: React.FC = () => {
                       onPress={handleAuthSubmit}
                       disabled={isSubmitting}
                       className="py-4 rounded-2xl items-center"
-                      style={{ backgroundColor: '#f97316', opacity: isSubmitting ? 0.5 : 1 }}
+                      style={{ backgroundColor: '#fc7127', opacity: isSubmitting ? 0.5 : 1 }}
                     >
                       {isSubmitting
                         ? <ActivityIndicator color="white" size="small" />
@@ -558,9 +599,9 @@ const LandingPage: React.FC = () => {
           <View className="bg-[#0d3d47] px-6 py-12">
             <View className="flex-row items-center gap-2 mb-4">
               <Image 
-                source={require('../../../assets/icon.png')} 
-                className="w-8 h-8 rounded-lg"
-                resizeMode="cover"
+                source={require('../../../assets/lalela_logo.png')} 
+                style={{ width: 32, height: 32, borderRadius: 8 }}
+                resizeMode="contain"
               />
               <Text className="text-2xl font-black text-white tracking-tight">lalela</Text>
             </View>
@@ -663,7 +704,7 @@ const LandingPage: React.FC = () => {
                     onPress={handleForgotPassword}
                     disabled={forgotSubmitting || !forgotEmail}
                     className="py-4 rounded-2xl items-center"
-                    style={{ backgroundColor: '#f97316', opacity: forgotSubmitting || !forgotEmail ? 0.5 : 1 }}
+                    style={{ backgroundColor: '#fc7127', opacity: forgotSubmitting || !forgotEmail ? 0.5 : 1 }}
                   >
                     {forgotSubmitting
                       ? <ActivityIndicator color="white" size="small" />

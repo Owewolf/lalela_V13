@@ -41,14 +41,14 @@ const EMPTY_UNREAD: ChatUnreadTotals = {
 
 /** Map raw Prisma/REST response to the client-side Community shape. */
 function mapServerCommunity(raw: any): Community {
+  // Prisma returns camelCase; also accept snake_case fallback for any legacy payloads
+  const lat  = raw.coverageLat  ?? raw.coverage_lat;
+  const lng  = raw.coverageLng  ?? raw.coverage_lng;
+  const rad  = raw.coverageRadius  ?? raw.coverage_radius ?? 1;
+  const loc  = raw.coverageLocation ?? raw.coverage_location ?? '';
   const coverageArea: CoverageArea | undefined =
-    raw.coverage_lat != null && raw.coverage_lng != null
-      ? {
-          latitude: raw.coverage_lat,
-          longitude: raw.coverage_lng,
-          radius: raw.coverage_radius ?? 1,
-          locationName: raw.coverage_location ?? '',
-        }
+    lat != null && lng != null
+      ? { latitude: lat, longitude: lng, radius: rad, locationName: loc }
       : raw.coverageArea;
   return { ...raw, coverageArea };
 }
@@ -255,12 +255,15 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   // ── Context methods ───────────────────────────────────────────────────────
 
   const setCurrentCommunity = useCallback(async (id: string) => {
-    await api.put('/users/me', { lastCommunityId: id });
+    // Update local auth state immediately so the UI reacts without waiting for the server
+    await updateUserProfile({ lastCommunityId: id } as any);
+    // Persist to server in background
+    api.put('/users/me', { lastCommunityId: id }).catch(console.error);
     if (socketRef.current) {
       if (currentCommunityId) socketRef.current.emit('leave:community', { communityId: currentCommunityId });
       socketRef.current.emit('join:community', { communityId: id });
     }
-  }, [currentCommunityId]);
+  }, [currentCommunityId, updateUserProfile]);
 
   const createCommunity = useCallback(async (name: string): Promise<string> => {
     const { data } = await api.post('/communities', { name });
@@ -279,7 +282,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [updateUserProfile]);
 
   const updateCommunityCoverage = useCallback(async (communityId: string, coverage: CoverageArea) => {
-    await api.put(`/communities/${communityId}`, { coverageArea: coverage });
+    await api.put(`/communities/${communityId}`, {
+      coverageLat: coverage.latitude,
+      coverageLng: coverage.longitude,
+      coverageRadius: coverage.radius,
+      coverageLocation: coverage.locationName,
+    });
     setCommunities((prev) => prev.map((c) => c.id === communityId ? { ...c, coverageArea: coverage } : c));
   }, []);
 
@@ -360,14 +368,20 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const approveCharitySuggestion = useCallback(async (suggestionId: string, feedback: string, charityData: Omit<Charity, 'id' | 'createdAt'>) => {
     if (!currentCommunityId) return;
+    // Create the charity
     const { data: charity } = await api.post(`/communities/${currentCommunityId}/charities`, charityData);
     setCharities((prev) => [...prev, charity]);
-    setCharitySuggestions((prev) => prev.map((s) => s.id === suggestionId ? { ...s, status: 'approved', feedback } : s));
+    // Mark suggestion as approved in the backend
+    await api.patch(`/communities/${currentCommunityId}/charity-suggestions/${suggestionId}/approve`, { feedback });
+    setCharitySuggestions((prev) => prev.map((s) => s.id === suggestionId ? { ...s, status: 'approved', adminFeedback: feedback } : s));
   }, [currentCommunityId]);
 
   const rejectCharitySuggestion = useCallback(async (suggestionId: string, feedback: string) => {
-    setCharitySuggestions((prev) => prev.map((s) => s.id === suggestionId ? { ...s, status: 'rejected', feedback } : s));
-  }, []);
+    if (!currentCommunityId) return;
+    // Mark suggestion as rejected in the backend
+    await api.patch(`/communities/${currentCommunityId}/charity-suggestions/${suggestionId}/reject`, { feedback });
+    setCharitySuggestions((prev) => prev.map((s) => s.id === suggestionId ? { ...s, status: 'rejected', adminFeedback: feedback } : s));
+  }, [currentCommunityId]);
 
   // ── Posts ─────────────────────────────────────────────────────────────────
   const addPost = useCallback(async (post: Omit<CommunityNotice, 'id' | 'timestamp'>): Promise<string | null> => {
@@ -504,19 +518,27 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   // ── Invite links ──────────────────────────────────────────────────────────
   const generateInviteLink = useCallback(async (): Promise<string> => {
     if (!currentCommunityId) throw new Error('No current community');
-    const { data } = await api.post(`/communities/${currentCommunityId}/invite-links`, { role: 'Member' });
+    const { data } = await api.post(`/communities/${currentCommunityId}/invite-links`, { role: 'MEMBER' });
     setActiveCommunityLink(data);
     return data.code;
   }, [currentCommunityId]);
 
   const joinViaInviteLink = useCallback(async (linkCode: string): Promise<string> => {
     const { data } = await api.post(`/communities/join/${linkCode}`);
-    setCommunities((prev) => prev.find((c) => c.id === data.communityId) ? prev : [...prev, mapServerCommunity(data.community)]);
+    // Reload the joined community from the server so the list is always fresh
+    const { data: communityData } = await api.get(`/communities/${data.communityId}`);
+    setCommunities((prev) =>
+      prev.find((c) => c.id === data.communityId)
+        ? prev.map((c) => (c.id === data.communityId ? mapServerCommunity(communityData) : c))
+        : [...prev, mapServerCommunity(communityData)]
+    );
+    // Select the joined community immediately
+    await updateUserProfile({ lastCommunityId: data.communityId } as any);
     return data.communityId;
-  }, []);
+  }, [updateUserProfile]);
 
   // ── Invitations ───────────────────────────────────────────────────────────
-  const inviteMember = useCallback(async (toUserId: string, role: 'Member' | 'Moderator') => {
+  const inviteMember = useCallback(async (toUserId: string, role: 'MEMBER' | 'MODERATOR') => {
     if (!currentCommunityId) return;
     const { data } = await api.put(`/communities/${currentCommunityId}/members/${toUserId}`, { role, status: 'INVITED' });
     setCommunityInvitations((prev) => [...prev, data]);

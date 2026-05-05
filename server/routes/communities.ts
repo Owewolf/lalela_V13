@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { v4 as uuidv4 } from 'uuid'; // still used for invite link codes
+import { v4 as uuidv4 } from 'uuid';
 import prisma from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { sendInviteEmail } from '../services/emailService.js';
@@ -65,12 +65,11 @@ router.post('/', async (req, res) => {
       },
     });
 
-    // Fetch creator once — used for both member record and trial logic
+    // Add creator as Admin member — populate cached display fields immediately
     const creator = await prisma.user.findUnique({
       where: { id: req.auth!.userId },
-      select: { name: true, profileImage: true, email: true, trialExpiresAt: true, licenseStatus: true },
+      select: { name: true, profileImage: true, email: true },
     });
-
     await prisma.communityMember.create({
       data: {
         communityId: community.id,
@@ -82,27 +81,25 @@ router.post('/', async (req, res) => {
       },
     });
 
-    // 30-day community trial; creator gets a 1-year platform trial
-    const communityTrialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    const userTrialEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-    const userUpdate: Record<string, unknown> = { communityCreated: true };
-    if (!creator?.trialExpiresAt) {
-      userUpdate.trialExpiresAt = userTrialEnd;
-      userUpdate.licenseStatus = 'TRIAL';
-    }
-
+    // 30-day trial
+    const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     await prisma.$transaction([
       prisma.community.update({
         where: { id: community.id },
-        data: { trialExpiresAt: communityTrialEnd, type: 'TRIAL', isPaid: false },
+        data: { trialExpiresAt: trialEnd, type: 'TRIAL' },
       }),
       prisma.user.update({
         where: { id: req.auth!.userId },
-        data: userUpdate,
+        data: { communityCreated: true, trialExpiresAt: trialEnd, licenseStatus: 'TRIAL' },
       }),
     ]);
 
-    return res.status(201).json({ ...community, trialExpiresAt: communityTrialEnd, type: 'TRIAL', isPaid: false });
+    return res.status(201).json({
+      ...community,
+      trialExpiresAt: trialEnd,
+      trialEndDate: trialEnd,
+      type: 'TRIAL',
+    });
   } catch (err: any) {
     console.error('[POST /communities] error:', err);
     return res.status(500).json({ error: err?.message ?? 'Failed to create community' });
@@ -122,19 +119,8 @@ router.post('/:id/license', async (req, res) => {
     return res.status(403).json({ error: 'Only community admins can license a community' });
   }
 
-  // R999 once-off — community is permanently ACTIVE (no expiry date)
+  const licenseExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
   const activatedAt = new Date();
-  // Creator also gets a fresh 1-year platform trial if they don't yet have one
-  const userTrialEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-  const owner = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { trialExpiresAt: true },
-  });
-  const userUpdate: Record<string, unknown> = {};
-  if (!owner?.trialExpiresAt) {
-    userUpdate.trialExpiresAt = userTrialEnd;
-    userUpdate.licenseStatus = 'TRIAL';
-  }
 
   const [community] = await prisma.$transaction([
     prisma.community.update({
@@ -143,7 +129,11 @@ router.post('/:id/license', async (req, res) => {
     }),
     prisma.user.update({
       where: { id: userId },
-      data: userUpdate,
+      data: {
+        licenseStatus: 'ACTIVE',
+        subscriptionActive: true,
+        subscriptionRenewalDate: licenseExpiry,
+      },
     }),
   ]);
 
@@ -261,7 +251,7 @@ router.post('/join/:code', async (req, res) => {
 
   const joiner = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
-    select: { name: true, profileImage: true, email: true },
+    select: { name: true, profileImage: true, email: true, licenseStatus: true },
   });
 
   await prisma.$transaction([
@@ -280,6 +270,17 @@ router.post('/join/:code', async (req, res) => {
       data: { uses: { increment: 1 } },
     }),
   ]);
+
+  // Grant the joining user a 1-year trial if they don't already have a license
+  if (!joiner?.licenseStatus || joiner.licenseStatus === 'NONE') {
+    await prisma.user.update({
+      where: { id: req.auth!.userId },
+      data: {
+        licenseStatus: 'TRIAL',
+        trialExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      },
+    });
+  }
 
   return res.json({ message: 'Joined community successfully', communityId: link.communityId });
 });
