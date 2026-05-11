@@ -1,15 +1,16 @@
 /**
- * AuthContext — JWT-based auth replacing Firebase Auth + Firestore user profile.
+ * AuthContext — JWT-based auth and cached user profile state.
  *
  * Storage keys in AsyncStorage:
- *   access_token   — short-lived JWT (15 min)
- *   refresh_token  — long-lived JWT (30 days, rotated on use)
- *   user_profile   — JSON-serialised UserProfile (offline cache)
+ *   accessToken   — short-lived JWT (15 min)
+ *   refreshToken  — long-lived JWT (30 days, rotated on use)
+ *   userProfile   — JSON-serialised UserProfile (offline cache)
  */
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../lib/api';
 import { disconnectSocket, updateSocketAuth } from '../lib/socket';
+import { migrateAsyncStorageKeys } from '../lib/migrateStorage';
 import { UserProfile } from '../types';
 
 // ─── Context shape ─────────────────────────────────────────────────────────────
@@ -53,15 +54,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 async function storeTokens(accessToken: string, refreshToken: string) {
   await AsyncStorage.multiSet([
-    ['access_token', accessToken],
-    ['refresh_token', refreshToken],
+    ['accessToken', accessToken],
+    ['refreshToken', refreshToken],
   ]);
   // Keep socket auth fresh after token refresh
   updateSocketAuth(accessToken);
 }
 
 async function clearTokens() {
-  await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user_profile']);
+  await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'userProfile']);
   disconnectSocket();
 }
 
@@ -76,9 +77,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     (async () => {
       try {
+        await migrateAsyncStorageKeys();
         const [accessToken, cached] = await AsyncStorage.multiGet([
-          'access_token',
-          'user_profile',
+          'accessToken',
+          'userProfile',
         ]);
 
         if (accessToken[1]) {
@@ -90,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           try {
             const { data } = await api.get<UserProfile>('/users/me');
             setUserProfile(data);
-            await AsyncStorage.setItem('user_profile', JSON.stringify(data));
+            await AsyncStorage.setItem('userProfile', JSON.stringify(data));
           } catch {
             // 401 → interceptor will attempt refresh; if that fails it clears tokens
             // and a subsequent render will see null userProfile → AppGuard routes to /landing
@@ -111,13 +113,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data } = await api.post('/auth/login', { email, password });
     await storeTokens(data.accessToken, data.refreshToken);
     setUserProfile(data.user);
-    await AsyncStorage.setItem('user_profile', JSON.stringify(data.user));
+    await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
   }, []);
 
-  // ── Sign out ──────────────────────────────────────────────────────────────
+  // ── Sign out ──────────────────────────────────────────────
   const signOut = useCallback(async () => {
     try {
-      const refreshToken = await AsyncStorage.getItem('refresh_token');
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
       if (refreshToken) await api.post('/auth/logout', { refreshToken });
     } catch {
       // Ignore network errors on logout
@@ -147,7 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUserProfile = useCallback(async (data: Partial<UserProfile>) => {
     const { data: updated } = await api.put<UserProfile>('/users/me', data);
     setUserProfile(updated);
-    await AsyncStorage.setItem('user_profile', JSON.stringify(updated));
+    await AsyncStorage.setItem('userProfile', JSON.stringify(updated));
   }, []);
 
   // ── Forgot / reset password ───────────────────────────────────────────────
@@ -176,7 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (data.accessToken) {
       await storeTokens(data.accessToken, data.refreshToken);
       setUserProfile(data.user);
-      await AsyncStorage.setItem('user_profile', JSON.stringify(data.user));
+      await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
     }
   }, []);
 
@@ -217,26 +219,3 @@ export const useAuth = () => {
   return ctx;
 };
 
-/**
- * @deprecated Use useAuth() instead.
- * Kept as a thin alias for gradual migration of old useFirebase() call-sites.
- */
-export const useFirebase = () => {
-  const ctx = useAuth();
-  // Map new fields to old FirebaseContext shape so existing components don't break yet
-  return {
-    ...ctx,
-    user: ctx.userProfile
-      ? { uid: ctx.userProfile.id, email: ctx.userProfile.email }
-      : null,
-    // Phone auth legacy stubs (no-ops — migrate call sites to sendPhoneOtp/verifyPhoneOtp)
-    confirmationResult: null,
-    setupRecaptcha: (_: string) => {},
-    signInWithPhone: async (phone: string) => ctx.sendPhoneOtp(phone),
-    verifySmsCode: async (code: string) => {
-      if (!ctx.userProfile?.phone) throw new Error('No phone linked');
-      return ctx.verifyPhoneOtp(ctx.userProfile.phone, code);
-    },
-    clearPhoneAuth: () => {},
-  };
-};

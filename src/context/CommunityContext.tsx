@@ -1,5 +1,5 @@
 /**
- * CommunityContext — REST + Socket.io replacing all Firestore onSnapshot.
+ * CommunityContext — REST + Socket.io community state.
  *
  * Data flow:
  *   Initial load  → REST GET via src/lib/api.ts (axios + JWT)

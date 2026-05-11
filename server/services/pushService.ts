@@ -10,7 +10,7 @@
  *   APNS_PRODUCTION     "true" for production APNs, "false" for sandbox (default: false)
  *
  *   GOOGLE_SA_PATH      Path to Google service account JSON (FCM-only scope)
- *   FCM_PROJECT_ID      Firebase project ID (lalela-2e9d5)
+ *   FCM_PROJECT_ID      Google Cloud messaging project ID (lalela-2e9d5)
  */
 
 import fs from 'fs';

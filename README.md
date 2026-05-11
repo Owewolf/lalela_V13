@@ -43,7 +43,7 @@ Lalela replaces the fragmented tools most neighbourhoods rely on — group chats
 - 🚨 Emergency hub — incident map, live location sharing, responder coordination
 - 📞 WebRTC voice & video calls — peer-to-peer with Coturn TURN fallback
 - 🏘️ Multi-community — one app, multiple neighbourhoods, roles per community
-- 🔔 Push notifications — APNs (iOS) + FCM (Android) via service account (no Firebase SDK)
+- 🔔 Push notifications — APNs (iOS) + Android push (HTTP v1) via Google service account
 - 🛡️ Admin dashboard — member management, moderation, community settings
 
 ---
@@ -97,8 +97,8 @@ Lalela replaces the fragmented tools most neighbourhoods rely on — group chats
 | Let's Encrypt / Certbot | Automated TLS certificates |
 | Coturn | TURN server for WebRTC NAT traversal |
 | EAS (Expo Application Services) | Cloud builds for Android (APK/AAB) and iOS (IPA) |
-| FCM (REST v1 API) | Android push — via Google service account JSON (no Firebase SDK) |
-| APNs | iOS push — via .p8 key (no Firebase SDK) |
+| Android push (HTTP v1 API) | Android push — via Google service account JSON |
+| APNs | iOS push — via .p8 key |
 | Fedora 42 VPS | Production hosting OS |
 
 ### Domain Layout
@@ -109,6 +109,37 @@ Lalela replaces the fragmented tools most neighbourhoods rely on — group chats
 | `lalela.net/api/*` | Express REST API |
 | `lalela.net/socket.io/*` | Socket.io WebSocket |
 | `storage.lalela.net` | MinIO object storage (public reads) |
+
+---
+
+## Security
+
+Lalela is no longer backed by a managed BaaS. The repository reflects a self-hosted architecture built around JWT auth, PostgreSQL, object storage, and direct push delivery. That changes the security model: infrastructure, secrets, and access control now live inside this codebase and deployment process.
+
+**Current security posture:**
+
+- JWT-based access and refresh tokens with server-side session rotation
+- Prisma-backed PostgreSQL access instead of client-side database rules
+- Direct APNs and Android push delivery using provider credentials stored outside the app bundle
+- Object uploads routed through the API instead of exposing raw write credentials to clients
+- Socket authentication tied to the same bearer token lifecycle as REST
+
+**Operational best practices for this app:**
+
+- Keep all signing keys, JWT secrets, SMTP credentials, APNs keys, and Google service-account files outside git and outside `public_html`
+- Restrict CORS and deployment origins to known frontend domains in production
+- Rotate refresh tokens on use and revoke sessions on sign-out or account deletion
+- Gate write routes on authenticated server-side authorization checks rather than trusting client state
+- Serve the frontend, API, storage, and WebSocket endpoints over TLS only
+- Run dependency audits and type checks before deployment, and keep Prisma migrations in sync with production
+- Treat uploaded media as untrusted input: validate type, size, and ownership before persisting or serving it
+- Limit who can access server logs, PM2, tunnel credentials, database backups, and object-storage admin credentials
+
+**Repository hygiene:**
+
+- No committed cloud-function packages or legacy BaaS service-account files
+- No checked-in agent skill packs that describe a different platform stack than the running application
+- Documentation aligned to the current Express, Socket.io, PostgreSQL, MinIO, and native push architecture
 
 ---
 

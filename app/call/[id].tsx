@@ -9,7 +9,7 @@ import { useCall } from '../../src/context/CallContext';
  *
  * Route params:
  *   id            — conversationId (used as the route segment)
- *   remoteUserId  — Firebase userId of the remote party
+ *   remoteUserId  — app user id of the remote party
  *   remoteName    — Display name shown in the call UI
  *   remoteAvatar  — (optional) profile image URL
  *   callType      — 'audio' | 'video'
