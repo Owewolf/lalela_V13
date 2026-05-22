@@ -34,11 +34,11 @@ export async function uploadImage(
 async function uploadImageNative(uri: string, folder: UploadFolder): Promise<string> {
   // Peek at the file size without loading the bytes into memory.
   try {
-    const info = await FileSystem.getInfoAsync(uri, { size: true });
+    const info = await FileSystem.getInfoAsync(uri);
     if (!info.exists) {
       throw new Error('Image file not found on device');
     }
-    if (typeof info.size === 'number') {
+    if (typeof (info as any).size === 'number') {
       if (info.size === 0) throw new Error('Image is empty');
       if (info.size > MAX_SIZE) throw new Error('Image must be smaller than 10MB');
     }
