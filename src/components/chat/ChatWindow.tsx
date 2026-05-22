@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useMemo } from 'react';
-import { View, Text, FlatList, Animated } from 'react-native';
+import { View, Text, FlatList, Animated, Platform } from 'react-native';
 import { Message, Conversation } from '../../types';
 import { MessageBubble } from './MessageBubble';
 
@@ -59,8 +59,8 @@ function TypingIndicator() {
       Animated.loop(
         Animated.sequence([
           Animated.delay(delay),
-          Animated.timing(dot, { toValue: 1.4, duration: 300, useNativeDriver: true }),
-          Animated.timing(dot, { toValue: 1, duration: 300, useNativeDriver: true }),
+          Animated.timing(dot, { toValue: 1.4, duration: 300, useNativeDriver: Platform.OS !== 'web' }),
+          Animated.timing(dot, { toValue: 1, duration: 300, useNativeDriver: Platform.OS !== 'web' }),
         ])
       ).start();
 

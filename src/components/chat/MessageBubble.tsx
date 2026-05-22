@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, Linking, Platform } from 'react-na
 import { Check, CheckCheck } from 'lucide-react-native';
 import { Conversation, Message } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { resolveMediaUrl } from '../../lib/config';
 
 interface MessageBubbleProps {
   message: Message;
@@ -133,11 +134,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             {message.messageType === 'image' && message.attachmentUrl ? (
               <>
                 <TouchableOpacity
-                  onPress={() => message.attachmentUrl && Linking.openURL(message.attachmentUrl)}
+                  onPress={() => {
+                    const u = resolveMediaUrl(message.attachmentUrl);
+                    if (u) Linking.openURL(u);
+                  }}
                   activeOpacity={0.85}
                 >
                   <Image
-                    source={{ uri: message.attachmentUrl }}
+                    source={{ uri: resolveMediaUrl(message.attachmentUrl) }}
                     className="w-60 h-44"
                     resizeMode="cover"
                   />

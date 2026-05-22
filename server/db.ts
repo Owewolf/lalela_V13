@@ -49,7 +49,7 @@ export async function getPublicCommunities() {
         latitude: c.coverageLat,
         longitude: c.coverageLng,
         radius: c.coverageRadius,
-        location_name: c.coverageLocation,
+        locationName: c.coverageLocation,
       },
       memberCount: c._count.members,
       listingCount: c._count.posts,

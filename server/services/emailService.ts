@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { baseEmailHtml, ctaButton, divider, infoRow } from './emailTemplates.js';
+import { getApiBaseUrl, getAppBaseUrl } from '../lib/urls.js';
 
 function createTransport() {
   const host = process.env.SMTP_HOST || 'mail.lalela.net';
@@ -11,9 +12,25 @@ function createTransport() {
   return nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
 }
 
-const FROM = () => `Lalela <${process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@lalela.net'}>`;
-const BASE_URL = () => process.env.API_BASE_URL || 'https://lalela.net/api';
-const APP_URL = () => process.env.APP_BASE_URL || 'https://lalela.net';
+function fromAddress() {
+  const configured = process.env.SMTP_FROM?.trim();
+  if (configured) {
+    const match = configured.match(/<([^>]+)>/);
+    return {
+      name: 'Lalela',
+      address: (match?.[1] ?? configured).trim(),
+    };
+  }
+
+  return {
+    name: 'Lalela',
+    address: process.env.SMTP_USER || 'admin@lalela.net',
+  };
+}
+
+const FROM = () => fromAddress();
+const BASE_URL = () => getApiBaseUrl();
+const APP_URL = () => getAppBaseUrl();
 
 function fmt(cents: number): string {
   return `R${(cents / 100).toFixed(2)}`;
@@ -26,10 +43,10 @@ export async function sendVerificationEmail(to: string, name: string, token: str
   const t = createTransport();
   await t.sendMail({
     from: FROM(), to,
-    subject: 'Verify your Lalela account',
+    subject: 'Verify your lalela account',
     text: `Hi ${name},\n\nVerify your email:\n${link}\n\nExpires in 24 hours.`,
     html: baseEmailHtml(`
-      <h2 style="color:#0d3d47;margin-top:0">Welcome to Lalela, ${name}!</h2>
+      <h2 style="color:#0d3d47;margin-top:0">Welcome to lalela, ${name}!</h2>
       <p>Click below to verify your email address and activate your account.</p>
       ${ctaButton('Verify Email', link, '#0d3d47')}
       <p style="color:#737971;font-size:12px;margin-top:24px">Link expires in 24 hours. If you didn't sign up, ignore this email.</p>
@@ -44,14 +61,14 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
   const t = createTransport();
   await t.sendMail({
     from: FROM(), to,
-    subject: 'Reset your Lalela password',
+    subject: 'Reset your lalela password',
     text: `Hi ${name},\n\nReset your password:\n${link}\n\nExpires in 1 hour.`,
     html: baseEmailHtml(`
       <h2 style="color:#0d3d47;margin-top:0">Password Reset</h2>
-      <p>Hi ${name}, we received a request to reset your Lalela password.</p>
+      <p>Hi ${name}, we received a request to reset your lalela password.</p>
       ${ctaButton('Reset Password', link, '#fc7127')}
       <p style="color:#737971;font-size:12px;margin-top:24px">Link expires in 1 hour. If you didn't request this, ignore this email.</p>
-    `, 'Reset your Lalela password.'),
+    `, 'Reset your lalela password.'),
   });
 }
 
@@ -66,7 +83,7 @@ export async function sendInviteEmail(
   const t = createTransport();
   await t.sendMail({
     from: FROM(), to,
-    subject: `${senderName} invited you to join ${communityName} on Lalela`,
+    subject: `${senderName} invited you to join ${communityName} on lalela`,
     text: `${senderName} invited you to join ${communityName}.\nJoin: ${inviteUrl}`,
     html: baseEmailHtml(`
       <h2 style="color:#0d3d47;margin-top:0">You're invited!</h2>
@@ -90,11 +107,11 @@ export async function sendCommunityCreatedEmail(
   const t = createTransport();
   await t.sendMail({
     from: FROM(), to,
-    subject: `Your community "${communityName}" is live on Lalela!`,
+    subject: `Your community "${communityName}" is live on lalela!`,
     text: `Hi ${name},\n\n"${communityName}" is live! 30-day trial ends ${expiry}.\nActivate permanently: ${activateUrl}`,
     html: baseEmailHtml(`
       <h2 style="color:#0d3d47;margin-top:0">Your community is live!</h2>
-      <p>Hi ${name}, <strong>${communityName}</strong> has been created on Lalela. Your <strong>30-day free trial</strong> has started.</p>
+      <p>Hi ${name}, <strong>${communityName}</strong> has been created on lalela. Your <strong>30-day free trial</strong> has started.</p>
       ${divider()}
       <table cellpadding="0" cellspacing="0" style="width:100%">
         ${infoRow('Community', communityName)}
@@ -121,11 +138,11 @@ export async function sendMemberJoinedEmail(
   const t = createTransport();
   await t.sendMail({
     from: FROM(), to,
-    subject: `Welcome to ${communityName} on Lalela!`,
+    subject: `Welcome to ${communityName} on lalela!`,
     text: `Hi ${name},\n\nWelcome to ${communityName}! Your free membership year runs until ${expiry}.`,
     html: baseEmailHtml(`
       <h2 style="color:#0d3d47;margin-top:0">Welcome to ${communityName}!</h2>
-      <p>Hi ${name}, you've successfully joined <strong>${communityName}</strong> on Lalela. You have a <strong>1-year free membership</strong>.</p>
+      <p>Hi ${name}, you've successfully joined <strong>${communityName}</strong> on lalela. You have a <strong>1-year free membership</strong>.</p>
       ${divider()}
       <table cellpadding="0" cellspacing="0" style="width:100%">
         ${infoRow('Community', communityName)}
@@ -242,11 +259,11 @@ export async function sendRenewalReminderEmail(opts: {
   const t = createTransport();
   await t.sendMail({
     from: FROM(), to,
-    subject: `Your Lalela subscription renews in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`,
-    text: `Hi ${name},\n\nYour Lalela subscription (${fmt(amount)}/year) renews on ${renewal}.\nManage: ${manageUrl}`,
+    subject: `Your lalela subscription renews in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`,
+    text: `Hi ${name},\n\nYour lalela subscription (${fmt(amount)}/year) renews on ${renewal}.\nManage: ${manageUrl}`,
     html: baseEmailHtml(`
       <h2 style="color:#0d3d47;margin-top:0">Renewal Reminder</h2>
-      <p>Hi ${name}, your Lalela membership renews in <strong>${daysLeft} day${daysLeft === 1 ? '' : 's'}</strong>.</p>
+      <p>Hi ${name}, your lalela membership renews in <strong>${daysLeft} day${daysLeft === 1 ? '' : 's'}</strong>.</p>
       ${divider()}
       <table cellpadding="0" cellspacing="0" style="width:100%">
         ${infoRow('Renewal date', renewal)}
@@ -282,7 +299,7 @@ export async function sendFailedPaymentEmail(opts: {
       ${divider()}
       ${ctaButton('Retry Payment', retryUrl, '#ba1a1a')}
       <p style="color:#737971;font-size:12px;margin-top:16px;text-align:center">
-        Need help? <a href="mailto:support@lalela.net" style="color:#0d3d47">support@lalela.net</a>
+        Need help? <a href="mailto:admin@lalela.net" style="color:#0d3d47">admin@lalela.net</a>
       </p>
     `, 'Your payment failed — please retry.'),
   });

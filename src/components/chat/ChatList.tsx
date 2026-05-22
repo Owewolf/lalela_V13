@@ -40,7 +40,7 @@ export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, act
   }
 
   const renderItem = ({ item: conv }: { item: Conversation }) => {
-    const unreadCount = conv.unreadCount[userProfile?.id || ''] || 0;
+    const unreadCount = conv.unreadCount || 0;
     const isEmergency = conv.type === 'emergency';
     const isListing = conv.type === 'listing';
     const isNotice = conv.type === 'notice';

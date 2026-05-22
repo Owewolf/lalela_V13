@@ -1,7 +1,7 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useRef } from 'react';
 import { GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from 'react-native-google-places-autocomplete';
-import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Circle } from 'react-native-maps';
 import Slider from '@react-native-community/slider';
 import {
   View,
@@ -36,6 +36,7 @@ import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { GOOGLE_PLACES_API_KEY, BUSINESS_CATEGORIES } from '../../constants';
+import { defaultMapViewProps } from '../../lib/mapViewProps';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -93,12 +94,14 @@ const OnboardingCreate: React.FC = () => {
   const user = userProfile ? { uid: userProfile.id, email: userProfile.email, displayName: userProfile.name, photoURL: userProfile.profileImage ?? null } : null;
   const router = useRouter();
 
-  const [step, setStep] = useState<OnboardingStep>('profile');
+  const [step, setStep] = useState<OnboardingStep>(
+    // If profile is already completed, jump straight to community creation steps.
+    // This avoids a flash of the profile step for existing users.
+    userProfile?.profileCompleted ? 'name' : 'profile'
+  );
 
-  // On mount only: if the user already has profileCompleted (e.g. re-entering onboarding),
-  // skip straight to the community name step.
-  // A ref prevents this from re-firing when profileCompleted is set inside handleSubmit.
-  const movedPastProfile = useRef(false);
+  // Keep step in sync if userProfile loads asynchronously after initial render.
+  const movedPastProfile = useRef(userProfile?.profileCompleted === true);
   useEffect(() => {
     if (userProfile?.profileCompleted && !movedPastProfile.current) {
       movedPastProfile.current = true;
@@ -112,14 +115,11 @@ const OnboardingCreate: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [locationName, setLocationName] = useState('');
-  const [locationLat, setLocationLat] = useState(0);
-  const [locationLng, setLocationLng] = useState(0);
-  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
-  const placesRef = useRef<GooglePlacesAutocompleteRef | null>(null);
 
   // Community fields
   const [communityName, setCommunityName] = useState('');
+  const [draftCommunityId, setDraftCommunityId] = useState<string | null>(null);
+  const [isSavingCommunity, setIsSavingCommunity] = useState(false);
 
   // Step 2 — Coverage
   const [coverageName, setCoverageName] = useState('');
@@ -127,6 +127,7 @@ const OnboardingCreate: React.FC = () => {
   const [coverageLng, setCoverageLng] = useState(0);
   const [coverageRadius, setCoverageRadius] = useState(5);
   const [mapDragging, setMapDragging] = useState(false);
+  const [isFetchingCoverageLocation, setIsFetchingCoverageLocation] = useState(false);
   const coveragePlacesRef = useRef<GooglePlacesAutocompleteRef | null>(null);
 
   // Step 3 — Categories (all enabled by default)
@@ -159,7 +160,87 @@ const OnboardingCreate: React.FC = () => {
   // True when the user already has a completed profile (coming from inside the app)
   const isExistingUser = userProfile?.profileCompleted === true;
 
-  const isProfileValid = fullName.trim().length > 0 && locationName.trim().length > 0 && locationLat !== 0;
+  const isProfileValid = fullName.trim().length > 0;
+
+  const handleCoverageCurrentLocation = async () => {
+    try {
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+      if (!servicesEnabled) {
+        Alert.alert('Location Services Off', 'Please enable location services and try again.');
+        return;
+      }
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please grant location permission to set your coverage area from the device location.');
+        return;
+      }
+
+      setIsFetchingCoverageLocation(true);
+      const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const { latitude, longitude } = position.coords;
+      setCoverageLat(latitude);
+      setCoverageLng(longitude);
+
+      const [place] = await Location.reverseGeocodeAsync({ latitude, longitude });
+      const parts = place
+        ? [place.streetNumber, place.street, place.district || place.subregion, place.city, place.region, place.country].filter(Boolean)
+        : [];
+      const resolvedName = parts.length > 0 ? parts.join(', ') : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      setCoverageName(resolvedName);
+      coveragePlacesRef.current?.setAddressText(resolvedName);
+    } catch {
+      setError('Failed to get your current location for coverage.');
+    } finally {
+      setIsFetchingCoverageLocation(false);
+    }
+  };
+
+  const saveCommunityDraft = async () => {
+    if (!communityName.trim()) return null;
+
+    setIsSavingCommunity(true);
+    setError(null);
+
+    try {
+      if (draftCommunityId) {
+        await api.put(`/communities/${draftCommunityId}`, {
+          name: communityName.trim(),
+        });
+        return draftCommunityId;
+      }
+
+      const { data } = await api.post('/communities', {
+        name: communityName.trim(),
+        enabledCategories: selectedCategories,
+      });
+
+      const nextCommunityId = data?.id ?? data?.community_id ?? null;
+      if (nextCommunityId) {
+        setDraftCommunityId(nextCommunityId);
+      }
+      return nextCommunityId;
+    } catch (err: any) {
+      if (err?.response?.data?.error === 'TRIAL_EXISTS') {
+        const existingCommunityId = err.response.data.communityId ?? err.response.data.community_id ?? null;
+        if (isExistingUser) {
+          setTrialBlocked(true);
+          return null;
+        }
+        if (existingCommunityId) {
+          setDraftCommunityId(existingCommunityId);
+          await api.put(`/communities/${existingCommunityId}`, {
+            name: communityName.trim(),
+          });
+          return existingCommunityId;
+        }
+      }
+
+      throw err;
+    } finally {
+      setIsSavingCommunity(false);
+    }
+  };
 
   const handleDiscover = async () => {
     const categoryTypes = selectedCategories.flatMap(id =>
@@ -230,9 +311,6 @@ const OnboardingCreate: React.FC = () => {
       if (!phone && (userProfile.mobileNumber || userProfile.phone))
         setPhone(userProfile.mobileNumber || userProfile.phone || '');
       if (!profileImage && userProfile.profileImage) setProfileImage(userProfile.profileImage);
-      if (!locationName && userProfile.address) setLocationName(userProfile.address);
-      if (locationLat === 0 && userProfile.defaultLocation?.latitude) setLocationLat(userProfile.defaultLocation.latitude);
-      if (locationLng === 0 && userProfile.defaultLocation?.longitude) setLocationLng(userProfile.defaultLocation.longitude);
     } else if (user) {
       if (!fullName && user.displayName) { setFullName(user.displayName); setCommunityName(`${user.displayName}'s Community`); }
       if (!email && user.email) setEmail(user.email);
@@ -247,7 +325,7 @@ const OnboardingCreate: React.FC = () => {
         Alert.alert('Permission Required', 'Please grant photo library access to upload a profile photo.');
         return;
       }
-      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.8 });
+      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.8 });
       if (!result.canceled && result.assets.length > 0) {
         setIsUploading(true);
         try {
@@ -264,84 +342,43 @@ const OnboardingCreate: React.FC = () => {
     }
   };
 
-  const handleGetCurrentLocation = async () => {
-    try {
-      const servicesEnabled = await Location.hasServicesEnabledAsync();
-      if (!servicesEnabled) {
-        Alert.alert('Location Services Off', 'Please go to Settings → Location and enable Location Services, then try again.');
-        return;
-      }
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Please grant location permission for this app in Settings, then try again.');
-        return;
-      }
-      setIsFetchingLocation(true);
-      const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const { latitude, longitude } = position.coords;
-      setLocationLat(latitude);
-      setLocationLng(longitude);
-      const [place] = await Location.reverseGeocodeAsync({ latitude, longitude });
-      if (place) {
-        const parts = [place.streetNumber, place.street, place.district || place.subregion, place.city, place.region, place.country].filter(Boolean);
-        const addr = parts.join(', ');
-        setLocationName(addr);
-        placesRef.current?.setAddressText(addr);
-      } else {
-        const coords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-        setLocationName(coords);
-        placesRef.current?.setAddressText(coords);
-      }
-    } catch {
-      setError('Failed to get current location. Please type your address manually.');
-    } finally {
-      setIsFetchingLocation(false);
-    }
-  };
-
   // Called from the final "Create & Launch" button after all 5 steps.
   const handleSubmit = async () => {
     if (!communityName.trim()) return;
     setIsSubmitting(true);
     setError(null);
     try {
-      // Validate location BEFORE any API call so we never orphan a community.
+      // Validate coverage BEFORE any API call so we never orphan a profile or community.
       if (!isExistingUser) {
-        if (!locationLat || !locationLng || !locationName.trim()) {
-          setError('Please set your location in the profile step before creating a community.');
-          setStep('profile');
+        if (!coverageLat || !coverageLng || !coverageName.trim()) {
+          setError('Please set your community coverage area before creating a community.');
+          setStep('coverage');
           setIsSubmitting(false);
           setShowConfirmation(false);
           return;
         }
       }
 
-      // 1. Create community — or recover the existing trial on a retry after partial failure.
-      let communityId: string | undefined;
-      try {
-        const { data: community } = await api.post('/communities', {
-          name: communityName.trim(),
-          coverageLat: coverageLat || undefined,
-          coverageLng: coverageLng || undefined,
-          coverageRadius: coverageRadius,
-          coverageLocation: coverageName || undefined,
-          enabledCategories: selectedCategories,
-        });
-        communityId = community?.id;
-      } catch (err: any) {
-        if (err?.response?.data?.error === 'TRIAL_EXISTS') {
-          if (isExistingUser) {
-            // Fully-onboarded user trying to create a second community → block.
-            setTrialBlocked(true);
-            return;
-          }
-          // New user whose community was created on a previous attempt but whose
-          // profile update failed (partial failure recovery). Use the existing community.
-          communityId = err.response.data.communityId;
-        } else {
-          throw err;
-        }
+      // 1. Ensure the draft community exists, then update it with the collected onboarding data.
+      let communityId = draftCommunityId;
+      if (!communityId) {
+        communityId = await saveCommunityDraft();
       }
+      if (!communityId) {
+        setIsSubmitting(false);
+        setShowConfirmation(false);
+        return;
+      }
+
+      await api.put(`/communities/${communityId}`, {
+        name: communityName.trim(),
+        coverageLat,
+        coverageLng,
+        coverageRadius,
+        coverageLocation: coverageName,
+        enabledCategories: selectedCategories,
+        onboardingStepsCompleted: COMMUNITY_STEPS,
+      });
 
       // 2. Save profile + completion flags.
       movedPastProfile.current = true;
@@ -368,9 +405,9 @@ const OnboardingCreate: React.FC = () => {
           email: resolvedEmail,
           phone: resolvedPhone,
           mobileNumber: resolvedPhone,
-          address: locationName,
+          address: coverageName,
           profileImage: resolvedImage,
-          defaultLocation: { name: locationName, latitude: locationLat, longitude: locationLng },
+          defaultLocation: { name: coverageName, latitude: coverageLat, longitude: coverageLng },
           profileCompleted: true,
           communityCreated: true,
           onboardingCompleted: true,
@@ -413,7 +450,7 @@ const OnboardingCreate: React.FC = () => {
     return (
       <SafeAreaView className="flex-1 bg-[#fff8f0] items-center justify-center px-8">
         <View className="w-16 h-16 rounded-3xl bg-orange-100 items-center justify-center mb-6">
-          <AlertCircle size={32} color="#f97316" />
+          <AlertCircle size={32} color="#fc7127" />
         </View>
         <Text className="text-2xl font-black text-[#0d3d47] text-center mb-3">Trial Community Active</Text>
         <Text className="text-sm text-gray-500 text-center leading-relaxed mb-8">
@@ -431,7 +468,7 @@ const OnboardingCreate: React.FC = () => {
           onPress={() => router.push('/pricing' as any)}
           className="w-full py-4 rounded-2xl items-center bg-orange-50 border border-orange-100"
         >
-          <Text className="text-[#f97316] font-bold text-base">View Licence Options</Text>
+          <Text className="text-[#fc7127] font-bold text-base">View Licence Options</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -458,7 +495,7 @@ const OnboardingCreate: React.FC = () => {
           <View className="px-6 pt-6 pb-4 flex-row items-center justify-between border-b border-gray-100">
             <View className="flex-row items-center gap-2">
               <View className="w-9 h-9 bg-[#0d3d47] rounded-xl items-center justify-center overflow-hidden">
-                <Image source={require('../../../assets/icon.png')} style={{ width: 36, height: 36 }} resizeMode="cover" />
+                <Image source={require('../../../assets/lalela_logo.png')} style={{ width: 36, height: 36 }} resizeMode="cover" />
               </View>
               <Text className="text-xl font-black text-[#0d3d47] tracking-tight">lalela</Text>
             </View>
@@ -505,11 +542,11 @@ const OnboardingCreate: React.FC = () => {
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
                   <View className="w-12 h-12 bg-orange-50 rounded-2xl items-center justify-center">
-                    <UserIcon size={24} color="#f97316" />
+                    <UserIcon size={24} color="#fc7127" />
                   </View>
                   <View className="flex-1">
                     <Text className="text-2xl font-black text-[#0d3d47]">Your Profile</Text>
-                    <Text className="text-xs text-gray-500 font-medium">Set your name and location to continue</Text>
+                    <Text className="text-xs text-gray-500 font-medium">Set your account details first. Coverage comes in the next step.</Text>
                   </View>
                 </View>
 
@@ -553,55 +590,16 @@ const OnboardingCreate: React.FC = () => {
                   <TextInput value={phone} onChangeText={setPhone} placeholder="+27..." keyboardType="phone-pad" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]" placeholderTextColor="#9ca3af" />
                 </View>
 
-                {/* Location */}
-                <View className="gap-1" style={{ zIndex: 10, elevation: 10 }}>
-                  <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Location <Text className="text-red-500">*</Text></Text>
-                  <View style={{ zIndex: 10, elevation: 10, position: 'relative' }}>
-                    <GooglePlacesAutocomplete
-                      placeholder="e.g. 123 Main St, Cape Town"
-                      fetchDetails
-                      // @ts-ignore
-                      scrollEnabled={false}
-                      onPress={(data, details) => {
-                        setLocationName(data.description);
-                        if (details?.geometry?.location) { setLocationLat(details.geometry.location.lat); setLocationLng(details.geometry.location.lng); }
-                      }}
-                      query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
-                      ref={placesRef as any}
-                      textInputProps={{
-                        placeholderTextColor: '#9ca3af',
-                        onBlur: () => {
-                          const currentText = placesRef.current?.getAddressText() || '';
-                          if (currentText !== locationName) {
-                            setLocationName(currentText);
-                            setLocationLat(0);
-                            setLocationLng(0);
-                          }
-                        }
-                      }}
-                      styles={{
-                        container: { flex: 0 },
-                        textInput: { backgroundColor: '#f3f4f6', borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14, fontWeight: 'bold', color: '#0d3d47', height: 52, margin: 0 },
-                        listView: { position: 'absolute', top: 56, left: 0, right: 0, zIndex: 9999, elevation: 9999, backgroundColor: '#fff', borderRadius: 12, marginTop: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8 },
-                        row: { paddingVertical: 12, paddingHorizontal: 16, zIndex: 9999 },
-                        description: { fontSize: 13, color: '#374151' }
-                      }}
-                      enablePoweredByContainer={false}
-                      keyboardShouldPersistTaps="handled"
-                      listUnderlayColor="transparent"
-                    />
+                <View className="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-4 flex-row items-start gap-3">
+                  <View className="w-10 h-10 rounded-xl bg-white items-center justify-center">
+                    <MapPin size={18} color="#3b82f6" />
                   </View>
-                  <TouchableOpacity onPress={handleGetCurrentLocation} disabled={isFetchingLocation} className="flex-row items-center gap-2 py-3 px-4 bg-surface-container-low border border-outline-variant rounded-2xl mt-1">
-                    {isFetchingLocation ? <ActivityIndicator size="small" color="#0d3d47" /> : <MapPin size={16} color="#0d3d47" />}
-                    <Text className="text-xs font-bold text-[#0d3d47]">{isFetchingLocation ? 'Getting location...' : 'Use current location'}</Text>
-                  </TouchableOpacity>
-                  {locationName && locationLat !== 0 ? (
-                    <View className="flex-row items-center gap-1 mt-1 ml-1"><CheckCircle2 size={12} color="#10b981" /><Text className="text-[10px] text-emerald-600 font-medium">Location set</Text></View>
-                  ) : locationName ? (
-                    <View className="flex-row items-center gap-1 mt-1 ml-1"><AlertCircle size={12} color="#f59e0b" /><Text className="text-[10px] text-amber-600 font-medium">Tap "Use current location" to confirm coordinates, or type your full address</Text></View>
-                  ) : (
-                    <View className="flex-row items-center gap-1 mt-1 ml-1"><AlertCircle size={12} color="#f59e0b" /><Text className="text-[10px] text-amber-600 font-medium">Set your location to continue</Text></View>
-                  )}
+                  <View className="flex-1">
+                    <Text className="text-sm font-bold text-blue-900">Coverage sets your default location</Text>
+                    <Text className="text-[11px] text-blue-800 leading-relaxed mt-1">
+                      You will choose the community coverage area in the next step. That location becomes your default profile location when onboarding finishes.
+                    </Text>
+                  </View>
                 </View>
 
                 {error && <View className="bg-red-50 border border-red-100 rounded-2xl p-4"><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
@@ -610,12 +608,6 @@ const OnboardingCreate: React.FC = () => {
                   onPress={() => {
                     if (isProfileValid) {
                       setError(null);
-                      // Pre-fill coverage from profile location if not set yet
-                      if (!coverageLat && locationLat) {
-                        setCoverageLat(locationLat);
-                        setCoverageLng(locationLng);
-                        setCoverageName(locationName);
-                      }
                       setStep('name');
                     }
                   }}
@@ -634,7 +626,7 @@ const OnboardingCreate: React.FC = () => {
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
                   <View className="w-12 h-12 bg-orange-50 rounded-2xl items-center justify-center">
-                    <Sparkles size={24} color="#f97316" />
+                    <Sparkles size={24} color="#fc7127" />
                   </View>
                   <View className="flex-1">
                     <Text className="text-2xl font-black text-[#0d3d47]">Start Your Community</Text>
@@ -651,7 +643,7 @@ const OnboardingCreate: React.FC = () => {
                     <Text className="text-sm font-bold text-[#0d3d47]" numberOfLines={1}>{fullName}</Text>
                     <View className="flex-row items-center gap-1">
                       <MapPin size={10} color="#9ca3af" />
-                      <Text className="text-[10px] text-gray-400" numberOfLines={1}>{locationName}</Text>
+                      <Text className="text-[10px] text-gray-400" numberOfLines={1}>{coverageName || 'Coverage area set in next step'}</Text>
                     </View>
                   </View>
                   <TouchableOpacity onPress={() => setStep('profile')}>
@@ -664,6 +656,16 @@ const OnboardingCreate: React.FC = () => {
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Community Name <Text className="text-red-500">*</Text></Text>
                   <TextInput value={communityName} onChangeText={setCommunityName} placeholder="e.g. Parkwood Heights" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]" placeholderTextColor="#9ca3af" />
                 </View>
+
+                {draftCommunityId ? (
+                  <View className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex-row items-center gap-3">
+                    <CheckCircle2 size={18} color="#10b981" />
+                    <View className="flex-1">
+                      <Text className="text-sm font-bold text-emerald-800">Community name saved</Text>
+                      <Text className="text-[11px] text-emerald-700 mt-1">Your community draft is created. Continue to add coverage, categories, and businesses.</Text>
+                    </View>
+                  </View>
+                ) : null}
 
                 {/* Trial banner */}
                 <View className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl flex-row items-start gap-3">
@@ -685,24 +687,24 @@ const OnboardingCreate: React.FC = () => {
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity
-                    onPress={() => {
+                    onPress={async () => {
                       if (communityName.trim()) {
-                        setError(null);
-                        // Pre-fill coverage from profile location if not set yet
-                        if (!coverageLat && locationLat) {
-                          setCoverageLat(locationLat);
-                          setCoverageLng(locationLng);
-                          setCoverageName(locationName);
+                        try {
+                          const communityId = await saveCommunityDraft();
+                          if (communityId) {
+                            setStep('coverage');
+                          }
+                        } catch (err: any) {
+                          setError(err?.response?.data?.error ?? err?.response?.data?.message ?? err.message ?? 'Failed to save community name.');
                         }
-                        setStep('coverage');
                       }
                     }}
-                    disabled={!communityName.trim()}
+                    disabled={!communityName.trim() || isSavingCommunity}
                     className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2 shadow-lg"
-                    style={{ backgroundColor: '#0d3d47', opacity: !communityName.trim() ? 0.5 : 1 }}
+                    style={{ backgroundColor: '#0d3d47', opacity: !communityName.trim() || isSavingCommunity ? 0.5 : 1 }}
                   >
-                    <Text className="text-white font-bold text-base">Next</Text>
-                    <ArrowRight size={20} color="white" />
+                    {isSavingCommunity ? <ActivityIndicator color="white" size="small" /> : <Text className="text-white font-bold text-base">Save & Continue</Text>}
+                    {!isSavingCommunity ? <ArrowRight size={20} color="white" /> : null}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -751,36 +753,47 @@ const OnboardingCreate: React.FC = () => {
                       listUnderlayColor="transparent"
                     />
                   </View>
+                  <TouchableOpacity onPress={handleCoverageCurrentLocation} disabled={isFetchingCoverageLocation} className="flex-row items-center gap-2 py-3 px-4 bg-surface-container-low border border-outline-variant rounded-2xl mt-1">
+                    {isFetchingCoverageLocation ? <ActivityIndicator size="small" color="#0d3d47" /> : <MapPin size={16} color="#0d3d47" />}
+                    <Text className="text-xs font-bold text-[#0d3d47]">{isFetchingCoverageLocation ? 'Getting location...' : 'Use current location'}</Text>
+                  </TouchableOpacity>
                   {coverageName ? (
                     <View className="flex-row items-center gap-1 mt-1 ml-1"><CheckCircle2 size={12} color="#10b981" /><Text className="text-[10px] text-emerald-600 font-medium">Location set: {coverageName}</Text></View>
-                  ) : null}
+                  ) : (
+                    <View className="flex-row items-center gap-1 mt-1 ml-1"><AlertCircle size={12} color="#f59e0b" /><Text className="text-[10px] text-amber-600 font-medium">Search, use current location, or tap the map to drop a pin.</Text></View>
+                  )}
                 </View>
 
-                {/* Draggable map — visible once a location is chosen */}
-                {coverageLat !== 0 && coverageLng !== 0 && (
-                  <View className="gap-2">
-                    <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Fine-tune Position</Text>
-                    <Text className="text-[10px] text-gray-400 ml-1">Tap anywhere on the map to move the pin, or drag it to fine-tune.</Text>
-                    <View style={{ height: 240, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb' }}>
-                      <MapView
-                        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
-                        style={{ flex: 1 }}
-                        region={{
-                          latitude: coverageLat,
-                          longitude: coverageLng,
-                          latitudeDelta: Math.max(0.02, (coverageRadius / 111) * 2.5),
-                          longitudeDelta: Math.max(0.02, (coverageRadius / 111) * 2.5),
-                        }}
-                        scrollEnabled={true}
-                        zoomEnabled={true}
-                        rotateEnabled={false}
-                        pitchEnabled={false}
-                        moveOnMarkerPress={false}
-                        onPress={(e) => {
-                          setCoverageLat(e.nativeEvent.coordinate.latitude);
-                          setCoverageLng(e.nativeEvent.coordinate.longitude);
-                        }}
-                      >
+                {/* Draggable map */}
+                <View className="gap-2">
+                  <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Fine-tune Position</Text>
+                  <Text className="text-[10px] text-gray-400 ml-1">Tap anywhere on the map to set coverage, or drag the pin to fine-tune.</Text>
+                  <View style={{ height: 240, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb' }}>
+                    <MapView
+                      {...defaultMapViewProps}
+                      provider={Platform.OS === 'ios' ? undefined : 'google'}
+                      style={{ flex: 1 }}
+                      region={{
+                        latitude: coverageLat || userProfile?.defaultLocation?.latitude || -26.2041,
+                        longitude: coverageLng || userProfile?.defaultLocation?.longitude || 28.0473,
+                        latitudeDelta: Math.max(0.02, (coverageRadius / 111) * 2.5),
+                        longitudeDelta: Math.max(0.02, (coverageRadius / 111) * 2.5),
+                      }}
+                      scrollEnabled={true}
+                      zoomEnabled={true}
+                      rotateEnabled={false}
+                      pitchEnabled={false}
+                      moveOnMarkerPress={false}
+                      onPress={(e) => {
+                        setCoverageLat(e.nativeEvent.coordinate.latitude);
+                        setCoverageLng(e.nativeEvent.coordinate.longitude);
+                        if (!coverageName) {
+                          setCoverageName(`${e.nativeEvent.coordinate.latitude.toFixed(4)}, ${e.nativeEvent.coordinate.longitude.toFixed(4)}`);
+                        }
+                      }}
+                    >
+                      {coverageLat !== 0 && coverageLng !== 0 ? (
+                        <>
                         <Circle
                           center={{ latitude: coverageLat, longitude: coverageLng }}
                           radius={coverageRadius * 1000}
@@ -799,10 +812,11 @@ const OnboardingCreate: React.FC = () => {
                           }}
                           pinColor="#0d3d47"
                         />
-                      </MapView>
-                    </View>
+                        </>
+                      ) : null}
+                    </MapView>
                   </View>
-                )}
+                </View>
 
                 {/* Radius */}
                 <View className="gap-3">

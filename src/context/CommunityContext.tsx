@@ -77,11 +77,16 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [activeCommunityLink, setActiveCommunityLink] = useState<CommunityInviteLink | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [securityResponders, setSecurityResponders] = useState<CommunityContextType['securityResponders']>([]);
-  const [chatUnreadTotals, setChatUnreadTotals] = useState<ChatUnreadTotals>(EMPTY_UNREAD);
 
   const socketRef = useRef<Awaited<ReturnType<typeof getSocket>> | null>(null);
   // Holds the latest `load` function so it can be called outside the useEffect.
   const loadRef = useRef<(() => Promise<void>) | null>(null);
+  // Tracks the active conversation id so socket handlers (bound once per
+  // community/user) can read the current value without closing over stale state.
+  const activeConversationIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    activeConversationIdRef.current = activeConversationId;
+  }, [activeConversationId]);
 
   const refreshCommunities = useCallback(async () => {
     if (loadRef.current) await loadRef.current();
@@ -96,6 +101,38 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     () => conversations.find((c) => c.id === activeConversationId) ?? null,
     [conversations, activeConversationId],
   );
+
+  // Aggregate unread totals across all conversations for the viewer.
+  // Used by the bottom tab badge (totalMessages) and chat filter chips.
+  const chatUnreadTotals = useMemo<ChatUnreadTotals>(() => {
+    const totals = { ...EMPTY_UNREAD };
+    for (const conv of conversations) {
+      const n = conv.unreadCount || 0;
+      if (n <= 0) continue;
+      totals.totalMessages += n;
+      switch (conv.type) {
+        case 'direct':
+          totals.direct += n;
+          break;
+        case 'listing':
+          if (conv.metadata?.source === 'marketplace') totals.marketplace += n;
+          else totals.listing += n;
+          break;
+        case 'notice':
+          totals.notice += n;
+          break;
+        case 'community':
+          totals.community += n;
+          break;
+        case 'emergency':
+          totals.emergency += n;
+          break;
+      }
+    }
+    totals.unreadFilterTotal =
+      totals.direct + totals.listing + totals.notice + totals.marketplace;
+    return totals;
+  }, [conversations]);
 
   // ── Initial data load ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -202,9 +239,26 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       });
 
       socket.on('message:new', (msg: Message) => {
-        setMessages((prev) => [...prev, msg]);
+        const convId = (msg as any).conversationId as string | undefined;
+        const senderId = (msg as any).userId as string | undefined;
+        const activeId = activeConversationIdRef.current;
+        // Only append to in-memory messages list if it belongs to the open conversation.
+        setMessages((prev) => (convId && convId === activeId ? [...prev, msg] : prev));
         setConversations((prev) =>
-          prev.map((c) => c.id === (msg as any).conversationId ? { ...c, lastMessage: msg.content ?? '' } : c)
+          prev.map((c) => {
+            if (c.id !== convId) return c;
+            const isMine = senderId === userId;
+            const isActive = convId === activeId;
+            // Bump unread for the viewer only when the message is from someone else
+            // and the conversation isn't currently open.
+            const shouldIncrement = !isMine && !isActive;
+            return {
+              ...c,
+              lastMessage: msg.content ?? '',
+              lastMessageAt: (msg as any).createdAt ?? c.lastMessageAt,
+              unreadCount: shouldIncrement ? (c.unreadCount || 0) + 1 : c.unreadCount,
+            };
+          })
         );
       });
 
@@ -480,7 +534,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     let body: object;
     if (params.type === 'direct') {
       endpoint = '/conversations/direct';
-      body = { participantId: params.participants[1] };
+      body = { otherUserId: params.participants[1] };
     } else {
       endpoint = '/conversations';
       body = params;
@@ -504,10 +558,15 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [activeConversationId]);
 
   const markAsRead = useCallback(async (conversationId: string) => {
-    await api.put(`/conversations/${conversationId}/read`);
+    // Optimistically clear locally first so badges disappear immediately.
     setConversations((prev) => prev.map((c) =>
-      c.id === conversationId ? { ...c, unreadCount: {} as Record<string, number> } : c
+      c.id === conversationId ? { ...c, unreadCount: 0 } : c
     ));
+    try {
+      await api.put(`/conversations/${conversationId}/read`);
+    } catch (err) {
+      console.error('markAsRead failed:', err);
+    }
   }, []);
 
   const setTypingStatus = useCallback(async (conversationId: string, typing: boolean) => {

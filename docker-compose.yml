@@ -17,24 +17,26 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── MinIO (S3-compatible object storage) ────────────────────────────────────
+  # ── MinIO AIStor (S3-compatible object storage) ─────────────────────────────
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/aistor/minio:latest
     restart: unless-stopped
-    command: server /data --console-address ":9001"
+    command: minio server /mnt/data --console-address ":9001" --license /minio.license
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-lalela}
-      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-ChangeThisToStrongPassword123!}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-lalela123}
     volumes:
-      - minio_data:/data
+      - minio_data:/mnt/data
+      - ./minio.license:/minio.license:ro
     ports:
-      - '9000:9000'   # API
-      - '9001:9001'   # Web console
+      - '9000:9000'              # API — direct, no nginx
+      - '127.0.0.1:19001:9001'  # Console — nginx proxies 9001→127.0.0.1:19001
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
-      interval: 30s
-      timeout: 20s
-      retries: 3
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   # ── MinIO bucket init (runs once, creates bucket + app user) ───────────────
   minio-init:
@@ -52,7 +54,7 @@ services:
       /bin/sh -c "
         mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
         mc mb --ignore-existing local/lalela;
-        mc anonymous set none local/lalela;
+        mc anonymous set download local/lalela;
         mc admin user add local $$MINIO_APP_USER $$MINIO_APP_PASSWORD || true;
         mc admin policy attach local readwrite --user $$MINIO_APP_USER || true;
         echo 'MinIO init complete';

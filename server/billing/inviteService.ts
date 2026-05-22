@@ -3,8 +3,9 @@
  */
 import { randomUUID } from 'crypto';
 import type { PrismaClient } from '../generated/prisma/index.js';
+import { getAppBaseUrl } from '../lib/urls.js';
 
-const APP_URL = () => process.env.APP_BASE_URL || 'https://lalela.net';
+const APP_URL = () => getAppBaseUrl();
 
 export async function getOrCreateCommunityInviteLink(
   prisma: PrismaClient,

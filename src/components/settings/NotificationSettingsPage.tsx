@@ -111,7 +111,13 @@ const NotificationSettingsPage: React.FC = () => {
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/settings');
+            }
+          }}
             style={{ padding: 8, borderRadius: 12, backgroundColor: '#f5f5f5' }}
           >
             <ArrowLeft size={20} color="#1a1a1a" />

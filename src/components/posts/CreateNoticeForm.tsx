@@ -1,3 +1,4 @@
+import { defaultMapViewProps } from "../../lib/mapViewProps";
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -121,12 +122,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
   const { currentCommunity, addPost, updatePost } = useCommunity();
   const { userProfile } = useAuth();
 
-  const isReadOnly = userProfile?.status === 'READ-ONLY' || (
-    userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
-    userProfile?.licenseStatus === 'UNLICENSED' &&
-    userProfile?.memberExpiryDate &&
-    (userProfile.memberExpiryDate.toDate ? userProfile.memberExpiryDate.toDate() : new Date(userProfile.memberExpiryDate)) < new Date()
-  );
+  const isReadOnly = userProfile?.licenseStatus === 'EXPIRED';
 
   const [title, setTitle] = useState(postToEdit?.title || '');
   const [description, setDescription] = useState(postToEdit?.description || '');
@@ -147,7 +143,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
     if (onBack) {
       onBack();
     } else {
-      router.back();
+      if (router.canGoBack()) if (router.canGoBack()) router.back(); else router.replace('/posts'); else router.replace('/posts');
     }
   };
 
@@ -193,7 +189,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: 0.8,
     });
     if (result.canceled || !result.assets?.[0]) return;
@@ -222,7 +218,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
         category: 'Community',
         authorName: postToEdit?.authorName || userProfile?.name || 'Community Member',
         authorId: postToEdit?.authorId || userProfile?.id,
-        authorRole: postToEdit?.authorRole || (currentCommunity?.userRole || 'Member'),
+        authorRole: postToEdit?.authorRole || (currentCommunity?.userRole || 'MEMBER'),
         authorImage: postToEdit?.authorImage || userProfile?.profileImage || `https://picsum.photos/seed/${userProfile?.id}/200/200`,
         urgency: config.urgency,
         urgencyLevel: config.urgencyLevel,
@@ -358,7 +354,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               </View>
 
               <View className="w-full rounded-3xl overflow-hidden border-2 border-amber-300" style={{ height: 220 }}>
-                <MapView
+                <MapView {...defaultMapViewProps}
                   style={{ flex: 1 }}
                   region={mapRegion}
                   showsUserLocation={false}

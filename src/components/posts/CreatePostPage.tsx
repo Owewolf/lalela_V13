@@ -1,3 +1,4 @@
+import { defaultMapViewProps } from "../../lib/mapViewProps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useMemo, useEffect } from 'react';
 import {
@@ -89,17 +90,10 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const { userProfile } = useAuth();
 
   const handleBack = () => {
-    router.back();
+    if (router.canGoBack()) router.back(); else router.replace('/posts');
   };
 
-  const isReadOnly =
-    userProfile?.status === 'READ-ONLY' ||
-    (userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
-      userProfile?.licenseStatus === 'UNLICENSED' &&
-      userProfile?.memberExpiryDate &&
-      (userProfile.memberExpiryDate.toDate
-        ? userProfile.memberExpiryDate.toDate()
-        : new Date(userProfile.memberExpiryDate)) < new Date());
+  const isReadOnly = userProfile?.licenseStatus === 'EXPIRED';
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [postType, setPostType] = useState<PostType>(
@@ -218,7 +212,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: 0.8,
     });
     if (result.canceled || !result.assets?.[0]) return;
@@ -294,14 +288,14 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
     try {
       if (postToEdit) {
         await updatePost({ ...postToEdit, ...postData });
-        router.back();
+        if (router.canGoBack()) router.back(); else router.replace('/posts');
       } else {
         const postId = await addPost(postData);
         if (postId && postData.urgency === 'emergency') {
           onEmergencyPosted?.({ ...postData, id: postId, timestamp: new Date().toISOString() });
           router.push(`/emergency/${postId}`);
         } else {
-          router.back();
+          if (router.canGoBack()) router.back(); else router.replace('/posts');
         }
       }
     } catch {
@@ -326,21 +320,21 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
     if (urgency === 'warning') {
       return (
         <SafeAreaView className="flex-1 bg-white">
-          <CreateWarningNotice onBack={() => router.back()} postToEdit={postToEdit} />
+          <CreateWarningNotice onBack={() => { if (router.canGoBack()) router.back(); else router.replace('/posts'); }} postToEdit={postToEdit} />
         </SafeAreaView>
       );
     }
     if (urgency === 'info') {
       return (
         <SafeAreaView className="flex-1 bg-white">
-          <CreateInfoNotice onBack={() => router.back()} postToEdit={postToEdit} />
+          <CreateInfoNotice onBack={() => { if (router.canGoBack()) router.back(); else router.replace('/posts'); }} postToEdit={postToEdit} />
         </SafeAreaView>
       );
     }
     if (urgency === 'general') {
       return (
         <SafeAreaView className="flex-1 bg-white">
-          <CreateGeneralNotice onBack={() => router.back()} postToEdit={postToEdit} />
+          <CreateGeneralNotice onBack={() => { if (router.canGoBack()) router.back(); else router.replace('/posts'); }} postToEdit={postToEdit} />
         </SafeAreaView>
       );
     }
@@ -484,7 +478,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     className="w-full rounded-3xl overflow-hidden border-2 border-slate-200"
                     style={{ height: 220 }}
                   >
-                    <MapView
+                    <MapView {...defaultMapViewProps}
                       style={{ flex: 1 }}
                       region={mapRegion}
                       onPress={(e) => {

@@ -295,17 +295,20 @@ router.post('/join/:code', async (req, res) => {
     }),
   ]);
 
+  // Always update lastCommunityId so the client knows which community to show
+  const userDataUpdate: Record<string, unknown> = { lastCommunityId: link.communityId };
+
   // Grant the joining user a 1-year trial if they don't already have a license
   if (!joiner?.licenseStatus || joiner.licenseStatus === 'NONE') {
     memberTrialExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-    await prisma.user.update({
-      where: { id: req.auth!.userId },
-      data: {
-        licenseStatus: 'TRIAL',
-        trialExpiresAt: memberTrialExpiresAt,
-      },
-    });
+    userDataUpdate.licenseStatus = 'TRIAL';
+    userDataUpdate.trialExpiresAt = memberTrialExpiresAt;
   }
+
+  await prisma.user.update({
+    where: { id: req.auth!.userId },
+    data: userDataUpdate,
+  });
 
   if (joiner?.email && joiner.name && memberTrialExpiresAt) {
     sendMemberJoinedEmail(joiner.email, joiner.name, link.community.name, memberTrialExpiresAt).catch(

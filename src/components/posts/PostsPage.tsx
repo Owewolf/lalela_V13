@@ -1,3 +1,5 @@
+import { defaultMapViewProps } from "../../lib/mapViewProps";
+import { resolveMediaUrl } from "../../lib/config";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useCallback } from 'react';
 import {
@@ -27,6 +29,7 @@ import {
   MapPin,
   Info,
   X,
+  Pencil,
 } from 'lucide-react-native';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { useRouter } from 'expo-router';
@@ -248,7 +251,7 @@ export default function PostsPage() {
         (isEmergency || isWarning) && notice.latitude && notice.longitude;
       const dist = calculateDistance(notice.latitude, notice.longitude, baseLat, baseLng);
       const isOwner = notice.authorId === userProfile?.id;
-      const isAdmin = currentCommunity?.userRole === 'Admin';
+      const isAdmin = currentCommunity?.userRole === 'ADMIN';
 
       return (
         <View
@@ -262,7 +265,7 @@ export default function PostsPage() {
               activeOpacity={0.9}
               style={{ height: 160, overflow: 'hidden', borderBottomWidth: 1, borderColor: '#f3f4f6' }}
             >
-              <MapView
+              <MapView {...defaultMapViewProps}
                 style={{ flex: 1 }}
                 initialRegion={{
                   latitude: notice.latitude!,
@@ -304,7 +307,7 @@ export default function PostsPage() {
           {notice.postsImage && !showMap ? (
             <View className="w-full aspect-video border-b border-gray-100 overflow-hidden">
               <Image
-                source={{ uri: notice.postsImage }}
+                source={{ uri: resolveMediaUrl(notice.postsImage) }}
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -329,6 +332,19 @@ export default function PostsPage() {
                     className="absolute right-0 top-10 w-48 bg-white rounded-2xl border border-gray-100 py-2 z-50"
                     style={{ shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 }}
                   >
+                    {isOwner && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setActiveMenuId(null);
+                          router.push({ pathname: '/create-post', params: { postId: notice.id } });
+                        }}
+                        className="flex-row items-center gap-2 px-4 py-2"
+                        activeOpacity={0.8}
+                      >
+                        <Pencil size={16} color="#0d3d47" />
+                        <Text className="text-primary text-sm font-bold">Edit Notice</Text>
+                      </TouchableOpacity>
+                    )}
                     {(isOwner || isAdmin) && (
                       <TouchableOpacity
                         onPress={() => {
@@ -375,7 +391,7 @@ export default function PostsPage() {
             {/* Location tag */}
             {notice.locationName || notice.latitude ? (
               <View className="flex-row items-center gap-1.5 bg-orange-50 self-start px-2 py-1 rounded-md">
-                <MapPin size={12} color="#f97316" />
+                <MapPin size={12} color="#fc7127" />
                 <Text className="text-[10px] font-bold text-orange-500">
                   {notice.locationName || 'Location Provided'}
                 </Text>
@@ -406,7 +422,7 @@ export default function PostsPage() {
                 <View>
                   <Text className="text-xs font-bold text-gray-800">{notice.authorName}</Text>
                   <Text className="text-[10px] text-gray-400">
-                    {notice.authorRole || 'Member'} • {formatDate(notice.timestamp)}
+                    {notice.authorRole || 'MEMBER'} • {formatDate(notice.timestamp)}
                   </Text>
                 </View>
               </View>
@@ -441,14 +457,14 @@ export default function PostsPage() {
       const isEmergency = post.urgency === 'emergency';
       const charity = charities.find(c => c.id === post.charityId);
       const isOwner = post.authorId === userProfile?.id;
-      const isAdmin = currentCommunity?.userRole === 'Admin';
+      const isAdmin = currentCommunity?.userRole === 'ADMIN';
 
       return (
         <View className="bg-gray-50 rounded-[2rem] overflow-hidden border border-gray-100 mb-6 shadow-sm">
           {/* Map (emergency) or image */}
           {isEmergency && post.latitude && post.longitude ? (
             <View className="w-full aspect-video overflow-hidden border-b border-gray-100">
-              <MapView
+              <MapView {...defaultMapViewProps}
                 style={{ flex: 1 }}
                 initialRegion={{
                   latitude: post.latitude,
@@ -473,7 +489,7 @@ export default function PostsPage() {
           ) : post.postsImage ? (
             <View className="w-full aspect-video overflow-hidden border-b border-gray-100">
               <Image
-                source={{ uri: post.postsImage }}
+                source={{ uri: resolveMediaUrl(post.postsImage) }}
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -529,6 +545,19 @@ export default function PostsPage() {
                     className="absolute right-0 top-10 w-48 bg-white rounded-2xl border border-gray-100 py-2 z-50"
                     style={{ shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 }}
                   >
+                    {isOwner && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setActiveMenuId(null);
+                          router.push({ pathname: '/create-post', params: { postId: post.id } });
+                        }}
+                        className="flex-row items-center gap-2 px-4 py-2"
+                        activeOpacity={0.8}
+                      >
+                        <Pencil size={16} color="#0d3d47" />
+                        <Text className="text-primary text-sm font-bold">Edit Post</Text>
+                      </TouchableOpacity>
+                    )}
                     {(isOwner || isAdmin) && (
                       <TouchableOpacity
                         onPress={() => {
@@ -591,7 +620,7 @@ export default function PostsPage() {
                   {post.isPublic && post.charityId ? (
                     <View className="items-end">
                       <View className="flex-row items-center gap-1.5 bg-orange-50 px-2 py-1 rounded-lg mb-1">
-                        <Heart size={12} color="#f97316" fill="#f97316" />
+                        <Heart size={12} color="#fc7127" fill="#fc7127" />
                         <Text className="text-[9px] font-black text-orange-500 uppercase tracking-wider">
                           {charity?.name || 'Charity Impact'}
                         </Text>
@@ -608,7 +637,7 @@ export default function PostsPage() {
             {/* Location */}
             {post.locationName ? (
               <View className="flex-row items-center gap-2 bg-orange-50 self-start px-4 py-2 rounded-full border border-orange-100">
-                <MapPin size={14} color="#f97316" />
+                <MapPin size={14} color="#fc7127" />
                 <Text className="text-[11px] font-extrabold text-orange-500" numberOfLines={1}>
                   {post.locationName}
                 </Text>
@@ -711,7 +740,7 @@ export default function PostsPage() {
       case 'listingHeader':
         return (
           <View className="flex-row items-center gap-2 px-2 mb-4 mt-2">
-            <Tag size={16} color="#f97316" />
+            <Tag size={16} color="#fc7127" />
             <Text className="text-sm font-black text-primary uppercase tracking-widest">
               Community Listing
             </Text>
@@ -839,7 +868,7 @@ export default function PostsPage() {
             </TouchableOpacity>
           </View>
           {mapPost?.latitude && mapPost?.longitude ? (
-            <MapView
+            <MapView {...defaultMapViewProps}
               style={{ flex: 1 }}
               initialRegion={{
                 latitude: mapPost.latitude,

@@ -25,10 +25,12 @@ import {
 } from 'lucide-react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { BusinessCard } from './BusinessCard';
+import { defaultMapViewProps } from '../../lib/mapViewProps';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { BUSINESS_CATEGORIES } from '../../constants';
 import { calculateDistance } from '../../lib/utils';
+import { resolveMediaUrl } from '../../lib/config';
 import type { UserBusiness } from '../../types';
 
 interface MarketBusiness {
@@ -52,7 +54,6 @@ interface MarketBusiness {
   closingTime?: string;
   hasCall?: boolean;
   isExternal?: boolean;
-  isVerified?: boolean;
   isFeatured?: boolean;
   distance: string;
   isExplicitlyLinked: boolean;
@@ -143,8 +144,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
     const internalBusinesses: MarketBusiness[] = (currentCommunity?.businesses || []).map(b => ({
       ...b,
       isExternal: false,
-      isVerified: b.isVerified ?? true,
-      isFeatured: b.isFeatured ?? b.isVerified ?? true,
+      isFeatured: b.isFeatured ?? true,
       isExplicitlyLinked: true,
       isMemberBusiness: false,
       status: (b.status as 'Open' | 'Closed') || 'Open',
@@ -154,7 +154,10 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
           : '0.0 km',
     }));
 
-    const allCommunityUserBusinesses: MarketBusiness[] = (communityBusinesses || []).map(b => ({
+    // User and imported businesses are visible in the marketplace by default.
+    const eligibleCommunityBusinesses = communityBusinesses || [];
+
+    const allCommunityUserBusinesses: MarketBusiness[] = eligibleCommunityBusinesses.map(b => ({
       id: b.id,
       name: b.name,
       category: b.category,
@@ -167,7 +170,6 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
       phone: b.contactPhone,
       website: undefined,
       isExternal: false,
-      isVerified: true,
       isFeatured: false,
       isMemberBusiness: b.source !== 'IMPORT',
       label: b.ownerId === userProfile?.id ? 'My Business' : undefined,
@@ -275,7 +277,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
           {hasListingImage ? (
             <View className="w-full aspect-[4/3] overflow-hidden">
               <Image
-                source={{ uri: listing.postsImage }}
+                source={{ uri: resolveMediaUrl(listing.postsImage) }}
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -348,7 +350,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
             {listing.isPublic && listing.charityId ? (
               <View className="bg-gray-100 p-3 rounded-2xl flex-row items-start gap-3 border border-gray-200">
                 <View className="bg-orange-50 p-2 rounded-full items-center justify-center">
-                  <Heart size={20} color="#f97316" fill="#f97316" />
+                  <Heart size={20} color="#fc7127" fill="#fc7127" />
                 </View>
                 <View className="flex-1">
                   <View className="flex-row justify-between items-center mb-1">
@@ -371,7 +373,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
             {/* Location */}
             {listing.locationName ? (
               <View className="flex-row items-center gap-2 bg-orange-50 px-4 py-2 rounded-full border border-orange-100 self-start">
-                <MapPin size={14} color="#f97316" />
+                <MapPin size={14} color="#fc7127" />
                 <Text className="text-[11px] font-extrabold text-orange-500" numberOfLines={1}>
                   {listing.locationName}
                 </Text>
@@ -420,7 +422,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                   className="w-10 h-10 rounded-full bg-orange-50 items-center justify-center"
                   activeOpacity={0.8}
                 >
-                  <Heart size={20} color="#f97316" />
+                  <Heart size={20} color="#fc7127" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -445,7 +447,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
             <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
               {hasListingImage ? (
                 <Image
-                  source={{ uri: selectedListing.postsImage }}
+                  source={{ uri: resolveMediaUrl(selectedListing.postsImage) }}
                   style={{ width: '100%', height: 240 }}
                   resizeMode="cover"
                 />
@@ -462,8 +464,8 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                       </View>
                       {selectedListing.locationName ? (
                         <View style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: '#fff7ed', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                          <MapPin size={12} color="#f97316" />
-                          <Text style={{ fontSize: 10, fontWeight: '700', color: '#f97316' }}>{selectedListing.locationName}</Text>
+                          <MapPin size={12} color="#fc7127" />
+                          <Text style={{ fontSize: 10, fontWeight: '700', color: '#fc7127' }}>{selectedListing.locationName}</Text>
                         </View>
                       ) : null}
                     </View>
@@ -694,14 +696,14 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                 className="flex-row items-center gap-1 bg-orange-50 px-2 py-1 rounded-lg"
                 activeOpacity={0.8}
               >
-                <X size={12} color="#f97316" />
+                <X size={12} color="#fc7127" />
                 <Text className="text-orange-500 text-[10px] font-bold">
                   {enabledCategories.find(c => c.id === selectedCategory)?.label}
                 </Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity className="flex-row items-center gap-1" activeOpacity={0.8}>
-              <SlidersHorizontal size={16} color="#f97316" />
+              <SlidersHorizontal size={16} color="#fc7127" />
               <Text className="text-orange-500 text-xs font-bold uppercase tracking-wider">
                 Filter
               </Text>
@@ -715,6 +717,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
         <View className="flex-1 m-4 rounded-3xl overflow-hidden border border-gray-200">
           {coverageArea ? (
             <MapView
+              {...defaultMapViewProps}
               style={{ flex: 1 }}
               initialRegion={{
                 latitude: coverageArea.latitude,

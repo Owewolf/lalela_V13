@@ -1,4 +1,10 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env', override: false });
+
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: '.env.production', override: true });
+}
 
 export default ({ config }) => {
   return {
@@ -16,12 +22,7 @@ export default ({ config }) => {
         },
       },
     },
-    ios: {
-      ...config.ios,
-      config: {
-        ...config.ios?.config,
-        googleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY,
-      },
-    },
+    // iOS intentionally uses Apple MapKit (react-native-maps default when provider is undefined).
+    // No Google Maps iOS SDK key is needed.
   };
 };

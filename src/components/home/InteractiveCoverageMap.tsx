@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Platform, Linking } from 'react-native';
 import MapView, { Marker, Circle, Callout } from 'react-native-maps';
 import {
   Siren,
@@ -77,6 +77,12 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
     useCommunity();
 
   const [mapFilter, setMapFilter] = useState<MapFilter>(initialFilter || 'members');
+  const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  const handleOpenDirections = (lat: number, lng: number) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    Linking.openURL(url);
+  };
   const mapRef = React.useRef<MapView>(null);
 
   const safeCenter = useMemo(
@@ -203,6 +209,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
           pitchEnabled={false}
           onPress={() => {
             if (isLocked) onUnlock?.();
+            setSelectedLocation(null);
           }}
           showsUserLocation={false}
           showsMyLocationButton={false}
@@ -419,9 +426,9 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 );
               })}
 
-          {/* Businesses Layer */}
+          {/* Businesses Layer — only user-created (no AI/imported) */}
           {mapFilter === 'businesses' &&
-            communityBusinesses.map((business) => (
+            communityBusinesses.filter((b) => b.source !== 'IMPORT').map((business) => (
               <Marker
                 key={business.id}
                 coordinate={{
@@ -599,6 +606,34 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
               </Text>
             </TouchableOpacity>
           ))}
+        </View>
+      )}
+
+      {/* Universal Floating Navigation Button (Required for Web, Fallback/Enhancement for all) */}
+      {selectedLocation && (
+        <View className="absolute bottom-6 right-4 shadow-xl z-50">
+          <TouchableOpacity 
+            className="flex-row items-center space-x-2 bg-blue-600 px-4 py-3 rounded-full shadow-lg border border-blue-500"
+            onPress={() => handleOpenDirections(selectedLocation.latitude, selectedLocation.longitude)}
+            activeOpacity={0.8}
+          >
+            <MapPin size={18} color="white" />
+            <Text className="text-white font-bold text-sm ml-2 tracking-wide">Navigate</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Universal Floating Navigation Button (Required for Web, Fallback/Enhancement for all) */}
+      {selectedLocation && (
+        <View className="absolute bottom-6 right-4 shadow-xl z-50">
+          <TouchableOpacity 
+            className="flex-row items-center space-x-2 bg-blue-600 px-4 py-3 rounded-full shadow-lg border border-blue-500"
+            onPress={() => handleOpenDirections(selectedLocation.latitude, selectedLocation.longitude)}
+            activeOpacity={0.8}
+          >
+            <MapPin size={18} color="white" />
+            <Text className="text-white font-bold text-sm ml-2 tracking-wide">Navigate</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>

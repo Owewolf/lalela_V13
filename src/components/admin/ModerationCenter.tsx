@@ -16,6 +16,7 @@ import {
   Alert,
   ActivityIndicator,
   StyleSheet,
+  Platform,
 } from 'react-native';
 import {
   Shield,
@@ -48,7 +49,6 @@ import {
   Copy,
   RefreshCw,
   Activity,
-  Star,
   Map,
   Save,
   Loader2,
@@ -58,8 +58,9 @@ import {
   DollarSign,
   MessageSquare,
   Sparkles,
+  Heart,
 } from 'lucide-react-native';
-import MapView, { Circle } from 'react-native-maps';
+import MapView, { Circle, Marker } from 'react-native-maps';
 import { useCommunity } from '../../context/CommunityContext';
 import { BUSINESS_CATEGORIES, GOOGLE_PLACES_API_KEY, POST_SUBTYPE_CONFIG } from '../../constants';
 import { PostConfirmationModal } from '../shared/PostConfirmationModal';
@@ -68,19 +69,21 @@ import api from '../../lib/api';
 import { Share } from 'react-native';
 import type { UserRole, UserProfile } from '../../types';
 import { BusinessImportTool } from './BusinessImportTool';
+import ManageCommunityCharity from '../settings/ManageCommunityCharity';
 import { GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from 'react-native-google-places-autocomplete';
 import Slider from '@react-native-community/slider';
+import { defaultMapViewProps } from '../../lib/mapViewProps';
 
 const PRIMARY = '#0d3d47';
 const SECONDARY = '#7c3aed';
 const ERROR = '#dc2626';
-const INVITE_WEB_BASE_URL = 'https://api.wolfslair.cc';
+const INVITE_WEB_BASE_URL = 'https://lalela.net';
 
 export interface ModerationCenterHandle {
   saveCurrentTab: () => Promise<void>;
 }
 
-type ModTab = 'members' | 'content' | 'businesses' | 'rules' | 'logs' | 'categories' | 'coverage';
+type ModTab = 'members' | 'content' | 'businesses' | 'rules' | 'logs' | 'categories' | 'coverage' | 'charity';
 type MemberSubView = 'list' | 'invite' | 'details';
 
 type MemberInsightsSnapshot = {
@@ -123,9 +126,10 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       charitySuggestions,
       removePost,
       updatePost,
-      updateCommunityBusiness,
       removeCommunityBusiness,
       updateCommunityCoverage,
+      communityBusinesses,
+      deleteUserBusiness,
       inviteMember,
       communityInvitations,
       addNotification,
@@ -168,6 +172,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     const [pendingDeleteMember, setPendingDeleteMember] = useState<{ id: string; name: string } | null>(null);
     const [pendingDeletePost, setPendingDeletePost] = useState<{ id: string; title: string } | null>(null);
     const [pendingRemoveBusiness, setPendingRemoveBusiness] = useState<any>(null);
+    const [bizFilter, setBizFilter] = useState<'user' | 'ai'>('user');
     const [pendingCancelInvitation, setPendingCancelInvitation] = useState<{ id: string; label: string } | null>(null);
     const [isProcessingDestructiveAction, setIsProcessingDestructiveAction] = useState(false);
     const [showImportTool, setShowImportTool] = useState(false);
@@ -253,7 +258,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
     const handleInviteMember = async (userId: string) => {
       try {
-        await inviteMember(userId, 'Member');
+        await inviteMember(userId, 'MEMBER');
         setMemberSubView('list');
         setSearchQuery('');
         setSearchResults([]);
@@ -264,10 +269,10 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     };
 
     const publicInviteUrl = activeCommunityLink
-      ? `${INVITE_WEB_BASE_URL}/?join=${activeCommunityLink.id}`
+      ? `${INVITE_WEB_BASE_URL}/join?join=${activeCommunityLink.code}`
       : '';
     const nativeInviteUrl = activeCommunityLink
-      ? `lalela://join?join=${activeCommunityLink.id}`
+      ? `lalela://join?join=${activeCommunityLink.code}`
       : '';
 
     const handleRemoveMember = async (userId: string) => {
@@ -292,7 +297,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       try {
         await updateMemberRole(userId, role);
         if (currentCommunity?.id && currentUserProfile?.id) {
-          const isPromotion = role === 'Moderator';
+          const isPromotion = role === 'MODERATOR';
           api.post(`/communities/${currentCommunity.id}/moderation-logs`, {
             moderator_id: currentUserProfile.id,
             action: isPromotion ? 'promote' : 'demote',
@@ -385,31 +390,14 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       }
     };
 
-    const handleApproveBusiness = async (business: any) => {
-      if (!currentCommunity?.id) return;
-      try {
-        await updateCommunityBusiness(currentCommunity.id, { ...business, isVerified: true });
-        await api.post(`/communities/${currentCommunity.id}/moderation-logs`, {
-          communityId: currentCommunity.id,
-          moderator_id: currentUserProfile?.id,
-          action: 'approve',
-          target_id: business.id,
-          target_type: 'business',
-        }).catch(() => {});
-      } catch (e) { console.error('Failed to approve business:', e); }
-    };
-
-    const handleToggleFeatured = async (business: any) => {
-      if (!currentCommunity?.id) return;
-      try {
-        await updateCommunityBusiness(currentCommunity.id, { ...business, isFeatured: !business.isFeatured });
-      } catch (e) { console.error('Failed to toggle featured:', e); }
-    };
-
     const handleRemoveBusiness = async (business: any) => {
-      if (!currentCommunity?.id) return;
       try {
-        await removeCommunityBusiness(currentCommunity.id, business.id);
+        if (business.source === 'IMPORT') {
+          await deleteUserBusiness(business.id);
+        } else {
+          if (!currentCommunity?.id) return;
+          await removeCommunityBusiness(currentCommunity.id, business.id);
+        }
       } catch (e) { console.error('Failed to remove business:', e); }
     };
 
@@ -510,6 +498,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       { id: 'categories', label: 'Categories', icon: <Tag size={20} color={activeTab === 'categories' ? '#fff' : '#64748b'} /> },
       { id: 'rules', label: 'Rules', icon: <Shield size={20} color={activeTab === 'rules' ? '#fff' : '#64748b'} /> },
       { id: 'coverage', label: 'Coverage', icon: <Map size={20} color={activeTab === 'coverage' ? '#fff' : '#64748b'} /> },
+      { id: 'charity', label: 'Charity', icon: <Heart size={20} color={activeTab === 'charity' ? '#fff' : '#64748b'} /> },
       { id: 'logs', label: 'Audit', icon: <History size={20} color={activeTab === 'logs' ? '#fff' : '#64748b'} /> },
     ];
 
@@ -530,6 +519,16 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             {t.icon}
           </TouchableOpacity>
         ))}
+      </ScrollView>
+    );
+
+    const renderCharityModeration = () => (
+      <ScrollView
+        style={styles.tabContent}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <ManageCommunityCharity initialMode="manage" clearInitialMode={() => {}} />
       </ScrollView>
     );
 
@@ -584,31 +583,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           />
         </View>
 
-        <View style={styles.fieldRow}>
-          <View style={[styles.fieldGroup, { flex: 1 }]}>
-            <Text style={styles.fieldLabel}>Latitude</Text>
-            <TextInput
-              style={styles.input}
-              value={String(tempCoverage.latitude)}
-              onChangeText={(v) => setTempCoverage({ ...tempCoverage, latitude: parseFloat(v) || 0 })}
-              keyboardType="numeric"
-              placeholder="-26.2041"
-              placeholderTextColor="#94a3b8"
-            />
-          </View>
-          <View style={[styles.fieldGroup, { flex: 1 }]}>
-            <Text style={styles.fieldLabel}>Longitude</Text>
-            <TextInput
-              style={styles.input}
-              value={String(tempCoverage.longitude)}
-              onChangeText={(v) => setTempCoverage({ ...tempCoverage, longitude: parseFloat(v) || 0 })}
-              keyboardType="numeric"
-              placeholder="28.0473"
-              placeholderTextColor="#94a3b8"
-            />
-          </View>
-        </View>
-
         <View style={styles.fieldGroup}>
           <View style={styles.radiusRow}>
             <Text style={styles.fieldLabel}>Radius</Text>
@@ -627,27 +601,63 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           />
         </View>
 
-        <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            region={{
-              latitude: isNaN(tempCoverage.latitude) ? -26.2041 : tempCoverage.latitude,
-              longitude: isNaN(tempCoverage.longitude) ? 28.0473 : tempCoverage.longitude,
-              latitudeDelta: (tempCoverage.radius || 10) * 0.015,
-              longitudeDelta: (tempCoverage.radius || 10) * 0.015,
-            }}
-          >
-            <Circle
-              center={{
+        <View style={styles.fieldGroup}>
+          <Text style={styles.fieldLabel}>Set Center on Map</Text>
+          <Text style={{ fontSize: 12, color: '#94a3b8', marginBottom: 10 }}>
+            Tap the map to move the center point, or drag the pin to fine-tune.
+          </Text>
+          <View style={styles.mapContainer}>
+            <MapView
+              {...defaultMapViewProps}
+              provider={Platform.OS === 'ios' ? undefined : 'google'}
+              style={styles.map}
+              region={{
                 latitude: isNaN(tempCoverage.latitude) ? -26.2041 : tempCoverage.latitude,
                 longitude: isNaN(tempCoverage.longitude) ? 28.0473 : tempCoverage.longitude,
+                latitudeDelta: Math.max(0.02, (tempCoverage.radius || 10) / 111) * 2.5,
+                longitudeDelta: Math.max(0.02, (tempCoverage.radius || 10) / 111) * 2.5,
               }}
-              radius={(tempCoverage.radius || 10) * 1000}
-              fillColor="rgba(124,58,237,0.15)"
-              strokeColor="rgba(124,58,237,0.5)"
-              strokeWidth={2}
-            />
-          </MapView>
+              scrollEnabled
+              zoomEnabled
+              rotateEnabled={false}
+              pitchEnabled={false}
+              onPress={(e) => {
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+                setTempCoverage({ ...tempCoverage, latitude, longitude });
+              }}
+            >
+              <Circle
+                center={{
+                  latitude: isNaN(tempCoverage.latitude) ? -26.2041 : tempCoverage.latitude,
+                  longitude: isNaN(tempCoverage.longitude) ? 28.0473 : tempCoverage.longitude,
+                }}
+                radius={(tempCoverage.radius || 10) * 1000}
+                fillColor="rgba(13,61,71,0.08)"
+                strokeColor="#0d3d47"
+                strokeWidth={2}
+              />
+              <Marker
+                coordinate={{
+                  latitude: isNaN(tempCoverage.latitude) ? -26.2041 : tempCoverage.latitude,
+                  longitude: isNaN(tempCoverage.longitude) ? 28.0473 : tempCoverage.longitude,
+                }}
+                draggable
+                onDragEnd={(e) => {
+                  const { latitude, longitude } = e.nativeEvent.coordinate;
+                  setTempCoverage({ ...tempCoverage, latitude, longitude });
+                }}
+                pinColor={PRIMARY}
+              />
+            </MapView>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+            <Text style={{ fontSize: 11, color: '#64748b' }}>
+              Lat: {isNaN(tempCoverage.latitude) ? '-' : tempCoverage.latitude.toFixed(5)}
+            </Text>
+            <Text style={{ fontSize: 11, color: '#64748b' }}>
+              Lng: {isNaN(tempCoverage.longitude) ? '-' : tempCoverage.longitude.toFixed(5)}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.infoBanner}>
@@ -738,9 +748,9 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   </View>
                   <View style={[
                     styles.roleBadge,
-                    { backgroundColor: member.role === 'Admin' ? PRIMARY : member.role === 'Moderator' ? SECONDARY : '#f1f5f9' }
+                    { backgroundColor: member.role === 'ADMIN' ? PRIMARY : member.role === 'MODERATOR' ? SECONDARY : '#f1f5f9' }
                   ]}>
-                    <Text style={[styles.roleBadgeText, { color: (member.role === 'Admin' || member.role === 'Moderator') ? '#fff' : '#64748b' }]}>
+                    <Text style={[styles.roleBadgeText, { color: (member.role === 'ADMIN' || member.role === 'MODERATOR') ? '#fff' : '#64748b' }]}>
                       {member.role}
                     </Text>
                   </View>
@@ -995,23 +1005,23 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
         <View style={styles.card}>
           <Text style={styles.cardLabel}>AUTHORITY CONTROLS</Text>
-          {currentCommunity?.userRole === 'Admin' &&
+          {currentCommunity?.userRole === 'ADMIN' &&
             selectedMember.userId !== currentUserProfile?.id &&
-            selectedMember.role !== 'Admin' && (
+            selectedMember.role !== 'ADMIN' && (
               <TouchableOpacity
-                style={[styles.controlBtn, { backgroundColor: selectedMember.role === 'Moderator' ? '#f5f3ff' : '#f8fafc' }]}
+                style={[styles.controlBtn, { backgroundColor: selectedMember.role === 'MODERATOR' ? '#f5f3ff' : '#f8fafc' }]}
                 onPress={() =>
                   setPendingRoleChange({
                     userId: selectedMember.userId,
                     userName: selectedMember.name || 'Member',
                     currentRole: selectedMember.role,
-                    nextRole: selectedMember.role === 'Moderator' ? 'Member' : 'Moderator',
+                    nextRole: selectedMember.role === 'MODERATOR' ? 'MEMBER' : 'MODERATOR',
                   })
                 }
               >
-                <ShieldAlert size={16} color={selectedMember.role === 'Moderator' ? SECONDARY : '#64748b'} />
-                <Text style={[styles.controlBtnText, { color: selectedMember.role === 'Moderator' ? SECONDARY : '#64748b' }]}>
-                  {selectedMember.role === 'Moderator' ? 'Remove Moderator Privileges' : 'Promote to Moderator'}
+                <ShieldAlert size={16} color={selectedMember.role === 'MODERATOR' ? SECONDARY : '#64748b'} />
+                <Text style={[styles.controlBtnText, { color: selectedMember.role === 'MODERATOR' ? SECONDARY : '#64748b' }]}>
+                  {selectedMember.role === 'MODERATOR' ? 'Remove Moderator Privileges' : 'Promote to Moderator'}
                 </Text>
               </TouchableOpacity>
             )}
@@ -1110,7 +1120,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           )}
         </View>
 
-        {selectedMember.userId !== currentUserProfile?.id && selectedMember.role !== 'Admin' && (
+        {selectedMember.userId !== currentUserProfile?.id && selectedMember.role !== 'ADMIN' && (
           <View style={[styles.card, { borderColor: '#fef2f2', backgroundColor: '#fff5f5' }]}>
             <View style={styles.dangerHeader}>
               <UserMinus size={20} color={ERROR} />
@@ -1190,11 +1200,11 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.contentTitle}>{biz.name}</Text>
-                  <Text style={styles.contentSub}>{biz.category} • {biz.isVerified ? 'Verified' : 'Pending'}</Text>
+                  <Text style={styles.contentSub}>{biz.category} • Live in Marketplace</Text>
                 </View>
-                <View style={[styles.statusChip, { backgroundColor: biz.isVerified ? '#f0fdf4' : '#fffbeb' }]}>
-                  <Text style={[styles.statusChipText, { color: biz.isVerified ? '#1e5667' : '#b45309' }]}>
-                    {biz.isVerified ? 'Verified' : 'Pending'}
+                <View style={[styles.statusChip, { backgroundColor: '#f0fdf4' }]}>
+                  <Text style={[styles.statusChipText, { color: '#1e5667' }] }>
+                    Live
                   </Text>
                 </View>
               </View>
@@ -1266,11 +1276,48 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         return <BusinessImportTool onBack={() => setShowImportTool(false)} />;
       }
 
-      const communityBusinesses = currentCommunity?.businesses || [];
+      const userCommunityBizs = (communityBusinesses || []).filter(b => b.source !== 'IMPORT');
+      const importedBizs = (communityBusinesses || []).filter(b => b.source === 'IMPORT');
+      const activeBizs = bizFilter === 'user' ? userCommunityBizs : importedBizs;
+
+      const renderBizCard = (biz: any, idx: number) => (
+        <View key={biz.id || idx} style={styles.bizCard}>
+          <Image
+            source={{ uri: biz.image || `https://picsum.photos/seed/${biz.name}/400/400` }}
+            style={styles.bizImg}
+          />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.bizName}>{biz.name}</Text>
+            <Text style={styles.bizCategory}>{biz.category}</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+              <View style={{ backgroundColor: '#dcfce7', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                <Text style={{ fontSize: 10, color: '#16a34a', fontWeight: '700' }}>Live in Marketplace</Text>
+              </View>
+              <View style={{ backgroundColor: biz.source === 'IMPORT' ? '#f5f3ff' : '#eff6ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                <Text style={{ fontSize: 10, color: biz.source === 'IMPORT' ? '#7c3aed' : '#1d4ed8', fontWeight: '700' }}>
+                  {biz.source === 'IMPORT' ? 'AI Imported' : 'User Business'}
+                </Text>
+              </View>
+            </View>
+            {biz.description ? (
+              <Text style={styles.memberSub} numberOfLines={2}>{biz.description}</Text>
+            ) : null}
+          </View>
+          <View style={styles.bizActions}>
+            <TouchableOpacity
+              style={styles.removeBtn}
+              onPress={() => setPendingRemoveBusiness(biz)}
+            >
+              <Trash2 size={14} color={ERROR} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+
       return (
         <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 16, paddingBottom: 40 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.sectionTitle}>Business Approvals</Text>
+            <Text style={styles.sectionTitle}>Business Management</Text>
             <TouchableOpacity
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#0d3d47', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 }}
               onPress={() => setShowImportTool(true)}
@@ -1280,53 +1327,37 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>AI Import</Text>
             </TouchableOpacity>
           </View>
-          {communityBusinesses.length > 0 ? communityBusinesses.map((biz: any, idx: number) => (
-            <View key={biz.id || idx} style={styles.bizCard}>
-              <Image
-                source={{ uri: biz.image || `https://picsum.photos/seed/${biz.name}/400/400` }}
-                style={styles.bizImg}
-              />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.bizName}>{biz.name}</Text>
-                <Text style={styles.bizCategory}>{biz.category}</Text>
-                <Text style={[styles.bizStatus, { color: biz.isVerified ? '#fc7127' : '#f59e0b' }]}>
-                  {biz.isVerified ? 'Verified Listing' : 'Pending Verification'}
+
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <TouchableOpacity
+              style={[styles.filterTab, bizFilter === 'user' && styles.filterTabActive]}
+              onPress={() => setBizFilter('user')}
+            >
+              <Text style={bizFilter === 'user' ? styles.filterTabTextActive : styles.filterTabText}>
+                User Businesses ({userCommunityBizs.length})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterTab, bizFilter === 'ai' && styles.filterTabActive]}
+              onPress={() => setBizFilter('ai')}
+            >
+              <Text style={bizFilter === 'ai' ? styles.filterTabTextActive : styles.filterTabText}>
+                AI Imported Businesses ({importedBizs.length})
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {activeBizs.length > 0
+            ? activeBizs.map((biz, idx) => renderBizCard(biz, idx))
+            : (
+              <View style={styles.emptyState}>
+                <Store size={32} color="#cbd5e1" />
+                <Text style={styles.emptyStateText}>
+                  {bizFilter === 'user' ? 'No user businesses yet' : 'No imported businesses yet'}
                 </Text>
-                {biz.description ? (
-                  <Text style={styles.memberSub} numberOfLines={2}>{biz.description}</Text>
-                ) : null}
               </View>
-              <View style={styles.bizActions}>
-                {!biz.isVerified ? (
-                  <TouchableOpacity style={styles.approveBtn} onPress={() => handleApproveBusiness(biz)}>
-                    <CheckCircle2 size={16} color="#fff" />
-                    <Text style={styles.approveBtnText}>Approve</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={[styles.featureBtn, biz.isFeatured && styles.featureBtnActive]}
-                    onPress={() => handleToggleFeatured(biz)}
-                  >
-                    <Star size={14} color={biz.isFeatured ? '#fff' : '#94a3b8'} />
-                    <Text style={[styles.featureBtnText, biz.isFeatured && { color: '#fff' }]}>
-                      {biz.isFeatured ? 'Featured' : 'Feature'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                  style={styles.removeBtn}
-                  onPress={() => setPendingRemoveBusiness(biz)}
-                >
-                  <Trash2 size={14} color={ERROR} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          )) : (
-            <View style={styles.emptyState}>
-              <Store size={32} color="#cbd5e1" />
-              <Text style={styles.emptyStateText}>No businesses listed</Text>
-            </View>
-          )}
+            )
+          }
         </ScrollView>
       );
     };
@@ -1478,6 +1509,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     const renderActiveTab = () => {
       switch (activeTab) {
         case 'coverage': return renderCoverage();
+        case 'charity': return renderCharityModeration();
         case 'members': return renderMembers();
         case 'content': return renderContent();
         case 'businesses': return renderBusinesses();
@@ -1505,13 +1537,13 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         {/* Confirmation modals */}
         <PostConfirmationModal
           isOpen={!!pendingRoleChange}
-          ctaLabel={pendingRoleChange?.nextRole === 'Moderator' ? 'Promote Member' : 'Demote Moderator'}
+          ctaLabel={pendingRoleChange?.nextRole === 'MODERATOR' ? 'Promote Member' : 'Demote Moderator'}
           postType="Member"
           communityName={currentCommunity?.name || 'Your Community'}
           title={pendingRoleChange?.userName || ''}
           themeColor="bg-warning"
           customTitle="Confirm Role Change"
-          customMessage={pendingRoleChange?.nextRole === 'Moderator'
+          customMessage={pendingRoleChange?.nextRole === 'MODERATOR'
             ? 'This member will gain moderator privileges in this community.'
             : 'This moderator will be moved back to member privileges.'}
           cancelLabel="Cancel"
@@ -1682,7 +1714,7 @@ const styles = StyleSheet.create({
   radiusBtnActive: { backgroundColor: PRIMARY, borderColor: PRIMARY },
   radiusBtnText: { fontSize: 12, fontWeight: '700', color: '#64748b' },
   radiusBtnTextActive: { color: '#fff' },
-  mapContainer: { borderRadius: 20, overflow: 'hidden', height: 220 },
+  mapContainer: { borderRadius: 20, overflow: 'hidden', height: 280, borderWidth: 1, borderColor: '#e2e8f0' },
   map: { width: '100%', height: '100%' },
   infoBanner: {
     flexDirection: 'row', backgroundColor: '#f0fdf4',

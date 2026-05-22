@@ -17,12 +17,14 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
   const [busyBusinessId, setBusyBusinessId] = useState<string | null>(null);
 
   const sortedBusinesses = useMemo(() => {
-    return [...userBusinesses].sort((left, right) => {
-      if ((left.status ?? 'ACTIVE') === (right.status ?? 'ACTIVE')) {
-        return left.name.localeCompare(right.name);
-      }
-      return (left.status ?? 'ACTIVE') === 'ACTIVE' ? -1 : 1;
-    });
+    return [...userBusinesses]
+      .filter(b => b.source !== 'IMPORT')
+      .sort((left, right) => {
+        if ((left.status ?? 'ACTIVE') === (right.status ?? 'ACTIVE')) {
+          return left.name.localeCompare(right.name);
+        }
+        return (left.status ?? 'ACTIVE') === 'ACTIVE' ? -1 : 1;
+      });
   }, [userBusinesses]);
 
   const getCommunityNames = (business: UserBusiness) => {

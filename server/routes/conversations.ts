@@ -69,8 +69,8 @@ router.post('/direct', async (req, res) => {
 // ─── Create conversation ──────────────────────────────────────────────────────
 
 router.post('/', async (req, res) => {
-  const { type, participantIds, listing_id, notice_id, community_id } = req.body as {
-    type: string; participantIds: string[]; listing_id?: string; notice_id?: string; community_id?: string;
+  const { type, participantIds, listingId, noticeId, communityId } = req.body as {
+    type: string; participantIds: string[]; listingId?: string; noticeId?: string; communityId?: string;
   };
 
   const allParticipants = [...new Set([req.auth!.userId, ...(participantIds ?? [])])];
@@ -78,9 +78,9 @@ router.post('/', async (req, res) => {
   const conversation = await prisma.conversation.create({
     data: {
       type: type as never,
-      listingId: listing_id,
-      noticeId: notice_id,
-      communityId: community_id,
+      listingId,
+      noticeId,
+      communityId,
       participants: { create: allParticipants.map((uid) => ({ userId: uid })) },
     },
     include: { participants: { include: { user: { select: { id: true, name: true, profileImage: true } } } } },
@@ -108,15 +108,15 @@ router.get('/:id/messages', async (req, res) => {
 // ─── Send message ─────────────────────────────────────────────────────────────
 
 router.post('/:id/messages', async (req, res) => {
-  const { content: text, type, attachment_url } = req.body as { content?: string; type?: string; attachment_url?: string };
+  const { content, type, attachmentUrl } = req.body as { content?: string; type?: string; attachmentUrl?: string };
 
   const message = await prisma.message.create({
     data: {
       conversationId: req.params.id,
       userId: req.auth!.userId,
-      content: text,
+      content,
       messageType: type as never ?? 'text',
-      attachmentUrl: attachment_url,
+      attachmentUrl,
       readBy: [req.auth!.userId],
     },
     include: { user: { select: { id: true, name: true, profileImage: true } } },
@@ -125,7 +125,7 @@ router.post('/:id/messages', async (req, res) => {
   // Update conversation last_message
   await prisma.conversation.update({
     where: { id: req.params.id },
-    data: { lastMessage: text ?? (type ?? 'attachment'), lastMessageAt: message.createdAt },
+    data: { lastMessage: content ?? (type ?? 'attachment'), lastMessageAt: message.createdAt },
   });
 
   // Increment unread count for all other participants

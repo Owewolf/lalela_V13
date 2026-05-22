@@ -511,6 +511,26 @@ exports.Prisma.SecurityEventScalarFieldEnum = {
   timestamp: 'timestamp'
 };
 
+exports.Prisma.BillingRecordScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  amount: 'amount',
+  status: 'status',
+  communityId: 'communityId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.InvoiceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  invoiceNumber: 'invoiceNumber',
+  amount: 'amount',
+  type: 'type',
+  pdfUrl: 'pdfUrl',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -563,7 +583,9 @@ exports.Prisma.ModelName = {
   Notification: 'Notification',
   License: 'License',
   ModerationLog: 'ModerationLog',
-  SecurityEvent: 'SecurityEvent'
+  SecurityEvent: 'SecurityEvent',
+  BillingRecord: 'BillingRecord',
+  Invoice: 'Invoice'
 };
 
 /**

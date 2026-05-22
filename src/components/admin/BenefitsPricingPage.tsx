@@ -36,7 +36,7 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
 
   const handleBack = () => {
     if (onBack) onBack();
-    else router.back();
+    else { if (router.canGoBack()) if (router.canGoBack()) router.back(); else router.replace('/admin'); else router.replace('/admin'); }
   };
 
   const handleUpgrade = () => {
@@ -49,71 +49,71 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
       icon: Zap,
       title: 'Platform Power',
       items: [
-        'Lifetime, uninterrupted access',
-        'No read-only restrictions',
-        'Full platform functionality unlocked',
+        '1-year free trial included on signup',
+        'Full platform functionality during trial',
+        'Continue for R99/year after trial ends',
       ],
     },
     {
       icon: Users,
       title: 'Community Leadership',
       items: [
-        'Create a community for R999 once-off',
-        'Each community gets a full 30-day trial first',
-        'Lead members, roles, content, and growth',
+        'Start a community for R999 once-off',
+        '30-day free trial before payment is required',
+        'Community stays live permanently once activated',
       ],
     },
     {
       icon: BarChart3,
       title: 'Advanced Insights',
       items: [
-        'Track engagement and growth',
-        'Monitor notices and activity',
+        'Track engagement and community growth',
+        'Monitor notices and platform activity',
         'Understand your community dynamics',
       ],
     },
     {
       icon: Star,
-      title: 'Fair, Simple Pricing',
+      title: 'Simple, Transparent Pricing',
       items: [
-        'Pay once, belong for life',
-        'No subscriptions and no renewals',
-        'Trials only delay payment, never change pricing',
+        'Community: R999 once-off, permanent activation',
+        'Membership: R99/year after 1-year free trial',
+        'No hidden fees, no complex tiers',
       ],
     },
     {
       icon: Store,
       title: 'Business Advantage',
       items: [
-        'Better visibility for businesses',
-        'Enhanced listing control',
+        'Enhanced marketplace visibility',
+        'Full listing control and management',
         'Stronger local ecosystem influence',
       ],
     },
   ];
 
   const membershipFeatures = [
-    'Includes lifetime platform membership after payment',
-    '1-year membership trial remains active before payment is required',
+    '1-year free trial — no payment required upfront',
+    'Continue access for R99/year after trial',
     'Join, engage, and participate in communities',
-    'No recurring fees',
+    'Simple annual renewal — no lock-in',
   ];
 
   const communityFeatures = [
-    'Create a new community with full ownership and controls',
-    'Automatically includes lifetime membership',
-    'Each community has its own 30-day trial before payment is enforced',
-    'Every additional community is R999 once-off',
+    '30-day free trial to set up your community',
+    'Activate permanently with R999 once-off payment',
+    'Creator receives a 1-year platform membership trial',
+    'Invite unlimited members',
   ];
 
   const comparison = [
     { feature: 'Join Communities', free: true, licensed: true },
-    { feature: 'Membership Access', free: '1-year trial', licensed: 'R149 once-off' },
+    { feature: 'Membership Access', free: '1-year trial', licensed: 'R99/year' },
     { feature: 'Create Community', free: '30-day trial', licensed: 'R999 once-off' },
-    { feature: 'Community Ownership', free: false, licensed: true },
-    { feature: 'Access Duration', free: 'Trial-limited', licensed: 'Pay once, lifetime' },
+    { feature: 'Community Active Status', free: 'Trial only', licensed: 'Permanent' },
+    { feature: 'Post & Interact', free: 'During trial', licensed: 'Active subscription' },
     { feature: 'Extra Communities', free: false, licensed: 'R999 each' },
-    { feature: 'Recurring Fees', free: 'None', licensed: 'None' },
+    { feature: 'Recurring Fees (Membership)', free: 'None (trial)', licensed: 'R99/year' },
   ];
 
   const renderCheckOrX = (val: boolean | string, isLicensed: boolean) => {
@@ -149,16 +149,16 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
         {/* Hero */}
         <View style={styles.heroSection}>
           <Text style={styles.heroTitle}>
-            Own Your Community.{'\n'}
-            <Text style={{ color: SECONDARY }}>Stay Connected for Life.</Text>
+            Free for 1 Year.{' \n'}
+            <Text style={{ color: SECONDARY }}>Then R99/year.</Text>
           </Text>
           <Text style={styles.heroSubtitle}>
-            Start with free trials, then pay once for lifetime access: R149 for membership or R999
-            to create and lead a community.
+            Start with a free 1-year trial. After that, stay connected for just R99/year.{' '}
+            Launching a community? R999 once-off — yours permanently.
           </Text>
           <View style={styles.heroButtons}>
             <TouchableOpacity style={styles.primaryCta} onPress={handleUpgrade} activeOpacity={0.85}>
-              <Text style={styles.primaryCtaText}>Get Membership for R149</Text>
+              <Text style={styles.primaryCtaText}>Subscribe — R99/year</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryCta} onPress={handleBack} activeOpacity={0.85}>
               <Text style={styles.secondaryCtaText}>Join a Community</Text>
@@ -174,10 +174,10 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
               <Crown size={28} color="#fc7127" />
             </View>
             <View style={styles.pricingInfo}>
-              <Text style={styles.pricingTierTitle}>Membership Only</Text>
-              <Text style={styles.pricingTierSub}>ONCE-OFF PAYMENT</Text>
+              <Text style={styles.pricingTierTitle}>Platform Membership</Text>
+              <Text style={styles.pricingTierSub}>FREE FOR 1 YEAR → ANNUAL SUBSCRIPTION</Text>
             </View>
-            <Text style={styles.pricingAmount}>R149</Text>
+            <Text style={styles.pricingAmount}>R99/yr</Text>
           </View>
 
           {membershipFeatures.map((item, i) => (
@@ -194,7 +194,7 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
           {/* Community tier */}
           <View style={styles.pricingRow}>
             <View style={styles.pricingInfo}>
-              <Text style={styles.pricingTierTitle}>Community Creation (Includes Membership)</Text>
+              <Text style={styles.pricingTierTitle}>Community Creation (30-day trial included)</Text>
             </View>
             <Text style={styles.pricingAmount}>R999</Text>
           </View>
@@ -217,27 +217,28 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
           </View>
 
           <View style={styles.ruleCard}>
-            <Text style={styles.ruleCardTitle}>Membership (R149 once-off) gives you:</Text>
-            <Text style={styles.ruleCardBullet}>• Lifetime platform access after payment</Text>
-            <Text style={styles.ruleCardBullet}>• A separate 1-year trial before payment is enforced</Text>
+            <Text style={styles.ruleCardTitle}>Platform Membership — free for 1 year, then R99/year</Text>
+            <Text style={styles.ruleCardBullet}>• 1-year free trial starts automatically on signup</Text>
+            <Text style={styles.ruleCardBullet}>• After trial: subscribe for R99/year to keep access</Text>
+            <Text style={styles.ruleCardBullet}>• Expired membership = restricted access until renewed</Text>
           </View>
 
           <View style={styles.ruleCard}>
-            <Text style={styles.ruleCardTitle}>Community creation is R999 once-off</Text>
+            <Text style={styles.ruleCardTitle}>Community creation — R999 once-off, permanent</Text>
             <Text style={styles.ruleCardDesc}>
-              Creating a community includes membership, and each community keeps its own 30-day
-              trial.
+              Your community is free for 30 days. Pay R999 to activate it permanently — no annual
+              community fees.
             </Text>
           </View>
 
           <View style={styles.ruleGridRow}>
             <View style={styles.ruleGridCard}>
               <Text style={styles.ruleGridLabel}>MEMBERSHIP</Text>
-              <Text style={styles.ruleGridValue}>1-year trial, then R149 once-off for lifetime access</Text>
+              <Text style={styles.ruleGridValue}>1-year free trial → R99/year subscription</Text>
             </View>
             <View style={styles.ruleGridCard}>
-              <Text style={styles.ruleGridLabel}>OWNERSHIP</Text>
-              <Text style={styles.ruleGridValue}>30-day trial per community, then R999 once-off each</Text>
+              <Text style={styles.ruleGridLabel}>COMMUNITY</Text>
+              <Text style={styles.ruleGridValue}>30-day trial → R999 once-off permanent activation</Text>
             </View>
           </View>
         </View>
@@ -291,13 +292,13 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
 
         {/* Final CTA */}
         <View style={styles.finalCta}>
-          <Text style={styles.finalCtaTitle}>Pay Once. Belong for Life.</Text>
+          <Text style={styles.finalCtaTitle}>Simple, Transparent Pricing.</Text>
           <Text style={styles.finalCtaSubtitle}>
-            Keep it simple: R149 once-off for membership, or R999 once-off to create and lead a
-            community. No subscriptions, no renewals.
+            Membership is free for 1 year, then R99/year. Launch a community for R999 once-off —
+            permanent, no annual community fees.
           </Text>
           <TouchableOpacity style={styles.finalCtaBtn} onPress={handleUpgrade} activeOpacity={0.85}>
-            <Text style={styles.finalCtaBtnText}>Start with Membership - R149</Text>
+            <Text style={styles.finalCtaBtnText}>Subscribe — R99/year</Text>
           </TouchableOpacity>
         </View>
 

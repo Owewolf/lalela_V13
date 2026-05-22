@@ -1,3 +1,4 @@
+import { defaultMapViewProps } from "../../lib/mapViewProps";
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -147,14 +148,18 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
     }
   }, [business, communities, currentCommunity?.id, defaultLocation, visible]);
 
-  const reverseGeocodeName = async (lat: number, lng: number) => {
-    const geo = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
-    const place = geo[0];
-    return place
-      ? [place.name, place.street, place.subregion, place.city, place.region]
-          .filter(Boolean)
-          .join(', ')
-      : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  const reverseGeocodeName = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const geo = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
+      const place = geo[0];
+      if (place) {
+        const parts = [place.name, place.street, place.subregion, place.city, place.region].filter(Boolean);
+        if (parts.length > 0) return parts.join(', ');
+      }
+    } catch {
+      // Geocoding unavailable — fall back to coordinates
+    }
+    return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
   };
 
   const applyBusinessLocation = async (lat: number, lng: number, preferredName?: string) => {
@@ -227,7 +232,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: 0.8,
     });
 
@@ -463,23 +468,26 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
 
               <View style={{ gap: 8 }}>
                 <Text style={labelStyle}>Refine With Pin</Text>
-                <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
-                  <MapView
-                    style={{ width: '100%', height: 220 }}
+                <View style={{ height: 240, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
+                  <MapView {...defaultMapViewProps}
+                    style={{ flex: 1 }}
                     region={mapRegion}
                     onPress={(event: MapPressEvent) => {
                       const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
                       handleMapSelection(lat, lng);
                     }}
                   >
-                    <Marker
-                      coordinate={{ latitude: Number(latitude) || mapRegion.latitude, longitude: Number(longitude) || mapRegion.longitude }}
-                      draggable
-                      onDragEnd={(event) => {
-                        const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
-                        handleMapSelection(lat, lng);
-                      }}
-                    />
+                    {Number.isFinite(Number(latitude)) && Number(latitude) !== 0 &&
+                     Number.isFinite(Number(longitude)) && Number(longitude) !== 0 && (
+                      <Marker
+                        coordinate={{ latitude: Number(latitude), longitude: Number(longitude) }}
+                        draggable
+                        onDragEnd={(event) => {
+                          const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
+                          handleMapSelection(lat, lng);
+                        }}
+                      />
+                    )}
                   </MapView>
                 </View>
                 <Text style={{ fontSize: 11, color: '#6b7280' }}>

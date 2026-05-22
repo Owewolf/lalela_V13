@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type UserRole = 'Member' | 'Moderator' | 'Admin' | 'Liaison';
+export type UserRole = 'MEMBER' | 'MODERATOR' | 'ADMIN' | 'LIAISON';
 
 export interface CommunityNotice {
   id: string;
@@ -119,7 +119,8 @@ export interface Conversation {
   lastMessage: string;
   lastMessageAt: string;
   priority: 'normal' | 'high';
-  unreadCount: Record<string, number>;
+  /** Unread message count for the current viewer (server-derived from ConversationParticipant.unreadCount). */
+  unreadCount: number;
   metadata?: {
     type?: 'listing' | 'notice' | 'emergency';
     title?: string;
@@ -187,7 +188,7 @@ export interface UserProfile {
   profileImage?: string;
   agreedToTerms?: boolean;
   marketingConsent?: boolean;
-  licenseStatus: 'UNLICENSED' | 'LICENSED';
+  licenseStatus: 'UNLICENSED' | 'LICENSED' | 'TRIAL' | 'EXPIRED' | 'ACTIVE';
   status: 'ACTIVE' | 'READ-ONLY';
   twoFactorEnabled?: boolean;
   twoFactorMethod?: 'SMS' | 'App';
@@ -219,6 +220,10 @@ export interface UserProfile {
   licenseType?: 'SELF' | 'COMMUNITY_GRANTED';
   fcmToken?: string;
   notificationPreferences?: any;
+  // Trial & subscription dates
+  trialExpiresAt?: string;
+  subscriptionRenewalDate?: string;
+  subscriptionActive?: boolean;
 }
 
 export interface UserSession {
@@ -247,10 +252,11 @@ export interface Community {
   id: string;
   name: string;
   ownerId: string;
-  type: 'TRIAL' | 'LICENSED';
+  type: 'TRIAL' | 'LICENSED' | 'ACTIVE';
   createdAt?: any;
   licenseId?: string;
   trialEndDate: any;
+  trialExpiresAt?: string;
   status: 'ACTIVE' | 'READ-ONLY' | 'Live' | 'Maintenance' | 'Alert';
   isEmergencyMode?: boolean;
   activeEmergencyId?: string;
@@ -264,6 +270,8 @@ export interface Community {
   enabledCategories?: string[];
   onboardingStepsCompleted?: string[];
   guidedSetupRequired?: boolean;
+  activatedAt?: string;
+  isPaid?: boolean;
 }
 
 export interface UserBusiness {
@@ -284,6 +292,7 @@ export interface UserBusiness {
   charityPercentage?: number;
   status?: 'ACTIVE' | 'INACTIVE';
   source?: 'MEMBER' | 'IMPORT';
+  isMarketplaceOnly?: boolean;
 }
 
 export type CharityCategory = 'Community Support' | 'Education' | 'Health' | 'Animal Welfare' | 'Disaster Relief';
@@ -379,10 +388,13 @@ export interface CommunityInviteLink {
   communityId: string;
   communityName: string;
   createdBy: string;
-  createdAt: any;
-  expiresAt: any;
+  code: string;
+  role: string;
   uses: number;
+  maxUses?: number | null;
   active: boolean;
+  expiresAt: any;
+  createdAt: any;
 }
 
 export interface AppNotification {
@@ -390,7 +402,7 @@ export interface AppNotification {
   userId: string;
   title: string;
   message: string;
-  type: 'invitation' | 'system' | 'alert';
+  type: 'invitation' | 'system' | 'alert' | 'trial_expiry' | 'payment_reminder';
   link?: string;
   read: boolean;
   createdAt: any;
@@ -499,7 +511,7 @@ export interface CommunityContextType {
   userInvitations: CommunityInvitation[];
   communityInvitations: CommunityInvitation[];
   notifications: AppNotification[];
-  inviteMember: (userId: string, role: 'Member' | 'Moderator') => Promise<void>;
+  inviteMember: (userId: string, role: 'MEMBER' | 'MODERATOR') => Promise<void>;
   acceptInvitation: (invitationId: string) => Promise<void>;
   declineInvitation: (invitationId: string) => Promise<void>;
   markNotificationAsRead: (notificationId: string) => Promise<void>;

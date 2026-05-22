@@ -30,6 +30,7 @@ import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
+import { resolveMediaUrl } from '../../lib/config';
 import { InteractiveCoverageMap } from './InteractiveCoverageMap';
 import { CommunityNotice } from '../../types';
 
@@ -547,7 +548,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         {notice.postsImage && !isEmergencyOrWarning && (
           <View className="w-full aspect-video border-b border-gray-200/30 overflow-hidden">
             <Image
-              source={{ uri: notice.postsImage }}
+              source={{ uri: resolveMediaUrl(notice.postsImage) }}
               className="w-full h-full"
               resizeMode="cover"
             />
@@ -739,7 +740,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       >
         {typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0 && (
           <Image 
-            source={{ uri: listing.postsImage }} 
+            source={{ uri: resolveMediaUrl(listing.postsImage) }} 
             className="w-full h-24 bg-gray-100" 
             resizeMode="cover" 
           />

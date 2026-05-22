@@ -3,9 +3,11 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import MapView, { Marker, Circle, Callout } from 'react-native-maps';
 import { Shield, Siren, Users, Navigation } from 'lucide-react-native';
+import { defaultMapViewProps } from '../../lib/mapViewProps';
 import { useCommunity } from '../../context/CommunityContext';
 import { CommunityNotice } from '../../types';
 
@@ -88,19 +90,24 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
   );
 
   const fitToAllMarkers = () => {
+    if (Platform.OS === 'web') return;
     const markerPoints = [
       { latitude: emergencyLat, longitude: emergencyLng },
       ...activeResponders.map((r) => ({ latitude: r.latitude, longitude: r.longitude })),
       ...visibleMembers.map((m) => ({ latitude: m.latitude!, longitude: m.longitude! })),
     ];
-    if (markerPoints.length <= 1) {
-      ref.current?.animateToRegion(initialRegion, 400);
-      return;
+    try {
+      if (markerPoints.length <= 1) {
+        ref.current?.animateToRegion(initialRegion, 400);
+        return;
+      }
+      ref.current?.fitToCoordinates(markerPoints, {
+        edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+        animated: true,
+      });
+    } catch (error) {
+      console.warn('Map animation error on web:', error);
     }
-    ref.current?.fitToCoordinates(markerPoints, {
-      edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
-      animated: true,
-    });
   };
 
   React.useEffect(() => {
@@ -112,6 +119,7 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
   return (
     <View className="flex-1 relative">
       <MapView
+        {...defaultMapViewProps}
         ref={ref}
         style={{ flex: 1 }}
         initialRegion={initialRegion}

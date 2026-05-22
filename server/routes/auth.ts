@@ -5,6 +5,7 @@ import prisma from '../db.js';
 import { issueTokens, verifyRefreshToken } from '../middleware/auth.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../services/emailService.js';
 import { sendSms, generateOtp } from '../services/smsService.js';
+import { getFrontendUrl } from '../lib/urls.js';
 
 const router = Router();
 
@@ -81,8 +82,14 @@ router.get('/verify-email', async (req, res) => {
     prisma.user.update({ where: { id: record.userId }, data: { emailVerified: true } }),
   ]);
 
-  // Redirect to a deep-link or success page
-  const appUrl = process.env.APP_DEEP_LINK ?? 'lalela://verified';
+  // Redirect to the web frontend with a success flag so the landing page
+  // can show a 'verified — please sign in' banner. On native, the
+  // universal link / deep link fallback is handled by APP_DEEP_LINK.
+  const frontendUrl = getFrontendUrl();
+  const isWebBrowser = (req.headers.accept ?? '').includes('text/html');
+  const appUrl = isWebBrowser
+    ? `${frontendUrl}?verified=1`
+    : (process.env.APP_DEEP_LINK ?? `${frontendUrl}?verified=1`);
   return res.redirect(appUrl);
 });
 
@@ -174,10 +181,9 @@ router.post('/login', async (req, res) => {
       profileImage: user.profileImage,
       profileCompleted: user.profileCompleted,
       communityCreated: user.communityCreated,
-      onboardingCompleted: user.onboardingComplete,
+      onboardingCompleted: user.onboardingCompleted,
       lastCommunityId: user.lastCommunityId,
       licenseStatus: user.licenseStatus,
-      licenseType: user.licenseType,
       role: user.role,
       status: user.status,
       latitude: user.latitude,
@@ -329,7 +335,16 @@ router.post('/phone/verify-otp', async (req, res) => {
   // Find or create user by phone
   let user = await prisma.user.findUnique({ where: { phone } });
   if (!user) {
-    user = await prisma.user.create({ data: { phone, phoneVerified: true, name: '', email: `${phone.replace('+', '')}@phone.lalela.net` } });
+    // Fallback: the phone may have been cleared in the DB (e.g. manual cleanup) but the
+    // account still exists under the synthetic email. Re-link the phone rather than
+    // attempting a create that would fail with a duplicate synthetic-email error.
+    const syntheticEmail = `${phone.replace('+', '')}@phone.lalela.net`;
+    const existing = await prisma.user.findUnique({ where: { email: syntheticEmail } });
+    if (existing) {
+      user = await prisma.user.update({ where: { id: existing.id }, data: { phone, phoneVerified: true } });
+    } else {
+      user = await prisma.user.create({ data: { phone, phoneVerified: true, name: '', email: syntheticEmail } });
+    }
   } else {
     await prisma.user.update({ where: { id: user.id }, data: { phoneVerified: true } });
   }

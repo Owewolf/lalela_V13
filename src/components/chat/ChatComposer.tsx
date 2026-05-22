@@ -106,7 +106,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
       <View className="px-3 pb-3 pt-2">
         <View className="flex-row items-center justify-center gap-2 py-3 px-4 bg-red-50 border border-red-200 rounded-2xl">
           <Text className="text-red-600 text-xs font-bold text-center">
-            Your trial has expired. Pay R149 once-off for lifetime membership to continue chatting.
+            Your trial has expired. Subscribe for R99/year to continue chatting.
           </Text>
         </View>
       </View>

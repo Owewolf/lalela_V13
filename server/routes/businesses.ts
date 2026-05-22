@@ -1,13 +1,17 @@
 import { Router } from 'express';
 import prisma from '../db.js';
+import type { Prisma } from '../generated/prisma/index.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
 router.use(requireAuth);
 
+type BusinessWithOwner = Prisma.BusinessGetPayload<{ include: { owner: { select: { id: true; name: true } } } }>;
+type BusinessPlain = Prisma.BusinessGetPayload<Record<string, never>>;
+
 // Map DB snake_case → client camelCase
-function toClient(b: any) {
+function toClient(b: BusinessWithOwner | BusinessPlain) {
   return {
     id: b.id,
     ownerId: b.ownerId,
@@ -63,11 +67,11 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   const {
     name, category, description, address, latitude, longitude,
-    communityIds, community_ids,
-    contactPhone, phone,
-    contactEmail, website,
-    image, image_url,
-    charity_id, charityId,
+    communityIds,
+    contactPhone,
+    contactEmail,
+    image,
+    charityId,
     status,
   } = req.body;
   if (!name?.trim() || !category) return res.status(400).json({ error: 'name and category are required' });
@@ -78,14 +82,14 @@ router.post('/', async (req, res) => {
       name: name.trim(),
       category,
       description,
-      communityIds: communityIds ?? communityIds ?? [],
+      communityIds: communityIds ?? [],
       latitude,
       longitude,
       address,
-      phone: contactPhone ?? phone,
-      website: contactEmail ?? website,
-      imageUrl: image ?? image_url,
-      charityId: charityId ?? charity_id,
+      phone: contactPhone,
+      website: contactEmail,
+      imageUrl: image,
+      charityId,
       status: status ?? 'ACTIVE',
     },
   });
@@ -99,13 +103,12 @@ router.put('/:id', async (req, res) => {
   const {
     name, category, description, address,
     latitude, longitude,
-    // client sends camelCase aliases
-    communityIds, community_ids,
-    contactPhone, phone,
-    contactEmail, website,
-    image, image_url,
+    communityIds,
+    contactPhone,
+    contactEmail,
+    image,
     status,
-    charity_id, charityId,
+    charityId,
     subcategory,
   } = req.body;
 
@@ -119,11 +122,11 @@ router.put('/:id', async (req, res) => {
       ...(latitude !== undefined ? { latitude: Number(latitude) } : {}),
       ...(longitude !== undefined ? { longitude: Number(longitude) } : {}),
       ...(status !== undefined ? { status } : {}),
-      communityIds: communityIds ?? communityIds ?? existing.communityIds,
-      phone: contactPhone ?? phone ?? existing.phone,
-      website: contactEmail ?? website ?? existing.website,
-      imageUrl: image ?? image_url ?? existing.imageUrl,
-      charityId: charityId ?? charityId ?? existing.charityId,
+      communityIds: communityIds ?? existing.communityIds,
+      phone: contactPhone ?? existing.phone,
+      website: contactEmail ?? existing.website,
+      imageUrl: image ?? existing.imageUrl,
+      charityId: charityId ?? existing.charityId,
     },
   });
   return res.json(toClient(business));
@@ -137,21 +140,18 @@ router.delete('/:id', async (req, res) => {
 // ─── Bulk import (admin) ──────────────────────────────────────────────────────
 
 router.post('/import', async (req, res) => {
-  const { businesses, community_id, communityId } = req.body as {
+  const { businesses, communityId } = req.body as {
     businesses: Array<{
       name: string; category: string; description?: string;
       latitude?: number; longitude?: number; address?: string;
-      phone?: string; website?: string; image_url?: string;
+      phone?: string; website?: string; imageUrl?: string;
     }>;
-    community_id?: string;
     communityId?: string;
   };
 
   if (!Array.isArray(businesses) || businesses.length === 0) {
     return res.status(400).json({ error: 'businesses array is required' });
   }
-
-  const cid = communityId ?? communityId;
 
   const created = await prisma.business.createMany({
     data: businesses.map((b) => ({
@@ -164,10 +164,10 @@ router.post('/import', async (req, res) => {
       address: b.address,
       phone: b.phone,
       website: b.website,
-      imageUrl: b.image_url,
+      imageUrl: b.imageUrl,
       status: 'ACTIVE',
       source: 'IMPORT',
-      communityIds: cid ? [cid] : [],
+      communityIds: communityId ? [communityId] : [],
     })),
     skipDuplicates: true,
   });

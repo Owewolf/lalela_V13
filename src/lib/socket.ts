@@ -3,16 +3,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SOCKET_URL } from './config';
 
 let socket: Socket | null = null;
+const shouldLogSocketEvents = typeof __DEV__ !== 'undefined' && __DEV__;
 
 export async function getSocket(): Promise<Socket> {
-  if (socket?.connected) return socket;
-
-  const token = await AsyncStorage.getItem('access_token');
-
   if (socket) {
-    socket.disconnect();
-    socket = null;
+    if (!socket.connected && !socket.active) {
+      socket.connect();
+    }
+    return socket;
   }
+
+  const token = await AsyncStorage.getItem('accessToken');
 
   socket = io(SOCKET_URL, {
     auth: { token },
@@ -24,8 +25,10 @@ export async function getSocket(): Promise<Socket> {
     autoConnect: false,
   });
 
-  socket.on('connect', () => console.log('✅ Socket connected to backend'));
-  socket.on('disconnect', () => console.log('❌ Socket disconnected'));
+  if (shouldLogSocketEvents) {
+    socket.on('connect', () => console.log('✅ Socket connected to backend'));
+    socket.on('disconnect', () => console.log('❌ Socket disconnected'));
+  }
 
   socket.connect();
   return socket;

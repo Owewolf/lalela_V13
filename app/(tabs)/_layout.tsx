@@ -15,7 +15,7 @@ function ChatTabIcon({ color, focused }: { color: string; focused: boolean }) {
     <View>
       <MessageCircle size={24} color={color} />
       {unread > 0 && (
-        <View className="absolute -top-1 -right-1 bg-red-500 rounded-full min-w-[16px] h-4 items-center justify-center px-1">
+        <View className="absolute -top-1 -right-1 bg-green-500 rounded-full min-w-[16px] h-4 items-center justify-center px-1">
           <Text className="text-white text-[10px] font-bold">{unread > 99 ? '99+' : unread}</Text>
         </View>
       )}
@@ -28,7 +28,6 @@ export default function TabLayout() {
   const [showSidebar, setShowSidebar] = useState(false);
   const router = useRouter();
   const segments = useSegments();
-
   // Derive active tab name from route segments
   const activeTab = (segments as string[])[1] ?? 'index';
 
@@ -108,8 +107,6 @@ export default function TabLayout() {
         onClose={() => setShowSidebar(false)}
         activeTab={activeTab}
         onNavigate={handleNavigate}
-        onOpenAdmin={() => { setShowSidebar(false); router.push('/admin'); }}
-        onOpenSettings={() => { setShowSidebar(false); router.push('/(tabs)/settings'); }}
       />
       <NotificationCenter
         isOpen={showNotifications}

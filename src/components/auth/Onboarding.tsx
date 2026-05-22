@@ -29,6 +29,8 @@ import { uploadImage } from '../../lib/uploadImage';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MapView, { Marker, MapPressEvent } from 'react-native-maps';
+import { defaultMapViewProps } from '../../lib/mapViewProps';
 
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
@@ -274,8 +276,10 @@ const OnboardingInvite: React.FC = () => {
       const resolvedImage = profileImage || user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(resolvedName)}`;
 
       // Join community via invite code if present (server validates + adds member)
+      let joinedCommunityId: string | null = null;
       if (inviteCode.trim()) {
-        await api.post(`/communities/join/${inviteCode.trim()}`);
+        const { data: joinData } = await api.post(`/communities/join/${inviteCode.trim()}`);
+        joinedCommunityId = joinData?.communityId ?? null;
         await AsyncStorage.removeItem('pendingJoinCode');
       }
 
@@ -285,13 +289,13 @@ const OnboardingInvite: React.FC = () => {
         firstName: resolvedFirstName,
         lastName: resolvedLastName,
         email: resolvedEmail,
-        phone: resolvedPhone,
-        mobileNumber: resolvedPhone,
+        ...(resolvedPhone ? { phone: resolvedPhone, mobileNumber: resolvedPhone } : {}),
         address: locationName,
         profileImage: resolvedImage,
         profileCompleted: true,
         onboardingCompleted: true,
         defaultLocation: { name: locationName, latitude: locationLat, longitude: locationLng },
+        ...(joinedCommunityId ? { lastCommunityId: joinedCommunityId } : {}),
       });
 
       await Promise.all([
@@ -465,6 +469,46 @@ const OnboardingInvite: React.FC = () => {
                   {isFetchingLocation ? 'Getting location...' : 'Use current location instead'}
                 </Text>
               </TouchableOpacity>
+
+              {/* Map picker — fine-tune pin (parity with Android profile editor / LocationSettings) */}
+              {locationLat !== 0 && locationLng !== 0 && (
+                <View className="gap-1 mt-2">
+                  <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
+                    Refine With Pin
+                  </Text>
+                  <View style={{ height: 240, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb' }}>
+                    <MapView
+                      {...defaultMapViewProps}
+                      style={{ flex: 1 }}
+                      region={{
+                        latitude: locationLat,
+                        longitude: locationLng,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                      }}
+                      onPress={(event: MapPressEvent) => {
+                        const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
+                        setLocationLat(lat);
+                        setLocationLng(lng);
+                      }}
+                    >
+                      <Marker
+                        coordinate={{ latitude: locationLat, longitude: locationLng }}
+                        draggable
+                        onDragEnd={(event) => {
+                          const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
+                          setLocationLat(lat);
+                          setLocationLng(lng);
+                        }}
+                      />
+                    </MapView>
+                  </View>
+                  <Text className="text-[10px] text-gray-500 italic px-1 mt-1">
+                    Tap or drag the pin to fine-tune your exact location.
+                  </Text>
+                </View>
+              )}
+
               {locationName && locationLat !== 0 ? (
                 <View className="flex-row items-center gap-1 mt-1 ml-1">
                   <CheckCircle2 size={12} color="#10b981" />

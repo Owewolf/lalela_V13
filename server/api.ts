@@ -38,9 +38,34 @@ const upload = multer({
   fileFilter: (_req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'audio/mpeg', 'audio/mp4'];
     if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new Error('File type not allowed'));
+    else cb(new Error(`File type not allowed: ${file.mimetype}`));
   },
 });
+
+// Invoke multer manually so its errors come back as JSON rather than the
+// default Express HTML error page (which the mobile/web client just sees as a
+// generic "Network Error" or unparseable response).
+const uploadSingle = (req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
+  console.log('[upload] request received', {
+    contentType: req.headers['content-type'],
+    contentLength: req.headers['content-length'],
+    origin: req.headers.origin,
+    ua: req.headers['user-agent']?.slice(0, 60),
+  });
+  upload.single('file')(req, res, (err) => {
+    if (!err) {
+      console.log('[upload] multer parsed file', {
+        name: req.file?.originalname,
+        size: req.file?.size,
+        mime: req.file?.mimetype,
+      });
+      return next();
+    }
+    console.error('[upload] multer error', { message: err.message, code: (err as any).code });
+    const status = err instanceof multer.MulterError ? 400 : 415;
+    return res.status(status).json({ error: err.message || 'Upload rejected' });
+  });
+};
 
 function getMinioClient(): MinioClient | null {
   const endpoint = process.env.MINIO_ENDPOINT;
@@ -54,7 +79,7 @@ function getMinioClient(): MinioClient | null {
   });
 }
 
-router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
+router.post('/upload', requireAuth, uploadSingle, async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file provided' });
 
   const minio = getMinioClient();
@@ -64,17 +89,81 @@ router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
   const ext = path.extname(req.file.originalname) || '.bin';
   const objectName = `${req.auth!.userId}/${uuidv4()}${ext}`;
 
-  // Ensure bucket exists
-  const exists = await minio.bucketExists(bucket);
-  if (!exists) await minio.makeBucket(bucket, 'us-east-1');
+  try {
+    // Ensure bucket exists
+    const exists = await minio.bucketExists(bucket);
+    if (!exists) await minio.makeBucket(bucket, 'us-east-1');
 
-  await minio.putObject(bucket, objectName, req.file.buffer, req.file.size, {
-    'Content-Type': req.file.mimetype,
-  });
+    await minio.putObject(bucket, objectName, req.file.buffer, req.file.size, {
+      'Content-Type': req.file.mimetype,
+    });
+  } catch (err: any) {
+    console.error('[upload] MinIO put failed', {
+      bucket,
+      objectName,
+      endpoint: process.env.MINIO_ENDPOINT,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      code: err?.code,
+      message: err?.message,
+    });
+    // NOTE: status 500 (not 502) — many nginx setups have
+    // `proxy_intercept_errors on` and will replace 502/503/504 with their own
+    // error page, which strips the CORS headers our middleware added and
+    // hides this JSON body from the browser.
+    return res.status(500).json({
+      error: 'Storage upload failed',
+      detail: err?.message || String(err),
+      code: err?.code,
+    });
+  }
 
-  const base = process.env.MINIO_PUBLIC_URL ?? `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT ?? 9000}`;
-  const url = `${base}/${bucket}/${objectName}`;
+  // Build a URL that is reachable from whichever client made the upload.
+  //
+  // Behaviour:
+  //   1. If MINIO_PUBLIC_URL is set, use it as-is (e.g. https://minio.lalela.net).
+  //   2. Otherwise, return a URL relative to *this* API host (e.g.
+  //      http://10.0.2.2:4000/api/media/...) and stream the object back via
+  //      the GET /api/media/:bucket/* route below. This Just Works for the
+  //      Android emulator, the web dev server, and the production tunnel
+  //      without any further infra setup.
+  const explicitBase = process.env.MINIO_PUBLIC_URL?.replace(/\/$/, '');
+  // Return a path-only URL by default so it is portable across clients
+  // (the web at localhost:4000, the Android emulator at 10.0.2.2:4000,
+  // production at api.lalela.net). Each client resolves it against its
+  // own API base via `resolveMediaUrl()` on the client.
+  const url = explicitBase
+    ? `${explicitBase}/${bucket}/${objectName}`
+    : `/api/media/${bucket}/${objectName}`;
   return res.json({ url });
+});
+
+// Stream an object from MinIO back to the client. Public-readable; used as a
+// stable, host-agnostic URL for chat/post images so they are reachable from
+// every environment (Android emulator, web dev, production tunnel).
+router.get('/media/:bucket/*', async (req, res) => {
+  const bucket = req.params.bucket;
+  const objectName = (req.params as any)[0] as string;
+  if (!bucket || !objectName) return res.status(400).end();
+
+  const minio = getMinioClient();
+  if (!minio) return res.status(503).end();
+
+  try {
+    const stat = await minio.statObject(bucket, objectName);
+    res.setHeader('Content-Type', stat.metaData?.['content-type'] || 'application/octet-stream');
+    res.setHeader('Content-Length', String(stat.size));
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    const stream = await minio.getObject(bucket, objectName);
+    stream.on('error', () => { if (!res.headersSent) res.status(502).end(); });
+    stream.pipe(res);
+  } catch (err: any) {
+    console.error('[media] fetch failed', { bucket, objectName, code: err?.code, message: err?.message });
+    if (!res.headersSent) {
+      const status = err?.code === 'NoSuchKey' ? 404 : 500;
+      res.status(status).json({ error: err?.message || 'Media fetch failed' });
+    }
+  }
 });
 
 // ─── OG Image Extraction ──────────────────────────────────────────────────────

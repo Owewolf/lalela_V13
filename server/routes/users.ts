@@ -16,9 +16,9 @@ router.get('/me', async (req, res) => {
       id: true, email: true, name: true, firstName: true, lastName: true,
       phone: true, mobileNumber: true, address: true, profileImage: true,
       emailVerified: true, phoneVerified: true, status: true, role: true,
-      profileCompleted: true, communityCreated: true, onboardingComplete: true,
-      licenseStatus: true, licenseExpiry: true, licenseType: true, autoRenew: true,
-      accessType: true, expiryDate: true, memberExpiryDate: true,
+      profileCompleted: true, communityCreated: true, onboardingCompleted: true,
+      licenseStatus: true, trialExpiresAt: true,
+      subscriptionActive: true, subscriptionRenewalDate: true, autoRenew: true,
       twoFactorEnabled: true, twoFactorMethod: true, loginAlertsEnabled: true,
       profileVisibility: true, piiVisibility: true,
       lastPasswordChanged: true, securityScore: true,
@@ -37,8 +37,7 @@ router.get('/me', async (req, res) => {
     user.latitude != null && user.longitude != null
       ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
       : undefined;
-  // Normalize DB column name (onboarding_complete) to client field name (onboarding_completed)
-  return res.json({ ...user, onboardingCompleted: user.onboardingComplete, defaultLocation });
+  return res.json({ ...user, defaultLocation });
 });
 
 router.put('/me', async (req, res) => {
@@ -50,24 +49,22 @@ router.put('/me', async (req, res) => {
   }
 
   const allowed = [
-    'name', 'firstName', 'lastName', 'phone', 'mobileNumber', 'address',
+    'name', 'email', 'firstName', 'lastName', 'phone', 'mobileNumber', 'address',
     'profileImage', 'latitude', 'longitude', 'locationSharing',
     'isSecurityMember', 'emergencyLocationOptIn', 'lastCommunityId',
-    'profileCompleted', 'onboardingComplete', 'communityCreated',
+    'profileCompleted', 'onboardingCompleted', 'communityCreated',
     'twoFactorEnabled', 'twoFactorMethod', 'loginAlertsEnabled',
     'profileVisibility', 'piiVisibility', 'lastPasswordChanged', 'securityScore',
     'agreedToTerms', 'marketingConsent', 'notificationPreferences',
-    'licenseStatus', 'licenseExpiry', 'licenseType', 'autoRenew',
-    'accessType', 'expiryDate', 'memberExpiryDate',
+    'autoRenew',
     'pendingInviteCode', 'fcmToken',
+    // NOTE: licenseStatus, subscriptionActive, trialExpiresAt, subscriptionRenewalDate
+    // are intentionally excluded — only server-side billing logic may write these.
   ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in req.body) data[key] = req.body[key];
   }
-  // Accept onboarding_completed (client alias) → map to onboarding_complete (DB column)
-  if ('onboardingCompleted' in req.body) data['onboardingComplete'] = req.body['onboardingCompleted'];
-
   // Guard: profile_completed can only be set to true if a location is provided
   if (data['profileCompleted'] === true) {
     const current = await prisma.user.findUnique({ where: { id: req.auth!.userId }, select: { latitude: true, longitude: true, address: true } });
@@ -80,12 +77,30 @@ router.put('/me', async (req, res) => {
 
   // Guard: onboarding_complete can only be set to true if profile_completed is already true
   // OR is being set to true in the same request (atomic first-time completion).
-  if (data['onboardingComplete'] === true) {
+  if (data['onboardingCompleted'] === true) {
     const settingProfileNow = data['profileCompleted'] === true;
     if (!settingProfileNow) {
       const current = await prisma.user.findUnique({ where: { id: req.auth!.userId }, select: { profileCompleted: true } });
       if (!current?.profileCompleted) {
         return res.status(400).json({ error: 'Profile must be completed before finishing onboarding.' });
+      }
+    }
+  }
+
+  // Guard: phone is @unique — drop empty values and skip if already owned by this user;
+  // reject if owned by another account.
+  if ('phone' in data) {
+    const phoneVal = (data['phone'] as string | null | undefined);
+    if (!phoneVal || (typeof phoneVal === 'string' && phoneVal.trim() === '')) {
+      delete data['phone'];
+    } else {
+      const existing = await prisma.user.findUnique({ where: { phone: phoneVal as string }, select: { id: true } });
+      if (existing) {
+        if (existing.id === req.auth!.userId) {
+          delete data['phone'];
+        } else {
+          return res.status(409).json({ error: 'That phone number is already associated with another account.' });
+        }
       }
     }
   }
@@ -96,8 +111,7 @@ router.put('/me', async (req, res) => {
     user.latitude != null && user.longitude != null
       ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
       : undefined;
-  // Normalize the same way GET /me does — client always receives `onboarding_completed`
-  return res.json({ ...user, onboardingCompleted: user.onboardingComplete, defaultLocation });
+  return res.json({ ...user, defaultLocation });
 });
 
 // ─── Push Token ───────────────────────────────────────────────────────────────

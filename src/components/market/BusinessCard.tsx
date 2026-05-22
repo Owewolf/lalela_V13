@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { ArrowRight, Phone, Star, Clock, MessageSquare, Globe, MapPin } from 'lucide-react-native';
+import { showMapOptions } from '../../lib/maps';
 
 interface BusinessCardProps {
   name: string;
@@ -29,6 +30,10 @@ interface BusinessCardProps {
   website?: string;
   description?: string;
   address?: string;
+  ownerName?: string;
+  ownerImage?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 const sanitizeUrl = (url: string): string | null => {
@@ -62,9 +67,17 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
   website,
   description,
   address,
+  ownerName,
+  ownerImage,
+  latitude,
+  longitude,
 }) => {
   const [imgError, setImgError] = useState(false);
+  const [ownerImgError, setOwnerImgError] = useState(false);
   const safeWebsite = website ? sanitizeUrl(website) : null;
+  const removedOwnerLabel = ['my', 'business'].join(' ');
+  const visibleLabel = label?.trim().toLowerCase() === removedOwnerLabel ? undefined : label;
+  const ownerInitial = ownerName?.trim().charAt(0).toUpperCase();
 
   const handleCall = () => {
     if (!phone) return;
@@ -162,12 +175,24 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
           ) : null}
 
           {address ? (
-            <View className="flex-row items-center gap-1 mt-1">
-              <MapPin size={10} color="#9ca3af" />
-              <Text className="text-gray-300 text-[10px] flex-1" numberOfLines={1}>
-                {address}
-              </Text>
-            </View>
+            latitude && longitude ? (
+              <TouchableOpacity 
+                className="flex-row items-center gap-1 mt-1" 
+                onPress={() => showMapOptions(latitude, longitude, name)}
+              >
+                <MapPin size={10} color="#3b82f6" />
+                <Text className="text-blue-500 text-[10px] flex-1 font-medium" numberOfLines={1}>
+                  {address}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <View className="flex-row items-center gap-1 mt-1">
+                <MapPin size={10} color="#9ca3af" />
+                <Text className="text-gray-300 text-[10px] flex-1" numberOfLines={1}>
+                  {address}
+                </Text>
+              </View>
+            )
           ) : null}
         </View>
 
@@ -175,7 +200,29 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         <View className="flex-row items-center justify-between mt-2">
           {/* Left: metadata */}
           <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
-            {neighbors !== undefined ? (
+            {isMemberBusiness && ownerName ? (
+              <View className="flex-row items-center gap-2 flex-1 min-w-0">
+                <View className="w-7 h-7 rounded-full overflow-hidden bg-gray-200 items-center justify-center flex-shrink-0">
+                  {ownerImage && !ownerImgError ? (
+                    <Image
+                      source={{ uri: ownerImage }}
+                      className="w-full h-full"
+                      resizeMode="cover"
+                      onError={() => setOwnerImgError(true)}
+                    />
+                  ) : (
+                    <View className="w-full h-full items-center justify-center bg-primary/10">
+                      <Text className="text-primary font-bold text-[10px]">
+                        {ownerInitial || '?'}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                <Text className="text-gray-500 text-[11px] font-semibold flex-1" numberOfLines={1}>
+                  {ownerName}
+                </Text>
+              </View>
+            ) : neighbors !== undefined ? (
               <View className="flex-row items-center gap-2">
                 <View className="flex-row">
                   {[1, 2].map((i) => (
@@ -195,7 +242,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
                 <Clock size={12} color="#9ca3af" />
                 <Text className="text-[10px] text-gray-400">Closes {closingTime}</Text>
               </View>
-            ) : label ? (
+            ) : visibleLabel ? (
               <View
                 className={[
                   'px-2 py-0.5 rounded',
@@ -208,7 +255,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
                     labelType === 'top-rated' ? 'text-amber-700' : 'text-primary',
                   ].join(' ')}
                 >
-                  {label}
+                  {visibleLabel}
                 </Text>
               </View>
             ) : null}

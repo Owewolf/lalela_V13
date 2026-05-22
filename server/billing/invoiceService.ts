@@ -4,7 +4,9 @@
  */
 import PDFDocument from 'pdfkit';
 import { Client as MinioClient } from 'minio';
-import { LALELA_LOGO_BASE64 } from './emailAssets.js';
+import crypto from 'node:crypto';
+import { LALELA_INVOICE_LOGO_BUFFER } from './emailAssets.js';
+import { getApiBaseUrl } from '../lib/urls.js';
 import type { PrismaClient } from '../generated/prisma/index.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -41,6 +43,43 @@ function getMinioClient(): MinioClient {
   });
 }
 
+function getInvoiceBucket(): string {
+  return process.env.MINIO_INVOICES_BUCKET ?? process.env.MINIO_BUCKET ?? 'lalela';
+}
+
+function getInvoiceObjectName(invoiceNumber: string): string {
+  return `invoices/${invoiceNumber}.pdf`;
+}
+
+function getInvoiceTokenSecret(): string {
+  return process.env.INVOICE_LINK_SECRET
+    ?? process.env.JWT_SECRET
+    ?? process.env.MINIO_SECRET_KEY
+    ?? 'lalela-invoice-secret';
+}
+
+export function createInvoiceAccessToken(invoiceNumber: string): string {
+  return crypto
+    .createHmac('sha256', getInvoiceTokenSecret())
+    .update(invoiceNumber)
+    .digest('hex');
+}
+
+export function verifyInvoiceAccessToken(invoiceNumber: string, token: string): boolean {
+  const expected = createInvoiceAccessToken(invoiceNumber);
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(token));
+  } catch {
+    return false;
+  }
+}
+
+export function buildInvoiceApiUrl(invoiceNumber: string): string {
+  const base = getApiBaseUrl();
+  const token = createInvoiceAccessToken(invoiceNumber);
+  return `${base}/billing/invoices/${encodeURIComponent(invoiceNumber)}/pdf?token=${token}`;
+}
+
 // ─── Invoice Number ───────────────────────────────────────────────────────────
 
 export async function generateInvoiceNumber(prisma: PrismaClient): Promise<string> {
@@ -69,11 +108,9 @@ export function createInvoicePdf(data: InvoiceData): Promise<Buffer> {
     // ── Header bar ────────────────────────────────────────────────────────────
     doc.rect(0, 0, doc.page.width, 90).fill(TEAL);
 
-    // Logo from base64 (strip data URI prefix)
+    // The charcoal bubble logo carries its own shape, so render it directly.
     try {
-      const b64 = LALELA_LOGO_BASE64.replace(/^data:image\/png;base64,/, '');
-      const logoBuf = Buffer.from(b64, 'base64');
-      doc.image(logoBuf, 50, 14, { width: 56, height: 56 });
+      doc.image(LALELA_INVOICE_LOGO_BUFFER, 46, 14, { width: 64, height: 64 });
     } catch {
       // Logo load failed — continue without it
     }
@@ -88,7 +125,7 @@ export function createInvoicePdf(data: InvoiceData): Promise<Buffer> {
       .text('Community Platform', 118, 54)
       .fillColor('#ffffff')
       .fontSize(9)
-      .text('lalela.net  |  support@lalela.net', 118, 68);
+      .text('lalela.net  |  admin@lalela.net', 118, 68);
 
     // Invoice title
     doc
@@ -178,8 +215,8 @@ export function createInvoicePdf(data: InvoiceData): Promise<Buffer> {
 
 export async function uploadInvoicePdf(buffer: Buffer, invoiceNumber: string): Promise<string> {
   const minio = getMinioClient();
-  const bucket = process.env.MINIO_INVOICES_BUCKET ?? process.env.MINIO_BUCKET ?? 'lalela';
-  const objectName = `invoices/${invoiceNumber}.pdf`;
+  const bucket = getInvoiceBucket();
+  const objectName = getInvoiceObjectName(invoiceNumber);
 
   const exists = await minio.bucketExists(bucket);
   if (!exists) await minio.makeBucket(bucket, 'us-east-1');
@@ -188,9 +225,21 @@ export async function uploadInvoicePdf(buffer: Buffer, invoiceNumber: string): P
     'Content-Type': 'application/pdf',
   });
 
-  const base = process.env.MINIO_PUBLIC_URL
-    ?? `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT ?? 9000}`;
-  return `${base}/${bucket}/${objectName}`;
+  return buildInvoiceApiUrl(invoiceNumber);
+}
+
+export async function getInvoicePdf(invoiceNumber: string): Promise<Buffer> {
+  const minio = getMinioClient();
+  const bucket = getInvoiceBucket();
+  const objectName = getInvoiceObjectName(invoiceNumber);
+  const stream = await minio.getObject(bucket, objectName);
+
+  return await new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+    stream.on('error', reject);
+  });
 }
 
 // ─── DB Record ────────────────────────────────────────────────────────────────

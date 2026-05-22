@@ -47,12 +47,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
     [conversations, conversationId]
   );
 
-  const isChatDisabled =
-    userProfile?.status === 'READ-ONLY' ||
-    (userProfile?.licenseType === 'COMMUNITY_GRANTED' &&
-      userProfile?.licenseStatus === 'UNLICENSED' &&
-      userProfile?.memberExpiryDate &&
-      new Date(userProfile.memberExpiryDate) < new Date());
+  const isChatDisabled = userProfile?.licenseStatus === 'EXPIRED';
 
   useEffect(() => {
     setActiveConversation(conversationId);
@@ -92,7 +87,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
     chat?.otherParticipant?.mobileNumber ||
     chat?.otherParticipant?.phone ||
     null;
-  const role = member?.role || 'Member';
+  const role = member?.role || 'MEMBER';
   const directSubtitleParts: string[] = [];
   if (member?.role) directSubtitleParts.push(member.role);
   if (hasBusiness) directSubtitleParts.push('Business owner');
@@ -171,8 +166,8 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
 
   const roleBadgeBg = (r: string) => {
     switch (r) {
-      case 'Admin': return '#0d3d47';
-      case 'Moderator': return '#8b5cf6';
+      case 'ADMIN': return '#0d3d47';
+      case 'MODERATOR': return '#8b5cf6';
       default: return '#9ca3af';
     }
   };
@@ -201,7 +196,13 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
           <View className="flex-row items-center justify-between px-4 py-2.5 min-h-[70px]">
             <View className="flex-row items-center gap-3 flex-1 min-w-0">
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/chat');
+            }
+          }}
               activeOpacity={0.7}
               className="p-1.5 -ml-1.5 rounded-xl"
             >
@@ -408,7 +409,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
         <View className="flex-1 bg-[#f7f8fc]">
           <ChatWindow
             messages={messages}
-            conversation={chat || { id: conversationId, participants: [], type: 'direct', lastMessage: '', lastMessageAt: '', priority: 'normal', unreadCount: {} }}
+            conversation={chat || { id: conversationId, participants: [], type: 'direct', lastMessage: '', lastMessageAt: '', priority: 'normal', unreadCount: 0 }}
             isTyping={isTyping}
           />
         </View>

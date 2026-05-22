@@ -19,7 +19,6 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import { RTCView } from 'react-native-webrtc';
 import {
   PhoneOff,
   Mic,
@@ -29,6 +28,15 @@ import {
   RefreshCw,
 } from 'lucide-react-native';
 import { useCall } from '../../context/CallContext';
+
+// Lazy-load RTCView so the module doesn't crash in Expo Go (no native WebRTC).
+let RTCView: React.ComponentType<any>;
+try {
+  RTCView = require('react-native-webrtc').RTCView;
+} catch {
+  // Fallback: plain View used in Expo Go / environments without native WebRTC.
+  RTCView = (({ style }: { style?: any }) => <View style={style} />) as React.ComponentType<any>;
+}
 
 interface CallScreenProps {
   remoteName: string;

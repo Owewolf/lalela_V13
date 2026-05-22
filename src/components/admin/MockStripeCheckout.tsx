@@ -7,12 +7,13 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import { CreditCard, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react-native';
+import { CreditCard, CheckCircle2, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { accountService } from '../../services/accountService';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import api from '../../lib/api';
 
 const PRIMARY = '#0d3d47';
 
@@ -38,19 +39,19 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const price = type === 'membership' ? 'R149.00' : 'R999.00';
-  const title =
-    type === 'membership' ? 'Lifetime Membership' : 'Community Creation & Leadership';
-  const description =
-    type === 'membership'
-      ? 'Once-off payment for lifetime access to the Lalela platform.'
-      : 'Once-off payment to create and own a community (includes lifetime membership).';
+  const isMembership = type === 'membership';
+  const price = isMembership ? 'R99.00/year' : 'R999.00';
+  const payLabel = isMembership ? 'R99.00' : 'R999.00';
+  const title = isMembership ? 'Annual Membership Subscription' : 'Community Activation';
+  const description = isMembership
+    ? 'Annual subscription (R99/year) for continued access to the Lalela platform after your free trial.'
+    : 'Once-off payment (R999) to permanently activate your community. No recurring community fees.';;
 
   const handleBack = () => {
     if (onCancel) {
       onCancel();
     } else {
-      router.back();
+      if (router.canGoBack()) if (router.canGoBack()) router.back(); else router.replace('/admin'); else router.replace('/admin');
     }
   };
 
@@ -68,21 +69,22 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
     setLoading(true);
     try {
       if (type === 'community' && targetId) {
+        // Server updates DB: community.isPaid=true, type='ACTIVE', activatedAt=now
         await licenseCommunity(targetId);
       } else if (type === 'membership') {
-        await updateUserProfile({
-          licenseType: 'SELF',
-          licenseStatus: 'LICENSED',
-        } as any);
+        // Server updates DB: user.licenseStatus='ACTIVE', subscriptionActive=true, renewalDate=now+1yr
+        await accountService.simulateSuccessfulPayment('membership');
+        // Refresh local profile from server so new licenseStatus is reflected immediately
+        const { data: freshUser } = await api.get('/users/me');
+        await updateUserProfile(freshUser);
       }
-      await accountService.simulateSuccessfulPayment(type, targetId);
       setLoading(false);
       setSuccess(true);
       setTimeout(() => {
         handleSuccess();
       }, 2000);
     } catch (error) {
-      console.error('Payment failed to simulate via webhook:', error);
+      console.error('Payment simulation failed:', error);
       setLoading(false);
     }
   };
@@ -129,7 +131,9 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
 
             <View style={styles.priceDivider} />
             <Text style={styles.priceAmount}>{price}</Text>
-            <Text style={styles.priceLabel}>PAYING ONCE-OFF</Text>
+            <Text style={styles.priceLabel}>
+              {isMembership ? 'ANNUAL SUBSCRIPTION' : 'ONCE-OFF PAYMENT'}
+            </Text>
             <View style={styles.priceDivider} />
 
             <TouchableOpacity
@@ -144,7 +148,7 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
                   <Text style={styles.payBtnText}>Processing...</Text>
                 </>
               ) : (
-                <Text style={styles.payBtnText}>Pay {price}</Text>
+                <Text style={styles.payBtnText}>Pay {payLabel}</Text>
               )}
             </TouchableOpacity>
 

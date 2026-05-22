@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   Animated,
+  Platform,
 } from 'react-native';
 import {
   Bell,
@@ -55,7 +56,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     if (isOpen) {
       Animated.spring(translateX, {
         toValue: 0,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
         damping: 20,
         stiffness: 200,
       }).start();
@@ -63,7 +64,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       Animated.timing(translateX, {
         toValue: 350,
         duration: 200,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
       }).start();
     }
   }, [isOpen]);

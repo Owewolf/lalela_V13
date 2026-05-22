@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useRouter, useSegments } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Header } from './Header';
 import { MobileSidebar } from './MobileSidebar';
 import { NotificationCenter } from './NotificationCenter';
@@ -25,14 +25,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, activeTab }) => {
     }
   };
 
-  const handleOpenAdmin = (communityId: string, role: string) => {
-    router.push('/admin');
-  };
-
-  const handleOpenSettings = () => {
-    router.push('/(tabs)/settings');
-  };
-
   return (
     <View style={{ flex: 1 }}>
       <Header
@@ -49,8 +41,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, activeTab }) => {
         onClose={() => setShowSidebar(false)}
         activeTab={activeTab}
         onNavigate={handleNavigate}
-        onOpenAdmin={handleOpenAdmin}
-        onOpenSettings={handleOpenSettings}
       />
 
       <NotificationCenter

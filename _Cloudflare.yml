@@ -1,0 +1,18 @@
+tunnel: 4b361416-2b2f-4865-b5a2-e5a4d003b579
+credentials-file: /home/wolf/.cloudflared/4b361416-2b2f-4865-b5a2-e5a4d003b579.json
+
+ingress:
+  # Primary API (current)
+  - hostname: api.wolfslair.cc
+    service: http://localhost:4000
+
+  # NEW: Lalela API domain
+  - hostname: api.lalela.net
+    service: http://localhost:4000
+
+  # Home Assistant (unchanged)
+  - hostname: home.wolfslair.cc
+    service: http://localhost:8123
+
+  # Catch-all (must stay last)
+  - service: http_status:404

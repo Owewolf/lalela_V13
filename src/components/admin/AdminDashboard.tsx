@@ -15,7 +15,6 @@ import {
   LayoutDashboard,
   Gavel,
   HeartHandshake,
-  Map,
   Shield,
   Users,
   LogOut,
@@ -36,7 +35,6 @@ import {
   Navigation,
   CheckCircle2,
 } from 'lucide-react-native';
-import MapView, { Circle } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import api from '../../lib/api';
@@ -48,7 +46,7 @@ const PRIMARY = '#0d3d47';
 const ERROR = '#dc2626';
 const SECONDARY = '#7c3aed';
 
-const APP_LOGO = require('../../../assets/icon.png');
+const APP_LOGO = require('../../../assets/lalela_logo.png');
 
 interface AdminDashboardProps {
   onBack?: () => void;
@@ -104,7 +102,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const handleBack = () => {
     if (onBack) onBack();
-    else router.back();
+    else { if (router.canGoBack()) if (router.canGoBack()) router.back(); else router.replace('/'); else router.replace('/'); }
   };
 
   const handleOpenManageCharity = () => {
@@ -112,7 +110,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       onManageCharity();
       return;
     }
-    router.push({ pathname: '/settings' as any, params: { charityMode: 'manage' } });
+    setModerationTab('charity');
+    setActiveView('moderation');
   };
 
   const handleOpenSuggestCharity = () => {
@@ -120,8 +119,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const canManageCharity =
-    currentCommunity?.userRole === 'Admin' ||
-    currentCommunity?.userRole === 'Moderator';
+    currentCommunity?.userRole === 'ADMIN' ||
+    currentCommunity?.userRole === 'MODERATOR';
 
   React.useEffect(() => {
     if (!readOnly) return;
@@ -135,7 +134,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setMemberCount(members.length);
     setActiveVolunteersCount(
       members.filter(
-        (m: any) => m.role === 'Liaison' || m.role === 'Moderator'
+        (m: any) => m.role === 'LIAISON' || m.role === 'MODERATOR'
       ).length
     );
   }, [members]);
@@ -273,9 +272,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     >
       {/* Hero */}
       <View style={styles.heroSection}>
-        <Text style={styles.heroTitle}>Admin Control Center</Text>
+        <Text style={styles.heroTitle}>{currentCommunity?.name || 'Community'} Dashboard</Text>
         <Text style={styles.heroSubtitle}>
-          Real-time oversight for the {currentCommunity?.name || 'Community'} platform.
+          Real-time activity overview for the {currentCommunity?.name || 'Community'} platform.
         </Text>
       </View>
 
@@ -318,55 +317,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <View style={styles.alertBox}>
           <Text style={styles.alertBoxLabel}>ACTIVE ALERTS</Text>
           <Text style={[styles.alertBoxValue, { color: ERROR }]}>{activeAlertsCount}</Text>
-        </View>
-      </TouchableOpacity>
-
-      {/* Coverage Area preview */}
-      <TouchableOpacity
-        style={[styles.bentoCard, !readOnly && styles.bentoCardClickable]}
-        onPress={() => { if (!readOnly) { setModerationTab('coverage'); setActiveView('moderation'); } }}
-        activeOpacity={readOnly ? 1 : 0.85}
-      >
-        <View style={styles.coverageHeader}>
-          <View style={[styles.bentoIcon, { backgroundColor: '#f8fafc' }]}>
-            <Map size={20} color={PRIMARY} />
-          </View>
-          <View style={[styles.syncBadge, { backgroundColor: currentCommunity?.coverageArea?.locationName ? '#f0fdf4' : '#f8fafc' }]}>
-            <Text style={[styles.syncBadgeText, { color: currentCommunity?.coverageArea?.locationName ? '#1e5667' : '#64748b' }]}>
-              {currentCommunity?.coverageArea?.locationName ? 'Synced' : 'Default'}
-            </Text>
-          </View>
-        </View>
-        <Text style={styles.bentoTitle}>Coverage Area</Text>
-        <Text style={styles.bentoDesc} numberOfLines={1}>
-          {currentCommunity?.coverageArea?.locationName || 'Active Monitoring Zone'}
-        </Text>
-        <View style={styles.mapPreview}>
-          <MapView
-            style={{ flex: 1 }}
-            pointerEvents="none"
-            region={{
-              latitude: currentCommunity?.coverageArea?.latitude || -26.2041,
-              longitude: currentCommunity?.coverageArea?.longitude || 28.0473,
-              latitudeDelta: (currentCommunity?.coverageArea?.radius || 10) * 0.015,
-              longitudeDelta: (currentCommunity?.coverageArea?.radius || 10) * 0.015,
-            }}
-          >
-            <Circle
-              center={{
-                latitude: currentCommunity?.coverageArea?.latitude || -26.2041,
-                longitude: currentCommunity?.coverageArea?.longitude || 28.0473,
-              }}
-              radius={(currentCommunity?.coverageArea?.radius || 10) * 1000}
-              fillColor="rgba(124,58,237,0.15)"
-              strokeColor="rgba(124,58,237,0.4)"
-              strokeWidth={2}
-            />
-          </MapView>
-        </View>
-        <View style={styles.mapFooter}>
-          <Text style={styles.mapFooterText}>Radius: {currentCommunity?.coverageArea?.radius || 10}km</Text>
-          <Text style={styles.mapFooterText}>Sync: Just now</Text>
         </View>
       </TouchableOpacity>
 

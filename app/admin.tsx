@@ -11,8 +11,8 @@ export default function AdminScreen() {
   const isOwner = currentCommunity?.ownerId === userProfile?.id;
   const canAccess =
     isOwner ||
-    currentCommunity?.userRole === 'Admin' ||
-    currentCommunity?.userRole === 'Moderator';
+    currentCommunity?.userRole === 'ADMIN' ||
+    currentCommunity?.userRole === 'MODERATOR';
 
   return (
     <AdminDashboard

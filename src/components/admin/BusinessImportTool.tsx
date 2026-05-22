@@ -111,7 +111,6 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
         website: b.website,
         status: 'Open' as const,
         isExternal: true,
-        isVerified: false,
         image: `https://picsum.photos/seed/${encodeURIComponent(b.name)}/400/300`,
       }));
       setResults(businesses);
@@ -149,7 +148,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
         }));
 
       await bulkAddCommunityBusinesses(currentCommunity.id, toImport);
-      Alert.alert('Imported!', `${toImport.length} business(es) added to ${currentCommunity.name}.`);
+      Alert.alert('Imported!', `${toImport.length} business(es) added to ${currentCommunity.name} and made visible in Marketplace.`);
       onBack();
     } catch (e: any) {
       Alert.alert('Import failed', e?.message ?? 'An error occurred.');

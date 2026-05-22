@@ -15,6 +15,7 @@ import { GOOGLE_PLACES_API_KEY } from '../../constants';
 import MapView, { Marker, MapPressEvent, Region } from 'react-native-maps';
 import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
+import { defaultMapViewProps } from '../../lib/mapViewProps';
 
 interface LocationSettingsProps {
   isEditing?: boolean;
@@ -258,9 +259,10 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
           <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
             Refine With Pin
           </Text>
-          <View style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb' }}>
+          <View style={{ height: 240, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb' }}>
             <MapView
-              style={{ width: '100%', height: 220 }}
+              {...defaultMapViewProps}
+              style={{ flex: 1 }}
               initialRegion={mapRegion}
               region={mapRegion}
               onPress={(event: MapPressEvent) => {
@@ -268,14 +270,16 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
                 handleMapSelect(lat, lng);
               }}
             >
-              <Marker
-                coordinate={{ latitude: localLatitude || mapRegion.latitude, longitude: localLongitude || mapRegion.longitude }}
-                draggable
-                onDragEnd={(event) => {
-                  const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
-                  handleMapSelect(lat, lng);
-                }}
-              />
+              {localLatitude !== 0 && localLongitude !== 0 && (
+                <Marker
+                  coordinate={{ latitude: localLatitude, longitude: localLongitude }}
+                  draggable
+                  onDragEnd={(event) => {
+                    const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
+                    handleMapSelect(lat, lng);
+                  }}
+                />
+              )}
             </MapView>
           </View>
           <Text className="text-[10px] text-gray-500 italic px-1">

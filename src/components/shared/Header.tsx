@@ -46,7 +46,11 @@ export const Header: React.FC<HeaderProps> = ({
     currentCommunity?.type === 'ACTIVE' ||
     !!communityTrialActive;
   const isLicensed = isActive || isTrial || communityActive;
-  const ringColor = isLicensed ? '#10b981' : '#dc2626';
+  // Avatar ring reflects the *user's* personal license status, not the community's.
+  // Matches the logic used on the Settings profile avatar so both rings stay in sync.
+  const userIsLicensed =
+    userProfile?.licenseStatus === 'LICENSED' || currentCommunity?.type === 'LICENSED';
+  const ringColor = userIsLicensed ? '#10b981' : '#dc2626';
   // Read-only only if the user's own license is expired AND the community itself is not active
   const isReadOnly = licenseStatus === 'EXPIRED' || ((!isActive && !isTrial) && !communityActive);
   // Warn when trial expires within 5 days
@@ -186,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
                 ]}
               />
             )}
-            <Bell size={24} color={unreadCount > 0 ? '#ef4444' : PRIMARY} />
+            <Bell size={24} color={unreadCount > 0 ? '#16a34a' : PRIMARY} />
           </TouchableOpacity>
 
           <View style={styles.avatarWrapper}>
@@ -201,7 +205,7 @@ export const Header: React.FC<HeaderProps> = ({
               <View
                 style={[
                   styles.shieldBadge,
-                  { backgroundColor: isLicensed ? '#fc7127' : '#dc2626' },
+                  { backgroundColor: userIsLicensed ? '#fc7127' : '#dc2626' },
                 ]}
               >
                 <Shield size={8} color="#fff" />
@@ -304,7 +308,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#ef4444',
+    backgroundColor: '#22c55e',
   },
   avatarWrapper: {
     paddingLeft: 4,

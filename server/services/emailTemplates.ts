@@ -2,7 +2,7 @@
  * Shared Lalela email templates.
  * All transactional emails use baseEmailHtml() for consistent branding.
  */
-import { LALELA_LOGO_BASE64 } from '../billing/emailAssets.js';
+import { LALELA_EMAIL_HEADER_LOGO_BASE64 } from '../billing/emailAssets.js';
 
 const TEAL = '#0d3d47';
 const ORANGE = '#fc7127';
@@ -66,11 +66,10 @@ export function baseEmailHtml(bodyContent: string, preheader = ''): string {
         <!-- Header -->
         <tr>
           <td style="background:${TEAL};padding:28px 32px;text-align:center">
-            <img src="${LALELA_LOGO_BASE64}"
+            <img src="${LALELA_EMAIL_HEADER_LOGO_BASE64}"
                  alt="Lalela"
-                 width="64" height="64"
-                 style="display:block;margin:0 auto 12px;border-radius:10px">
-            <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:1px">Lalela</span>
+                 width="72"
+                 style="display:block;margin:0 auto;max-width:72px;height:auto;border-radius:16px;background:${CREAM}">
           </td>
         </tr>
 

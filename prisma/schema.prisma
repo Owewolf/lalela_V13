@@ -591,43 +591,6 @@ model License {
 }
 
 // =============================================
-// BILLING
-// =============================================
-
-model BillingRecord {
-  id               String    @id @default(cuid())
-  userId           String    @map("user_id")
-  type             String    // COMMUNITY | MEMBERSHIP
-  amount           Int       // in cents (e.g. 99900 = R999)
-  status           String    @default("PAID") // PAID | FAILED | PENDING
-  stripePaymentId  String?   @map("stripe_payment_id")
-  communityId      String?   @map("community_id")
-  createdAt        DateTime  @default(now()) @map("created_at")
-
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  community Community? @relation(fields: [communityId], references: [id])
-
-  @@index([userId])
-  @@index([communityId])
-  @@map("billing_records")
-}
-
-model Invoice {
-  id            String   @id @default(cuid())
-  userId        String   @map("user_id")
-  invoiceNumber String   @unique @map("invoice_number")
-  amount        Int      // in cents
-  type          String   // COMMUNITY | MEMBERSHIP
-  pdfUrl        String   @map("pdf_url")
-  createdAt     DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("invoices")
-}
-
-// =============================================
 // MODERATION LOGS
 // =============================================
 model ModerationLog {
@@ -663,4 +626,39 @@ model SecurityEvent {
 
   @@index([communityId])
   @@map("security_events")
+}
+
+// =============================================
+// BILLING
+// =============================================
+model BillingRecord {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  type        String   // 'COMMUNITY' | 'MEMBERSHIP'
+  amount      Int      // cents
+  status      String   @default("PAID")
+  communityId String?  @map("community_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community Community? @relation(fields: [communityId], references: [id])
+
+  @@index([userId])
+  @@index([communityId])
+  @@map("billing_records")
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  invoiceNumber String   @unique @map("invoice_number")
+  amount        Int      // cents
+  type          String   // 'COMMUNITY' | 'MEMBERSHIP'
+  pdfUrl        String   @map("pdf_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("invoices")
 }

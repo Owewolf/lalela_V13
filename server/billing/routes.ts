@@ -18,10 +18,33 @@ import { Router } from 'express';
 import prisma from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { handlePaymentSuccess } from './paymentService.js';
+import { getInvoicePdf, verifyInvoiceAccessToken } from './invoiceService.js';
 
 const router = Router();
 
-// All billing routes require auth
+router.get('/invoices/:invoiceNumber/pdf', async (req, res) => {
+  const { invoiceNumber } = req.params;
+  const token = typeof req.query.token === 'string' ? req.query.token : '';
+
+  if (!token || !verifyInvoiceAccessToken(invoiceNumber, token)) {
+    return res.status(403).json({ error: 'Invalid invoice link' });
+  }
+
+  try {
+    const pdf = await getInvoicePdf(invoiceNumber);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${invoiceNumber}.pdf"`);
+    return res.send(pdf);
+  } catch (err: any) {
+    if (err?.code === 'NoSuchKey' || err?.code === 'NoSuchObject' || err?.code === 'NotFound') {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+    console.error('[GET /billing/invoices/:invoiceNumber/pdf] error:', err);
+    return res.status(500).json({ error: 'Failed to retrieve invoice PDF' });
+  }
+});
+
+// All other billing routes require auth
 router.use(requireAuth);
 
 // ─── Create checkout session (mock) ──────────────────────────────────────────

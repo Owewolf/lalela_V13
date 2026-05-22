@@ -21,7 +21,7 @@ export default function JoinRoute() {
   // even if it fires before Step 2 below.
   useEffect(() => {
     if (inviteCode) {
-      AsyncStorage.setItem('pending_onboarding_invite', inviteCode);
+      AsyncStorage.setItem('pendingOnboardingInvite', inviteCode);
     }
   }, [inviteCode]);
 
@@ -39,7 +39,7 @@ export default function JoinRoute() {
         // Existing onboarded user — join silently, then drop back to tabs
         try {
           await joinViaInviteLink(inviteCode);
-          await AsyncStorage.removeItem('pending_onboarding_invite');
+          await AsyncStorage.removeItem('pendingOnboardingInvite');
           Alert.alert('Joined!', 'You have successfully joined the community.');
         } catch (e: any) {
           Alert.alert('Could not join', e?.message ?? 'Invalid or expired invite link.');

@@ -13,6 +13,7 @@ import {
 import {
   Lock,
   BellRing,
+  Building2,
   ChevronRight,
   ShieldCheck,
   MapPin,
@@ -27,7 +28,10 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationPreferences } from '../../types';
-import ManageUserBusinesses from './ManageUserBusinesses';
+
+
+const APP_LOGO = require('../../../assets/lalela_logo.png');
+const APP_LOGO_SELECTED = require('../../../assets/lalela_logo_transparent.png');
 import ManageCommunityCharity from './ManageCommunityCharity';
 
 const SettingsPage: React.FC = () => {
@@ -72,8 +76,8 @@ const SettingsPage: React.FC = () => {
 
   const roleColor = () => {
     switch (currentCommunity?.userRole) {
-      case 'Admin': return { bg: 'rgba(239,68,68,0.1)', text: '#ef4444', dot: '#ef4444' };
-      case 'Moderator': return { bg: 'rgba(37,99,235,0.1)', text: '#2563eb', dot: '#2563eb' };
+      case 'ADMIN': return { bg: 'rgba(239,68,68,0.1)', text: '#ef4444', dot: '#ef4444' };
+      case 'MODERATOR': return { bg: 'rgba(37,99,235,0.1)', text: '#2563eb', dot: '#2563eb' };
       default: return { bg: 'rgba(22,163,74,0.1)', text: '#0d3d47', dot: '#0d3d47' };
     }
   };
@@ -81,7 +85,10 @@ const SettingsPage: React.FC = () => {
   const hasTrialCommunity = (communities || []).some(
     (c: any) => c.ownerId === userProfile?.id && c.type === 'TRIAL'
   );
-  const canCreateNewCommunity = !hasTrialCommunity;
+  const ownsLicensedCommunity = (communities || []).some(
+    (c: any) => c.ownerId === userProfile?.id && c.type === 'LICENSED'
+  );
+  const canCreateNewCommunity = ownsLicensedCommunity && !hasTrialCommunity;
 
   const rc = roleColor();
 
@@ -168,7 +175,7 @@ const SettingsPage: React.FC = () => {
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                <Image source={require('../../../assets/icon.png')} style={{ width: 40, height: 40, borderRadius: 12 }} resizeMode="cover" />
+                <Image source={APP_LOGO_SELECTED} style={{ width: 40, height: 40, borderRadius: 12 }} resizeMode="cover" />
                 <View>
                   <Text style={{ fontSize: 9, fontWeight: '800', color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>Active Community</Text>
                   <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a1a', marginTop: 2 }}>
@@ -197,7 +204,7 @@ const SettingsPage: React.FC = () => {
               <View style={{ backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
                 {(communities || []).map((c, idx) => {
                   const isActive = c.id === currentCommunity?.id;
-                  const isAdminOrMod = c.ownerId === userProfile?.id || c.userRole === 'Admin' || c.userRole === 'Moderator';
+                  const isAdminOrMod = c.ownerId === userProfile?.id || c.userRole === 'ADMIN' || c.userRole === 'MODERATOR';
                   return (
                     <TouchableOpacity
                       key={c.id}
@@ -209,12 +216,12 @@ const SettingsPage: React.FC = () => {
                       }}
                     >
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
-                        <Image source={require('../../../assets/icon.png')} style={{ width: 32, height: 32, borderRadius: 10 }} resizeMode="cover" />
+                        <Image source={isActive ? APP_LOGO_SELECTED : APP_LOGO} style={{ width: 32, height: 32, borderRadius: 10 }} resizeMode="cover" />
                         <View>
                           <Text style={{ fontSize: 13, fontWeight: '700', color: isActive ? '#0d3d47' : '#1a1a1a' }}>{c.name}</Text>
                           <View style={{ flexDirection: 'row', gap: 6, marginTop: 2 }}>
                             <Text style={{ fontSize: 9, fontWeight: '800', color: isAdminOrMod ? '#2563eb' : '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
-                              {c.userRole || 'Member'}
+                              {c.userRole || 'MEMBER'}
                             </Text>
                             <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color: c.type === 'LICENSED' ? '#059669' : '#d97706' }}>
                               {c.type === 'LICENSED' ? 'Licensed' : 'Trial'}
@@ -287,6 +294,26 @@ const SettingsPage: React.FC = () => {
               )}
             </View>
           </View>
+
+          {/* ── Manage My Businesses ── */}
+          <TouchableOpacity
+            onPress={() => router.push({ pathname: '/security', params: { tab: 'businesses' } })}
+            style={{
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+              padding: 16, borderRadius: 16, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)',
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center' }}>
+                <Building2 size={20} color="#0d3d47" />
+              </View>
+              <View>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a1a' }}>Manage My Businesses</Text>
+                <Text style={{ fontSize: 11, color: '#888' }}>Create, edit and manage your businesses</Text>
+              </View>
+            </View>
+            <ChevronRight size={20} color="#9ca3af" />
+          </TouchableOpacity>
         </View>
 
         {initialCharityMode && (
@@ -297,11 +324,6 @@ const SettingsPage: React.FC = () => {
             }}
           />
         )}
-
-        <ManageUserBusinesses
-          communities={communities || []}
-          currentCommunity={currentCommunity || null}
-        />
 
         {/* ── Community License Card (Only for Trial) ── */}
         {currentCommunity?.type === 'TRIAL' && (currentCommunity.ownerId === userProfile?.id) && (

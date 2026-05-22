@@ -196,7 +196,13 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
 
         {/* Back button */}
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/');
+            }
+          }}
           className="absolute top-4 left-4 bg-white/95 p-2 rounded-xl shadow"
           style={{ zIndex: 30, elevation: 8 }}
           activeOpacity={0.8}

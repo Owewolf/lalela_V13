@@ -14,9 +14,29 @@ const app = express();
 const httpServer = createServer(app);
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
+//
+// Browsers reject `Access-Control-Allow-Origin: *` whenever the response also
+// sets `Access-Control-Allow-Credentials: true`. When ALLOWED_ORIGINS is unset
+// or contains `*` we therefore reflect the request origin instead of emitting
+// a literal wildcard, which keeps preflighted requests (e.g. multipart uploads
+// with an Authorization header) working from any front-end host.
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? '*').split(',');
-app.use(cors({ origin: allowedOrigins.includes('*') ? '*' : allowedOrigins, credentials: true }));
+const allowedOriginsRaw = (process.env.ALLOWED_ORIGINS ?? '*')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+const allowAnyOrigin = allowedOriginsRaw.includes('*');
+const allowedOrigins = allowedOriginsRaw.filter((o) => o !== '*');
+
+const corsOriginFn: cors.CorsOptions['origin'] = (origin, callback) => {
+  // Non-browser clients (curl, mobile native fetch) have no Origin header.
+  if (!origin) return callback(null, true);
+  if (allowAnyOrigin) return callback(null, origin);
+  if (allowedOrigins.includes(origin)) return callback(null, origin);
+  return callback(new Error(`Origin ${origin} not allowed by CORS`));
+};
+
+app.use(cors({ origin: corsOriginFn, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 
 // ─── REST API ─────────────────────────────────────────────────────────────────
@@ -26,7 +46,7 @@ app.use('/api', apiRouter);
 // ─── Socket.io ────────────────────────────────────────────────────────────────
 
 const io = new SocketServer(httpServer, {
-  cors: { origin: allowedOrigins.includes('*') ? '*' : allowedOrigins, methods: ['GET', 'POST'] },
+  cors: { origin: corsOriginFn, methods: ['GET', 'POST'], credentials: true },
 });
 
 // Auth middleware — verify JWT on socket handshake

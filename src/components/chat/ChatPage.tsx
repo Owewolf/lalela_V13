@@ -20,6 +20,24 @@ import { useAuth } from '../../context/AuthContext';
 import { calculateDistance } from '../../lib/utils';
 import { CommunityMember, Conversation } from '../../types';
 
+// The REST API returns conversation.participants as an array of
+// ConversationParticipant objects ({ userId, user, ... }), but legacy code paths
+// (and some socket payloads) may still supply plain string IDs. Normalise here
+// so member ↔ conversation matching works in either shape.
+function getParticipantId(p: any): string | null {
+  if (typeof p === 'string') return p;
+  if (p && typeof p === 'object') return p.userId ?? p.user?.id ?? p.id ?? null;
+  return null;
+}
+
+function otherParticipantId(conv: Conversation, myId: string): string | null {
+  for (const p of conv.participants as any[]) {
+    const id = getParticipantId(p);
+    if (id && id !== myId) return id;
+  }
+  return null;
+}
+
 function formatRelativeTime(dateStr: string): string {
   if (!dateStr) return '';
   try {
@@ -85,9 +103,9 @@ export const ChatPage: React.FC = () => {
     for (const conv of conversations) {
       if (!userProfile) continue;
       if (conv.type === 'community' || conv.type === 'emergency') continue;
-      const otherId = conv.participants.find((p) => p !== userProfile.id);
+      const otherId = otherParticipantId(conv, userProfile.id);
       if (!otherId) continue;
-      const myUnread = conv.unreadCount?.[userProfile.id] || 0;
+      const myUnread = conv.unreadCount || 0;
       const info = unreadInfoMap.get(otherId) || {
         direct: 0,
         listing: 0,
@@ -125,7 +143,7 @@ export const ChatPage: React.FC = () => {
 
       for (const conv of conversations) {
         if (conv.type === 'community' || conv.type === 'emergency') continue;
-        const otherId = conv.participants.find(p => p !== userProfile?.id);
+        const otherId = userProfile ? otherParticipantId(conv, userProfile.id) : null;
         if (otherId === m.userId) {
           if (!lastMessageConv || new Date(conv.lastMessageAt).getTime() > new Date(lastMessageConv.lastMessageAt).getTime()) {
             lastMessageConv = conv;
@@ -228,8 +246,8 @@ export const ChatPage: React.FC = () => {
 
   const roleBadgeBg = (role: string) => {
     switch (role) {
-      case 'Admin': return '#0d3d47';
-      case 'Moderator': return '#8b5cf6';
+      case 'ADMIN': return '#0d3d47';
+      case 'MODERATOR': return '#8b5cf6';
       default: return '#9ca3af';
     }
   };
@@ -363,26 +381,32 @@ export const ChatPage: React.FC = () => {
             <Text className="text-[11px] text-green-600 font-semibold flex-shrink-0">
               {lastMessageTime}
             </Text>
-            {unread.direct > 0 ? (
-              <View className="bg-green-500 rounded-full h-6 min-w-[24px] px-1.5 items-center justify-center">
-                <Text className="text-[11px] text-white font-black">
-                  {unread.direct > 99 ? '99+' : unread.direct}
-                </Text>
-              </View>
-            ) : null}
-
-            {unread.marketplace > 0 && unread.marketplaceConv ? (
-              <TouchableOpacity
-                onPress={() => openConversation(unread.marketplaceConv!)}
-                activeOpacity={0.7}
-                className="flex-row items-center gap-0.5 bg-purple-500 rounded-full h-6 min-w-[24px] px-1.5 items-center justify-center"
-              >
-                <Store size={9} color="white" />
-                <Text className="text-[11px] text-white font-black">
-                  {unread.marketplace > 99 ? '99+' : unread.marketplace}
-                </Text>
-              </TouchableOpacity>
-            ) : null}
+            {(() => {
+              const totalUnread =
+                unread.direct + unread.listing + unread.notice + unread.marketplace;
+              if (totalUnread <= 0) return null;
+              // Prefer opening the conversation that actually has unread messages.
+              const targetConv =
+                unread.directConv ||
+                unread.marketplaceConv ||
+                unread.listingConv ||
+                unread.noticeConv ||
+                null;
+              const onPress = targetConv
+                ? () => openConversation(targetConv)
+                : () => handleMemberTap(member);
+              return (
+                <TouchableOpacity
+                  onPress={onPress}
+                  activeOpacity={0.7}
+                  className="bg-green-500 rounded-full h-6 min-w-[24px] px-1.5 items-center justify-center"
+                >
+                  <Text className="text-[11px] text-white font-black">
+                    {totalUnread > 99 ? '99+' : totalUnread}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })()}
 
             {isEmergency && isSecurity && emergencyDistance != null ? (
               <View className="flex-row items-center gap-1">

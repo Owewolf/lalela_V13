@@ -115,8 +115,8 @@ export default function ManageCommunityCharity({
   } = useCommunity();
 
   const canManageCharity =
-    currentCommunity?.userRole === 'Admin' ||
-    currentCommunity?.userRole === 'Moderator';
+    currentCommunity?.userRole === 'ADMIN' ||
+    currentCommunity?.userRole === 'MODERATOR';
   const hasCommunity = !!currentCommunity?.id;
 
   const [showManager, setShowManager] = useState(false);

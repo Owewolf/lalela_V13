@@ -97,11 +97,7 @@ export const accountService = {
     type: 'membership' | 'community',
     targetId?: string,
   ): Promise<{ message: string; status: string }> {
-    try {
-      const { data } = await api.post('/billing/simulate-payment', { type, targetId });
-      return data;
-    } catch {
-      return { message: 'License activated successfully', status: 'active' };
-    }
+    const { data } = await api.post('/billing/simulate-payment', { type, targetId });
+    return data;
   },
 };
