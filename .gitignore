@@ -80,3 +80,6 @@ assets/Lalela Favicon - White on Green.png
 !assets/favicon.png
 !assets/lalela_email_logo_64.png
 .build-number
+
+# pm2 runtime logs
+logs/

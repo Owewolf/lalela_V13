@@ -171,6 +171,25 @@ fi
 ASSET_COUNT=$(unzip -l "${ZIPNAME}" | tail -1 | awk '{print $2}')
 success "ZIP verified — ${ASSET_COUNT} files, ${ZIP_SIZE}"
 
+# ── 9b. Restart backend via pm2 ───────────────────────────────────────────────
+# The deployed web bundle calls the API at EXPO_PUBLIC_API_URL (from
+# .env.production). We always reload the local backend so any server-side
+# code changes shipped in this commit go live at the same time as the web
+# bundle. `startOrReload` is idempotent: it starts the apps if they aren't
+# running, or performs a zero-downtime reload if they are.
+info "Reloading backend via pm2..."
+if ! command -v pm2 >/dev/null 2>&1; then
+  warn "pm2 is not installed — skipping backend reload. Install with: npm i -g pm2"
+else
+  if pm2 startOrReload ecosystem.config.js --update-env; then
+    pm2 save >/dev/null 2>&1 || true
+    success "Backend reloaded"
+    pm2 status
+  else
+    warn "pm2 reload failed — check 'pm2 logs' and 'pm2 status'"
+  fi
+fi
+
 # ── 10. Summary ───────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}══════════════════════════════════════════${NC}"
@@ -189,12 +208,13 @@ echo "  4. Extract — select 'Overwrite existing files'"
 echo "  5. Verify public_html/index.html and public_html/.htaccess exist"
 echo "  6. Open https://lalela.net in a browser"
 echo ""
-echo -e "${YELLOW}▶  ENSURE BACKEND IS RUNNING (local machine)${NC}"
+echo -e "${YELLOW}▶  BACKEND${NC}"
 echo ""
-echo "  pm2 status"
-echo "  # Both 'lalela-server' and 'lalela-tunnel' must be 'online'"
-echo "  # Quick health check:"
-echo "  curl https://api.wolfslair.cc/api/health"
-echo "  # To make this script fail on API health issues, run:"
-echo "  STRICT_API_HEALTH_CHECK=1 ./deploy-lalela.sh"
+echo "  This script just reloaded the local backend via pm2."
+echo "  Verify both 'lalela-server' and 'lalela-tunnel' are 'online':"
+echo "    pm2 status"
+echo "  Quick health check:"
+echo "    curl https://api.wolfslair.cc/api/health"
+echo "  To make this script fail on API health issues, run:"
+echo "    STRICT_API_HEALTH_CHECK=1 ./deploy-lalela.sh"
 echo ""
