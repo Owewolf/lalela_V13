@@ -26,7 +26,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
-import { isCommunityActive, isCommunityTrial, isUserLicensed } from '../../lib/licensing';
+import { isCommunityActive, isCommunityTrial, isCommunityLicensed, isUserLicensed } from '../../lib/licensing';
 import { NotificationPreferences } from '../../types';
 
 
@@ -127,15 +127,15 @@ const SettingsPage: React.FC = () => {
                   <Text style={{ fontSize: 13, color: '#4b5563' }}>{currentCommunity?.name}</Text>
                 </View>
                 {(() => {
-                  const active = isCommunityActive(currentCommunity);
-                  const trial = isCommunityTrial(currentCommunity);
-                  const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
-                  const palette = active
+                  // Profile pill is binary: ACTIVE (paid) vs UNLICENSED (trial /
+                  // expired / never-paid). The community-switcher row below shows
+                  // the finer-grained Active/Trial/Expired distinction.
+                  const licensed = isCommunityLicensed(currentCommunity);
+                  const label = licensed ? 'Active' : 'Unlicensed';
+                  const palette = licensed
                     ? { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)', fg: '#059669' }
-                    : trial
-                      ? { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)', fg: '#d97706' }
-                      : { bg: 'rgba(220,38,38,0.1)', border: 'rgba(220,38,38,0.2)', fg: '#dc2626' };
-                  const Icon = active ? ShieldCheck : AlertCircle;
+                    : { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)', fg: '#d97706' };
+                  const Icon = licensed ? ShieldCheck : AlertCircle;
                   return (
                     <View style={{
                       flexDirection: 'row', alignItems: 'center', gap: 4,
@@ -234,7 +234,7 @@ const SettingsPage: React.FC = () => {
                               {c.userRole || 'MEMBER'}
                             </Text>
                             {(() => {
-                              const active = isCommunityActive(c);
+                              const active = isCommunityLicensed(c);
                               const trial = isCommunityTrial(c);
                               const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
                               const color = active ? '#059669' : trial ? '#d97706' : '#dc2626';

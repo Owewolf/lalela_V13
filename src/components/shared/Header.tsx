@@ -5,7 +5,7 @@ import { Bell, Shield, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react-
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
-import { isUserLicensed } from '../../lib/licensing';
+import { isUserLicensed, isCommunityLicensed, isCommunityTrial } from '../../lib/licensing';
 
 const APP_LOGO_PATH = require('../../../assets/lalela_logo.png');
 const PRIMARY = '#0d3d47';
@@ -113,9 +113,15 @@ export const Header: React.FC<HeaderProps> = ({
   const roleColor = roleColors[userRole] ?? roleColors.Member;
 
   const communityType = currentCommunity?.type;
-  const typeBadgeBg = communityActive ? '#ecfdf5' : '#fffbeb';
-  const typeBadgeText = communityActive ? '#1e5667' : '#b45309';
-  const typeBadgeBorder = communityActive ? '#ffddb9' : '#fde68a';
+  // Badge in the header shows ACTIVE only when the community has been paid
+  // for (R999). A community still in its 30-day trial reads TRIAL. Other
+  // states read EXPIRED. Access/read-only logic continues to use
+  // `communityActive` so trial users keep their permissions.
+  const communityLicensed = isCommunityLicensed(currentCommunity);
+  const communityInTrial = isCommunityTrial(currentCommunity);
+  const typeBadgeBg = communityLicensed ? '#ecfdf5' : communityInTrial ? '#fffbeb' : '#fef2f2';
+  const typeBadgeText = communityLicensed ? '#1e5667' : communityInTrial ? '#b45309' : '#dc2626';
+  const typeBadgeBorder = communityLicensed ? '#ffddb9' : communityInTrial ? '#fde68a' : '#fecaca';
 
   const profileImageUri =
     userProfile?.profileImage ||
@@ -154,13 +160,13 @@ export const Header: React.FC<HeaderProps> = ({
                   { backgroundColor: typeBadgeBg, borderColor: typeBadgeBorder },
                 ]}
               >
-                {communityActive ? (
+                {communityLicensed ? (
                   <ShieldCheck size={9} color={typeBadgeText} />
                 ) : (
                   <AlertCircle size={9} color={typeBadgeText} />
                 )}
                 <Text style={[styles.badgeText, { color: typeBadgeText }]}>
-                  {communityActive ? 'Active' : communityType === 'TRIAL' ? 'Trial' : 'Inactive'}
+                  {communityLicensed ? 'Active' : communityInTrial ? 'Trial' : 'Expired'}
                 </Text>
               </View>
               {/* Role badge */}

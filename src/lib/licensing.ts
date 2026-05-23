@@ -44,6 +44,17 @@ export function isCommunityTrial(c: CommunityLike): boolean {
   return false;
 }
 
+/**
+ * True only when the community has been *licensed* (R999 once-off paid).
+ * A community in its 30-day trial window is NOT considered licensed.
+ * Use this for badge display — surfaces that must read "Active" only after
+ * payment, and "Trial"/"Unlicensed" while still on trial.
+ */
+export function isCommunityLicensed(c: CommunityLike): boolean {
+  if (!c) return false;
+  return c.isPaid === true || c.type === 'ACTIVE';
+}
+
 /** True when the user's *own* platform membership is active (paid R99/year, not expired). */
 export function isUserSubscriptionActive(u: UserLike): boolean {
   if (!u) return false;

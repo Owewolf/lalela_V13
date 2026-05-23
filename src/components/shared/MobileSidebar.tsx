@@ -29,7 +29,7 @@ import {
 } from 'lucide-react-native';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
-import { isCommunityActive, isCommunityTrial, isUserLicensed } from '../../lib/licensing';
+import { isCommunityActive, isCommunityTrial, isCommunityLicensed, isUserLicensed } from '../../lib/licensing';
 
 const PRIMARY = '#0d3d47';
 const APP_LOGO = require('../../../assets/icon.png');
@@ -246,7 +246,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                         </Text>
                         <View style={styles.communityBadges}>
                           {(() => {
-                            const active = isCommunityActive(c);
+                            const active = isCommunityLicensed(c);
                             const trial = isCommunityTrial(c);
                             const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
                             const bg = active ? '#ecfdf5' : trial ? '#fffbeb' : '#fef2f2';
