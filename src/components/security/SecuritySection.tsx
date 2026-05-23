@@ -21,6 +21,7 @@ import {
   Check,
   Info,
   Phone,
+  Mail,
 } from 'lucide-react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useAuth } from '../../context/AuthContext';
@@ -29,7 +30,7 @@ import { accountService } from '../../services/accountService';
 import { TwoFASetupResponse } from '../../types';
 
 export const SecuritySection: React.FC = () => {
-  const { userProfile, updateUserProfile, linkPhone, verifyLinkPhone } = useAuth();
+  const { userProfile, updateUserProfile, linkPhone, verifyLinkPhone, linkEmail, setInitialPassword, resendVerification } = useAuth();
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [twoFASetupData, setTwoFASetupData] = useState<TwoFASetupResponse | null>(null);
@@ -49,6 +50,17 @@ export const SecuritySection: React.FC = () => {
   const [phoneOtpSent, setPhoneOtpSent] = useState(false);
   const [phoneOtp, setPhoneOtp] = useState('');
   const [phoneLoading, setPhoneLoading] = useState(false);
+
+  // Email link state
+  const [showEmailLink, setShowEmailLink] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [emailPasswordInput, setEmailPasswordInput] = useState('');
+  const [emailPasswordConfirm, setEmailPasswordConfirm] = useState('');
+  const [showEmailPassword, setShowEmailPassword] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+
+  const hasPassword = userProfile?.hasPassword !== false; // default true if undefined (back-compat)
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.trim());
 
   const isLinkedPhoneValid =
     phoneFormatted.length >= 8 && (phoneInputRef.current?.isValidNumber(phoneRaw) ?? false);
@@ -110,17 +122,73 @@ export const SecuritySection: React.FC = () => {
       return;
     }
     try {
-      await api.post('/auth/change-password', {
-        current_password: passwordData.current,
-        new_password: passwordData.new,
-      });
-      await updateUserProfile({ lastPasswordChanged: new Date().toISOString() } as any);
+      if (hasPassword) {
+        await api.post('/auth/change-password', {
+          currentPassword: passwordData.current,
+          newPassword: passwordData.new,
+        });
+        await updateUserProfile({ lastPasswordChanged: new Date().toISOString() } as any);
+      } else {
+        // First-time password set for phone-only accounts.
+        await setInitialPassword(passwordData.new);
+      }
       setShowPasswordForm(false);
       setPasswordData({ current: '', new: '', confirm: '' });
-      setStatus({ type: 'success', message: 'Password changed successfully' });
-      setTimeout(() => setStatus(null), 3000);
+      setStatus({ type: 'success', message: hasPassword ? 'Password changed successfully' : 'Password set successfully — you can now log in with email and password' });
+      setTimeout(() => setStatus(null), 4000);
     } catch (error: any) {
-      setStatus({ type: 'error', message: error?.response?.data?.message ?? error.message ?? 'Failed to change password' });
+      setStatus({ type: 'error', message: error?.response?.data?.error ?? error?.response?.data?.message ?? error.message ?? 'Failed to update password' });
+    }
+  };
+
+  const handleLinkEmail = async () => {
+    if (emailLoading || !emailValid) return;
+    // When no password exists yet, force one in the same step so the user can
+    // actually log in with the email once they verify it.
+    if (!hasPassword) {
+      if (emailPasswordInput.length < 8) {
+        setStatus({ type: 'error', message: 'Password must be at least 8 characters' });
+        return;
+      }
+      if (emailPasswordInput !== emailPasswordConfirm) {
+        setStatus({ type: 'error', message: 'Passwords do not match' });
+        return;
+      }
+    }
+    setEmailLoading(true);
+    setStatus(null);
+    try {
+      await linkEmail(emailInput.trim().toLowerCase());
+      if (!hasPassword) {
+        await setInitialPassword(emailPasswordInput);
+      }
+      setShowEmailLink(false);
+      setEmailInput('');
+      setEmailPasswordInput('');
+      setEmailPasswordConfirm('');
+      setStatus({
+        type: 'success',
+        message: hasPassword
+          ? 'Verification email sent. Check your inbox to confirm.'
+          : 'Password saved and verification email sent. Confirm your email to start signing in with it.',
+      });
+      setTimeout(() => setStatus(null), 5000);
+    } catch (err: any) {
+      const msg = err?.response?.data?.error ?? err.message ?? 'Failed to link email';
+      setStatus({ type: 'error', message: msg });
+    } finally {
+      setEmailLoading(false);
+    }
+  };
+
+  const handleResendEmailVerification = async () => {
+    if (!userProfile?.email) return;
+    try {
+      await resendVerification(userProfile.email);
+      setStatus({ type: 'success', message: 'Verification email re-sent.' });
+      setTimeout(() => setStatus(null), 3000);
+    } catch (err: any) {
+      setStatus({ type: 'error', message: err?.response?.data?.error ?? err.message ?? 'Failed to resend' });
     }
   };
 
@@ -188,7 +256,9 @@ export const SecuritySection: React.FC = () => {
           </View>
           <View>
             <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Password</Text>
-            <Text style={{ fontSize: 10, color: '#888' }}>Last changed: {lastChangedText()}</Text>
+            <Text style={{ fontSize: 10, color: '#888' }}>
+              {hasPassword ? `Last changed: ${lastChangedText()}` : 'Not set — add one to log in with email'}
+            </Text>
           </View>
         </View>
         <TouchableOpacity
@@ -196,30 +266,32 @@ export const SecuritySection: React.FC = () => {
           style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: 'rgba(22,163,74,0.08)', borderRadius: 12 }}
         >
           <Text style={{ fontSize: 11, fontWeight: '800', color: '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
-            {showPasswordForm ? 'Cancel' : 'Change'}
+            {showPasswordForm ? 'Cancel' : hasPassword ? 'Change' : 'Set'}
           </Text>
         </TouchableOpacity>
       </View>
 
       {showPasswordForm && (
         <View style={{ gap: 12 }}>
-          {/* Current password */}
-          <View style={{ position: 'relative' }}>
-            <TextInput
-              value={passwordData.current}
-              onChangeText={(v) => setPasswordData({ ...passwordData, current: v })}
-              placeholder="Current Password"
-              placeholderTextColor="#aaa"
-              secureTextEntry={!showCurrentPass}
-              style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, paddingRight: 50, fontSize: 14, color: '#1a1a1a' }}
-            />
-            <TouchableOpacity
-              onPress={() => setShowCurrentPass(!showCurrentPass)}
-              style={{ position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' }}
-            >
-              {showCurrentPass ? <EyeOff size={18} color="#888" /> : <Eye size={18} color="#888" />}
-            </TouchableOpacity>
-          </View>
+          {/* Current password — only when changing an existing one */}
+          {hasPassword && (
+            <View style={{ position: 'relative' }}>
+              <TextInput
+                value={passwordData.current}
+                onChangeText={(v) => setPasswordData({ ...passwordData, current: v })}
+                placeholder="Current Password"
+                placeholderTextColor="#aaa"
+                secureTextEntry={!showCurrentPass}
+                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, paddingRight: 50, fontSize: 14, color: '#1a1a1a' }}
+              />
+              <TouchableOpacity
+                onPress={() => setShowCurrentPass(!showCurrentPass)}
+                style={{ position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' }}
+              >
+                {showCurrentPass ? <EyeOff size={18} color="#888" /> : <Eye size={18} color="#888" />}
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* New password */}
           <View style={{ position: 'relative' }}>
@@ -253,8 +325,114 @@ export const SecuritySection: React.FC = () => {
             onPress={handleChangePassword}
             style={{ backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center' }}
           >
-            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>Update Password</Text>
+            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>{hasPassword ? 'Update Password' : 'Set Password'}</Text>
           </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Email Address Card */}
+      <View style={{ backgroundColor: '#f5f5f5', borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+            <Mail size={22} color="#0d3d47" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Email Address</Text>
+            <Text style={{ fontSize: 10, color: '#888' }}>
+              {userProfile?.email
+                ? `${userProfile.email}${userProfile.emailVerified ? '  • Verified' : '  • Unverified'}`
+                : 'Add an email to log in with email + password'}
+            </Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            setShowEmailLink((v) => !v);
+            setEmailInput('');
+          }}
+          style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: 'rgba(22,163,74,0.08)', borderRadius: 12 }}
+        >
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
+            {showEmailLink ? 'Cancel' : userProfile?.email ? 'Change' : 'Link'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Unverified-email helper: resend link */}
+      {userProfile?.email && !userProfile.emailVerified && !showEmailLink && (
+        <TouchableOpacity onPress={handleResendEmailVerification}>
+          <Text style={{ fontSize: 12, color: '#2563eb', textAlign: 'center', textDecorationLine: 'underline' }}>
+            Resend verification email
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {showEmailLink && (
+        <View style={{ gap: 12 }}>
+          <TextInput
+            value={emailInput}
+            onChangeText={setEmailInput}
+            placeholder="you@example.com"
+            placeholderTextColor="#aaa"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoComplete="email"
+            textContentType="emailAddress"
+            style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+          />
+
+          {!hasPassword && (
+            <>
+              <Text style={{ fontSize: 12, color: '#666' }}>
+                Set a password now so you can sign in with this email later.
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20 }}>
+                <TextInput
+                  value={emailPasswordInput}
+                  onChangeText={setEmailPasswordInput}
+                  placeholder="New password (min 8 characters)"
+                  placeholderTextColor="#aaa"
+                  secureTextEntry={!showEmailPassword}
+                  autoCapitalize="none"
+                  autoComplete="new-password"
+                  textContentType="newPassword"
+                  style={{ flex: 1, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+                />
+                <TouchableOpacity onPress={() => setShowEmailPassword((v) => !v)}>
+                  {showEmailPassword ? <EyeOff size={18} color="#666" /> : <Eye size={18} color="#666" />}
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                value={emailPasswordConfirm}
+                onChangeText={setEmailPasswordConfirm}
+                placeholder="Confirm password"
+                placeholderTextColor="#aaa"
+                secureTextEntry={!showEmailPassword}
+                autoCapitalize="none"
+                autoComplete="new-password"
+                textContentType="newPassword"
+                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+              />
+            </>
+          )}
+
+          <TouchableOpacity
+            onPress={handleLinkEmail}
+            disabled={emailLoading || !emailValid || (!hasPassword && (emailPasswordInput.length < 8 || emailPasswordInput !== emailPasswordConfirm))}
+            style={{
+              backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center',
+              opacity: emailLoading || !emailValid || (!hasPassword && (emailPasswordInput.length < 8 || emailPasswordInput !== emailPasswordConfirm)) ? 0.5 : 1,
+            }}
+          >
+            {emailLoading
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>
+                  {hasPassword ? 'Send Verification Email' : 'Set Password & Send Verification'}
+                </Text>}
+          </TouchableOpacity>
+          <Text style={{ fontSize: 11, color: '#888', textAlign: 'center' }}>
+            We’ll send a verification link to confirm the address.
+          </Text>
         </View>
       )}
 

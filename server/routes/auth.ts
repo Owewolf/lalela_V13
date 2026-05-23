@@ -391,7 +391,21 @@ router.post('/phone/verify-otp', async (req, res) => {
       name: user.name,
       phone: user.phone,
       phoneVerified: user.phoneVerified,
+      profileImage: user.profileImage,
       profileCompleted: user.profileCompleted,
+      communityCreated: user.communityCreated,
+      onboardingCompleted: user.onboardingCompleted,
+      lastCommunityId: user.lastCommunityId,
+      licenseStatus: user.licenseStatus,
+      role: user.role,
+      status: user.status,
+      latitude: user.latitude,
+      longitude: user.longitude,
+      address: user.address,
+      defaultLocation:
+        user.latitude != null && user.longitude != null
+          ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
+          : undefined,
     },
   });
 });
@@ -632,6 +646,99 @@ router.post('/change-password', requireAuth, async (req, res) => {
   });
 
   return res.json({ message: 'Password updated successfully' });
+});
+
+// ─── Set Initial Password (authenticated) ─────────────────────────────────────
+//
+// For accounts that have no password yet (e.g. phone-only signups). Once a
+// password is set, the user can sign in via email + password as well.
+// Refuses to overwrite an existing password — those flows must go through
+// /change-password (requires currentPassword) or /reset-password.
+
+router.post('/set-password', requireAuth, async (req, res) => {
+  const { newPassword } = req.body as { newPassword?: string };
+  if (!newPassword || newPassword.length < 8) {
+    return res.status(400).json({ error: 'New password must be at least 8 characters' });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.auth!.userId } });
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.passwordHash) {
+    return res.status(409).json({ error: 'Password already set. Use change-password instead.' });
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash, lastPasswordChanged: new Date() },
+  });
+
+  await prisma.auditLog.create({
+    data: { userId: user.id, type: 'password_set', message: 'Initial password set', ip: req.ip ?? null },
+  });
+
+  return res.json({ message: 'Password set successfully' });
+});
+
+// ─── Link Email (authenticated) ───────────────────────────────────────────────
+//
+// Attach an email address to the current account (e.g. for phone-only users
+// who want to also log in by email). Immediately updates user.email and
+// resets emailVerified=false, then sends a verification link. Until the
+// link is followed, the email is attached but unverified. Rejects emails
+// already owned by another account or blacklisted.
+
+router.post('/link-email', requireAuth, async (req, res) => {
+  const { email: rawEmail } = req.body as { email?: string };
+  const email = rawEmail?.trim().toLowerCase();
+  if (!email || !emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Valid email is required' });
+  }
+
+  const userId = req.auth!.userId;
+
+  const blacklisted = await prisma.blacklistedEmail.findUnique({ where: { email } });
+  if (blacklisted) return res.status(403).json({ error: 'This email address cannot be used' });
+
+  const owner = await prisma.user.findUnique({ where: { email } });
+  if (owner && owner.id !== userId) {
+    return res.status(409).json({ error: 'This email is already linked to another account' });
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { email, emailVerified: false },
+  });
+
+  // Invalidate any previous verification tokens for this user.
+  await prisma.emailVerificationToken.updateMany({
+    where: { userId, used: false },
+    data: { used: true },
+  });
+
+  const token = await prisma.emailVerificationToken.create({
+    data: {
+      userId,
+      token: uuidv4(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    },
+  });
+
+  try {
+    await sendVerificationEmail(email, updated.name, token.token);
+  } catch (err) {
+    console.error('[auth/link-email] Failed to send verification email:', err);
+    return res.status(503).json({ error: 'Email linked but verification message failed to send. Use "Resend" to try again.' });
+  }
+
+  return res.json({
+    message: 'Verification email sent. Please check your inbox to confirm the address.',
+    user: {
+      id: updated.id,
+      email: updated.email,
+      emailVerified: updated.emailVerified,
+    },
+  });
 });
 
 export default router;

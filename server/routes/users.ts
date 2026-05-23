@@ -28,6 +28,7 @@ router.get('/me', async (req, res) => {
       notificationPreferences: true,
       fcmToken: true, pushToken: true, pushPlatform: true,
       pendingInviteCode: true,
+      passwordHash: true, // selected only to compute hasPassword; stripped from response below
       createdAt: true, updatedAt: true,
     },
   });
@@ -37,7 +38,9 @@ router.get('/me', async (req, res) => {
     user.latitude != null && user.longitude != null
       ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
       : undefined;
-  return res.json({ ...user, defaultLocation });
+  // Never leak the password hash to clients; expose a boolean flag instead.
+  const { passwordHash, ...safeUser } = user;
+  return res.json({ ...safeUser, hasPassword: passwordHash != null, defaultLocation });
 });
 
 router.put('/me', async (req, res) => {

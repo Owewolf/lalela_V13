@@ -1,6 +1,6 @@
 import '../global.css';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, Alert, View, StyleSheet, LogBox, Animated } from 'react-native';
+import { Platform, Alert, View, StyleSheet, LogBox, Animated, AppState } from 'react-native';
 
 // GooglePlacesAutocomplete uses a FlatList internally (nestedScrollEnabled is already set).
 // This warning is a false positive in the form layout context.
@@ -28,7 +28,16 @@ function parseJoinCode(url: string | null): string | null {
     return null;
   }
 }
-
+function parseVerifiedFlag(url: string | null): boolean {
+  if (!url) return false;
+  try {
+    const parsed = Linking.parse(url);
+    const v = parsed.queryParams?.verified;
+    return v === '1' || v === 'true';
+  } catch {
+    return false;
+  }
+}
 function getNotificationsModule() {
   return require('expo-notifications');
 }
@@ -67,7 +76,7 @@ async function registerForPushNotifications(): Promise<string | null> {
 // ─── Inner guard — runs inside all context providers ────────────────────────
 
 function AppGuard() {
-  const { userProfile, loading, registerPushToken, signOut } = useAuth();
+  const { userProfile, loading, registerPushToken, signOut, refreshProfile } = useAuth();
   // Map to legacy `user` shape used in this component
   const user = userProfile ? { uid: userProfile.id, email: userProfile.email, emailVerified: true, providerData: [] as any[] } : null;
   const { joinViaInviteLink } = useCommunity();
@@ -138,6 +147,23 @@ function AppGuard() {
     if (loading) return;
 
     const handleUrl = async (url: string | null) => {
+      // After email verification the server redirects to APP_DEEP_LINK with ?verified=1.
+      // Refresh the cached profile so emailVerified / community wiring is up to date.
+      if (parseVerifiedFlag(url)) {
+        try {
+          const fresh = await refreshProfile();
+          // If the account still has no password (e.g. user added an email to a
+          // phone-only account but never set a password), send them to the
+          // Login & Authentication tab so they can set one — otherwise they
+          // would never be able to log in with the email they just verified.
+          if (fresh && fresh.hasPassword === false) {
+            router.replace('/security?tab=security' as any);
+          }
+        } catch {
+          // Non-fatal
+        }
+      }
+
       const code = parseJoinCode(url);
       if (!code) return;
 
@@ -162,6 +188,23 @@ function AppGuard() {
     const sub = Linking.addEventListener('url', ({ url }) => handleUrl(url));
     return () => sub.remove();
   }, [user, userProfile, loading]);
+
+  // ── App resume → refresh profile when email is unverified ──────────────
+  // Covers the case where a user verifies their email in a web browser (e.g.
+  // desktop inbox) while the mobile app is still open in the background. On
+  // resume we re-fetch /users/me so emailVerified flips to true and the
+  // CommunityContext re-resolves the correct community/role.
+  useEffect(() => {
+    if (loading || !user) return;
+    if (userProfile?.emailVerified !== false) return;
+
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        refreshProfile().catch(() => undefined);
+      }
+    });
+    return () => sub.remove();
+  }, [user, userProfile?.emailVerified, loading, refreshProfile]);
 
   // ── Push notifications ────────────────────────────────────────────────────
   useEffect(() => {

@@ -31,6 +31,8 @@ interface AuthContextType {
   register: (email: string, password: string, name: string, phone?: string) => Promise<void>;
   /** Resend email verification */
   resendVerification: (email: string) => Promise<void>;
+  /** Force a re-fetch of /users/me and update local cache (used after email verification round-trip) */
+  refreshProfile: () => Promise<UserProfile | null>;
   /** Update the current user's profile via REST + refresh local cache */
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
   /** Request a password reset email */
@@ -46,8 +48,10 @@ interface AuthContextType {
   /** Send OTP to link a new phone number to the currently authenticated user */
   linkPhone: (phone: string) => Promise<void>;
   /** Verify OTP and attach phone to current user */
-  verifyLinkPhone: (phone: string, code: string) => Promise<void>;
-  /** Send OTP for SMS-based password reset (always 200 to prevent enumeration) */
+  verifyLinkPhone: (phone: string, code: string) => Promise<void>;  /** Attach (or replace) an email on the current account; triggers a verification email */
+  linkEmail: (email: string) => Promise<void>;
+  /** Set the initial password on an account that doesn't have one yet */
+  setInitialPassword: (newPassword: string) => Promise<void>;  /** Send OTP for SMS-based password reset (always 200 to prevent enumeration) */
   sendPhoneResetOtp: (phone: string) => Promise<void>;
   /** Reset password using OTP delivered by SMS */
   resetPasswordWithPhone: (phone: string, code: string, newPassword: string) => Promise<void>;
@@ -155,6 +159,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await api.post('/auth/resend-verification', { email });
   }, []);
 
+  // ── Refresh profile (used after email verification deep-link or app resume) ─
+  const refreshProfile = useCallback(async (): Promise<UserProfile | null> => {
+    try {
+      const { data: fresh } = await api.get<UserProfile>('/users/me');
+      setUserProfile(fresh);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
+      return fresh;
+    } catch {
+      return null;
+    }
+  }, []);
+
   // ── Update profile ────────────────────────────────────────────────────────
   const updateUserProfile = useCallback(async (data: Partial<UserProfile>) => {
     const { data: updated } = await api.put<UserProfile>('/users/me', data);
@@ -187,8 +203,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data } = await api.post('/auth/phone/verify-otp', { phone, code });
     if (data.accessToken) {
       await storeTokens(data.accessToken, data.refreshToken);
-      setUserProfile(data.user);
-      await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+      // Refetch the canonical profile so we get the full shape (role,
+      // lastCommunityId, licenseStatus, etc.) — mirrors the boot path and
+      // guards against any drift in the verify-otp response payload.
+      try {
+        const { data: fresh } = await api.get<UserProfile>('/users/me');
+        setUserProfile(fresh);
+        await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
+      } catch {
+        setUserProfile(data.user);
+        await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+      }
     }
   }, []);
 
@@ -202,6 +227,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (data?.user) {
       setUserProfile(data.user);
       await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+    }
+  }, []);
+
+  // ── Link email to current account ───────────────────────────────────
+  const linkEmail = useCallback(async (email: string) => {
+    await api.post('/auth/link-email', { email });
+    // Refresh the canonical profile so email + emailVerified=false are reflected.
+    try {
+      const { data: fresh } = await api.get<UserProfile>('/users/me');
+      setUserProfile(fresh);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
+    } catch {
+      // Non-fatal — next /users/me call will pick it up.
+    }
+  }, []);
+
+  // ── Set initial password (phone-only accounts) ────────────────────────
+  const setInitialPassword = useCallback(async (newPassword: string) => {
+    await api.post('/auth/set-password', { newPassword });
+    try {
+      const { data: fresh } = await api.get<UserProfile>('/users/me');
+      setUserProfile(fresh);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
+    } catch {
+      // Non-fatal.
     }
   }, []);
 
@@ -237,6 +287,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signOut,
         register,
         resendVerification,
+        refreshProfile,
         updateUserProfile,
         forgotPassword,
         changePassword,
@@ -245,6 +296,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         verifyPhoneOtp,
         linkPhone,
         verifyLinkPhone,
+        linkEmail,
+        setInitialPassword,
         sendPhoneResetOtp,
         resetPasswordWithPhone,
         sendSmsInvite,

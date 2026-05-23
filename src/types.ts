@@ -182,8 +182,10 @@ export interface UserProfile {
   firstName?: string;
   lastName?: string;
   email: string | null;
+  emailVerified?: boolean;
   phone?: string;
   phoneVerified?: boolean;
+  hasPassword?: boolean;
   mobileNumber?: string;
   address?: string;
   profileImage?: string;

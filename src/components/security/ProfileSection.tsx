@@ -9,8 +9,9 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { User, CheckCircle2, Smartphone, Camera, Siren, ShieldCheck } from 'lucide-react-native';
+import { User, CheckCircle2, Smartphone, Camera, Siren, ShieldCheck, Mail } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 import { LocationSettings } from './LocationSettings';
@@ -20,7 +21,8 @@ interface ProfileSectionProps {
 }
 
 export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = false }) => {
-  const { userProfile, updateUserProfile } = useAuth();
+  const { userProfile, updateUserProfile, linkEmail, resendVerification } = useAuth();
+  const router = useRouter();
   const { communities, toggleCommunityResponder } = useCommunity();
   const [isEditing, setIsEditing] = useState(initialEdit);
   const [isSaving, setIsSaving] = useState(false);
@@ -30,6 +32,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
 
   const [formData, setFormData] = useState({
     name: userProfile?.name || '',
+    email: userProfile?.email || '',
     phone: userProfile?.phone || '',
     address: userProfile?.address || userProfile?.defaultLocation?.name || '',
     profileImage: userProfile?.profileImage || '',
@@ -40,6 +43,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
     if (!isEditing && userProfile) {
       setFormData({
         name: userProfile.name || '',
+        email: userProfile.email || '',
         phone: userProfile.phone || '',
         address: userProfile.address || userProfile.defaultLocation?.name || '',
         profileImage: userProfile.profileImage || '',
@@ -77,6 +81,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
     setStatus(null);
     setFormData({
       name: userProfile?.name || '',
+      email: userProfile?.email || '',
       phone: userProfile?.phone || '',
       address: userProfile?.address || userProfile?.defaultLocation?.name || '',
       profileImage: userProfile?.profileImage || '',
@@ -94,13 +99,55 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
         profileImage: formData.profileImage,
         defaultLocation: formData.defaultLocation,
       });
+      // If the email was changed (or added), link it and trigger verification.
+      const trimmedEmail = formData.email.trim().toLowerCase();
+      const currentEmail = (userProfile?.email || '').trim().toLowerCase();
+      let emailLinked = false;
+      if (trimmedEmail && trimmedEmail !== currentEmail) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmedEmail)) {
+          setStatus({ type: 'error', message: 'Please enter a valid email address.' });
+          setIsSaving(false);
+          return;
+        }
+        // Block email add/change when the account has no password yet —
+        // otherwise the user would never be able to log in with the email.
+        if (userProfile?.hasPassword === false) {
+          setStatus({
+            type: 'error',
+            message: 'Set a password first under Login & Authentication so you can sign in with this email.',
+          });
+          setIsSaving(false);
+          return;
+        }
+        await linkEmail(trimmedEmail);
+        emailLinked = true;
+      }
       setIsEditing(false);
-      setStatus({ type: 'success', message: 'Your profile has been updated.' });
-      setTimeout(() => setStatus(null), 3000);
-    } catch {
-      setStatus({ type: 'error', message: 'Failed to update profile' });
+      setStatus({
+        type: 'success',
+        message: emailLinked
+          ? 'Profile updated. Check your inbox to verify your new email.'
+          : 'Your profile has been updated.',
+      });
+      setTimeout(() => setStatus(null), 4000);
+    } catch (err: any) {
+      const msg = err?.response?.data?.error ?? err?.response?.data?.message ?? 'Failed to update profile';
+      setStatus({ type: 'error', message: msg });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!userProfile?.email) return;
+    try {
+      await resendVerification(userProfile.email);
+      setStatus({ type: 'success', message: 'Verification email sent.' });
+      setTimeout(() => setStatus(null), 3000);
+    } catch (err: any) {
+      const msg = err?.response?.data?.error ?? err?.response?.data?.message ?? 'Failed to send verification email';
+      setStatus({ type: 'error', message: msg });
     }
   };
 
@@ -168,15 +215,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
           ) : (
             <Text className="text-xl font-bold text-gray-900">{userProfile?.name}</Text>
           )}
-          <View className="flex-row items-center gap-2">
-            <Text className="text-xs text-gray-500">{userProfile?.email}</Text>
-            {userProfile?.email && (
-              <View className="flex-row items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-full">
-                <CheckCircle2 size={10} color="#10b981" />
-                <Text className="text-[10px] font-bold text-primary uppercase">Verified</Text>
-              </View>
-            )}
-          </View>
         </View>
       </View>
 
@@ -196,6 +234,63 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
             <View className="flex-row items-center gap-2 p-3 bg-gray-50 rounded-xl">
               <Smartphone size={16} color="#6b7280" />
               <Text className="text-sm font-bold text-gray-900">{userProfile?.phone || 'Not set'}</Text>
+            </View>
+          )}
+        </View>
+
+        <View className="gap-y-1">
+          <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Email Address</Text>
+          {isEditing ? (
+            <View className="gap-y-1">
+              <TextInput
+                value={formData.email}
+                onChangeText={(v) => setFormData({ ...formData, email: v })}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={userProfile?.hasPassword !== false}
+                className={`rounded-xl px-4 py-2 text-sm ${userProfile?.hasPassword === false ? 'bg-gray-100 text-gray-400' : 'bg-gray-100 text-gray-900'}`}
+                placeholder="you@example.com"
+              />
+              {userProfile?.hasPassword === false ? (
+                <View className="gap-y-1">
+                  <Text className="text-[10px] text-yellow-700 italic px-1">
+                    Set a password first so you can sign in with email.
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => router.push('/security?tab=security' as any)}
+                    className="self-start bg-blue-50 px-3 py-1.5 rounded-lg"
+                  >
+                    <Text className="text-[11px] font-bold text-blue-600">Go to Login & Authentication</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : userProfile?.email && formData.email.trim().toLowerCase() !== userProfile.email.toLowerCase() ? (
+                <Text className="text-[10px] text-yellow-700 italic px-1">
+                  Changing your email will require re-verification.
+                </Text>
+              ) : !userProfile?.email ? (
+                <Text className="text-[10px] text-gray-400 italic px-1">
+                  Add an email so you can sign in with email + password.
+                </Text>
+              ) : null}
+            </View>
+          ) : (
+            <View className="flex-row items-center gap-2 p-3 bg-gray-50 rounded-xl">
+              <Mail size={16} color="#6b7280" />
+              <Text className="text-sm font-bold text-gray-900 flex-1" numberOfLines={1}>
+                {userProfile?.email || 'Not set'}
+              </Text>
+              {userProfile?.email && userProfile?.emailVerified && (
+                <View className="flex-row items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-full">
+                  <CheckCircle2 size={10} color="#10b981" />
+                  <Text className="text-[10px] font-bold text-primary uppercase">Verified</Text>
+                </View>
+              )}
+              {userProfile?.email && !userProfile?.emailVerified && (
+                <TouchableOpacity onPress={handleResendVerification} className="bg-yellow-50 px-2 py-0.5 rounded-full">
+                  <Text className="text-[10px] font-bold text-yellow-700 uppercase">Resend</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>
