@@ -83,3 +83,6 @@ assets/Lalela Favicon - White on Green.png
 
 # pm2 runtime logs
 logs/
+
+# Build artifacts
+lalela-static-*.zip
