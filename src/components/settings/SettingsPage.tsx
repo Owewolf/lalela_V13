@@ -26,6 +26,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
+import { isCommunityActive, isCommunityTrial, isUserLicensed } from '../../lib/licensing';
 import { NotificationPreferences } from '../../types';
 
 
@@ -81,17 +82,16 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  // Per pricing model: only a pending TRIAL community blocks creating another.
+  // Aligned with the sidebar gate so both surfaces stay consistent.
   const hasTrialCommunity = (communities || []).some(
-    (c: any) => c.ownerId === userProfile?.id && c.type === 'TRIAL'
+    (c: any) => c.ownerId === userProfile?.id && isCommunityTrial(c)
   );
-  const ownsLicensedCommunity = (communities || []).some(
-    (c: any) => c.ownerId === userProfile?.id && c.type === 'LICENSED'
-  );
-  const canCreateNewCommunity = ownsLicensedCommunity && !hasTrialCommunity;
+  const canCreateNewCommunity = !hasTrialCommunity;
 
   const rc = roleColor();
 
-  const isLicensed = userProfile?.licenseStatus === 'LICENSED' || currentCommunity?.type === 'LICENSED';
+  const isLicensed = isUserLicensed(userProfile, currentCommunity);
   const ringColor = isLicensed ? '#10b981' : '#dc2626';
 
   return (
@@ -126,19 +126,30 @@ const SettingsPage: React.FC = () => {
                   <MapPin size={14} color="#0d3d47" />
                   <Text style={{ fontSize: 13, color: '#4b5563' }}>{currentCommunity?.name}</Text>
                 </View>
-                <View style={{
-                  flexDirection: 'row', alignItems: 'center', gap: 4,
-                  paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, borderWidth: 1,
-                  backgroundColor: currentCommunity?.type === 'LICENSED' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
-                  borderColor: currentCommunity?.type === 'LICENSED' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)',
-                }}>
-                  {currentCommunity?.type === 'LICENSED'
-                    ? <ShieldCheck size={11} color="#059669" />
-                    : <AlertCircle size={11} color="#d97706" />}
-                  <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color: currentCommunity?.type === 'LICENSED' ? '#059669' : '#d97706' }}>
-                    {currentCommunity?.type === 'LICENSED' ? 'Licensed' : 'Unlicensed'}
-                  </Text>
-                </View>
+                {(() => {
+                  const active = isCommunityActive(currentCommunity);
+                  const trial = isCommunityTrial(currentCommunity);
+                  const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
+                  const palette = active
+                    ? { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)', fg: '#059669' }
+                    : trial
+                      ? { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)', fg: '#d97706' }
+                      : { bg: 'rgba(220,38,38,0.1)', border: 'rgba(220,38,38,0.2)', fg: '#dc2626' };
+                  const Icon = active ? ShieldCheck : AlertCircle;
+                  return (
+                    <View style={{
+                      flexDirection: 'row', alignItems: 'center', gap: 4,
+                      paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, borderWidth: 1,
+                      backgroundColor: palette.bg,
+                      borderColor: palette.border,
+                    }}>
+                      <Icon size={11} color={palette.fg} />
+                      <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color: palette.fg }}>
+                        {label}
+                      </Text>
+                    </View>
+                  );
+                })()}
               </View>
 
               {/* Role badges */}
@@ -222,9 +233,17 @@ const SettingsPage: React.FC = () => {
                             <Text style={{ fontSize: 9, fontWeight: '800', color: isAdminOrMod ? '#2563eb' : '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
                               {c.userRole || 'MEMBER'}
                             </Text>
-                            <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color: c.type === 'LICENSED' ? '#059669' : '#d97706' }}>
-                              {c.type === 'LICENSED' ? 'Licensed' : 'Trial'}
-                            </Text>
+                            {(() => {
+                              const active = isCommunityActive(c);
+                              const trial = isCommunityTrial(c);
+                              const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
+                              const color = active ? '#059669' : trial ? '#d97706' : '#dc2626';
+                              return (
+                                <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color }}>
+                                  {label}
+                                </Text>
+                              );
+                            })()}
                           </View>
                         </View>
                       </View>
@@ -348,7 +367,10 @@ const SettingsPage: React.FC = () => {
           </View>
         )}
 
-        {/* ── Create New Community ── */}
+        {/* ── Create New Community ──
+            Hidden when the owner still has a TRIAL community (pricing rule:
+            one trial per owner). Server enforces this via TRIAL_EXISTS as
+            the backstop. */}
         {canCreateNewCommunity && (
           <TouchableOpacity
             style={{

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react-native';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
+import { isCommunityActive, isCommunityTrial, isUserLicensed } from '../../lib/licensing';
 
 const PRIMARY = '#0d3d47';
 const APP_LOGO = require('../../../assets/icon.png');
@@ -51,7 +52,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 
 }) => {
   const router = useRouter();
-  const { currentCommunity, communities, setCurrentCommunity, createCommunity } = useCommunity();
+  const { currentCommunity, communities, setCurrentCommunity, createCommunity, refreshCommunities } = useCommunity();
   const { userProfile, signOut } = useAuth();
   const [communitiesExpanded, setCommunitiesExpanded] = useState(false);
 
@@ -61,15 +62,19 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   const chevronRotate = useRef(new Animated.Value(0)).current;
   const [visible, setVisible] = useState(false);
 
-  const isLicensed = userProfile?.licenseStatus === 'LICENSED' || currentCommunity?.type === 'LICENSED';
+  const isLicensed = isUserLicensed(userProfile, currentCommunity);
+  // Per pricing model: a TRIAL community must be activated (R999) before its
+  // owner can create another one. Communities in ACTIVE state don't block.
   const hasTrialCommunity = (communities || []).some(
-    (c: any) => c.ownerId === userProfile?.id && c.type === 'TRIAL'
+    (c: any) => c.ownerId === userProfile?.id && isCommunityTrial(c)
   );
   const canCreateNewCommunity = !hasTrialCommunity;
 
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
+      // Refresh from server so badges/gates reflect latest license state.
+      refreshCommunities?.().catch(() => {});
       Animated.parallel([
         Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
         Animated.spring(translateX, {
@@ -118,6 +123,9 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   };
 
   const handleCreateCommunity = () => {
+    // Per pricing model: a user may only own one TRIAL community at a time.
+    // The wizard backs this up server-side via TRIAL_EXISTS, but block here
+    // first so the user gets immediate feedback.
     if (canCreateNewCommunity) {
       router.push('/onboarding-create');
       onClose();
@@ -237,29 +245,27 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                           {c.name}
                         </Text>
                         <View style={styles.communityBadges}>
-                          <View
-                            style={[
-                              styles.smallBadge,
-                              {
-                                backgroundColor:
-                                  c.type === 'LICENSED' ? '#ecfdf5' : '#fffbeb',
-                              },
-                            ]}
-                          >
-                            {c.type === 'LICENSED' ? (
-                              <ShieldCheck size={8} color="#1e5667" />
-                            ) : (
-                              <AlertCircle size={8} color="#b45309" />
-                            )}
-                            <Text
-                              style={[
-                                styles.smallBadgeText,
-                                { color: c.type === 'LICENSED' ? '#1e5667' : '#b45309' },
-                              ]}
-                            >
-                              {c.type === 'LICENSED' ? 'Licensed' : 'Trial'}
-                            </Text>
-                          </View>
+                          {(() => {
+                            const active = isCommunityActive(c);
+                            const trial = isCommunityTrial(c);
+                            const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
+                            const bg = active ? '#ecfdf5' : trial ? '#fffbeb' : '#fef2f2';
+                            const fg = active ? '#1e5667' : trial ? '#b45309' : '#dc2626';
+                            const Icon = active ? ShieldCheck : AlertCircle;
+                            return (
+                              <View
+                                style={[
+                                  styles.smallBadge,
+                                  { backgroundColor: bg },
+                                ]}
+                              >
+                                <Icon size={8} color={fg} />
+                                <Text style={[styles.smallBadgeText, { color: fg }]}>
+                                  {label}
+                                </Text>
+                              </View>
+                            );
+                          })()}
                           <View
                             style={[
                               styles.smallBadge,

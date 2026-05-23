@@ -191,7 +191,9 @@ export interface UserProfile {
   profileImage?: string;
   agreedToTerms?: boolean;
   marketingConsent?: boolean;
-  licenseStatus: 'UNLICENSED' | 'LICENSED' | 'TRIAL' | 'EXPIRED' | 'ACTIVE';
+  // Aligned with `Pricing Licensing Model.md`. Legacy 'LICENSED' has been
+  // retired in favour of 'ACTIVE' (paid R99/year subscription).
+  licenseStatus: 'UNLICENSED' | 'TRIAL' | 'EXPIRED' | 'ACTIVE';
   status: 'ACTIVE' | 'READ-ONLY';
   twoFactorEnabled?: boolean;
   twoFactorMethod?: 'SMS' | 'App';
@@ -255,7 +257,9 @@ export interface Community {
   id: string;
   name: string;
   ownerId: string;
-  type: 'TRIAL' | 'LICENSED' | 'ACTIVE';
+  // Aligned with `Pricing Licensing Model.md`. Legacy 'LICENSED' has been
+  // retired in favour of 'ACTIVE' (paid R999 once-off activation).
+  type: 'TRIAL' | 'ACTIVE';
   createdAt?: any;
   licenseId?: string;
   trialEndDate: any;

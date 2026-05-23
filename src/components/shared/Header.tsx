@@ -5,6 +5,7 @@ import { Bell, Shield, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react-
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
+import { isUserLicensed } from '../../lib/licensing';
 
 const APP_LOGO_PATH = require('../../../assets/lalela_logo.png');
 const PRIMARY = '#0d3d47';
@@ -46,10 +47,11 @@ export const Header: React.FC<HeaderProps> = ({
     currentCommunity?.type === 'ACTIVE' ||
     !!communityTrialActive;
   const isLicensed = isActive || isTrial || communityActive;
-  // Avatar ring reflects the *user's* personal license status, not the community's.
-  // Matches the logic used on the Settings profile avatar so both rings stay in sync.
-  const userIsLicensed =
-    userProfile?.licenseStatus === 'LICENSED' || currentCommunity?.type === 'LICENSED';
+  // Avatar ring reflects whether the user currently has platform access —
+  // either via their own active subscription / trial, or via the community
+  // they are currently viewing being active. Uses the shared predicate so all
+  // surfaces (Header, Sidebar, Settings) stay in sync with the new pricing model.
+  const userIsLicensed = isUserLicensed(userProfile, currentCommunity);
   const ringColor = userIsLicensed ? '#10b981' : '#dc2626';
   // Read-only only if the user's own license is expired AND the community itself is not active
   const isReadOnly = licenseStatus === 'EXPIRED' || ((!isActive && !isTrial) && !communityActive);

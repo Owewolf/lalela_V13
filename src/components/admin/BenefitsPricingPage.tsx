@@ -110,7 +110,7 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
     { feature: 'Join Communities', free: true, licensed: true },
     { feature: 'Membership Access', free: '1-year trial', licensed: 'R99/year' },
     { feature: 'Create Community', free: '30-day trial', licensed: 'R999 once-off' },
-    { feature: 'Community Active Status', free: 'Trial only', licensed: 'Permanent' },
+    { feature: 'Community Status', free: 'Trial only', licensed: 'Permanently active' },
     { feature: 'Post & Interact', free: 'During trial', licensed: 'Active subscription' },
     { feature: 'Extra Communities', free: false, licensed: 'R999 each' },
     { feature: 'Recurring Fees (Membership)', free: 'None (trial)', licensed: 'R99/year' },
@@ -266,12 +266,12 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
 
         {/* Comparison Table */}
         <View style={styles.tableSection}>
-          <Text style={styles.tableSectionTitle}>Free vs Licensed</Text>
+          <Text style={styles.tableSectionTitle}>Trial vs Active</Text>
           <View style={styles.table}>
             <View style={styles.tableHeader}>
               <Text style={[styles.tableHeaderCell, { flex: 2 }]}>FEATURE</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1, textAlign: 'center' }]}>FREE</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1, textAlign: 'center' }]}>LICENSED</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1, textAlign: 'center' }]}>TRIAL</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1, textAlign: 'center' }]}>ACTIVE</Text>
             </View>
             {comparison.map((row, i) => (
               <View

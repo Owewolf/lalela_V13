@@ -327,12 +327,29 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const licenseCommunity = useCallback(async (communityId: string) => {
     const { data } = await api.post(`/communities/${communityId}/license`);
+    // Server transitions the community to ACTIVE (isPaid=true, activatedAt=now)
+    // and the owner's membership to ACTIVE (subscriptionActive=true, +1y renewal).
+    // Mirror those fields locally so the UI flips immediately, then refresh from
+    // the server in the background to pick up activatedAt / licenseId / etc.
+    const renewalDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
     setCommunities((prev) => prev.map((c) => c.id === communityId
-      ? { ...c, type: 'LICENSED', status: 'ACTIVE', licenseId: data.licenseId }
+      ? {
+          ...c,
+          ...mapServerCommunity(data),
+          type: 'ACTIVE',
+          status: 'ACTIVE',
+          isPaid: true,
+          activatedAt: data?.activatedAt ?? new Date().toISOString(),
+          licenseId: data?.licenseId ?? c.licenseId,
+        }
       : c
     ));
-    // Sync the user's licenseStatus locally so the green ring appears immediately
-    await updateUserProfile({ licenseStatus: 'LICENSED', licenseType: 'SELF' } as any);
+    await updateUserProfile({
+      licenseStatus: 'ACTIVE',
+      subscriptionActive: true,
+      subscriptionRenewalDate: renewalDate,
+    } as any);
+    if (loadRef.current) loadRef.current().catch(console.error);
   }, [updateUserProfile]);
 
   const updateCommunityCoverage = useCallback(async (communityId: string, coverage: CoverageArea) => {

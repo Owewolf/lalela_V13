@@ -130,7 +130,7 @@ function AppGuard() {
         .then((pendingCode) => {
           router.replace(pendingCode ? (`/onboarding?join=${pendingCode}` as any) : '/onboarding');
         });
-    } else if (onboardingComplete && !['(tabs)', 'admin', 'checkout', 'pricing', 'create-post', 'chat', 'emergency', 'call', 'notifications-settings', 'security'].includes(segments[0] as string)) {
+    } else if (onboardingComplete && !['(tabs)', 'admin', 'checkout', 'pricing', 'create-post', 'chat', 'emergency', 'call', 'notifications-settings', 'security', 'onboarding-create'].includes(segments[0] as string)) {
       // Navigate to tabs whenever authenticated+onboarded and not already there.
       // Do NOT gate on inAuthGroup — on web, segments may not reflect the current
       // URL at the exact moment setUserProfile fires (static rendering hydration),
