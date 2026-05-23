@@ -15,7 +15,7 @@ datasource db {
 // =============================================
 model User {
   id                      String    @id @default(cuid())
-  email                   String    @unique
+  email                   String?   @unique
   name                    String
   phone                   String?   @unique
   passwordHash            String?   @map("password_hash")
@@ -123,6 +123,7 @@ model OtpCode {
   userId    String?  @map("user_id")
   phone     String
   code      String
+  purpose   String   @default("login")
   expiresAt DateTime @map("expires_at")
   used      Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
@@ -130,6 +131,7 @@ model OtpCode {
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([phone])
+  @@index([phone, purpose])
   @@map("otp_codes")
 }
 

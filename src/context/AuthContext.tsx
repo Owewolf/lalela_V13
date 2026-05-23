@@ -43,6 +43,16 @@ interface AuthContextType {
   // ── Phone / OTP ────────────────────────────────────────────────────────────
   sendPhoneOtp: (phone: string) => Promise<void>;
   verifyPhoneOtp: (phone: string, code: string) => Promise<void>;
+  /** Send OTP to link a new phone number to the currently authenticated user */
+  linkPhone: (phone: string) => Promise<void>;
+  /** Verify OTP and attach phone to current user */
+  verifyLinkPhone: (phone: string, code: string) => Promise<void>;
+  /** Send OTP for SMS-based password reset (always 200 to prevent enumeration) */
+  sendPhoneResetOtp: (phone: string) => Promise<void>;
+  /** Reset password using OTP delivered by SMS */
+  resetPasswordWithPhone: (phone: string, code: string, newPassword: string) => Promise<void>;
+  /** Send an SMS invite to a neighbour */
+  sendSmsInvite: (phone: string, communityId: string) => Promise<void>;
 
   // ── Push token registration ────────────────────────────────────────────────
   registerPushToken: (token: string, platform: 'ios' | 'android') => Promise<void>;
@@ -182,6 +192,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  // ── Link phone to current account ─────────────────────────────────────────
+  const linkPhone = useCallback(async (phone: string) => {
+    await api.post('/auth/link-phone', { phone });
+  }, []);
+
+  const verifyLinkPhone = useCallback(async (phone: string, code: string) => {
+    const { data } = await api.post<{ user: UserProfile }>('/auth/verify-link-phone', { phone, code });
+    if (data?.user) {
+      setUserProfile(data.user);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+    }
+  }, []);
+
+  // ── Phone-based password reset ────────────────────────────────────────────
+  const sendPhoneResetOtp = useCallback(async (phone: string) => {
+    await api.post('/auth/phone/send-reset-otp', { phone });
+  }, []);
+
+  const resetPasswordWithPhone = useCallback(
+    async (phone: string, code: string, newPassword: string) => {
+      await api.post('/auth/phone/reset-password', { phone, code, newPassword });
+    },
+    [],
+  );
+
+  // ── SMS invite ────────────────────────────────────────────────────────────
+  const sendSmsInvite = useCallback(async (phone: string, communityId: string) => {
+    await api.post('/auth/send-invite', { phone, communityId });
+  }, []);
+
   // ── Push token ────────────────────────────────────────────────────────────
   const registerPushToken = useCallback(async (token: string, platform: 'ios' | 'android') => {
     await api.put('/users/me/push-token', { token, platform });
@@ -203,6 +243,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteAccount,
         sendPhoneOtp,
         verifyPhoneOtp,
+        linkPhone,
+        verifyLinkPhone,
+        sendPhoneResetOtp,
+        resetPasswordWithPhone,
+        sendSmsInvite,
         registerPushToken,
       }}
     >

@@ -192,6 +192,7 @@ exports.Prisma.OtpCodeScalarFieldEnum = {
   userId: 'userId',
   phone: 'phone',
   code: 'code',
+  purpose: 'purpose',
   expiresAt: 'expiresAt',
   used: 'used',
   createdAt: 'createdAt'

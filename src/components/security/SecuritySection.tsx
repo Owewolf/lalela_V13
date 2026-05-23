@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import PhoneInput from 'react-native-phone-number-input';
 import {
   Key,
   ShieldCheck,
@@ -19,6 +20,7 @@ import {
   Copy,
   Check,
   Info,
+  Phone,
 } from 'lucide-react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useAuth } from '../../context/AuthContext';
@@ -27,7 +29,7 @@ import { accountService } from '../../services/accountService';
 import { TwoFASetupResponse } from '../../types';
 
 export const SecuritySection: React.FC = () => {
-  const { userProfile, updateUserProfile } = useAuth();
+  const { userProfile, updateUserProfile, linkPhone, verifyLinkPhone } = useAuth();
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [twoFASetupData, setTwoFASetupData] = useState<TwoFASetupResponse | null>(null);
@@ -38,6 +40,56 @@ export const SecuritySection: React.FC = () => {
   const [showNewPass, setShowNewPass] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Phone link state
+  const phoneInputRef = useRef<PhoneInput>(null);
+  const [showPhoneLink, setShowPhoneLink] = useState(false);
+  const [phoneRaw, setPhoneRaw] = useState('');
+  const [phoneFormatted, setPhoneFormatted] = useState('');
+  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+  const [phoneOtp, setPhoneOtp] = useState('');
+  const [phoneLoading, setPhoneLoading] = useState(false);
+
+  const isLinkedPhoneValid =
+    phoneFormatted.length >= 8 && (phoneInputRef.current?.isValidNumber(phoneRaw) ?? false);
+
+  const handleSendLinkOtp = async () => {
+    if (phoneLoading || !isLinkedPhoneValid) return;
+    setPhoneLoading(true);
+    setStatus(null);
+    try {
+      await linkPhone(phoneFormatted);
+      setPhoneOtpSent(true);
+      setStatus({ type: 'success', message: 'OTP sent. Check your SMS.' });
+      setTimeout(() => setStatus(null), 3000);
+    } catch (err: any) {
+      const msg = err?.response?.data?.error ?? err.message ?? 'Failed to send OTP';
+      setStatus({ type: 'error', message: msg });
+    } finally {
+      setPhoneLoading(false);
+    }
+  };
+
+  const handleVerifyLinkOtp = async () => {
+    if (phoneLoading || phoneOtp.length !== 6) return;
+    setPhoneLoading(true);
+    setStatus(null);
+    try {
+      await verifyLinkPhone(phoneFormatted, phoneOtp);
+      setStatus({ type: 'success', message: 'Phone linked successfully' });
+      setShowPhoneLink(false);
+      setPhoneOtpSent(false);
+      setPhoneOtp('');
+      setPhoneRaw('');
+      setPhoneFormatted('');
+      setTimeout(() => setStatus(null), 3000);
+    } catch (err: any) {
+      const msg = err?.response?.data?.error ?? err.message ?? 'Verification failed';
+      setStatus({ type: 'error', message: msg });
+    } finally {
+      setPhoneLoading(false);
+    }
+  };
 
   const handleCopyKey = () => {
     if (twoFASetupData?.secret) {
@@ -203,6 +255,101 @@ export const SecuritySection: React.FC = () => {
           >
             <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>Update Password</Text>
           </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Phone Number Card */}
+      <View style={{ backgroundColor: '#f5f5f5', borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+            <Phone size={22} color="#0d3d47" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Phone Number</Text>
+            <Text style={{ fontSize: 10, color: '#888' }}>
+              {userProfile?.phone
+                ? `${userProfile.phone}${userProfile.phoneVerified ? '  • Verified' : ''}`
+                : 'Add a phone number to log in via SMS'}
+            </Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            setShowPhoneLink((v) => !v);
+            setPhoneOtpSent(false);
+            setPhoneOtp('');
+          }}
+          style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: 'rgba(22,163,74,0.08)', borderRadius: 12 }}
+        >
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
+            {showPhoneLink ? 'Cancel' : userProfile?.phone ? 'Change' : 'Link'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {showPhoneLink && (
+        <View style={{ gap: 12 }}>
+          {!phoneOtpSent ? (
+            <>
+              <PhoneInput
+                ref={phoneInputRef}
+                defaultValue={phoneRaw}
+                defaultCode="ZA"
+                layout="first"
+                onChangeText={setPhoneRaw}
+                onChangeFormattedText={setPhoneFormatted}
+                containerStyle={{ width: '100%', backgroundColor: '#f5f5f5', borderRadius: 20 }}
+                textContainerStyle={{ backgroundColor: '#f5f5f5', borderRadius: 20 }}
+                textInputStyle={{ color: '#0d3d47', fontWeight: '700' }}
+                codeTextStyle={{ color: '#0d3d47', fontWeight: '700' }}
+              />
+              <TouchableOpacity
+                onPress={handleSendLinkOtp}
+                disabled={phoneLoading || !isLinkedPhoneValid}
+                style={{
+                  backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center',
+                  opacity: phoneLoading || !isLinkedPhoneValid ? 0.5 : 1,
+                }}
+              >
+                {phoneLoading
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>Send SMS Code</Text>}
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Text style={{ fontSize: 12, color: '#666', textAlign: 'center' }}>
+                We sent a 6-digit code to {phoneFormatted}
+              </Text>
+              <TextInput
+                value={phoneOtp}
+                onChangeText={(t) => setPhoneOtp(t.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                placeholderTextColor="#aaa"
+                keyboardType="number-pad"
+                textContentType="oneTimeCode"
+                autoComplete="sms-otp"
+                importantForAutofill="yes"
+                maxLength={6}
+                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 24, paddingVertical: 16, fontSize: 24, fontWeight: '800', color: '#1a1a1a', textAlign: 'center', letterSpacing: 8 }}
+              />
+              <TouchableOpacity
+                onPress={handleVerifyLinkOtp}
+                disabled={phoneLoading || phoneOtp.length !== 6}
+                style={{
+                  backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center',
+                  opacity: phoneLoading || phoneOtp.length !== 6 ? 0.5 : 1,
+                }}
+              >
+                {phoneLoading
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>Verify & Link Phone</Text>}
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { setPhoneOtpSent(false); setPhoneOtp(''); }}>
+                <Text style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Change number</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       )}
 

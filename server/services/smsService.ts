@@ -102,3 +102,29 @@ export function generateOtp(): string {
   crypto.getRandomValues(array);
   return String(array[0] % 1_000_000).padStart(6, '0');
 }
+
+// ─── OTP message builder ──────────────────────────────────────────────────────
+
+/**
+ * Build an OTP SMS message that is compatible with iOS Security Code AutoFill.
+ * iOS detects codes when they appear early in a short, single-line message and
+ * the app name (or a recognisable token) is present in the body.
+ */
+export function buildOtpMessage(code: string, purpose: string = 'login'): string {
+  const action =
+    purpose === 'reset'
+      ? 'password reset'
+      : purpose === 'link'
+        ? 'phone linking'
+        : purpose === 'signup'
+          ? 'sign-up'
+          : 'verification';
+  return `Your Lalela ${action} code is ${code}. It expires in 10 minutes. Do not share it. Lalela`;
+}
+
+// ─── Invite message builder ───────────────────────────────────────────────────
+
+export function buildInviteMessage(opts: { inviterName?: string | null; joinUrl: string }): string {
+  const inviter = opts.inviterName?.trim() ? opts.inviterName.trim() : 'A neighbour';
+  return `${inviter} invited you to join Lalela. Tap to accept: ${opts.joinUrl}`;
+}

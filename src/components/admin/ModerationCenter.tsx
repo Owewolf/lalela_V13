@@ -137,7 +137,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       activeCommunityLink,
       generateInviteLink,
     } = useCommunity();
-    const { userProfile: currentUserProfile } = useAuth();
+    const { userProfile: currentUserProfile, sendSmsInvite } = useAuth();
 
     const [activeTab, setActiveTab] = useState<ModTab>(initialTab || 'members');
     const coveragePlacesRef = useRef<GooglePlacesAutocompleteRef | null>(null);
@@ -160,6 +160,12 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     const [inviteEmailRecipient, setInviteEmailRecipient] = useState('');
     const [isSendingInviteEmail, setIsSendingInviteEmail] = useState(false);
     const [inviteEmailStatus, setInviteEmailStatus] = useState<{
+      type: 'success' | 'error';
+      message: string;
+    } | null>(null);
+    const [inviteSmsRecipient, setInviteSmsRecipient] = useState('');
+    const [isSendingInviteSms, setIsSendingInviteSms] = useState(false);
+    const [inviteSmsStatus, setInviteSmsStatus] = useState<{
       type: 'success' | 'error';
       message: string;
     } | null>(null);
@@ -892,6 +898,57 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 }]}>
                   <Text style={{ color: inviteEmailStatus.type === 'success' ? '#1e5667' : ERROR, fontSize: 12, fontWeight: '700' }}>
                     {inviteEmailStatus.message}
+                  </Text>
+                </View>
+              )}
+              <View style={[styles.buttonRow, { marginTop: 12 }]}>
+                <TextInput
+                  style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                  value={inviteSmsRecipient}
+                  onChangeText={setInviteSmsRecipient}
+                  placeholder="+27 phone in E.164…"
+                  placeholderTextColor="#94a3b8"
+                  keyboardType="phone-pad"
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity
+                  style={[styles.actionBtn, { marginLeft: 8, paddingHorizontal: 16 }]}
+                  onPress={async () => {
+                    if (!inviteSmsRecipient || !currentCommunity?.id || currentCommunity.id === 'loading') return;
+                    const phone = inviteSmsRecipient.trim();
+                    if (!/^\+[1-9]\d{6,14}$/.test(phone)) {
+                      setInviteSmsStatus({ type: 'error', message: 'Use international format, e.g. +27821234567' });
+                      return;
+                    }
+                    setIsSendingInviteSms(true);
+                    setInviteSmsStatus(null);
+                    try {
+                      await sendSmsInvite(phone, currentCommunity.id);
+                      setInviteSmsStatus({ type: 'success', message: 'SMS invite sent.' });
+                      setInviteSmsRecipient('');
+                    } catch (err: any) {
+                      const msg = err?.response?.data?.error ?? err.message ?? 'Failed to send SMS invite';
+                      setInviteSmsStatus({ type: 'error', message: msg });
+                    } finally {
+                      setIsSendingInviteSms(false);
+                    }
+                  }}
+                  disabled={isSendingInviteSms || !inviteSmsRecipient}
+                >
+                  {isSendingInviteSms ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <MessageSquare size={16} color="#fff" />
+                  )}
+                </TouchableOpacity>
+              </View>
+              {inviteSmsStatus && (
+                <View style={[styles.statusBanner, {
+                  backgroundColor: inviteSmsStatus.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                  marginTop: 12
+                }]}>
+                  <Text style={{ color: inviteSmsStatus.type === 'success' ? '#1e5667' : ERROR, fontSize: 12, fontWeight: '700' }}>
+                    {inviteSmsStatus.message}
                   </Text>
                 </View>
               )}

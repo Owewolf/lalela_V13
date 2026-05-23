@@ -50,6 +50,7 @@ async function runCommunityTrialExpiryReminders(prisma: PrismaClient) {
 
     for (const community of communities) {
       if (!community.trialExpiresAt) continue;
+      if (!community.owner.email) continue;
       try {
         await sendTrialExpiryEmail({
           to: community.owner.email,
@@ -83,6 +84,7 @@ async function runMemberTrialExpiryReminders(prisma: PrismaClient) {
 
     for (const user of users) {
       if (!user.trialExpiresAt) continue;
+      if (!user.email) continue;
       try {
         await sendTrialExpiryEmail({
           to: user.email,
@@ -117,6 +119,7 @@ async function runRenewalReminders(prisma: PrismaClient) {
 
     for (const user of users) {
       if (!user.subscriptionRenewalDate) continue;
+      if (!user.email) continue;
       try {
         await sendRenewalReminderEmail({
           to: user.email,

@@ -181,8 +181,9 @@ export interface UserProfile {
   name: string;
   firstName?: string;
   lastName?: string;
-  email: string;
+  email: string | null;
   phone?: string;
+  phoneVerified?: boolean;
   mobileNumber?: string;
   address?: string;
   profileImage?: string;

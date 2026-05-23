@@ -2,9 +2,19 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '../db.js';
-import { issueTokens, verifyRefreshToken } from '../middleware/auth.js';
+import { issueTokens, verifyRefreshToken, requireAuth } from '../middleware/auth.js';
+import {
+  otpRateLimiter,
+  passwordResetRateLimiter,
+  inviteRateLimiter,
+} from '../middleware/rateLimit.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../services/emailService.js';
-import { sendSms, generateOtp } from '../services/smsService.js';
+import {
+  sendSms,
+  generateOtp,
+  buildOtpMessage,
+  buildInviteMessage,
+} from '../services/smsService.js';
 import { getFrontendUrl } from '../lib/urls.js';
 
 const router = Router();
@@ -54,7 +64,7 @@ router.post('/register', async (req, res) => {
   });
 
   try {
-    await sendVerificationEmail(user.email, user.name, token.token);
+    await sendVerificationEmail(user.email!, user.name, token.token);
   } catch (err) {
     console.error('[auth/register] Failed to send verification email:', err);
     // Don't block registration — user can request resend
@@ -120,7 +130,7 @@ router.post('/resend-verification', async (req, res) => {
   });
 
   try {
-    await sendVerificationEmail(user.email, user.name, token.token);
+    await sendVerificationEmail(user.email!, user.name, token.token);
   } catch (err) {
     console.error('[auth/resend] email error:', err);
   }
@@ -236,7 +246,7 @@ router.post('/logout', async (req, res) => {
 
 // ─── Forgot Password ──────────────────────────────────────────────────────────
 
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', passwordResetRateLimiter, async (req, res) => {
   const { email } = req.body as { email?: string };
   // Always return 200 to prevent enumeration
   if (!email) return res.json({ message: 'If that account exists, a reset link has been sent.' });
@@ -255,7 +265,7 @@ router.post('/forgot-password', async (req, res) => {
     });
 
     try {
-      await sendPasswordResetEmail(user.email, user.name, token.token);
+      await sendPasswordResetEmail(user.email!, user.name, token.token);
     } catch (err) {
       console.error('[auth/forgot-password] email error:', err);
     }
@@ -289,7 +299,7 @@ router.post('/reset-password', async (req, res) => {
 
 // ─── Phone OTP: Send ──────────────────────────────────────────────────────────
 
-router.post('/phone/send-otp', async (req, res) => {
+router.post('/phone/send-otp', otpRateLimiter, async (req, res) => {
   const { phone } = req.body as { phone?: string };
   if (!phone || !phoneRegex.test(phone)) {
     return res.status(400).json({ error: 'Valid E.164 phone number is required (e.g. +27821234567)' });
@@ -298,12 +308,15 @@ router.post('/phone/send-otp', async (req, res) => {
   const code = generateOtp();
   const expires_at = new Date(Date.now() + 10 * 60 * 1000); // 10 min
 
-  // Invalidate previous OTPs for this number
-  await prisma.otpCode.updateMany({ where: { phone, used: false }, data: { used: true } });
-  await prisma.otpCode.create({ data: { phone, code, expiresAt: expires_at } });
+  // Invalidate previous login OTPs for this number
+  await prisma.otpCode.updateMany({
+    where: { phone, used: false, purpose: 'login' },
+    data: { used: true },
+  });
+  await prisma.otpCode.create({ data: { phone, code, purpose: 'login', expiresAt: expires_at } });
 
   try {
-    await sendSms(phone, `Your Lalela verification code is: ${code}. Valid for 10 minutes.`);
+    await sendSms(phone, buildOtpMessage(code, 'login'));
   } catch (err) {
     console.error('[auth/phone/send-otp] SMS error:', err);
     return res.status(503).json({ error: 'Failed to send SMS. Please try again.' });
@@ -312,7 +325,7 @@ router.post('/phone/send-otp', async (req, res) => {
   return res.json({ message: `OTP sent to ${phone}` });
 });
 
-// ─── Phone OTP: Verify ────────────────────────────────────────────────────────
+// ─── Phone OTP: Verify (login / signup) ───────────────────────────────────────
 
 router.post('/phone/verify-otp', async (req, res) => {
   const { phone, code, device, ip } = req.body as {
@@ -322,7 +335,7 @@ router.post('/phone/verify-otp', async (req, res) => {
   if (!phone || !code) return res.status(400).json({ error: 'Phone and code are required' });
 
   const otp = await prisma.otpCode.findFirst({
-    where: { phone, code, used: false },
+    where: { phone, code, used: false, purpose: 'login' },
     orderBy: { createdAt: 'desc' },
   });
 
@@ -332,21 +345,27 @@ router.post('/phone/verify-otp', async (req, res) => {
 
   await prisma.otpCode.update({ where: { id: otp.id }, data: { used: true } });
 
-  // Find or create user by phone
+  // Find or create user by phone.
   let user = await prisma.user.findUnique({ where: { phone } });
   if (!user) {
-    // Fallback: the phone may have been cleared in the DB (e.g. manual cleanup) but the
-    // account still exists under the synthetic email. Re-link the phone rather than
-    // attempting a create that would fail with a duplicate synthetic-email error.
+    // Legacy compat: older phone-only accounts were created with a synthetic
+    // email like "27821234567@phone.lalela.net". If the phone column was
+    // cleared but the synthetic-email row still exists, re-link it rather
+    // than creating a duplicate. New accounts no longer get a synthetic email.
     const syntheticEmail = `${phone.replace('+', '')}@phone.lalela.net`;
-    const existing = await prisma.user.findUnique({ where: { email: syntheticEmail } });
-    if (existing) {
-      user = await prisma.user.update({ where: { id: existing.id }, data: { phone, phoneVerified: true } });
+    const legacy = await prisma.user.findUnique({ where: { email: syntheticEmail } });
+    if (legacy) {
+      user = await prisma.user.update({
+        where: { id: legacy.id },
+        data: { phone, phoneVerified: true },
+      });
     } else {
-      user = await prisma.user.create({ data: { phone, phoneVerified: true, name: '', email: syntheticEmail } });
+      user = await prisma.user.create({
+        data: { phone, phoneVerified: true, name: '' },
+      });
     }
-  } else {
-    await prisma.user.update({ where: { id: user.id }, data: { phoneVerified: true } });
+  } else if (!user.phoneVerified) {
+    user = await prisma.user.update({ where: { id: user.id }, data: { phoneVerified: true } });
   }
 
   const payload = { userId: user.id, email: user.email };
@@ -354,19 +373,245 @@ router.post('/phone/verify-otp', async (req, res) => {
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
   await prisma.userSession.create({
-    data: { userId: user.id, refreshToken: refreshToken, device: device ?? null, ip: ip ?? req.ip ?? null, expiresAt: expiresAt },
+    data: {
+      userId: user.id,
+      refreshToken: refreshToken,
+      device: device ?? req.headers['user-agent'] ?? null,
+      ip: ip ?? req.ip ?? null,
+      expiresAt: expiresAt,
+    },
   });
 
   return res.json({
     accessToken,
     refreshToken,
-    user: { id: user.id, email: user.email, name: user.name, profileCompleted: user.profileCompleted },
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      phoneVerified: user.phoneVerified,
+      profileCompleted: user.profileCompleted,
+    },
   });
 });
 
-// ─── Change Password (authenticated) ──────────────────────────────────────────
+// ─── Phone Link: Send OTP (authenticated) ─────────────────────────────────────
+//
+// Sends an OTP to a phone number the *current* user wants to attach to their
+// account. The OTP is scoped to userId + purpose='link' so it can only be
+// consumed by the same authenticated session.
 
-import { requireAuth } from '../middleware/auth.js';
+router.post('/link-phone', requireAuth, otpRateLimiter, async (req, res) => {
+  const { phone } = req.body as { phone?: string };
+  if (!phone || !phoneRegex.test(phone)) {
+    return res.status(400).json({ error: 'Valid E.164 phone number is required (e.g. +27821234567)' });
+  }
+
+  const userId = req.auth!.userId;
+
+  // Reject if another user already owns this phone.
+  const owner = await prisma.user.findUnique({ where: { phone } });
+  if (owner && owner.id !== userId) {
+    return res.status(409).json({ error: 'This phone number is already linked to another account' });
+  }
+
+  const code = generateOtp();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  // Invalidate any prior link OTPs for this user + phone.
+  await prisma.otpCode.updateMany({
+    where: { phone, userId, used: false, purpose: 'link' },
+    data: { used: true },
+  });
+  await prisma.otpCode.create({
+    data: { phone, code, purpose: 'link', userId, expiresAt },
+  });
+
+  try {
+    await sendSms(phone, buildOtpMessage(code, 'link'));
+  } catch (err) {
+    console.error('[auth/link-phone] SMS error:', err);
+    return res.status(503).json({ error: 'Failed to send SMS. Please try again.' });
+  }
+
+  return res.json({ message: `Verification code sent to ${phone}` });
+});
+
+// ─── Phone Link: Verify OTP (authenticated) ───────────────────────────────────
+
+router.post('/verify-link-phone', requireAuth, async (req, res) => {
+  const { phone, code } = req.body as { phone?: string; code?: string };
+  if (!phone || !code) return res.status(400).json({ error: 'Phone and code are required' });
+
+  const userId = req.auth!.userId;
+
+  const otp = await prisma.otpCode.findFirst({
+    where: { phone, code, used: false, purpose: 'link', userId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (!otp || otp.expiresAt < new Date()) {
+    return res.status(400).json({ error: 'Invalid or expired verification code' });
+  }
+
+  // Re-check ownership in case another account claimed the number after send.
+  const owner = await prisma.user.findUnique({ where: { phone } });
+  if (owner && owner.id !== userId) {
+    return res.status(409).json({ error: 'This phone number is already linked to another account' });
+  }
+
+  await prisma.$transaction([
+    prisma.otpCode.update({ where: { id: otp.id }, data: { used: true } }),
+    prisma.user.update({ where: { id: userId }, data: { phone, phoneVerified: true } }),
+  ]);
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  return res.json({
+    message: 'Phone number linked successfully',
+    user: user
+      ? {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          phoneVerified: user.phoneVerified,
+        }
+      : null,
+  });
+});
+
+// ─── Phone Password Reset: Send OTP ───────────────────────────────────────────
+//
+// Always returns 200 to prevent enumeration. Only dispatches an SMS if a user
+// with that phone exists AND has a passwordHash (i.e. has a password to reset
+// in the first place — phone-only accounts skip this silently).
+
+router.post('/phone/send-reset-otp', passwordResetRateLimiter, async (req, res) => {
+  const { phone } = req.body as { phone?: string };
+  const okResponse = { message: 'If that account exists, a reset code has been sent.' };
+  if (!phone || !phoneRegex.test(phone)) return res.json(okResponse);
+
+  const user = await prisma.user.findUnique({ where: { phone } });
+  if (user?.passwordHash) {
+    const code = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await prisma.otpCode.updateMany({
+      where: { phone, userId: user.id, used: false, purpose: 'reset' },
+      data: { used: true },
+    });
+    await prisma.otpCode.create({
+      data: { phone, code, purpose: 'reset', userId: user.id, expiresAt },
+    });
+
+    try {
+      await sendSms(phone, buildOtpMessage(code, 'reset'));
+    } catch (err) {
+      console.error('[auth/phone/send-reset-otp] SMS error:', err);
+      // Still return 200 to avoid enumeration.
+    }
+  }
+
+  return res.json(okResponse);
+});
+
+// ─── Phone Password Reset: Apply ──────────────────────────────────────────────
+
+router.post('/phone/reset-password', async (req, res) => {
+  const { phone, code, newPassword } = req.body as {
+    phone?: string; code?: string; newPassword?: string;
+  };
+
+  if (!phone || !code || !newPassword) {
+    return res.status(400).json({ error: 'phone, code and newPassword are required' });
+  }
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  }
+
+  const user = await prisma.user.findUnique({ where: { phone } });
+  if (!user) return res.status(400).json({ error: 'Invalid or expired code' });
+
+  const otp = await prisma.otpCode.findFirst({
+    where: { phone, code, used: false, purpose: 'reset', userId: user.id },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (!otp || otp.expiresAt < new Date()) {
+    return res.status(400).json({ error: 'Invalid or expired code' });
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+
+  await prisma.$transaction([
+    prisma.otpCode.update({ where: { id: otp.id }, data: { used: true } }),
+    prisma.user.update({ where: { id: user.id }, data: { passwordHash } }),
+    // Revoke all existing sessions — mirrors the email reset flow.
+    prisma.userSession.deleteMany({ where: { userId: user.id } }),
+  ]);
+
+  await prisma.auditLog.create({
+    data: {
+      userId: user.id,
+      type: 'password_change',
+      message: 'Password reset via phone OTP',
+      ip: req.ip ?? null,
+    },
+  });
+
+  return res.json({ message: 'Password reset successfully. Please log in again.' });
+});
+
+// ─── SMS Invite (authenticated) ───────────────────────────────────────────────
+//
+// Sends an invite SMS to a phone number. Creates a single-use
+// CommunityInviteLink for the inviter's community and texts the deep link.
+
+router.post('/send-invite', requireAuth, inviteRateLimiter, async (req, res) => {
+  const { phone, communityId } = req.body as { phone?: string; communityId?: string };
+  if (!phone || !phoneRegex.test(phone)) {
+    return res.status(400).json({ error: 'Valid E.164 phone number is required (e.g. +27821234567)' });
+  }
+  if (!communityId) {
+    return res.status(400).json({ error: 'communityId is required' });
+  }
+
+  const inviter = await prisma.user.findUnique({ where: { id: req.auth!.userId } });
+  if (!inviter) return res.status(401).json({ error: 'User not found' });
+
+  // Verify the inviter is a member of the community they're inviting into.
+  const membership = await prisma.communityMember.findFirst({
+    where: { userId: inviter.id, communityId },
+  });
+  if (!membership) {
+    return res.status(403).json({ error: 'You are not a member of that community' });
+  }
+
+  const link = await prisma.communityInviteLink.create({
+    data: {
+      communityId,
+      createdBy: inviter.id,
+      maxUses: 1,
+      expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
+    },
+  });
+
+  const joinUrl = `${getFrontendUrl()}/join?code=${link.code}`;
+
+  try {
+    await sendSms(
+      phone,
+      buildInviteMessage({ inviterName: inviter.name, joinUrl }),
+    );
+  } catch (err) {
+    console.error('[auth/send-invite] SMS error:', err);
+    return res.status(503).json({ error: 'Failed to send SMS. Please try again.' });
+  }
+
+  return res.json({ message: `Invite sent to ${phone}`, code: link.code });
+});
+
+// ─── Change Password (authenticated) ──────────────────────────────────────────
 
 router.post('/change-password', requireAuth, async (req, res) => {
   const { currentPassword, newPassword } = req.body as { currentPassword?: string; newPassword?: string };

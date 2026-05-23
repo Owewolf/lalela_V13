@@ -405,6 +405,9 @@ const LandingPage: React.FC = () => {
                         maxLength={6}
                         placeholder="000000"
                         keyboardType="number-pad"
+                        textContentType="oneTimeCode"
+                        autoComplete="sms-otp"
+                        importantForAutofill="yes"
                         className="w-full px-6 py-4 bg-gray-100 rounded-2xl font-bold text-center tracking-widest text-2xl text-[#0d3d47]"
                         placeholderTextColor="#9ca3af"
                       />
@@ -710,6 +713,12 @@ const LandingPage: React.FC = () => {
                       ? <ActivityIndicator color="white" size="small" />
                       : <Text className="text-white font-black uppercase tracking-widest">Send Reset Link</Text>
                     }
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => { setShowForgotPassword(false); router.push('/phone-reset'); }}
+                    className="items-center py-2"
+                  >
+                    <Text className="text-sm font-bold text-[#0d3d47] underline">Reset via SMS instead</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => setShowForgotPassword(false)} className="items-center py-2">
                     <Text className="text-sm font-bold text-gray-400">Back to Login</Text>

@@ -29,7 +29,7 @@ export async function handlePaymentSuccess(
     console.error('[billing] billingRecord.create failed:', err);
   }
 
-  let user: { name: string; email: string; subscriptionRenewalDate: Date | null } | null = null;
+  let user: { name: string; email: string | null; subscriptionRenewalDate: Date | null } | null = null;
   try {
     user = await prisma.user.findUnique({
       where: { id: userId },
@@ -49,7 +49,7 @@ export async function handlePaymentSuccess(
       invoiceNumber,
       createdAt: new Date(),
       userName: user.name,
-      userEmail: user.email,
+      userEmail: user.email ?? '',
       type,
       amount,
     });
@@ -72,6 +72,8 @@ export async function handlePaymentSuccess(
       console.error('[billing] invite link generation failed:', err);
     }
   }
+
+  if (!user.email) return;
 
   try {
     await sendPaymentConfirmationEmail({

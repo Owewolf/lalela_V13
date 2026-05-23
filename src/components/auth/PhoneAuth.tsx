@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Phone, KeyRound, ArrowLeft } from 'lucide-react-native';
+import PhoneInput from 'react-native-phone-number-input';
+import { KeyRound, ArrowLeft } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 
 interface PhoneAuthProps {
@@ -64,13 +65,18 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
 export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
   const { sendPhoneOtp, verifyPhoneOtp, userProfile } = useAuth();
-  const [phoneNumber, setPhoneNumber] = useState('+27');
+  const phoneInputRef = useRef<PhoneInput>(null);
+  const [phoneRaw, setPhoneRaw] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingAction, setPendingAction] = useState<'sendCode' | 'verifyCode' | null>(null);
+
+  const isPhoneValid =
+    phoneNumber.length >= 8 && (phoneInputRef.current?.isValidNumber(phoneRaw) ?? false);
 
   const handleConfirmSendCode = async () => {
     setLocalError(null);
@@ -91,7 +97,7 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
   };
 
   const handlePrepareSendCode = () => {
-    if (isLoading || phoneNumber.length < 9) return;
+    if (isLoading || !isPhoneValid) return;
     setPendingAction('sendCode');
     setShowConfirm(true);
   };
@@ -138,25 +144,28 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
               <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">
                 Mobile Number
               </Text>
-              <View className="relative">
-                <View className="absolute left-4 top-0 bottom-0 justify-center z-10">
-                  <Phone size={20} color="#0d3d47" />
-                </View>
-                <TextInput
-                  value={phoneNumber}
-                  onChangeText={setPhoneNumber}
-                  placeholder="+27..."
-                  keyboardType="phone-pad"
-                  className="w-full pl-12 pr-6 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                  placeholderTextColor="#9ca3af"
-                />
-              </View>
+              <PhoneInput
+                ref={phoneInputRef}
+                defaultValue={phoneRaw}
+                defaultCode="ZA"
+                layout="first"
+                onChangeText={setPhoneRaw}
+                onChangeFormattedText={setPhoneNumber}
+                withDarkTheme={false}
+                withShadow={false}
+                autoFocus={false}
+                containerStyle={{ width: '100%', backgroundColor: '#f3f4f6', borderRadius: 16, paddingVertical: 4 }}
+                textContainerStyle={{ backgroundColor: '#f3f4f6', borderRadius: 16, paddingVertical: 0 }}
+                textInputStyle={{ color: '#0d3d47', fontWeight: '700' }}
+                codeTextStyle={{ color: '#0d3d47', fontWeight: '700' }}
+                textInputProps={{ placeholderTextColor: '#9ca3af', accessibilityLabel: 'Phone number' }}
+              />
             </View>
             <TouchableOpacity
               onPress={handlePrepareSendCode}
-              disabled={isLoading || phoneNumber.length < 9}
+              disabled={isLoading || !isPhoneValid}
               className="w-full py-5 rounded-2xl items-center justify-center flex-row gap-2"
-              style={{ backgroundColor: isLoading || phoneNumber.length < 9 ? '#ffddb9' : '#0d3d47', opacity: isLoading || phoneNumber.length < 9 ? 0.6 : 1 }}
+              style={{ backgroundColor: isLoading || !isPhoneValid ? '#ffddb9' : '#0d3d47', opacity: isLoading || !isPhoneValid ? 0.6 : 1 }}
             >
               {isLoading ? (
                 <ActivityIndicator color="white" size="small" />
@@ -182,6 +191,9 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
                   onChangeText={(t) => setOtpCode(t.replace(/\D/g, '').slice(0, 6))}
                   placeholder="123456"
                   keyboardType="number-pad"
+                  textContentType="oneTimeCode"
+                  autoComplete="sms-otp"
+                  importantForAutofill="yes"
                   maxLength={6}
                   className="w-full pl-12 pr-6 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47] text-center text-xl tracking-widest"
                   placeholderTextColor="#9ca3af"
