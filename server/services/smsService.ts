@@ -1,58 +1,97 @@
 /**
- * SMS Service — Africa's Talking (primary) with Twilio fallback.
+ * SMS Service — Clickatell One API (primary) with Twilio fallback.
  *
  * Required env vars:
- *   SMS_PROVIDER        = "africastalking" | "twilio"  (default: africastalking)
- *   AT_API_KEY          Africa's Talking API key
- *   AT_USERNAME         Africa's Talking username (use "sandbox" for testing)
- *   AT_SENDER_ID        (optional) shortcode or alphanumeric sender
- *   TWILIO_ACCOUNT_SID  Twilio account SID (fallback)
- *   TWILIO_AUTH_TOKEN   Twilio auth token (fallback)
- *   TWILIO_FROM_NUMBER  Twilio from number (fallback)
+ *   SMS_PROVIDER         = "clickatell" | "twilio"  (default: clickatell)
+ *   CLICKATELL_API_KEY   Clickatell One API key
+ *   CLICKATELL_FROM      (optional) registered sender ID or long-code number
+ *   TWILIO_ACCOUNT_SID   Twilio account SID (fallback)
+ *   TWILIO_AUTH_TOKEN    Twilio auth token  (fallback)
+ *   TWILIO_FROM_NUMBER   Twilio from number (fallback)
  */
 
-// ─── Africa's Talking ─────────────────────────────────────────────────────────
+// ─── Clickatell One API ───────────────────────────────────────────────────────
+// Docs: https://help.clickatell.com/developers-api-reference/reference/one-api
 
-async function sendViaAT(to: string, message: string): Promise<void> {
-  const apiKey = process.env.AT_API_KEY;
-  const username = process.env.AT_USERNAME;
+async function sendViaClickatell(to: string, message: string): Promise<void> {
+  const apiKey = process.env.CLICKATELL_API_KEY;
 
-  if (!apiKey || !username) {
-    throw new Error('AT_API_KEY and AT_USERNAME must be set for Africa\'s Talking SMS');
+  if (!apiKey) {
+    throw new Error('CLICKATELL_API_KEY must be set for Clickatell SMS');
   }
 
-  // Africa's Talking v3 uses a simple REST API
-  const endpoint =
-    username === 'sandbox'
-      ? 'https://api.sandbox.africastalking.com/version1/messaging'
-      : 'https://api.africastalking.com/version1/messaging';
+  const endpoint = 'https://platform.clickatell.com/v1/message';
 
-  const params = new URLSearchParams({
-    username,
-    to,
-    message,
-    ...(process.env.AT_SENDER_ID ? { from: process.env.AT_SENDER_ID } : {}),
-  });
+  // One API expects E.164 WITHOUT the leading "+" (e.g. "27849002028").
+  const recipient = to.replace(/^\+/, '');
+
+  // One API payload: messages[] with channel/to/content.
+  const msg: Record<string, unknown> = {
+    channel: 'sms',
+    to: recipient,
+    content: message,
+  };
+  if (process.env.CLICKATELL_FROM) {
+    msg.from = process.env.CLICKATELL_FROM;
+  }
+  const body = { messages: [msg] };
 
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      apiKey,
+      Authorization: apiKey,
+      'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    body: params.toString(),
+    body: JSON.stringify(body),
   });
 
+  const text = await response.text();
+
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Africa's Talking SMS failed: ${response.status} ${text}`);
+    console.error('[Clickatell] request body that failed:', JSON.stringify(body));
+    throw new Error(`Clickatell SMS failed: ${response.status} ${text}`);
   }
 
-  const json = (await response.json()) as { SMSMessageData?: { Recipients?: Array<{ status: string }> } };
-  const recipient = json.SMSMessageData?.Recipients?.[0];
-  if (recipient && recipient.status !== 'Success') {
-    throw new Error(`Africa's Talking: message not delivered — status: ${recipient.status}`);
+  let json: {
+    error?: { code?: number; description?: string } | string | null;
+    messages?: Array<{
+      accepted?: boolean;
+      apiMessageId?: string;
+      to?: string;
+      error?: { code?: number; description?: string } | string | null;
+    }>;
+  };
+  try {
+    json = JSON.parse(text);
+  } catch {
+    throw new Error(`Clickatell SMS: invalid JSON response: ${text}`);
+  }
+
+  // Always log so delivery problems are diagnosable.
+  console.log('[Clickatell] response:', JSON.stringify(json));
+
+  const describeErr = (e: unknown): string => {
+    if (!e) return 'unknown';
+    if (typeof e === 'string') return e;
+    if (typeof e === 'object') {
+      const o = e as { code?: number; description?: string };
+      return `${o.description ?? 'error'}${o.code !== undefined ? ` (code ${o.code})` : ''}`;
+    }
+    return String(e);
+  };
+
+  if (json.error) {
+    throw new Error(`Clickatell: account-level error — ${describeErr(json.error)}`);
+  }
+
+  const m = json.messages?.[0];
+  if (!m) {
+    throw new Error('Clickatell: no message record returned');
+  }
+
+  if (m.accepted !== true) {
+    throw new Error(`Clickatell: message not accepted — ${describeErr(m.error)}`);
   }
 }
 
@@ -88,12 +127,12 @@ async function sendViaTwilio(to: string, message: string): Promise<void> {
 // ─── Public interface ─────────────────────────────────────────────────────────
 
 export async function sendSms(to: string, message: string): Promise<void> {
-  const provider = (process.env.SMS_PROVIDER ?? 'africastalking').toLowerCase();
+  const provider = (process.env.SMS_PROVIDER ?? 'clickatell').toLowerCase();
 
   if (provider === 'twilio') {
     return sendViaTwilio(to, message);
   }
-  return sendViaAT(to, message);
+  return sendViaClickatell(to, message);
 }
 
 export function generateOtp(): string {

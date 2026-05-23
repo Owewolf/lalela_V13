@@ -13,7 +13,6 @@ import {
 import {
   Lock,
   BellRing,
-  Building2,
   ChevronRight,
   ShieldCheck,
   MapPin,
@@ -256,7 +255,7 @@ const SettingsPage: React.FC = () => {
               <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center' }}>
                 <Lock size={20} color="#0d3d47" />
               </View>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a1a' }}>Account & Security</Text>
+              <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a1a' }}>My Profile & Account</Text>
             </View>
             <ChevronRight size={20} color="#9ca3af" />
           </TouchableOpacity>
@@ -295,25 +294,6 @@ const SettingsPage: React.FC = () => {
             </View>
           </View>
 
-          {/* ── Manage My Businesses ── */}
-          <TouchableOpacity
-            onPress={() => router.push({ pathname: '/security', params: { tab: 'businesses' } })}
-            style={{
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-              padding: 16, borderRadius: 16, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)',
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center' }}>
-                <Building2 size={20} color="#0d3d47" />
-              </View>
-              <View>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a1a' }}>Manage My Businesses</Text>
-                <Text style={{ fontSize: 11, color: '#888' }}>Create, edit and manage your businesses</Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#9ca3af" />
-          </TouchableOpacity>
         </View>
 
         {initialCharityMode && (

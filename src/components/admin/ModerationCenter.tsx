@@ -783,52 +783,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           <Text style={styles.sectionTitle}>Invite New Members</Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>SEARCH BY EMAIL</Text>
-          <View style={styles.searchRow}>
-            <TextInput
-              style={[styles.input, { flex: 1 }]}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={handleSearch}
-              placeholder="Enter user email..."
-              placeholderTextColor="#94a3b8"
-              keyboardType="email-address"
-            />
-            <TouchableOpacity style={styles.searchBtn} onPress={handleSearch} disabled={isSearching}>
-              {isSearching ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.searchBtnText}>Search</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {searchResults.map((u) => (
-            <View key={u.id} style={styles.memberRow}>
-              <View style={[styles.memberAvatar, { backgroundColor: '#f0fdf4' }]}>
-                <Text style={{ color: PRIMARY, fontWeight: '700', fontSize: 16 }}>
-                  {u.name?.charAt(0)?.toUpperCase()}
-                </Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.memberName}>{u.name}</Text>
-                <Text style={styles.memberSub}>{u.email}</Text>
-              </View>
-              <TouchableOpacity
-                style={styles.actionBtn}
-                onPress={() => handleInviteMember(u.id)}
-              >
-                <Text style={styles.actionBtnText}>Invite</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-
-          {searchQuery && searchResults.length === 0 && !isSearching && (
-            <Text style={styles.emptyStateText}>No users found.</Text>
-          )}
-        </View>
-
         {/* Invite link */}
         <View style={styles.card}>
           <Text style={styles.cardLabel}>SHARE INVITE LINK</Text>
