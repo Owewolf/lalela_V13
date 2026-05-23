@@ -20,7 +20,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "postinstall": "prisma generate && node scripts/patch-google-places.js"
+    "postinstall": "prisma generate && node scripts/patch-google-places.js && node scripts/patch-react-async-hook.js"
   },
   "dependencies": {
     "@expo-google-fonts/epilogue": "^0.4.2",

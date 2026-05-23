@@ -190,6 +190,51 @@ else
   fi
 fi
 
+# ── 9c. Verify backend services are available ────────────────────────────────
+# The deployed web bundle is useless if the API server or the Cloudflare
+# tunnel that exposes it (api.wolfslair.cc) are down. The API server runs
+# under pm2 as `lalela-server`; the tunnel runs system-wide as the systemd
+# unit `cloudflared.service` (installed via `cloudflared service install`).
+# Both must be online for production traffic to reach the backend.
+info "Verifying backend services are online..."
+
+# lalela-server (pm2)
+SERVER_STATUS="unknown"
+if command -v pm2 >/dev/null 2>&1; then
+  SERVER_STATUS="$(pm2 jlist 2>/dev/null \
+    | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const a=JSON.parse(d);const p=a.find(x=>x.name==='lalela-server');console.log(p?p.pm2_env.status:'missing');}catch(e){console.log('unknown');}})" 2>/dev/null || echo unknown)"
+fi
+if [ "${SERVER_STATUS}" = "online" ]; then
+  success "lalela-server (pm2) is online"
+else
+  warn "lalela-server is NOT online (status: ${SERVER_STATUS}). Run: pm2 status && pm2 logs lalela-server"
+fi
+
+# cloudflared tunnel (systemd, system-wide)
+TUNNEL_STATUS="unknown"
+if command -v systemctl >/dev/null 2>&1; then
+  TUNNEL_STATUS="$(systemctl is-active cloudflared.service 2>/dev/null || echo inactive)"
+fi
+if [ "${TUNNEL_STATUS}" = "active" ]; then
+  success "cloudflared tunnel (systemd) is active"
+else
+  warn "cloudflared.service is NOT active (status: ${TUNNEL_STATUS}). Run: sudo systemctl status cloudflared"
+fi
+
+# End-to-end check through the tunnel
+HEALTH_STATUS="$(curl -L -s -o /dev/null -w '%{http_code}' "${API_URL}/health" || true)"
+if [ "${HEALTH_STATUS}" = "200" ]; then
+  success "API reachable through tunnel at ${API_URL}/health"
+else
+  warn "API health check via tunnel failed (HTTP ${HEALTH_STATUS:-000}) at ${API_URL}/health"
+fi
+
+if [ "${STRICT_API_HEALTH_CHECK:-0}" = "1" ]; then
+  if [ "${SERVER_STATUS}" != "online" ] || [ "${TUNNEL_STATUS}" != "active" ] || [ "${HEALTH_STATUS}" != "200" ]; then
+    fail "Backend not fully available (server=${SERVER_STATUS}, tunnel=${TUNNEL_STATUS}, health=${HEALTH_STATUS:-000})."
+  fi
+fi
+
 # ── 10. Summary ───────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}══════════════════════════════════════════${NC}"
@@ -210,11 +255,13 @@ echo "  6. Open https://lalela.net in a browser"
 echo ""
 echo -e "${YELLOW}▶  BACKEND${NC}"
 echo ""
-echo "  This script just reloaded the local backend via pm2."
-echo "  Verify both 'lalela-server' and 'lalela-tunnel' are 'online':"
-echo "    pm2 status"
+echo "  This script just reloaded the local backend via pm2 and verified"
+echo "  that both the API server and the Cloudflare tunnel are available."
+echo "  Manual checks:"
+echo "    pm2 status                          # lalela-server (user pm2)"
+echo "    systemctl status cloudflared        # tunnel (system-wide)"
 echo "  Quick health check:"
-echo "    curl https://api.wolfslair.cc/api/health"
-echo "  To make this script fail on API health issues, run:"
+echo "    curl ${API_URL}/health"
+echo "  To make this script fail on backend availability issues, run:"
 echo "    STRICT_API_HEALTH_CHECK=1 ./deploy-lalela.sh"
 echo ""
