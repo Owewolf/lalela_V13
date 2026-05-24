@@ -32,6 +32,7 @@ import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
 import { resolveMediaUrl } from '../../lib/config';
 import { InteractiveCoverageMap } from './InteractiveCoverageMap';
+import { useCommunityMap } from '../../hooks/useCommunityMap';
 import { CommunityNotice } from '../../types';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -224,21 +225,17 @@ export const HomePage: React.FC<HomePageProps> = ({
   );
 
   // ─── local state ──────────────────────────────────────────────────────────
-  const [mapCenter, setMapCenter] = useState<{
-    latitude: number;
-    longitude: number;
-    latitudeDelta?: number;
-    longitudeDelta?: number;
-  }>({
-    latitude: -26.2041,
-    longitude: 28.0473,
-  });
-  const [resetTrigger, setResetTrigger] = useState(0);
-  const [isEmergencyActive, setIsEmergencyActive] = useState(false);
-  const [mapFilterOverride, setMapFilterOverride] = useState<
-    'members' | 'listings' | 'notices' | 'businesses' | undefined
-  >(undefined);
-  const [mapUnlocked, setMapUnlocked] = useState(false);
+  const {
+    mapCenter,
+    setMapCenter,
+    resetTrigger,
+    isEmergencyActive,
+    mapFilterOverride,
+    setMapFilterOverride,
+    mapUnlocked,
+    setMapUnlocked,
+    resetCommunityMapView,
+  } = useCommunityMap();
 
   const [showEmergencyDialog, setShowEmergencyDialog] = useState(false);
   const [showIncidentMenu, setShowIncidentMenu] = useState(false);
@@ -270,6 +267,22 @@ export const HomePage: React.FC<HomePageProps> = ({
           );
         }),
     [posts]
+  );
+
+  // Emergency/warning/caution notices fill the row; info & general are 2-up.
+  const isFullWidthNotice = (n: CommunityNotice) =>
+    n.urgency === 'emergency' ||
+    n.urgencyLevel === 'emergency' ||
+    n.urgencyLevel === 'warning' ||
+    n.urgency === 'high';
+
+  const fullWidthNotices = useMemo(
+    () => notices.filter(isFullWidthNotice),
+    [notices]
+  );
+  const compactNotices = useMemo(
+    () => notices.filter((n) => !isFullWidthNotice(n)),
+    [notices]
   );
 
   const listings = useMemo(
@@ -364,46 +377,6 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   // ─── effects ──────────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    if (currentCommunity?.coverageArea) {
-      const { latitude, longitude, radius } = currentCommunity.coverageArea;
-      const latDelta = (radius * 2.2) / 111;
-      const latRad = latitude * (Math.PI / 180);
-      const lonDelta = (radius * 2.2) / (111 * Math.cos(latRad));
-      
-      setMapCenter({
-        latitude,
-        longitude,
-        latitudeDelta: latDelta,
-        longitudeDelta: lonDelta,
-      });
-    }
-  }, [currentCommunity?.id, currentCommunity?.coverageArea]);
-
-  useEffect(() => {
-    const hasEmergencyPost = posts.some(
-      (p) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
-    );
-    
-    const isEmergency = hasEmergencyPost || !!currentCommunity?.isEmergencyMode;
-
-    setIsEmergencyActive(isEmergency);
-
-    if (isEmergency) {
-      const latest = posts.find(
-        (p) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
-      );
-      if (latest?.latitude && latest?.longitude) {
-        setMapCenter({
-          latitude: latest.latitude,
-          longitude: latest.longitude,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02
-        });
-      }
-    }
-  }, [currentCommunity?.isEmergencyMode, posts]);
-
   // Animate progress bar
   useEffect(() => {
     Animated.timing(progressAnim, {
@@ -435,29 +408,6 @@ export const HomePage: React.FC<HomePageProps> = ({
     if (!postToDelete) return;
     removePost(postToDelete);
     setPostToDelete(null);
-  };
-
-  const resetCommunityMapView = () => {
-    if (currentCommunity?.coverageArea) {
-      const { latitude, longitude, radius } = currentCommunity.coverageArea;
-      
-      // Calculate delta to fit the entire diameter (radius * 2) precisely.
-      // 1 degree latitude ~= 111km
-      const latDelta = (radius * 2.2) / 111;
-      
-      // 1 degree longitude ~= 111km * cos(latitude)
-      const latRad = latitude * (Math.PI / 180);
-      const lonDelta = (radius * 2.2) / (111 * Math.cos(latRad));
-
-      setMapCenter({
-        latitude,
-        longitude,
-        latitudeDelta: latDelta,
-        longitudeDelta: lonDelta,
-      });
-      setResetTrigger((t) => t + 1);
-      setMapUnlocked(false);
-    }
   };
 
   // ─── Incident urgency menu items ──────────────────────────────────────────
@@ -505,7 +455,10 @@ export const HomePage: React.FC<HomePageProps> = ({
       <View
         key={notice.id}
         style={{ borderColor, backgroundColor: bgColor }}
-        className="rounded-3xl border shadow-sm overflow-hidden mb-4"
+        className={cn(
+          'rounded-3xl border shadow-sm overflow-hidden mb-4',
+          !isEmergencyOrWarning && 'flex-1'
+        )}
       >
         {/* Mini map for emergency/warning with location */}
         {isEmergencyOrWarning && notice.latitude && notice.longitude && (
@@ -546,7 +499,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
         {/* Attached image (non-emergency) layout at top */}
         {notice.postsImage && !isEmergencyOrWarning && (
-          <View className="w-full aspect-video border-b border-gray-200/30 overflow-hidden">
+          <View className="w-full h-24 border-b border-gray-200/30 overflow-hidden">
             <Image
               source={{ uri: resolveMediaUrl(notice.postsImage) }}
               className="w-full h-full"
@@ -555,6 +508,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           </View>
         )}
 
+        {isEmergencyOrWarning ? (
         <View className="p-5 flex-1">
           {/* Title and Context Menu Row */}
           <View className="flex-row items-start justify-between gap-3 mb-2">
@@ -647,7 +601,20 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           {/* Location chip */}
           {(notice.locationName || notice.latitude) && (
-            <View className="flex-row items-center gap-1.5 bg-surface-container-low self-start px-2 py-1 rounded-md mb-3">
+            <TouchableOpacity
+              activeOpacity={0.7}
+              disabled={!notice.latitude || !notice.longitude}
+              onPress={() => {
+                if (!notice.latitude || !notice.longitude) return;
+                setMapFilterOverride('notices');
+                setMapCenter({
+                  latitude: notice.latitude,
+                  longitude: notice.longitude,
+                });
+                scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+              }}
+              className="flex-row items-center gap-1.5 bg-surface-container-low self-start px-2 py-1 rounded-md mb-3"
+            >
               <MapPin size={10} color="#0d3d47" />
               <Text className="text-[10px] font-bold text-primary">
                 {notice.locationName || 'Location Provided'}
@@ -657,7 +624,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   • {dist}km
                 </Text>
               )}
-            </View>
+            </TouchableOpacity>
           )}
 
           {/* Description */}
@@ -714,6 +681,162 @@ export const HomePage: React.FC<HomePageProps> = ({
             </View>
           </View>
         </View>
+        ) : (
+        <View className="p-3 gap-1">
+          {/* Header: title + kebab */}
+          <View className="flex-row items-start justify-between gap-2">
+            <Text className="flex-1 text-sm font-bold text-gray-900 leading-tight" numberOfLines={2}>
+              {notice.title}
+            </Text>
+            <View className="relative shrink-0">
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() =>
+                  setActiveMenuId(activeMenuId === notice.id ? null : notice.id)
+                }
+                className="w-7 h-7 rounded-full bg-gray-100 items-center justify-center"
+              >
+                <MoreVertical size={14} color="#6b7280" />
+              </TouchableOpacity>
+              {activeMenuId === notice.id && (
+                <View
+                  className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
+                  style={{ top: 32 }}
+                >
+                  {(notice.authorId === userProfile?.id ||
+                    currentCommunity?.userRole === 'ADMIN') && (
+                    <>
+                      {notice.authorId === userProfile?.id && (
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => {
+                            onEditPost?.(notice);
+                            setActiveMenuId(null);
+                          }}
+                          className="flex-row items-center gap-2 px-4 py-2"
+                        >
+                          <Tag size={14} color="#0d3d47" />
+                          <Text className="text-sm font-bold text-primary">
+                            Edit Notice
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => {
+                          setPostToDelete(notice.id);
+                          setActiveMenuId(null);
+                        }}
+                        className="flex-row items-center gap-2 px-4 py-2"
+                      >
+                        <AlertTriangle size={14} color="#dc2626" />
+                        <Text className="text-sm font-bold text-red-600">
+                          Delete Notice
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => setActiveMenuId(null)}
+                    className="flex-row items-center gap-2 px-4 py-2"
+                  >
+                    <Share2 size={14} color="#6b7280" />
+                    <Text className="text-sm font-bold text-gray-500">
+                      Share
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Urgency badge (info / general) */}
+          <View
+            className="self-start flex-row items-center gap-1 px-2 py-0.5 rounded-full border"
+            style={{ borderColor, backgroundColor: `${textColor}15` }}
+          >
+            <UrgencyIcon
+              level={notice.urgencyLevel}
+              urgency={notice.urgency}
+              size={8}
+            />
+            <Text
+              className="text-[8px] font-black uppercase tracking-widest"
+              style={{ color: textColor }}
+            >
+              {notice.urgencyLevel || notice.urgency || 'Info'}
+            </Text>
+          </View>
+
+          {/* Location chip */}
+          {(notice.locationName || notice.latitude) && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              disabled={!notice.latitude || !notice.longitude}
+              onPress={() => {
+                if (!notice.latitude || !notice.longitude) return;
+                setMapFilterOverride('notices');
+                setMapCenter({
+                  latitude: notice.latitude,
+                  longitude: notice.longitude,
+                });
+                scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+              }}
+              className="flex-row items-center gap-1 bg-surface-container-low self-start px-2 py-0.5 rounded-md"
+            >
+              <MapPin size={10} color="#0d3d47" />
+              <Text className="text-[10px] font-bold text-primary" numberOfLines={1}>
+                {notice.locationName || 'Location Provided'}
+              </Text>
+              {dist && (
+                <Text className="text-[10px] text-gray-400 ml-1">
+                  • {dist}km
+                </Text>
+              )}
+            </TouchableOpacity>
+          )}
+
+          {/* Description */}
+          <Text className="text-xs text-gray-500 leading-snug" numberOfLines={2}>
+            {notice.description}
+          </Text>
+
+          {/* Footer: author + chat */}
+          <View className="flex-row items-center gap-2 pt-1 mt-1 border-t border-gray-50">
+            <View className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
+              {notice.authorImage ? (
+                <Image
+                  source={{ uri: notice.authorImage }}
+                  className="w-full h-full"
+                  resizeMode="cover"
+                />
+              ) : (
+                <View className="w-full h-full items-center justify-center">
+                  <Text className="text-[10px] font-bold text-gray-500">
+                    {notice.authorName?.charAt(0)}
+                  </Text>
+                </View>
+              )}
+            </View>
+            <Text
+              className="flex-1 text-[10px] font-semibold text-gray-800"
+              numberOfLines={1}
+            >
+              {notice.authorName}
+            </Text>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              className="w-7 h-7 rounded-full bg-surface-container-low items-center justify-center"
+              onPress={() =>
+                onOpenChat ? onOpenChat(notice) : handleOpenContextChat(notice)
+              }
+            >
+              <MessageSquare size={14} color="#0d3d47" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        )}
       </View>
     );
   };
@@ -746,12 +869,76 @@ export const HomePage: React.FC<HomePageProps> = ({
           />
         )}
         <View className="p-3 gap-1">
-          <Text
-            className="text-sm font-bold text-gray-900 leading-tight"
-            numberOfLines={2}
-          >
-            {listing.title}
-          </Text>
+          {/* Header: title + kebab */}
+          <View className="flex-row items-start justify-between gap-2">
+            <Text
+              className="flex-1 text-sm font-bold text-gray-900 leading-tight"
+              numberOfLines={2}
+            >
+              {listing.title}
+            </Text>
+            {(listing.authorId === userProfile?.id ||
+              currentCommunity?.userRole === 'ADMIN') && (
+              <View className="relative shrink-0">
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() =>
+                    setActiveMenuId(
+                      activeMenuId === listing.id ? null : listing.id
+                    )
+                  }
+                  className="w-7 h-7 rounded-full bg-gray-100 items-center justify-center"
+                >
+                  <MoreVertical size={14} color="#6b7280" />
+                </TouchableOpacity>
+                {activeMenuId === listing.id && (
+                  <View
+                    className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
+                    style={{ top: 32 }}
+                  >
+                    {listing.authorId === userProfile?.id && (
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => {
+                          setActiveMenuId(null);
+                          router.push(`/create-post?postId=${listing.id}` as any);
+                        }}
+                        className="flex-row items-center gap-2 px-4 py-2"
+                      >
+                        <Tag size={14} color="#0d3d47" />
+                        <Text className="text-sm font-bold text-primary">
+                          Edit Listing
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setPostToDelete(listing.id);
+                        setActiveMenuId(null);
+                      }}
+                      className="flex-row items-center gap-2 px-4 py-2"
+                    >
+                      <AlertTriangle size={14} color="#dc2626" />
+                      <Text className="text-sm font-bold text-red-600">
+                        Delete Listing
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => setActiveMenuId(null)}
+                      className="flex-row items-center gap-2 px-4 py-2"
+                    >
+                      <Share2 size={14} color="#6b7280" />
+                      <Text className="text-sm font-bold text-gray-500">
+                        Share
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
 
           <Text
             className="text-xs text-gray-500 leading-snug"
@@ -818,6 +1005,15 @@ export const HomePage: React.FC<HomePageProps> = ({
             >
               {listing.authorName}
             </Text>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              className="w-7 h-7 rounded-full bg-surface-container-low items-center justify-center"
+              onPress={() =>
+                onOpenChat ? onOpenChat(listing) : handleOpenContextChat(listing)
+              }
+            >
+              <MessageSquare size={14} color="#0d3d47" />
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
@@ -1133,6 +1329,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </Text>
             <TouchableOpacity
               activeOpacity={0.7}
+              onPress={() => router.push('/posts')}
               className="flex-row items-center gap-1"
             >
               <Text className="text-primary font-semibold text-sm">
@@ -1168,12 +1365,28 @@ export const HomePage: React.FC<HomePageProps> = ({
               )}
             </View>
           ) : (
-            <FlatList
-              data={notices}
-              keyExtractor={(item) => item.id}
-              renderItem={renderNoticeCard}
-              scrollEnabled={false}
-            />
+            <View className="gap-0">
+              {fullWidthNotices.length > 0 && (
+                <FlatList
+                  key="notices-full"
+                  data={fullWidthNotices}
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderNoticeCard}
+                  scrollEnabled={false}
+                />
+              )}
+              {compactNotices.length > 0 && (
+                <FlatList
+                  key="notices-compact"
+                  data={compactNotices}
+                  numColumns={2}
+                  columnWrapperStyle={{ gap: 8, paddingHorizontal: 4 }}
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderNoticeCard}
+                  scrollEnabled={false}
+                />
+              )}
+            </View>
           )}
         </View>
 

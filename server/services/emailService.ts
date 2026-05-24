@@ -101,14 +101,22 @@ export async function sendCommunityCreatedEmail(
   name: string,
   communityName: string,
   trialExpiresAt: Date,
+  inviteLink?: string,
 ) {
   const expiry = trialExpiresAt.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
   const activateUrl = `${APP_URL()}/pricing`;
+  const inviteSection = inviteLink ? `
+    ${divider()}
+    <h3 style="color:#0d3d47;margin-bottom:8px">Start Growing Your Community</h3>
+    <p>Your community is live. Share the link below to invite your first members:</p>
+    ${ctaButton('Invite Members', inviteLink, '#0d3d47')}
+    <p style="text-align:center;font-size:12px;color:#737971;margin-top:4px">Or share: <a href="${inviteLink}" style="color:#0d3d47">${inviteLink}</a></p>
+  ` : '';
   const t = createTransport();
   await t.sendMail({
     from: FROM(), to,
     subject: `Your community "${communityName}" is live on lalela!`,
-    text: `Hi ${name},\n\n"${communityName}" is live! 30-day trial ends ${expiry}.\nActivate permanently: ${activateUrl}`,
+    text: `Hi ${name},\n\n"${communityName}" is live! 30-day trial ends ${expiry}.\nActivate permanently: ${activateUrl}${inviteLink ? `\nInvite members: ${inviteLink}` : ''}`,
     html: baseEmailHtml(`
       <h2 style="color:#0d3d47;margin-top:0">Your community is live!</h2>
       <p>Hi ${name}, <strong>${communityName}</strong> has been created on lalela. Your <strong>30-day free trial</strong> has started.</p>
@@ -121,6 +129,7 @@ export async function sendCommunityCreatedEmail(
       ${divider()}
       ${ctaButton('Activate Community — R999', activateUrl, '#fc7127')}
       <p style="color:#737971;font-size:12px;margin-top:8px;text-align:center">Activation is once-off and permanent — your community never expires.</p>
+      ${inviteSection}
     `, `${communityName} is live — 30-day trial started.`),
   });
 }

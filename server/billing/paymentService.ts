@@ -45,6 +45,39 @@ export async function handlePaymentSuccess(
   let pdfUrl = '#';
   try {
     invoiceNumber = await generateInvoiceNumber(prisma);
+
+    // Build optional community / membership context for the invoice panel.
+    let communityName: string | undefined;
+    let communityActivatedAt: Date | undefined;
+    let memberCount: number | undefined;
+    let postCount: number | undefined;
+    let canCreateCommunity: boolean | undefined;
+
+    if (type === 'COMMUNITY' && communityId) {
+      try {
+        const community = await prisma.community.findUnique({
+          where: { id: communityId },
+          select: {
+            name: true,
+            activatedAt: true,
+            createdAt: true,
+            _count: { select: { members: true, posts: true } },
+          },
+        });
+        if (community) {
+          communityName = community.name;
+          communityActivatedAt = community.activatedAt ?? community.createdAt;
+          memberCount = community._count.members;
+          postCount = community._count.posts;
+        }
+      } catch (err) {
+        console.error('[billing] community context fetch failed:', err);
+      }
+    } else if (type === 'MEMBERSHIP') {
+      // First paid MEMBERSHIP unlocks the right to start a community on a 30-day trial.
+      canCreateCommunity = true;
+    }
+
     const pdfBuffer = await createInvoicePdf({
       invoiceNumber,
       createdAt: new Date(),
@@ -52,6 +85,12 @@ export async function handlePaymentSuccess(
       userEmail: user.email ?? '',
       type,
       amount,
+      communityName,
+      communityActivatedAt,
+      memberCount,
+      postCount,
+      platformRenewalDate: user.subscriptionRenewalDate ?? null,
+      canCreateCommunity,
     });
     pdfUrl = await uploadInvoicePdf(pdfBuffer, invoiceNumber);
   } catch (err) {

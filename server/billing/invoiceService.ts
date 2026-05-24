@@ -18,6 +18,13 @@ export interface InvoiceData {
   userEmail: string;
   type: 'COMMUNITY' | 'MEMBERSHIP';
   amount: number; // cents
+  // Optional context for the welcome / community panel
+  communityName?: string;
+  communityActivatedAt?: Date;
+  memberCount?: number;
+  postCount?: number;
+  platformRenewalDate?: Date | null;
+  canCreateCommunity?: boolean;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -93,6 +100,7 @@ export async function generateInvoiceNumber(prisma: PrismaClient): Promise<strin
 
 export function createInvoicePdf(data: InvoiceData): Promise<Buffer> {
   return new Promise((resolve, reject) => {
+    // autoFirstPage:true (default); we add nothing that could trigger a second page.
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
     const chunks: Buffer[] = [];
 
@@ -100,15 +108,37 @@ export function createInvoicePdf(data: InvoiceData): Promise<Buffer> {
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
-    const { invoiceNumber, createdAt, userName, userEmail, type, amount } = data;
+    const {
+      invoiceNumber, createdAt, userName, userEmail, type, amount,
+      communityName, communityActivatedAt, memberCount, postCount,
+      platformRenewalDate, canCreateCommunity,
+    } = data;
+
+    const PAGE_W = doc.page.width;   // 595
+    const PAGE_H = doc.page.height;  // 842
+    const LEFT = 50;
+    const RIGHT = PAGE_W - 50;
+
+    // Strict column grid for items + totals (eliminates the prior overlap)
+    const DESC_X = 58;
+    const DESC_W = 240;
+    const QTY_X = 320;
+    const QTY_W = 40;
+    const PRICE_X = 380;
+    const PRICE_W = 80;
+    const TOTAL_X = 460;
+    const TOTAL_W = 65;
+
     const itemLabel = type === 'COMMUNITY'
-      ? 'Community Activation — Once-off (Permanent)'
-      : 'Platform Membership — Annual Subscription';
+      ? 'Community Licence (once-off, lifelong) — includes 1-year Creator Platform Membership'
+      : 'Platform Membership — Annual (R99/year)';
 
-    // ── Header bar ────────────────────────────────────────────────────────────
-    doc.rect(0, 0, doc.page.width, 90).fill(TEAL);
+    const fmtDate = (d: Date) =>
+      d.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    // The charcoal bubble logo carries its own shape, so render it directly.
+    // ── 1. Header band ────────────────────────────────────────────────────────
+    doc.rect(0, 0, PAGE_W, 90).fill(TEAL);
+
     try {
       doc.image(LALELA_INVOICE_LOGO_BUFFER, 46, 14, { width: 64, height: 64 });
     } catch {
@@ -117,95 +147,177 @@ export function createInvoicePdf(data: InvoiceData): Promise<Buffer> {
 
     doc
       .fillColor('#ffffff')
-      .fontSize(22)
-      .font('Helvetica-Bold')
-      .text('Lalela', 118, 28)
-      .fontSize(10)
-      .font('Helvetica')
-      .text('Community Platform', 118, 54)
-      .fillColor('#ffffff')
-      .fontSize(9)
-      .text('lalela.net  |  admin@lalela.net', 118, 68);
+      .fontSize(22).font('Helvetica-Bold').text('Lalela', 118, 24, { width: 300 })
+      .fontSize(10).font('Helvetica').text('Community Platform', 118, 50, { width: 300 })
+      .fontSize(9).text('lalela.net  |  admin@lalela.net', 118, 64, { width: 300 });
 
-    // Invoice title
     doc
-      .fillColor(TEAL)
-      .fontSize(24)
-      .font('Helvetica-Bold')
-      .text('INVOICE', doc.page.width - 180, 20, { width: 130, align: 'right' });
+      .fillColor('#ffffff')
+      .fontSize(22).font('Helvetica-Bold')
+      .text('INVOICE', PAGE_W - 200, 34, { width: 150, align: 'right' });
 
-    doc.moveDown(0);
-
-    // ── Info block ────────────────────────────────────────────────────────────
+    // ── 2. Bill-to / meta block ───────────────────────────────────────────────
     const infoTop = 110;
-    doc.y = infoTop;
 
-    // Left: Invoice To
-    doc.fillColor(MUTED).fontSize(8).font('Helvetica').text('INVOICE TO', 50, infoTop);
-    doc.fillColor('#1a1c1a').fontSize(11).font('Helvetica-Bold').text(userName, 50, infoTop + 14);
-    doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica').text(userEmail, 50, infoTop + 28);
+    doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+      .text('INVOICE TO', LEFT, infoTop, { width: 200 });
+    doc.fillColor('#1a1c1a').fontSize(11).font('Helvetica-Bold')
+      .text(userName, LEFT, infoTop + 14, { width: 240 });
+    doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica')
+      .text(userEmail || ' ', LEFT, infoTop + 30, { width: 240 });
 
-    // Right: Invoice details
-    const rCol = doc.page.width - 230;
-    doc.fillColor(MUTED).fontSize(8).font('Helvetica').text('INVOICE NUMBER', rCol, infoTop);
-    doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica-Bold').text(invoiceNumber, rCol, infoTop + 14);
-    doc.fillColor(MUTED).fontSize(8).font('Helvetica').text('DATE', rCol, infoTop + 32);
-    doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica').text(
-      createdAt.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' }),
-      rCol, infoTop + 46,
-    );
+    const rCol = PAGE_W - 220;
+    const rColW = 170;
+    doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+      .text('INVOICE NUMBER', rCol, infoTop, { width: rColW });
+    doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica-Bold')
+      .text(invoiceNumber, rCol, infoTop + 14, { width: rColW });
+    doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+      .text('DATE', rCol, infoTop + 32, { width: rColW });
+    doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica')
+      .text(fmtDate(createdAt), rCol, infoTop + 46, { width: rColW });
 
-    // ── Divider ───────────────────────────────────────────────────────────────
-    doc.moveTo(50, infoTop + 70).lineTo(doc.page.width - 50, infoTop + 70)
+    // Divider
+    doc.moveTo(LEFT, infoTop + 76).lineTo(RIGHT, infoTop + 76)
       .strokeColor('#e5e7eb').lineWidth(1).stroke();
 
-    // ── Items table header ────────────────────────────────────────────────────
-    const tableTop = infoTop + 82;
-    doc.rect(50, tableTop, doc.page.width - 100, 22).fill(TEAL);
+    // ── 3. Items table ────────────────────────────────────────────────────────
+    const tableTop = infoTop + 92;
+    doc.rect(LEFT, tableTop, RIGHT - LEFT, 22).fill(TEAL);
     doc.fillColor('#ffffff').fontSize(9).font('Helvetica-Bold');
-    doc.text('DESCRIPTION', 58, tableTop + 7);
-    doc.text('QTY', doc.page.width - 200, tableTop + 7, { width: 40, align: 'center' });
-    doc.text('UNIT PRICE', doc.page.width - 150, tableTop + 7, { width: 80, align: 'right' });
-    doc.text('TOTAL', doc.page.width - 58, tableTop + 7, { width: 60, align: 'right' });
+    doc.text('DESCRIPTION', DESC_X, tableTop + 7, { width: DESC_W });
+    doc.text('QTY', QTY_X, tableTop + 7, { width: QTY_W, align: 'center' });
+    doc.text('UNIT PRICE', PRICE_X, tableTop + 7, { width: PRICE_W, align: 'right' });
+    doc.text('TOTAL', TOTAL_X, tableTop + 7, { width: TOTAL_W, align: 'right' });
 
-    // ── Items table row ───────────────────────────────────────────────────────
     const rowTop = tableTop + 30;
+    const ROW_H = 32;
     doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica');
-    doc.text(itemLabel, 58, rowTop, { width: doc.page.width - 320 });
-    doc.text('1', doc.page.width - 200, rowTop, { width: 40, align: 'center' });
-    doc.text(fmt(amount), doc.page.width - 150, rowTop, { width: 80, align: 'right' });
-    doc.text(fmt(amount), doc.page.width - 58, rowTop, { width: 60, align: 'right' });
+    doc.text(itemLabel, DESC_X, rowTop, { width: DESC_W });
+    doc.text('1', QTY_X, rowTop, { width: QTY_W, align: 'center' });
+    doc.text(fmt(amount), PRICE_X, rowTop, { width: PRICE_W, align: 'right' });
+    doc.text(fmt(amount), TOTAL_X, rowTop, { width: TOTAL_W, align: 'right' });
 
     // Row divider
-    doc.moveTo(50, rowTop + 22).lineTo(doc.page.width - 50, rowTop + 22)
+    doc.moveTo(LEFT, rowTop + ROW_H).lineTo(RIGHT, rowTop + ROW_H)
       .strokeColor('#e5e7eb').lineWidth(0.5).stroke();
 
-    // ── Totals ────────────────────────────────────────────────────────────────
-    const totTop = rowTop + 32;
-    const labelX = doc.page.width - 200;
-    const valueX = doc.page.width - 58;
+    // ── 4. Totals block ───────────────────────────────────────────────────────
+    const totTop = rowTop + ROW_H + 14;
+    const labelOpts = { width: PRICE_W, align: 'right' as const };
+    const valueOpts = { width: TOTAL_W, align: 'right' as const };
 
-    doc.fillColor(MUTED).fontSize(9).font('Helvetica');
-    doc.text('Subtotal', labelX, totTop, { width: 140, align: 'right' });
-    doc.fillColor('#1a1c1a').text(fmt(amount), valueX - 60, totTop, { width: 60, align: 'right' });
+    doc.fillColor(MUTED).fontSize(9).font('Helvetica')
+      .text('Subtotal', PRICE_X, totTop, labelOpts);
+    doc.fillColor('#1a1c1a')
+      .text(fmt(amount), TOTAL_X, totTop, valueOpts);
 
-    doc.fillColor(MUTED).text('VAT (0%)', labelX, totTop + 16, { width: 140, align: 'right' });
-    doc.fillColor('#1a1c1a').text('R 0.00', valueX - 60, totTop + 16, { width: 60, align: 'right' });
+    doc.fillColor(MUTED)
+      .text('VAT (0%)', PRICE_X, totTop + 16, labelOpts);
+    doc.fillColor('#1a1c1a')
+      .text('R 0.00', TOTAL_X, totTop + 16, valueOpts);
 
-    // Total bar
-    doc.rect(labelX - 10, totTop + 32, doc.page.width - labelX + 10 - 50, 26).fill(ORANGE);
-    doc.fillColor('#ffffff').fontSize(11).font('Helvetica-Bold');
-    doc.text('TOTAL', labelX, totTop + 39, { width: 140, align: 'right' });
-    doc.text(fmt(amount), valueX - 60, totTop + 39, { width: 60, align: 'right' });
+    // Orange TOTAL bar — spans PRICE_X to the right page margin
+    const barY = totTop + 34;
+    const barH = 28;
+    const barX = PRICE_X;
+    const barW = RIGHT - PRICE_X;
+    doc.rect(barX, barY, barW, barH).fill(ORANGE);
+    doc.fillColor('#ffffff').fontSize(11).font('Helvetica-Bold')
+      .text('TOTAL', PRICE_X + 4, barY + 9, labelOpts);
+    doc.fillColor('#ffffff')
+      .text(fmt(amount), TOTAL_X, barY + 9, valueOpts);
 
-    // ── Footer ────────────────────────────────────────────────────────────────
-    const footerY = doc.page.height - 80;
-    doc.moveTo(50, footerY).lineTo(doc.page.width - 50, footerY)
+    // ── 5. Welcome / community panel ──────────────────────────────────────────
+    const panelTop = barY + barH + 28;
+    const panelH = 200;
+    const panelX = LEFT;
+    const panelW = RIGHT - LEFT;
+
+    doc.roundedRect(panelX, panelTop, panelW, panelH, 8).fill(CREAM);
+
+    if (type === 'COMMUNITY') {
+      const heading = communityName
+        ? `Welcome to Lalela, ${communityName}`
+        : 'Welcome to Lalela';
+      doc.fillColor(TEAL).fontSize(15).font('Helvetica-Bold')
+        .text(heading, panelX + 18, panelTop + 16, { width: panelW - 36 });
+
+      // 2×2 stat grid
+      const statTop = panelTop + 48;
+      const colAX = panelX + 18;
+      const colBX = panelX + Math.floor(panelW / 2) + 8;
+      const colW = Math.floor(panelW / 2) - 26;
+
+      const drawStat = (x: number, y: number, label: string, value: string) => {
+        doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+          .text(label.toUpperCase(), x, y, { width: colW });
+        doc.fillColor('#1a1c1a').fontSize(12).font('Helvetica-Bold')
+          .text(value, x, y + 12, { width: colW });
+      };
+
+      drawStat(colAX, statTop, 'Members', String(memberCount ?? 1));
+      drawStat(colBX, statTop, 'Posts', String(postCount ?? 0));
+      drawStat(
+        colAX, statTop + 38,
+        'Community licensed since',
+        fmtDate(communityActivatedAt ?? createdAt),
+      );
+      drawStat(colBX, statTop + 38, 'Community licence', 'Permanent (lifelong)');
+
+      // Platform renewal note
+      if (platformRenewalDate) {
+        doc.fillColor(TEAL).fontSize(9).font('Helvetica-Bold')
+          .text(
+            `Platform membership renews on ${fmtDate(platformRenewalDate)}`,
+            panelX + 18, statTop + 86, { width: panelW - 36 },
+          );
+      }
+
+      // Warm paragraph
+      doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica')
+        .text(
+          "Your community now has a permanent home on Lalela. From here every post, every voice and every member helps shape a stronger neighbourhood. We're glad to walk this road with you.",
+          panelX + 18, statTop + 108, { width: panelW - 36, align: 'left' },
+        );
+    } else {
+      // MEMBERSHIP
+      doc.fillColor(TEAL).fontSize(15).font('Helvetica-Bold')
+        .text('Thank you for renewing your Lalela membership', panelX + 18, panelTop + 16, { width: panelW - 36 });
+
+      doc.fillColor('#1a1c1a').fontSize(10).font('Helvetica')
+        .text(
+          'Your next year on Lalela starts today. Stay close to your community, stay heard, stay connected.',
+          panelX + 18, panelTop + 50, { width: panelW - 36 },
+        );
+
+      if (platformRenewalDate) {
+        doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+          .text('MEMBERSHIP RENEWS ON', panelX + 18, panelTop + 96, { width: panelW - 36 });
+        doc.fillColor('#1a1c1a').fontSize(12).font('Helvetica-Bold')
+          .text(fmtDate(platformRenewalDate), panelX + 18, panelTop + 108, { width: panelW - 36 });
+      }
+
+      if (canCreateCommunity) {
+        doc.fillColor(ORANGE).fontSize(10).font('Helvetica-Bold')
+          .text(
+            "You're now entitled to start your own community — 30-day trial included.",
+            panelX + 18, panelTop + 150, { width: panelW - 36 },
+          );
+      }
+    }
+
+    // ── 6. Footer ─────────────────────────────────────────────────────────────
+    // Keep well inside the 50pt bottom margin so pdfkit never auto-paginates.
+    const footerLineY = PAGE_H - 70;
+    doc.moveTo(LEFT, footerLineY).lineTo(RIGHT, footerLineY)
       .strokeColor('#e5e7eb').lineWidth(1).stroke();
-    doc.fillColor(MUTED).fontSize(8).font('Helvetica');
-    doc.text('Thank you for being part of the Lalela community.', 50, footerY + 10, { align: 'center' });
-    doc.text('Lalela — Community Platform  |  lalela.net  |  support@lalela.net', 50, footerY + 22, { align: 'center' });
-    doc.text(`Invoice ${invoiceNumber} — Generated ${createdAt.toISOString().slice(0, 10)}`, 50, footerY + 34, { align: 'center' });
+    doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+      .text(
+        `Lalela — Community Platform  |  lalela.net  |  support@lalela.net   ·   Invoice ${invoiceNumber}`,
+        LEFT, footerLineY + 8,
+        { width: RIGHT - LEFT, align: 'center', lineBreak: false },
+      );
 
     doc.end();
   });

@@ -30,7 +30,6 @@ import {
   Flag,
   History,
   Activity,
-  MapPin,
   Siren,
   Navigation,
   CheckCircle2,
@@ -41,6 +40,11 @@ import api from '../../lib/api';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { ModerationCenter, ModerationCenterHandle } from './ModerationCenter';
+import { useLiveInsights } from '../../hooks/useLiveInsights';
+import { CommunityInsightPanels } from './CommunityInsightPanels';
+import { InteractiveCoverageMap } from '../home/InteractiveCoverageMap';
+import { useCommunityMap } from '../../hooks/useCommunityMap';
+import { Lock, ScrollText, FileWarning } from 'lucide-react-native';
 
 const PRIMARY = '#0d3d47';
 const ERROR = '#dc2626';
@@ -79,17 +83,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { userProfile, updateUserProfile } = useAuth();
-  const { currentCommunity, updateCommunityCoverage, posts, members, securityResponders } = useCommunity();
+  const { currentCommunity, updateCommunityCoverage, posts, members, securityResponders, charities } = useCommunity();
+  const { data: liveInsights } = useLiveInsights(currentCommunity?.id);
+  const previousRaisedRef = useRef<number | null>(null);
+  const previousLiveDonationsRef = useRef<number | null>(null);
+  const [donationTicker, setDonationTicker] = React.useState<Array<{ id: string; amount: number; at: number }>>([]);
 
   const [activeView, setActiveView] = React.useState<'dashboard' | 'moderation' | 'members'>(
     readOnly ? 'dashboard' : initialView
   );
   const [moderationTab, setModerationTab] = React.useState<any>('members');
   const [memberCount, setMemberCount] = React.useState(0);
-  const [totalCharityRaised, setTotalCharityRaised] = React.useState(0);
   const [activeAlertsCount, setActiveAlertsCount] = React.useState(0);
   const [recentActivities, setRecentActivities] = React.useState<any[]>([]);
-  const [charities, setCharities] = React.useState<any[]>([]);
   const [systemUptime, setSystemUptime] = React.useState(99.9);
   const [securityThreats, setSecurityThreats] = React.useState(0);
   const [activeVolunteersCount, setActiveVolunteersCount] = React.useState(0);
@@ -98,6 +104,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [setupStepIndex, setSetupStepIndex] = React.useState(0);
   const [completedSetupSteps, setCompletedSetupSteps] = React.useState<Set<SetupStepId>>(new Set());
   const [showSetupComplete, setShowSetupComplete] = React.useState(false);
+  const {
+    mapCenter,
+    resetTrigger,
+    isEmergencyActive,
+    mapUnlocked,
+    setMapUnlocked,
+    resetCommunityMapView,
+    findLatestEmergencyPost,
+  } = useCommunityMap();
   const moderationRef = useRef<ModerationCenterHandle>(null);
 
   const handleBack = () => {
@@ -139,14 +154,41 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     );
   }, [members]);
 
-  // Derive charity totals from CommunityContext state
+  // Derive charity totals directly from the context charities list
+  const totalCharityRaised = React.useMemo(
+    () => charities.reduce((s: number, c: any) => s + (c.raisedAmount || c.totalRaised || 0), 0),
+    [charities],
+  );
+
+  // Track donation deltas from featured charity (no donor identity) → ephemeral ticker chips
   React.useEffect(() => {
-    const list: any[] = (currentCommunity as any)?.charities ?? [];
-    let total = 0;
-    list.forEach((c: any) => { total += c.totalRaised || 0; });
-    setTotalCharityRaised(total);
-    setCharities(list);
-  }, [(currentCommunity as any)?.charities]);
+    const featured = charities.find((c: any) => c.isFeatured);
+    const raised = featured?.raisedAmount ?? 0;
+    const prev = previousRaisedRef.current;
+    if (prev !== null && raised > prev) {
+      const delta = raised - prev;
+      setDonationTicker((curr) => [
+        { id: `${Date.now()}`, amount: delta, at: Date.now() },
+        ...curr,
+      ].slice(0, 3));
+    }
+    previousRaisedRef.current = raised;
+  }, [charities]);
+
+  // Also derive ticker from polled live-insights donationsTotal deltas
+  React.useEffect(() => {
+    const total = liveInsights?.counts?.donationsTotal;
+    if (total == null) return;
+    const prev = previousLiveDonationsRef.current;
+    if (prev !== null && total > prev) {
+      const delta = total - prev;
+      setDonationTicker((curr) => [
+        { id: `live-${Date.now()}`, amount: delta, at: Date.now() },
+        ...curr,
+      ].slice(0, 3));
+    }
+    previousLiveDonationsRef.current = total;
+  }, [liveInsights?.counts?.donationsTotal]);
 
   // Load moderation logs + security event counts via REST
   React.useEffect(() => {
@@ -260,9 +302,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     },
   ];
 
-  const availableCharities = charities.filter((c) => c.status !== 'Archived');
-  const featuredCharity = availableCharities.find((c) => c.isFeatured) || (availableCharities.length === 1 ? availableCharities[0] : undefined);
-  const otherCharities = charities.filter((c) => c !== featuredCharity && (c.totalRaised || 0) > 0);
+  const availableCharities = charities.filter((c: any) => c.status !== 'Archived');
+  const featuredCharity = availableCharities.find((c: any) => c.isFeatured) || (availableCharities.length === 1 ? availableCharities[0] : undefined);
+  const otherCharities = charities.filter((c: any) => c !== featuredCharity && ((c.raisedAmount || c.totalRaised || 0) > 0));
 
   const renderDashboard = () => (
     <ScrollView
@@ -296,29 +338,99 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         ))}
       </View>
 
+      {/* Interactive Community Map */}
+      <View style={[styles.bentoCard, { padding: 12 }]}>
+        <InteractiveCoverageMap
+          center={mapCenter}
+          resetTrigger={resetTrigger}
+          height={280}
+          showFilters
+          showLegend
+          showPulseOverlay
+          showEmergencyOverlay
+          isEmergencyActive={isEmergencyActive}
+          isLocked={!mapUnlocked}
+          onUnlock={() => setMapUnlocked(true)}
+          onResetMap={resetCommunityMapView}
+          onOpenEmergencyHub={() => {
+            const latest = findLatestEmergencyPost();
+            if (latest?.id) router.push(`/emergency/${latest.id}` as any);
+          }}
+        />
+      </View>
+
       {/* Moderation Center CTA */}
-      <TouchableOpacity
-        style={[styles.bentoCard, styles.bentoCardLarge, !readOnly && styles.bentoCardClickable]}
-        onPress={() => !readOnly && setActiveView('moderation')}
-        activeOpacity={readOnly ? 1 : 0.85}
-      >
+      <View style={[styles.bentoCard, styles.bentoCardLarge]}>
         <View style={styles.bentoHeader}>
           <View style={[styles.bentoIcon, { backgroundColor: '#f0fdf4' }]}>
             <Gavel size={24} color={PRIMARY} />
           </View>
-          {!readOnly && <ArrowUpRight size={18} color="#94a3b8" />}
+          {!readOnly && (
+            <TouchableOpacity
+              style={styles.openModBtn}
+              onPress={() => setActiveView('moderation')}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.openModBtnText}>Open</Text>
+              <ArrowUpRight size={14} color="#fff" />
+            </TouchableOpacity>
+          )}
         </View>
         <Text style={styles.bentoTitle}>Moderation Center</Text>
         <Text style={styles.bentoDesc}>
           {readOnly
             ? 'Community moderation is managed by authorized moderators and admins.'
-            : 'Review and manage community listings and alerts.'}
+            : 'Quick access to every moderation surface.'}
         </Text>
-        <View style={styles.alertBox}>
-          <Text style={styles.alertBoxLabel}>ACTIVE ALERTS</Text>
-          <Text style={[styles.alertBoxValue, { color: ERROR }]}>{activeAlertsCount}</Text>
-        </View>
-      </TouchableOpacity>
+
+        {(() => {
+          const c = liveInsights?.counts;
+          const tiles: Array<{
+            id: string;
+            label: string;
+            tab: any;
+            Icon: any;
+            color: string;
+            bg: string;
+            count: number;
+          }> = [
+            { id: 'members', label: 'Members', tab: 'members', Icon: Users, color: PRIMARY, bg: '#f0fdf4', count: memberCount },
+            { id: 'alerts', label: 'Alerts', tab: 'logs', Icon: Bell, color: ERROR, bg: '#fef2f2', count: c?.alertsActive ?? activeAlertsCount },
+            { id: 'charity', label: 'Charity', tab: 'charity', Icon: HeartHandshake, color: SECONDARY, bg: '#f5f3ff', count: availableCharities.length },
+            { id: 'reports', label: 'Reports', tab: 'content', Icon: FileWarning, color: '#fc7127', bg: '#fff7ed', count: c?.activeReports ?? 0 },
+            { id: 'rules', label: 'Rules', tab: 'rules', Icon: ScrollText, color: PRIMARY, bg: '#f0fdf4', count: 0 },
+            { id: 'security', label: 'Security', tab: 'members', Icon: Shield, color: SECONDARY, bg: '#f5f3ff', count: c?.respondersOnline ?? 0 },
+          ];
+          return (
+            <View style={styles.tileGrid}>
+              {tiles.map((t) => (
+                <TouchableOpacity
+                  key={t.id}
+                  style={[styles.tile, readOnly && styles.tileLocked]}
+                  onPress={() => {
+                    if (readOnly) return;
+                    setModerationTab(t.tab);
+                    setActiveView('moderation');
+                  }}
+                  activeOpacity={readOnly ? 1 : 0.8}
+                  disabled={readOnly}
+                >
+                  <View style={[styles.tileIcon, { backgroundColor: t.bg }]}>
+                    <t.Icon size={18} color={t.color} />
+                  </View>
+                  <Text style={styles.tileLabel}>{t.label}</Text>
+                  <Text style={[styles.tileCount, { color: t.color }]}>{t.count}</Text>
+                  {readOnly && (
+                    <View style={styles.tileLockBadge}>
+                      <Lock size={10} color="#94a3b8" />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          );
+        })()}
+      </View>
 
       {/* Charity Hub */}
       <View style={styles.bentoCard}>
@@ -356,7 +468,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             )}
             <View style={styles.progressRow}>
               <Text style={styles.progressText}>
-                R{(featuredCharity.totalRaised || 0).toLocaleString()} raised
+                R{(featuredCharity.raisedAmount ?? 0).toLocaleString()} raised
               </Text>
               <Text style={styles.goalText}>
                 Goal: R{(featuredCharity.fundraisingGoal || 0).toLocaleString()}
@@ -365,10 +477,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <View style={styles.progressTrack}>
               <View
                 style={[styles.progressFill, {
-                  width: `${Math.min(Math.max(((featuredCharity.totalRaised || 0) / (featuredCharity.fundraisingGoal || 1)) * 100, 0), 100)}%`
+                  width: `${Math.min(Math.max(((featuredCharity.raisedAmount ?? 0) / (featuredCharity.fundraisingGoal || 1)) * 100, 0), 100)}%`
                 }]}
               />
             </View>
+            {donationTicker.length > 0 && (
+              <View style={styles.donorTickerRow}>
+                {donationTicker.map((d) => (
+                  <View key={d.id} style={styles.donorChip}>
+                    <Text style={styles.donorChipText}>+R{d.amount.toLocaleString()}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
             {!readOnly && !featuredCharity.campaignCompleted && currentCommunity?.id && (
               <TouchableOpacity
                 style={styles.completeBtn}
@@ -399,12 +520,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {otherCharities.slice(0, 3).map((c) => (
               <View key={c.id} style={styles.prevCampaignRow}>
                 <Text style={styles.prevCampaignName} numberOfLines={1}>{c.name}</Text>
-                <Text style={styles.prevCampaignAmount}>R{(c.totalRaised || 0).toLocaleString()}</Text>
+                <Text style={styles.prevCampaignAmount}>R{(c.raisedAmount ?? 0).toLocaleString()}</Text>
               </View>
             ))}
           </View>
         )}
       </View>
+
+      {/* Community Insights (rotating mini-cards) */}
+      <CommunityInsightPanels insights={liveInsights?.insights ?? null} />
 
       {/* Security Panel */}
       <View style={styles.bentoCard}>
@@ -430,7 +554,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <View style={styles.securityStats}>
             <View style={styles.securityStat}>
               <Text style={styles.securityStatLabel}>SECURITY MEMBERS</Text>
-              <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
+              <View style={styles.securityValueRow}>
+                <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
+                {(liveInsights?.counts?.respondersOnline ?? 0) > 0 && (
+                  <View style={styles.onlinePulseDot} />
+                )}
+              </View>
+              {(liveInsights?.counts?.respondersOnline ?? 0) > 0 && (
+                <Text style={styles.onlineHint}>
+                  {liveInsights?.counts.respondersOnline} online now
+                </Text>
+              )}
             </View>
             <View style={styles.securityStat}>
               <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
@@ -471,7 +605,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Recent Activity */}
       <View style={styles.bentoCard}>
-        <Text style={styles.bentoTitle}>Recent Community Pulse</Text>
+        <Text style={styles.bentoTitle}>Recent Moderator Activity</Text>
         <View style={{ gap: 10, marginTop: 12 }}>
           {activities.map((activity) => (
             <View key={activity.id} style={styles.activityItem}>
@@ -835,4 +969,61 @@ const styles = StyleSheet.create({
     shadowColor: PRIMARY, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 4,
   },
   submitSuggestBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+
+  // Moderation tile grid
+  openModBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: PRIMARY, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 99,
+  },
+  openModBtnText: { color: '#fff', fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.8 },
+  tileGrid: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8,
+  },
+  tile: {
+    width: '31.5%',
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    alignItems: 'flex-start',
+    position: 'relative',
+  },
+  tileLocked: { opacity: 0.5 },
+  tileIcon: {
+    width: 32, height: 32, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  tileLabel: {
+    fontSize: 10, fontWeight: '900', color: '#64748b',
+    textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4,
+  },
+  tileCount: { fontSize: 18, fontWeight: '900' },
+  tileLockBadge: {
+    position: 'absolute', top: 8, right: 8,
+    width: 18, height: 18, borderRadius: 9,
+    backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: '#f1f5f9',
+  },
+
+  // Donor ticker chips
+  donorTickerRow: { flexDirection: 'row', gap: 6, marginTop: 8, flexWrap: 'wrap' },
+  donorChip: {
+    backgroundColor: 'rgba(252,113,39,0.15)',
+    borderRadius: 99, paddingHorizontal: 10, paddingVertical: 5,
+    borderWidth: 1, borderColor: 'rgba(252,113,39,0.35)',
+  },
+  donorChipText: { fontSize: 11, fontWeight: '900', color: '#fc7127' },
+
+  // Security online pulse
+  securityValueRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  onlinePulseDot: {
+    width: 10, height: 10, borderRadius: 5, backgroundColor: PRIMARY,
+  },
+  onlineHint: {
+    fontSize: 10, fontWeight: '700', color: PRIMARY,
+    textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2,
+  },
 });

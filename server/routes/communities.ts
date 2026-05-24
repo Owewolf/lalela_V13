@@ -8,6 +8,7 @@ import {
   sendMemberJoinedEmail,
 } from '../services/emailService.js';
 import { handlePaymentSuccess } from '../billing/paymentService.js';
+import { getOrCreateCommunityInviteLink } from '../billing/inviteService.js';
 // UserRole is a string enum in Prisma schema; reference it as a string literal type
 type UserRole = 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER';
 
@@ -100,9 +101,15 @@ router.post('/', async (req, res) => {
     ]);
 
     if (creator?.email && creator.name) {
-      sendCommunityCreatedEmail(creator.email, creator.name, community.name, trialEnd).catch(
-        (err) => console.error('[communities] community created email failed:', err),
-      );
+      (async () => {
+        let inviteLink: string | undefined;
+        try {
+          inviteLink = await getOrCreateCommunityInviteLink(prisma, community.id, req.auth!.userId);
+        } catch (err) {
+          console.error('[communities] invite link generation failed:', err);
+        }
+        await sendCommunityCreatedEmail(creator.email!, creator.name!, community.name, trialEnd, inviteLink);
+      })().catch((err) => console.error('[communities] community created email failed:', err));
     }
 
     return res.status(201).json({
@@ -561,6 +568,164 @@ router.put('/:id/charities/:charityId', async (req, res) => {
 
 router.get('/:id/moderation-logs', async (_req, res) => {
   return res.json([]);
+});
+
+// ─── Live community insights (aggregate) ─────────────────────────────────────
+// Returns a single payload powering the dashboard "Community Pulse" experience.
+// Numbers are derived from real tables only — never fabricated. Where source
+// tables are still stubbed (moderation logs, security events), the relevant
+// counts are returned as 0.
+
+router.get('/:id/live-insights', async (req, res) => {
+  try {
+    const cid = req.params.id;
+    const now = new Date();
+    const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const last30d = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const responderActiveSince = new Date(now.getTime() - 15 * 60 * 1000); // online if location updated in last 15 min
+
+    const [
+      postsLast24h,
+      newMembersLast7d,
+      moderatorsTotal,
+      respondersOnline,
+      charities,
+      recentBusinesses,
+      recentMembers,
+      recentPosts,
+      activeReports,
+      topCategoryRows,
+    ] = await Promise.all([
+      prisma.post.count({ where: { communityId: cid, createdAt: { gte: last24h }, status: { not: 'Deleted' } } }),
+      prisma.communityMember.count({ where: { communityId: cid, joinedAt: { gte: last7d }, status: 'ACTIVE' } }),
+      prisma.communityMember.count({ where: { communityId: cid, role: { in: ['ADMIN', 'MODERATOR', 'OWNER'] }, status: 'ACTIVE' } }),
+      prisma.securityLocation.count({ where: { communityId: cid, timestamp: { gte: responderActiveSince } } }),
+      prisma.charity.findMany({ where: { communityId: cid }, orderBy: { updatedAt: 'desc' } }),
+      prisma.business.findMany({
+        where: { communityIds: { has: cid }, createdAt: { gte: last7d } },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+      }),
+      prisma.communityMember.findMany({
+        where: { communityId: cid, joinedAt: { gte: last7d }, status: 'ACTIVE' },
+        orderBy: { joinedAt: 'desc' },
+        take: 5,
+      }),
+      prisma.post.findMany({
+        where: { communityId: cid, status: { not: 'Deleted' } },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+      }),
+      prisma.report.count({ where: { communityId: cid, status: 'pending' } }),
+      prisma.post.groupBy({
+        by: ['category'],
+        where: { communityId: cid, createdAt: { gte: last30d }, status: { not: 'Deleted' }, category: { not: '' } },
+        _count: { category: true },
+        orderBy: { _count: { category: 'desc' } },
+        take: 1,
+      }),
+    ]);
+
+    const donationsTotal = charities.reduce((sum, c) => sum + (c.raisedAmount || 0), 0);
+    const featuredCharity = charities.find((c) => c.isFeatured) || charities[0] || null;
+
+    // Volunteers = members flagged as security responders (active)
+    const activeVolunteers = await prisma.communityMember.count({
+      where: { communityId: cid, isSecurityMember: true, status: 'ACTIVE' },
+    });
+
+    // Most active area: location of most recent post that has a name
+    const mostActiveArea =
+      recentPosts.find((p) => p.locationName && p.locationName.trim().length > 0)?.locationName || null;
+
+    // Energy score (0..3 → QUIET/MEDIUM/ACTIVE/HIGH)
+    const energyScore =
+      (postsLast24h >= 5 ? 1 : 0) +
+      (newMembersLast7d >= 3 ? 1 : 0) +
+      (respondersOnline > 0 ? 1 : 0) +
+      (recentBusinesses.length > 0 ? 1 : 0);
+    const energy: 'QUIET' | 'MEDIUM' | 'ACTIVE' | 'HIGH' =
+      energyScore >= 4 ? 'HIGH' : energyScore === 3 ? 'ACTIVE' : energyScore === 2 ? 'MEDIUM' : 'QUIET';
+
+    // Engagement score: simple 0-100 blend of post/member/responder/business activity
+    const engagementScore = Math.min(
+      100,
+      postsLast24h * 8 + newMembersLast7d * 5 + respondersOnline * 10 + recentBusinesses.length * 6,
+    );
+
+    // Build a unified feed (latest first) from posts + new members + business approvals
+    type FeedKind = 'post' | 'join' | 'business' | 'donation';
+    type FeedItem = { id: string; kind: FeedKind; icon: string; message: string; timestamp: string };
+    const feed: FeedItem[] = [];
+
+    for (const p of recentPosts.slice(0, 6)) {
+      const title = (p.title || 'Untitled').slice(0, 60);
+      feed.push({
+        id: `post-${p.id}`,
+        kind: 'post',
+        icon: p.type === 'notice' ? '📢' : p.type === 'listing' ? '🏷️' : '📝',
+        message: `${p.authorName || 'A member'} posted "${title}"`,
+        timestamp: p.createdAt.toISOString(),
+      });
+    }
+    for (const m of recentMembers) {
+      feed.push({
+        id: `join-${m.userId}`,
+        kind: 'join',
+        icon: '👥',
+        message: `${m.name || 'A new member'} joined the community`,
+        timestamp: m.joinedAt.toISOString(),
+      });
+    }
+    for (const b of recentBusinesses) {
+      feed.push({
+        id: `biz-${b.id}`,
+        kind: 'business',
+        icon: '🏪',
+        message: `New local business "${b.name}" added`,
+        timestamp: b.createdAt.toISOString(),
+      });
+    }
+    // Donation chip — only if featured charity has any raised amount (cannot identify donors)
+    if (featuredCharity && (featuredCharity.raisedAmount || 0) > 0) {
+      feed.push({
+        id: `donation-${featuredCharity.id}`,
+        kind: 'donation',
+        icon: '❤️',
+        message: `R${Math.round(featuredCharity.raisedAmount || 0).toLocaleString()} raised for ${featuredCharity.name}`,
+        timestamp: featuredCharity.updatedAt.toISOString(),
+      });
+    }
+
+    feed.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1));
+
+    return res.json({
+      energy,
+      counts: {
+        postsLast24h,
+        newMembersLast7d,
+        alertsActive: 0,            // SecurityEvent table not built
+        alertsResolved24h: 0,
+        donationsTotal,
+        donationsLast24h: 0,        // No transactions table — cannot compute deltas accurately
+        businessesAdded7d: recentBusinesses.length,
+        respondersOnline,
+        moderatorsOnline: moderatorsTotal, // online-state not tracked; report total instead
+        activeReports,
+      },
+      feed: feed.slice(0, 10),
+      insights: {
+        mostActiveArea,
+        topCategory: topCategoryRows[0]?.category || null,
+        activeVolunteers,
+        engagementScore,
+      },
+    });
+  } catch (error: any) {
+    console.error('[API Error] /live-insights:', error);
+    return res.status(500).json({ error: error.message || 'Failed to load live insights' });
+  }
 });
 
 // ─── Security events (stub — returns empty list until security is built) ──────
