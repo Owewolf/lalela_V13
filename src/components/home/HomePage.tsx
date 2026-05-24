@@ -345,6 +345,44 @@ export const HomePage: React.FC<HomePageProps> = ({
     }, 0);
   }, [approvedPublicCharityListings]);
 
+  // Potential CAT running total across ALL approved Public listings in the
+  // community (regardless of whether a charity is selected). Represents the
+  // benefit CAT brings to the community when activated.
+  const potentialCatTotal = useMemo(() => {
+    const eligible = posts.filter((post) => {
+      if (post.type !== 'listing') return false;
+      if (!post.isPublic) return false;
+      const s = typeof post.status === 'string' ? post.status.toLowerCase() : '';
+      return s === 'active' || s === 'pinned';
+    });
+    return eligible.reduce((sum, listing) => {
+      if (
+        typeof listing.charityAmount === 'number' &&
+        Number.isFinite(listing.charityAmount)
+      ) {
+        return sum + Math.max(0, listing.charityAmount);
+      }
+      const base =
+        typeof listing.communityPrice === 'number'
+          ? listing.communityPrice
+          : typeof listing.price === 'number'
+          ? listing.price
+          : 0;
+      const pub =
+        typeof listing.publicPrice === 'number'
+          ? listing.publicPrice
+          : typeof listing.price === 'number'
+          ? listing.price
+          : base;
+      return sum + Math.max(0, pub - base);
+    }, 0);
+  }, [posts]);
+  const potentialCatLabel = `R${potentialCatTotal.toLocaleString()}`;
+  const potentialCatCount = useMemo(
+    () => posts.filter((p) => p.type === 'listing' && p.isPublic).length,
+    [posts],
+  );
+
   const fundraisingGoal =
     typeof selectedCharity?.fundraisingGoal === 'number'
       ? selectedCharity.fundraisingGoal
@@ -1482,13 +1520,28 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </View>
               </View>
             ) : (
-              <View className="gap-2">
+              <View className="gap-3">
                 <Text className="text-base font-bold text-primary">
-                  No featured charity yet
+                  CAT is in effect
                 </Text>
                 <Text className="text-sm text-gray-500">
-                  Charity management and suggestions are handled through the dashboard workflow.
+                  No featured charity is selected yet. Every public listing still
+                  accrues the CAT margin — funds will route once a charity is
+                  featured.
                 </Text>
+                <View className="flex-row items-end justify-between rounded-2xl bg-primary/5 px-4 py-3">
+                  <View>
+                    <Text className="text-[10px] font-semibold uppercase tracking-wide text-primary/70">
+                      Potential CAT Total
+                    </Text>
+                    <Text className="text-lg font-bold text-primary">
+                      {potentialCatLabel}
+                    </Text>
+                  </View>
+                  <Text className="text-[10px] font-semibold text-primary/70">
+                    {potentialCatCount} public listing{potentialCatCount === 1 ? '' : 's'}
+                  </Text>
+                </View>
               </View>
             )}
           </View>

@@ -247,6 +247,8 @@ exports.Prisma.CommunityScalarFieldEnum = {
   onboardingStepsCompleted: 'onboardingStepsCompleted',
   guidedSetupRequired: 'guidedSetupRequired',
   isPublic: 'isPublic',
+  catCycleActive: 'catCycleActive',
+  catFeaturedCharityId: 'catFeaturedCharityId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -338,6 +340,7 @@ exports.Prisma.PostScalarFieldEnum = {
   rejectionReason: 'rejectionReason',
   changesRequestedNote: 'changesRequestedNote',
   expiresAt: 'expiresAt',
+  soldAt: 'soldAt',
   expiredAt: 'expiredAt',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',
@@ -366,6 +369,7 @@ exports.Prisma.CharityScalarFieldEnum = {
   longitude: 'longitude',
   isVerified: 'isVerified',
   isFeatured: 'isFeatured',
+  isCATCharity: 'isCATCharity',
   tags: 'tags',
   linkedBusinessIds: 'linkedBusinessIds',
   campaignCompleted: 'campaignCompleted',
@@ -387,6 +391,17 @@ exports.Prisma.CharitySuggestionScalarFieldEnum = {
   website: 'website',
   status: 'status',
   adminFeedback: 'adminFeedback',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.CatTransactionScalarFieldEnum = {
+  id: 'id',
+  communityId: 'communityId',
+  postId: 'postId',
+  sellerId: 'sellerId',
+  catAmount: 'catAmount',
+  catPercentage: 'catPercentage',
+  charityId: 'charityId',
   createdAt: 'createdAt'
 };
 
@@ -575,6 +590,7 @@ exports.Prisma.ModelName = {
   Post: 'Post',
   Charity: 'Charity',
   CharitySuggestion: 'CharitySuggestion',
+  CatTransaction: 'CatTransaction',
   Business: 'Business',
   Report: 'Report',
   CommunityInvitation: 'CommunityInvitation',

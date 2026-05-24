@@ -81,6 +81,7 @@ model User {
   licenses            License[]
   billingRecords      BillingRecord[]
   invoices            Invoice[]
+  catTransactions     CatTransaction[]
 
   @@index([email])
   @@index([phone])
@@ -200,6 +201,8 @@ model Community {
   onboardingStepsCompleted String[]  @default([]) @map("onboarding_steps_completed")
   guidedSetupRequired      Boolean   @default(true) @map("guided_setup_required")
   isPublic                 Boolean   @default(true) @map("is_public")
+  catCycleActive           Boolean   @default(false) @map("cat_cycle_active")
+  catFeaturedCharityId     String?   @map("cat_featured_charity_id")
   createdAt                DateTime  @default(now()) @map("created_at")
   updatedAt                DateTime  @updatedAt @map("updated_at")
 
@@ -218,6 +221,7 @@ model Community {
   securityEvents     SecurityEvent[]
   licenses           License[]
   billingRecords     BillingRecord[]
+  catTransactions    CatTransaction[]
 
   @@index([ownerId])
   @@index([status])
@@ -347,6 +351,7 @@ model Post {
   rejectionReason      String?   @map("rejection_reason")
   changesRequestedNote String?   @map("changes_requested_note")
   expiresAt            DateTime? @map("expires_at")
+  soldAt               DateTime? @map("sold_at")
   expiredAt            DateTime? @map("expired_at")
   deletedAt            DateTime? @map("deleted_at")
   createdAt            DateTime  @default(now()) @map("created_at")
@@ -354,6 +359,7 @@ model Post {
 
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   author    User      @relation(fields: [authorId], references: [id])
+  catTransactions CatTransaction[]
 
   @@index([communityId, createdAt])
   @@index([authorId])
@@ -386,6 +392,7 @@ model Charity {
   longitude            Float?
   isVerified           Boolean  @default(false) @map("is_verified")
   isFeatured           Boolean  @default(false) @map("is_featured")
+  isCATCharity         Boolean  @default(false) @map("is_cat_charity")
   tags                 String[] @default([])
   linkedBusinessIds    String[] @default([]) @map("linked_business_ids")
   campaignCompleted    Boolean  @default(false) @map("campaign_completed")
@@ -396,6 +403,7 @@ model Charity {
 
   community          Community           @relation(fields: [communityId], references: [id], onDelete: Cascade)
   charitySuggestions CharitySuggestion[]
+  catTransactions    CatTransaction[]
 
   @@index([communityId])
   @@map("charities")
@@ -421,6 +429,28 @@ model CharitySuggestion {
 
   @@index([communityId])
   @@map("charity_suggestions")
+}
+
+model CatTransaction {
+  id            String   @id @default(cuid())
+  communityId   String   @map("community_id")
+  postId        String   @map("post_id")
+  sellerId      String   @map("seller_id")
+  catAmount     Float    @map("cat_amount")
+  catPercentage Float    @map("cat_percentage")
+  charityId     String?  @map("charity_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  seller    User      @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  charity   Charity?  @relation(fields: [charityId], references: [id], onDelete: SetNull)
+
+  @@index([communityId, createdAt])
+  @@index([postId])
+  @@index([sellerId])
+  @@index([charityId])
+  @@map("cat_transactions")
 }
 
 // =============================================

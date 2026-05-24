@@ -182,12 +182,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     const loadCommunity = async () => {
       try {
-        const [membersRes, postsRes, charitiesRes, bizRes, invRes, locRes] = await Promise.allSettled([
+        const [membersRes, postsRes, charitiesRes, charitySuggestionsRes, bizRes, locRes] = await Promise.allSettled([
           api.get(`/communities/${currentCommunityId}/members`),
           api.get(`/communities/${currentCommunityId}/posts`),
           api.get(`/communities/${currentCommunityId}/charities`),
+          api.get(`/communities/${currentCommunityId}/charity-suggestions`),
           api.get('/businesses'),
-          api.get('/communities'),   // refresh to get invites embedded
           api.get(`/communities/${currentCommunityId}/locations`),
         ]);
         // Members always use their default location (lat/lng from user profile)
@@ -200,6 +200,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         }
         if (postsRes.status === 'fulfilled') setPosts(postsRes.value.data);
         if (charitiesRes.status === 'fulfilled') setCharities(charitiesRes.value.data);
+        if (charitySuggestionsRes.status === 'fulfilled') setCharitySuggestions(charitySuggestionsRes.value.data);
         if (bizRes.status === 'fulfilled') {
           const all: UserBusiness[] = bizRes.value.data;
           setUserBusinesses(all.filter((b) => b.ownerId === userId));
@@ -439,11 +440,16 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const approveCharitySuggestion = useCallback(async (suggestionId: string, feedback: string, charityData: Omit<Charity, 'id' | 'createdAt'>) => {
     if (!currentCommunityId) return;
-    // Create the charity
-    const { data: charity } = await api.post(`/communities/${currentCommunityId}/charities`, charityData);
-    setCharities((prev) => [...prev, charity]);
-    // Mark suggestion as approved in the backend
-    await api.patch(`/communities/${currentCommunityId}/charity-suggestions/${suggestionId}/approve`, { feedback });
+    const { data } = await api.patch(`/communities/${currentCommunityId}/charity-suggestions/${suggestionId}/approve`, {
+      feedback,
+      charityData,
+    });
+    if (data?.charity?.id) {
+      setCharities((prev) => {
+        if (prev.some((charity) => charity.id === data.charity.id)) return prev;
+        return [...prev, data.charity];
+      });
+    }
     setCharitySuggestions((prev) => prev.map((s) => s.id === suggestionId ? { ...s, status: 'approved', adminFeedback: feedback } : s));
   }, [currentCommunityId]);
 
@@ -454,9 +460,55 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     setCharitySuggestions((prev) => prev.map((s) => s.id === suggestionId ? { ...s, status: 'rejected', adminFeedback: feedback } : s));
   }, [currentCommunityId]);
 
+  const setCatCycle = useCallback(async (active: boolean, featuredCharityId?: string) => {
+    if (!currentCommunityId) return;
+    const payload: { active: boolean; featuredCharityId?: string } = { active };
+    if (featuredCharityId) payload.featuredCharityId = featuredCharityId;
+    const { data } = await api.post(`/communities/${currentCommunityId}/cat-cycle`, payload);
+    setCommunities((prev) => prev.map((community) =>
+      community.id === currentCommunityId
+        ? {
+            ...community,
+            catCycleActive: Boolean(data?.catCycleActive),
+            catFeaturedCharityId: data?.catFeaturedCharityId ?? null,
+          }
+        : community,
+    ));
+  }, [currentCommunityId]);
+
+  const markPostSold = useCallback(async (postId: string) => {
+    if (!currentCommunityId) return { catTriggered: false };
+    const { data } = await api.post(`/communities/${currentCommunityId}/posts/${postId}/sold`);
+    const soldPost = data?.post;
+    if (soldPost?.id) {
+      setPosts((prev) => prev.map((post) => (post.id === soldPost.id ? soldPost : post)));
+    }
+    return {
+      catTriggered: Boolean(data?.catTriggered),
+      catAmount: data?.catAmount,
+      pooledToCharity: Boolean(data?.pooledToCharity),
+    };
+  }, [currentCommunityId]);
+
+  const getCatHub = useCallback(async () => {
+    if (!currentCommunityId) {
+      return {
+        totalCATGenerated: 0,
+        totalRaisedForCharity: 0,
+        catCycleActive: false,
+        activeCycleCharity: null,
+        recentTransactions: [],
+      };
+    }
+    const { data } = await api.get(`/communities/${currentCommunityId}/cat-hub`);
+    return data;
+  }, [currentCommunityId]);
+
   // ── Posts ─────────────────────────────────────────────────────────────────
   const addPost = useCallback(async (post: Omit<CommunityNotice, 'id' | 'timestamp'>): Promise<string | null> => {
-    if (!currentCommunityId) return null;
+    if (!currentCommunityId) {
+      throw new Error('No active community selected');
+    }
     const { data } = await api.post(`/communities/${currentCommunityId}/posts`, post);
     setPosts((prev) => [data, ...prev]);
     return data.id;
@@ -662,6 +714,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         addCharitySuggestion,
         approveCharitySuggestion,
         rejectCharitySuggestion,
+        setCatCycle,
+        markPostSold,
+        getCatHub,
         charitySuggestions,
         posts,
         addPost,

@@ -376,6 +376,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const featuredCharity = availableCharities.find((c: any) => c.isFeatured) || (availableCharities.length === 1 ? availableCharities[0] : undefined);
   const otherCharities = charities.filter((c: any) => c !== featuredCharity && ((c.raisedAmount || c.totalRaised || 0) > 0));
 
+  // Potential CAT running total across all approved Public listings, shown
+  // whether or not a charity is currently featured.
+  const potentialCatTotal = (posts as any[])
+    .filter((p) => {
+      if (p?.type !== 'listing') return false;
+      if (!p?.isPublic) return false;
+      const s = typeof p?.status === 'string' ? p.status.toLowerCase() : '';
+      return s === 'active' || s === 'pinned';
+    })
+    .reduce((sum: number, listing: any) => {
+      if (typeof listing.charityAmount === 'number' && Number.isFinite(listing.charityAmount)) {
+        return sum + Math.max(0, listing.charityAmount);
+      }
+      const base = typeof listing.communityPrice === 'number'
+        ? listing.communityPrice
+        : typeof listing.price === 'number' ? listing.price : 0;
+      const pub = typeof listing.publicPrice === 'number'
+        ? listing.publicPrice
+        : typeof listing.price === 'number' ? listing.price : base;
+      return sum + Math.max(0, pub - base);
+    }, 0);
+  const potentialCatCount = (posts as any[]).filter(
+    (p) => p?.type === 'listing' && p?.isPublic,
+  ).length;
+
   const renderDashboard = () => (
     <ScrollView
       style={styles.dashScroll}
@@ -431,28 +456,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Moderation Center CTA */}
       <View style={[styles.bentoCard, styles.bentoCardLarge]}>
-        <View style={styles.bentoHeader}>
-          <View style={[styles.bentoIcon, { backgroundColor: '#f0fdf4' }]}>
-            <Gavel size={24} color={PRIMARY} />
-          </View>
-          {!readOnly && (
-            <TouchableOpacity
-              style={styles.openModBtn}
-              onPress={() => setActiveView('moderation')}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.openModBtnText}>Open</Text>
-              <ArrowUpRight size={14} color="#fff" />
-            </TouchableOpacity>
-          )}
-        </View>
-        <Text style={styles.bentoTitle}>Moderation Center</Text>
-        <Text style={styles.bentoDesc}>
-          {readOnly
-            ? 'Community moderation is managed by authorized moderators and admins.'
-            : 'Quick access to every moderation surface.'}
-        </Text>
-
         {(() => {
           const c = liveInsights?.counts;
           const tiles: Array<{
@@ -580,7 +583,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         ) : (
           <View style={styles.noCharity}>
             <Droplets size={28} color="#cbd5e1" />
-            <Text style={styles.noCharityText}>No active initiatives</Text>
+            <Text style={styles.noCharityText}>CAT is in effect</Text>
+            <Text style={styles.noCharitySubtext}>
+              No featured charity is selected yet.
+            </Text>
+            <View style={styles.potentialCatBox}>
+              <View>
+                <Text style={styles.potentialCatLabel}>Potential CAT Total</Text>
+                <Text style={styles.potentialCatValue}>
+                  R{potentialCatTotal.toLocaleString()}
+                </Text>
+              </View>
+              <Text style={styles.potentialCatMeta}>
+                {potentialCatCount} public listing{potentialCatCount === 1 ? '' : 's'}
+              </Text>
+            </View>
           </View>
         )}
 
@@ -967,6 +984,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc', borderRadius: 12, gap: 8, marginTop: 8,
   },
   noCharityText: { fontSize: 13, color: '#94a3b8', fontWeight: '500' },
+  noCharitySubtext: { fontSize: 12, color: '#94a3b8' },
+  potentialCatBox: {
+    marginTop: 12,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(30, 86, 103, 0.06)',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  potentialCatLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    color: 'rgba(30, 86, 103, 0.7)',
+  },
+  potentialCatValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1e5667',
+  },
+  potentialCatMeta: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'rgba(30, 86, 103, 0.7)',
+  },
   previousCampaigns: { marginTop: 8, gap: 8 },
   previousCampaignsTitle: { fontSize: 13, fontWeight: '700', color: PRIMARY },
   prevCampaignRow: {
@@ -1100,11 +1146,6 @@ const styles = StyleSheet.create({
   submitSuggestBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
 
   // Moderation tile grid
-  openModBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: PRIMARY, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 99,
-  },
-  openModBtnText: { color: '#fff', fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.8 },
   tileGrid: {
     flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8,
   },
@@ -1117,7 +1158,7 @@ const styles = StyleSheet.create({
     gap: 4,
     borderWidth: 1,
     borderColor: '#f1f5f9',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     position: 'relative',
   },
   tileLocked: { opacity: 0.5 },
@@ -1128,8 +1169,9 @@ const styles = StyleSheet.create({
   tileLabel: {
     fontSize: 10, fontWeight: '900', color: '#64748b',
     textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4,
+    textAlign: 'center',
   },
-  tileCount: { fontSize: 18, fontWeight: '900' },
+  tileCount: { fontSize: 18, fontWeight: '900', textAlign: 'center' },
   tileLockBadge: {
     position: 'absolute', top: 8, right: 8,
     width: 18, height: 18, borderRadius: 9,

@@ -180,6 +180,52 @@ router.get('/me/notifications', async (req, res) => {
   return res.json(notifications);
 });
 
+// Backward-compatible create endpoint used by client-side helper.
+router.post('/me/notifications', async (req, res) => {
+  const { target_userId, title, message, type, metadata } = req.body as {
+    target_userId?: string;
+    title?: string;
+    message?: string;
+    type?: string;
+    metadata?: unknown;
+  };
+
+  if (!target_userId || !title || !message || !type) {
+    return res.status(400).json({ error: 'target_userId, title, message and type are required' });
+  }
+
+  const notification = await prisma.notification.create({
+    data: {
+      userId: target_userId,
+      title,
+      message,
+      type,
+      metadata: metadata as any,
+    },
+  });
+  return res.status(201).json(notification);
+});
+
+// Backward-compatible preferences endpoint used by client context.
+router.put('/me/notifications', async (req, res) => {
+  const prefs = req.body;
+  await prisma.user.update({
+    where: { id: req.auth!.userId },
+    data: { notificationPreferences: prefs as any },
+  });
+  return res.json({ message: 'Notification preferences updated' });
+});
+
+// Backward-compatible mark-read endpoint used by client context.
+router.put('/me/notifications/:id', async (req, res) => {
+  const readValue = typeof req.body?.read === 'boolean' ? req.body.read : true;
+  await prisma.notification.updateMany({
+    where: { id: req.params.id, userId: req.auth!.userId },
+    data: { read: readValue },
+  });
+  return res.json({ message: 'Notification updated' });
+});
+
 router.put('/me/notifications/:id/read', async (req, res) => {
   await prisma.notification.updateMany({
     where: { id: req.params.id, userId: req.auth!.userId },
@@ -194,6 +240,13 @@ router.put('/me/notifications/read-all', async (req, res) => {
     data: { read: true },
   });
   return res.json({ message: 'All notifications marked as read' });
+});
+
+router.delete('/me/notifications/:id', async (req, res) => {
+  await prisma.notification.deleteMany({
+    where: { id: req.params.id, userId: req.auth!.userId },
+  });
+  return res.json({ message: 'Notification deleted' });
 });
 
 export default router;

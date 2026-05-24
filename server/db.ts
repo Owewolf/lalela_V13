@@ -22,7 +22,9 @@ export async function getPublicCommunities() {
       _count: {
         select: {
           members: true,
-          posts: { where: { type: 'listing', status: 'Active' } },
+          // Schema default for posts.status is lowercase 'active'; exclude
+          // soft-deleted and sold listings from the public count.
+          posts: { where: { type: 'listing', status: { notIn: ['Deleted', 'SOLD'] } } },
         },
       },
     },

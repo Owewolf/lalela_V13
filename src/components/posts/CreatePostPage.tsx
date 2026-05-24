@@ -165,7 +165,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
     }
   }, [enabledListingCategories]);
 
-  const basePercentage = selectedCharity?.percentage || 0;
+  const basePercentage = isPublic ? Math.max(selectedCharity?.percentage || 0, 15) : 0;
   const parsedCustom = parseFloat(customCharityPercentage) || 0;
   const charityPercentage = Math.max(parsedCustom, basePercentage);
   const numericPrice = parseFloat(price) || 0;
@@ -235,7 +235,6 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
     const isEmergency = postType === 'notice' && urgency === 'emergency';
     if (isEmergency && !emergencyCategory) return;
     if (!isEmergency && (!title || !description)) return;
-    if (postType === 'listing' && isPublic && !featuredCharity) return;
 
     const urgencyMap: Record<Urgency, NonNullable<CommunityNotice['urgency']>> = {
       emergency: 'emergency',
@@ -292,6 +291,10 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
         if (router.canGoBack()) router.back(); else router.replace('/posts');
       } else {
         const postId = await addPost(postData);
+        if (!postId) {
+          Alert.alert('Error', 'No active community selected. Open your community first, then post again.');
+          return;
+        }
         if (postId && postData.urgency === 'emergency') {
           onEmergencyPosted?.({ ...postData, id: postId, timestamp: new Date().toISOString() });
           router.push(`/emergency/${postId}`);
@@ -299,8 +302,12 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
           if (router.canGoBack()) router.back(); else router.replace('/posts');
         }
       }
-    } catch {
-      Alert.alert('Error', 'Failed to post. Please try again.');
+    } catch (err: any) {
+      const serverMessage =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err?.message;
+      Alert.alert('Error', serverMessage ? `Failed to post: ${serverMessage}` : 'Failed to post. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -815,7 +822,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       ) : (
                         <View className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
                           <Text className="text-xs text-amber-700 leading-5">
-                            Public CAT pricing is unavailable until an admin selects the active charity.
+                            No active community charity has been set yet — the {basePercentage}% CAT margin still applies and represents the buyer’s potential resale earning.
                           </Text>
                         </View>
                       )}
@@ -834,17 +841,17 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         </View>
                         <View className="flex-row justify-between">
                           <Text className="text-xs font-bold text-primary">
-                            To Charity{selectedCharity ? ` (${charityPercentage}%)` : ''}
+                            {selectedCharity ? `To Charity (${charityPercentage}%)` : `CAT Margin (${charityPercentage}%)`}
                           </Text>
                           <Text className="text-xs font-bold text-primary">
-                            + R {selectedCharity ? charityAmount.toFixed(2) : '0.00'}
+                            + R {charityAmount.toFixed(2)}
                           </Text>
                         </View>
                         <View className="h-px bg-gray-200 my-1" />
                         <View className="flex-row justify-between">
                           <Text className="text-sm font-bold text-primary">Public Price</Text>
                           <Text className="text-sm font-bold text-primary">
-                            R {(selectedCharity ? publicPrice : numericPrice).toFixed(2)}
+                            R {publicPrice.toFixed(2)}
                           </Text>
                         </View>
                       </View>

@@ -22,7 +22,7 @@ import {
 } from 'lucide-react-native';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
-import type { Charity, CharitySuggestion } from '../../types';
+import type { Charity, CharitySuggestion, CatHubSummary } from '../../types';
 
 type CharityEntryMode = 'manage' | 'suggest' | null;
 type CharityAdminView = 'list' | 'form' | 'suggestions';
@@ -112,9 +112,12 @@ export default function ManageCommunityCharity({
     addCharitySuggestion,
     approveCharitySuggestion,
     rejectCharitySuggestion,
+    setCatCycle,
+    getCatHub,
   } = useCommunity();
 
   const canManageCharity =
+    currentCommunity?.userRole === 'OWNER' ||
     currentCommunity?.userRole === 'ADMIN' ||
     currentCommunity?.userRole === 'MODERATOR';
   const hasCommunity = !!currentCommunity?.id;
@@ -135,6 +138,9 @@ export default function ManageCommunityCharity({
   const [reviewFeedback, setReviewFeedback] = useState('');
   const [savingCharity, setSavingCharity] = useState(false);
   const [savingSuggestion, setSavingSuggestion] = useState(false);
+  const [updatingCatCycle, setUpdatingCatCycle] = useState(false);
+  const [catHubLoading, setCatHubLoading] = useState(false);
+  const [catHubSummary, setCatHubSummary] = useState<CatHubSummary | null>(null);
 
   const availableCharities = useMemo(
     () => charities.filter((charity) => charity.status !== 'Archived'),
@@ -161,6 +167,15 @@ export default function ManageCommunityCharity({
       setShowSuggestModal(true);
     }
   }, [initialMode, canManageCharity]);
+
+  useEffect(() => {
+    if (!showManager || !canManageCharity || !hasCommunity) return;
+    setCatHubLoading(true);
+    getCatHub()
+      .then((data) => setCatHubSummary(data))
+      .catch(() => setCatHubSummary(null))
+      .finally(() => setCatHubLoading(false));
+  }, [showManager, canManageCharity, hasCommunity, getCatHub]);
 
   const closeManager = () => {
     setShowManager(false);
@@ -380,6 +395,33 @@ export default function ManageCommunityCharity({
     }
   };
 
+  const handleToggleCatCycle = async (nextActive: boolean) => {
+    if (!hasCommunity || updatingCatCycle) return;
+    if (nextActive && !featuredCharity?.id) {
+      Alert.alert('Featured charity required', 'Select a featured charity before activating the CAT cycle.');
+      return;
+    }
+    setUpdatingCatCycle(true);
+    try {
+      await setCatCycle(nextActive, featuredCharity?.id);
+      const latest = await getCatHub();
+      setCatHubSummary(latest);
+      Alert.alert(
+        nextActive ? 'Charity cycle activated' : 'Charity cycle paused',
+        nextActive
+          ? 'Public listing CAT earnings now pool into the featured charity when sold.'
+          : 'Public listing CAT earnings now remain seller earnings when sold.'
+      );
+    } catch (error) {
+      Alert.alert(
+        'Unable to update CAT cycle',
+        error instanceof Error ? error.message : 'Please try again.'
+      );
+    } finally {
+      setUpdatingCatCycle(false);
+    }
+  };
+
   return (
     <>
       <View style={styles.section}>
@@ -463,6 +505,43 @@ export default function ManageCommunityCharity({
             <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: 20 }}>
               {adminView === 'list' && (
                 <>
+                  <View style={styles.catCycleCard}>
+                    <View style={{ flex: 1, gap: 4 }}>
+                      <Text style={styles.listItemTitle}>CAT Charity Cycle</Text>
+                      <Text style={styles.listItemMeta}>
+                        {currentCommunity?.catCycleActive
+                          ? `Active${featuredCharity?.name ? ` • Pooling to ${featuredCharity.name}` : ''}`
+                          : 'Inactive • Public CAT remains seller earnings'}
+                      </Text>
+                    </View>
+                    <Switch
+                      value={Boolean(currentCommunity?.catCycleActive)}
+                      disabled={updatingCatCycle}
+                      onValueChange={handleToggleCatCycle}
+                      trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
+                      thumbColor="#ffffff"
+                    />
+                  </View>
+
+                  <View style={styles.catHubCard}>
+                    <Text style={styles.catHubTitle}>Charity Hub</Text>
+                    {catHubLoading ? (
+                      <ActivityIndicator color="#0d3d47" />
+                    ) : (
+                      <>
+                        <Text style={styles.catHubMetric}>
+                          Total CAT Generated: R{Number(catHubSummary?.totalCATGenerated ?? 0).toLocaleString()}
+                        </Text>
+                        <Text style={styles.catHubMetric}>
+                          Total Raised For Charity: R{Number(catHubSummary?.totalRaisedForCharity ?? 0).toLocaleString()}
+                        </Text>
+                        <Text style={styles.listItemMeta}>
+                          Recent transactions: {catHubSummary?.recentTransactions?.length ?? 0}
+                        </Text>
+                      </>
+                    )}
+                  </View>
+
                   <TouchableOpacity
                     style={styles.primaryButton}
                     onPress={() => openAdminForm(null, null)}
@@ -486,6 +565,12 @@ export default function ManageCommunityCharity({
                         <View style={{ flex: 1, gap: 4 }}>
                           <View style={styles.inlineRow}>
                             <Text style={styles.listItemTitle}>{charity.name}</Text>
+                            {charity.isCATCharity && (
+                              <View style={styles.badge}>
+                                <CheckCircle2 size={11} color="#0d3d47" />
+                                <Text style={styles.badgeText}>CAT</Text>
+                              </View>
+                            )}
                             {charity.isFeatured && (
                               <View style={styles.badge}>
                                 <ShieldCheck size={11} color="#0d3d47" />
@@ -588,7 +673,11 @@ export default function ManageCommunityCharity({
                     }
                     placeholder="Charity name"
                     placeholderTextColor="#94a3b8"
+                    editable={!selectedCharity?.isCATCharity}
                   />
+                  {selectedCharity?.isCATCharity ? (
+                    <Text style={styles.listItemMeta}>CAT charity name is fixed and cannot be renamed.</Text>
+                  ) : null}
                   <TextInput
                     style={[styles.input, styles.textarea]}
                     value={charityForm.description}
@@ -967,6 +1056,34 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0,0,0,0.06)',
     padding: 14,
     backgroundColor: '#fff',
+  },
+  catCycleCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    padding: 14,
+    backgroundColor: '#f8fafc',
+  },
+  catHubCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    padding: 14,
+    gap: 6,
+    backgroundColor: '#ffffff',
+  },
+  catHubTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0d3d47',
+  },
+  catHubMetric: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#111827',
   },
   listItemTitle: { fontSize: 14, fontWeight: '700', color: '#111827' },
   listItemMeta: { fontSize: 11, color: '#6b7280' },

@@ -70,15 +70,26 @@ interface MarketPageProps {
 export default function MarketPage({ initialListingId }: MarketPageProps) {
   const router = useRouter();
   const { userProfile } = useAuth();
-  const { currentCommunity, userBusinesses, posts, communityBusinesses, charities, startConversation, setActiveConversation } = useCommunity();
+  const {
+    currentCommunity,
+    userBusinesses,
+    posts,
+    communityBusinesses,
+    charities,
+    startConversation,
+    setActiveConversation,
+    markPostSold,
+  } = useCommunity();
 
   const [activeTab, setActiveTab] = useState<'featured' | 'listings' | 'businesses'>('businesses');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedListing, setSelectedListing] = useState<(typeof listings)[0] | null>(null);
+  const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
 
   const coverageArea = currentCommunity?.coverageArea;
+  const cycleFeaturedCharity = charities.find((charity) => charity.id === currentCommunity?.catFeaturedCharityId);
 
   const listings = useMemo(() => {
     let l = posts.filter(p => p.type === 'listing');
@@ -270,6 +281,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
   const renderListing = useCallback(
     ({ item: listing }: { item: (typeof listings)[0] }) => {
       const charity = charities.find(c => c.id === listing.charityId);
+      const isSold = String(listing.status || '').toUpperCase() === 'SOLD';
       const hasListingImage = typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0;
       const hasAuthorImage = typeof listing.authorImage === 'string' && listing.authorImage.trim().length > 0;
       return (
@@ -346,6 +358,12 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
               ) : null}
             </View>
 
+            {isSold ? (
+              <View className="self-start bg-gray-200 px-3 py-1 rounded-full">
+                <Text className="text-[10px] font-bold uppercase tracking-widest text-gray-700">Sold</Text>
+              </View>
+            ) : null}
+
             {/* Charity */}
             {listing.isPublic && listing.charityId ? (
               <View className="bg-gray-100 p-3 rounded-2xl flex-row items-start gap-3 border border-gray-200">
@@ -360,11 +378,9 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                     </Text>
                   </View>
                   <Text className="text-gray-400 text-[11px] leading-relaxed">
-                    Benefiting{' '}
-                    <Text className="font-bold text-primary">
-                      {charity?.name || 'Local Charity'}
-                    </Text>{' '}
-                    from this purchase.
+                    {currentCommunity?.catCycleActive && cycleFeaturedCharity
+                      ? `CAT pooled to ${cycleFeaturedCharity.name} during active charity cycle.`
+                      : `Seller CAT earning via ${charity?.name || 'Local Charity'} for public sale.`}
                   </Text>
                 </View>
               </View>
@@ -430,8 +446,43 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
         </TouchableOpacity>
       );
     },
-    [charities, handleOpenListingChat]
+    [charities, currentCommunity?.catCycleActive, cycleFeaturedCharity, handleOpenListingChat]
   );
+
+  const handleMarkListingSold = useCallback(async (listing: (typeof listings)[0]) => {
+    const isOwner = listing.authorId && userProfile?.id && listing.authorId === userProfile.id;
+    if (!isOwner) return;
+
+    Alert.alert(
+      'Mark as sold',
+      listing.isPublic
+        ? 'This will mark the listing sold and trigger CAT accounting for this public listing.'
+        : 'This will mark the listing sold. Local listing sales do not trigger CAT.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm',
+          onPress: async () => {
+            setMarkingSoldId(listing.id);
+            try {
+              const result = await markPostSold(listing.id);
+              setSelectedListing(null);
+              Alert.alert(
+                'Listing updated',
+                result.catTriggered
+                  ? `Sold marked. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
+                  : 'Sold marked with no CAT trigger (local listing).'
+              );
+            } catch (error) {
+              Alert.alert('Unable to mark sold', 'Please try again.');
+            } finally {
+              setMarkingSoldId(null);
+            }
+          },
+        },
+      ]
+    );
+  }, [markPostSold, userProfile?.id]);
 
   const ListingDetailModal = () => {
     if (!selectedListing) return null;
@@ -439,6 +490,8 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
     const charity = selectedListing.charityId ? charities.find((item) => item.id === selectedListing.charityId) : null;
     const hasListingImage = typeof selectedListing.postsImage === 'string' && selectedListing.postsImage.trim().length > 0;
     const hasAuthorImage = typeof selectedListing.authorImage === 'string' && selectedListing.authorImage.trim().length > 0;
+    const isOwner = selectedListing.authorId && userProfile?.id && selectedListing.authorId === userProfile.id;
+    const isSold = String(selectedListing.status || '').toUpperCase() === 'SOLD';
 
     return (
       <Modal visible={!!selectedListing} transparent animationType="fade" onRequestClose={() => setSelectedListing(null)}>
@@ -533,6 +586,18 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
                     Open Chat
                   </Text>
                 </TouchableOpacity>
+
+                {isOwner && !isSold ? (
+                  <TouchableOpacity
+                    onPress={() => handleMarkListingSold(selectedListing)}
+                    disabled={markingSoldId === selectedListing.id}
+                    style={{ backgroundColor: '#f59e0b', borderRadius: 16, paddingVertical: 14, alignItems: 'center' }}
+                  >
+                    <Text style={{ color: '#111827', fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>
+                      {markingSoldId === selectedListing.id ? 'Marking...' : 'Mark as Sold'}
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
               </View>
             </ScrollView>
           </View>

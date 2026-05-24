@@ -13,6 +13,17 @@ import { getOrCreateCommunityInviteLink } from '../billing/inviteService.js';
 type UserRole = 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER';
 
 const router = Router();
+const CAT_MIN_PERCENTAGE = 15;
+
+const isAdminRole = (role?: string | null) => role === 'OWNER' || role === 'ADMIN';
+
+async function getCommunityRole(communityId: string, userId: string): Promise<string | null> {
+  const member = await prisma.communityMember.findUnique({
+    where: { communityId_userId: { communityId, userId } },
+    select: { role: true },
+  });
+  return member?.role ?? null;
+}
 
 // All community routes require auth
 router.use(requireAuth);
@@ -71,6 +82,20 @@ router.post('/', async (req, res) => {
       },
     });
 
+    const catCharity = await prisma.charity.create({
+      data: {
+        communityId: community.id,
+        name: 'CAT',
+        description: 'Community Assistance Tax baseline charity',
+        percentage: CAT_MIN_PERCENTAGE,
+        status: 'ACTIVE',
+        isFeatured: true,
+        isCATCharity: true,
+        isVerified: true,
+        locationName: coverageLocation ?? name.trim(),
+      } as any,
+    });
+
     // Add creator as Admin member — populate cached display fields immediately
     const creator = await prisma.user.findUnique({
       where: { id: req.auth!.userId },
@@ -92,7 +117,7 @@ router.post('/', async (req, res) => {
     await prisma.$transaction([
       prisma.community.update({
         where: { id: community.id },
-        data: { trialExpiresAt: trialEnd, type: 'TRIAL' },
+        data: { trialExpiresAt: trialEnd, type: 'TRIAL', catFeaturedCharityId: catCharity.id } as any,
       }),
       prisma.user.update({
         where: { id: req.auth!.userId },
@@ -419,11 +444,19 @@ router.get('/:id/posts', async (req, res) => {
 });
 
 router.post('/:id/posts', async (req, res) => {
-  const { type, category, subtype, title, description, image_url, imageUrl, postsImage, urgency, urgencyLevel,
+  const { type, category, subtype, postSubtype, title, description, image_url, imageUrl, postsImage, urgency, urgencyLevel,
     latitude, longitude, price, communityPrice, publicPrice, charityAmount, charityPercentage,
     is_charity, charity_id, charityId, expires_at, isPublic, locationName, source,
     authorName: bodyAuthorName, authorRole: bodyAuthorRole, authorImage: bodyAuthorImage } = req.body;
   if (!type || !title?.trim()) return res.status(400).json({ error: 'type and title are required' });
+
+  const resolvedIsPublic = Boolean(isPublic);
+  // CAT margin (≥15%) always applies to public listings as the buyer's potential
+  // resale earning. A charity is optional — funds route there only when one is set.
+  const rawCharityPercentage = Number(charityPercentage ?? 0);
+  const resolvedCharityPercentage = resolvedIsPublic
+    ? Math.max(Number.isFinite(rawCharityPercentage) ? rawCharityPercentage : 0, CAT_MIN_PERCENTAGE)
+    : 0;
 
   // Fetch author info to populate cached columns
   const authorUser = await prisma.user.findUnique({
@@ -442,7 +475,7 @@ router.post('/:id/posts', async (req, res) => {
       authorId: req.auth!.userId,
       type,
       category,
-      subtype,
+      subtype: subtype ?? postSubtype ?? null,
       title: title.trim(),
       description,
       imageUrl: imageUrl ?? image_url ?? null,
@@ -455,10 +488,10 @@ router.post('/:id/posts', async (req, res) => {
       price,
       communityPrice: communityPrice ?? null,
       publicPrice: publicPrice ?? null,
-      isPublic: isPublic ?? false,
+      isPublic: resolvedIsPublic,
       isCharity: is_charity ?? false,
       charityId: charityId ?? charity_id ?? null,
-      charityPercentage: charityPercentage ?? null,
+      charityPercentage: resolvedIsPublic ? resolvedCharityPercentage : (charityPercentage ?? null),
       charityAmount: charityAmount ?? null,
       source: source ?? null,
       expiresAt: expires_at ? new Date(expires_at) : null,
@@ -477,17 +510,114 @@ router.post('/:id/posts', async (req, res) => {
 });
 
 router.put('/:id/posts/:postId', async (req, res) => {
+  const existingPost = await prisma.post.findFirst({
+    where: { id: req.params.postId, communityId: req.params.id },
+  });
+  if (!existingPost) return res.status(404).json({ error: 'Post not found' });
+
   const allowed = [
     'title', 'description', 'imageUrl', 'postsImage', 'status', 'urgency', 'urgencyLevel',
     'price', 'communityPrice', 'publicPrice', 'charityId', 'charityPercentage', 'charityAmount',
-    'isPublic', 'category', 'locationName', 'latitude', 'longitude', 'source', 'expiresAt',
+    'isPublic', 'category', 'subtype', 'locationName', 'latitude', 'longitude', 'source', 'expiresAt',
   ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in req.body) data[key] = key === 'expiresAt' && req.body[key] ? new Date(req.body[key]) : req.body[key];
   }
-  const post = await prisma.post.update({ where: { id: req.params.postId }, data });
-  return res.json({ ...post, timestamp: post.createdAt });
+  // Accept legacy camelCase alias from the mobile client.
+  if (!('subtype' in data) && 'postSubtype' in req.body) {
+    data.subtype = req.body.postSubtype;
+  }
+
+  const nextIsPublic = 'isPublic' in data ? Boolean(data.isPublic) : Boolean(existingPost.isPublic);
+  const nextCharityPercentage =
+    'charityPercentage' in data
+      ? Number(data.charityPercentage ?? 0)
+      : Number(existingPost.charityPercentage ?? 0);
+  if (nextIsPublic && (!Number.isFinite(nextCharityPercentage) || nextCharityPercentage < CAT_MIN_PERCENTAGE)) {
+    return res.status(400).json({ error: `Public listings require charityPercentage >= ${CAT_MIN_PERCENTAGE}` });
+  }
+
+  if (nextIsPublic) {
+    const nextCharityId = ('charityId' in data ? data.charityId : existingPost.charityId) as string | null | undefined;
+    if (!nextCharityId) {
+      return res.status(400).json({ error: 'Public listings require a charityId' });
+    }
+  }
+
+  const post = await prisma.post.update({
+    where: { id: req.params.postId },
+    data,
+    include: { author: { select: { name: true, profileImage: true } } },
+  });
+  const { author, ...rest } = post;
+  return res.json({
+    ...rest,
+    timestamp: post.createdAt,
+    authorName: post.authorName || author?.name || null,
+    authorImage: post.authorImage || author?.profileImage || null,
+    authorRole: post.authorRole || null,
+  });
+});
+
+router.post('/:id/posts/:postId/sold', async (req, res) => {
+  const post = await prisma.post.findFirst({
+    where: { id: req.params.postId, communityId: req.params.id },
+  });
+  if (!post) return res.status(404).json({ error: 'Post not found' });
+  if (post.authorId !== req.auth!.userId) {
+    return res.status(403).json({ error: 'Only the listing owner can mark a post as sold' });
+  }
+
+  if (String(post.status).toUpperCase() === 'SOLD') {
+    return res.status(409).json({ error: 'Post already marked as sold' });
+  }
+
+  const soldAt = new Date();
+  const updatedPost = await prisma.post.update({
+    where: { id: post.id },
+    data: { status: 'SOLD', soldAt } as any,
+  });
+
+  // Local sales do not trigger CAT accounting.
+  if (!post.isPublic) {
+    return res.json({ post: { ...updatedPost, timestamp: updatedPost.createdAt }, catTriggered: false });
+  }
+
+  const community = await prisma.community.findUnique({ where: { id: req.params.id } });
+  const catAmount = Number(post.charityAmount ?? 0);
+  const catPercentage = Number(post.charityPercentage ?? CAT_MIN_PERCENTAGE);
+  const poolToCharity = Boolean((community as any)?.catCycleActive) && Boolean((community as any)?.catFeaturedCharityId);
+  const targetCharityId = poolToCharity ? (community as any).catFeaturedCharityId : null;
+
+  const catTx = (prisma as any).catTransaction;
+  const transaction = catTx
+    ? await catTx.create({
+        data: {
+          communityId: req.params.id,
+          postId: post.id,
+          sellerId: req.auth!.userId,
+          catAmount,
+          catPercentage,
+          charityId: targetCharityId,
+        },
+      })
+    : null;
+
+  if (targetCharityId && catAmount > 0) {
+    await prisma.charity.update({
+      where: { id: targetCharityId },
+      data: { raisedAmount: { increment: catAmount } },
+    });
+  }
+
+  return res.json({
+    post: { ...updatedPost, timestamp: updatedPost.createdAt },
+    catTriggered: true,
+    catAmount,
+    pooledToCharity: Boolean(targetCharityId),
+    transaction,
+  });
 });
 
 router.delete('/:id/posts/:postId', async (req, res) => {
@@ -556,11 +686,91 @@ router.post('/:id/charities', async (req, res) => {
 
 router.put('/:id/charities/:charityId', async (req, res) => {
   try {
+    const existingCharity = await prisma.charity.findUnique({
+      where: { id: req.params.charityId },
+      select: { id: true, name: true, isCATCharity: true },
+    });
+    if (!existingCharity) return res.status(404).json({ error: 'Charity not found' });
+    if (existingCharity.isCATCharity && typeof req.body?.name === 'string' && req.body.name.trim() !== existingCharity.name) {
+      return res.status(400).json({ error: 'The CAT charity name is fixed and cannot be renamed' });
+    }
+
     const charity = await prisma.charity.update({ where: { id: req.params.charityId }, data: req.body });
     return res.json(charity);
   } catch (error: any) {
     console.error('[API Error] 500:', error);
     return res.status(500).json({ error: error.message || 'Failed to update charity' });
+  }
+});
+
+router.post('/:id/cat-cycle', async (req, res) => {
+  try {
+    const role = await getCommunityRole(req.params.id, req.auth!.userId);
+    if (!isAdminRole(role)) {
+      return res.status(403).json({ error: 'Only community admins can manage CAT cycle' });
+    }
+
+    const { active, featuredCharityId } = req.body as { active?: boolean; featuredCharityId?: string };
+    if (typeof active !== 'boolean') {
+      return res.status(400).json({ error: 'active must be a boolean' });
+    }
+
+    let resolvedFeaturedId: string | null = null;
+    if (active) {
+      if (!featuredCharityId) {
+        return res.status(400).json({ error: 'featuredCharityId is required when activating CAT cycle' });
+      }
+      const featured = await prisma.charity.findFirst({
+        where: {
+          id: featuredCharityId,
+          communityId: req.params.id,
+          status: { in: ['ACTIVE', 'Active', 'active'] },
+        },
+      });
+      if (!featured) {
+        return res.status(400).json({ error: 'featuredCharityId must reference an active community charity' });
+      }
+      resolvedFeaturedId = featured.id;
+    }
+
+    const community = await prisma.community.update({
+      where: { id: req.params.id },
+      data: {
+        catCycleActive: active,
+        catFeaturedCharityId: active ? resolvedFeaturedId : null,
+      } as any,
+    });
+
+    const members = await prisma.communityMember.findMany({
+      where: { communityId: req.params.id, status: 'ACTIVE' },
+      select: { userId: true },
+    });
+    if (members.length > 0) {
+      await prisma.notification.createMany({
+        data: members.map((member) => ({
+          userId: member.userId,
+          type: 'system',
+          title: active ? 'Charity cycle activated' : 'Charity cycle paused',
+          message: active
+            ? 'CAT contributions from public sold listings are now pooled to the featured charity.'
+            : 'CAT contributions from sold public listings now remain as seller earnings.',
+          metadata: {
+            communityId: req.params.id,
+            catCycleActive: active,
+            featuredCharityId: resolvedFeaturedId,
+          },
+        })),
+      });
+    }
+
+    return res.json({
+      community,
+      catCycleActive: (community as any).catCycleActive,
+      catFeaturedCharityId: (community as any).catFeaturedCharityId,
+    });
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to update CAT cycle' });
   }
 });
 
@@ -772,11 +982,37 @@ router.delete('/:id/charities/:charityId', async (req, res) => {
 // Approve charity suggestion
 router.patch('/:id/charity-suggestions/:suggestionId/approve', async (req, res) => {
   try {
+    const role = await getCommunityRole(req.params.id, req.auth!.userId);
+    if (!isAdminRole(role)) {
+      return res.status(403).json({ error: 'Only community admins can approve suggestions' });
+    }
+
+    const existingSuggestion = await prisma.charitySuggestion.findFirst({
+      where: { id: req.params.suggestionId, communityId: req.params.id },
+    });
+    if (!existingSuggestion) return res.status(404).json({ error: 'Suggestion not found' });
+
+    let createdCharity: any = null;
+    if (req.body?.charityData && !existingSuggestion.charityId) {
+      createdCharity = await prisma.charity.create({
+        data: {
+          communityId: req.params.id,
+          ...req.body.charityData,
+          isApprovedSuggestion: true,
+          suggestedById: existingSuggestion.suggestedBy,
+        },
+      });
+    }
+
     const suggestion = await prisma.charitySuggestion.update({
       where: { id: req.params.suggestionId },
-      data: { status: 'approved', adminFeedback: req.body.feedback },
+      data: {
+        status: 'approved',
+        adminFeedback: req.body.feedback,
+        charityId: createdCharity?.id ?? existingSuggestion.charityId,
+      },
     });
-    return res.json(suggestion);
+    return res.json({ suggestion, charity: createdCharity });
   } catch (error: any) {
     console.error('[API Error] 500:', error);
     return res.status(500).json({ error: error.message || 'Failed to approve suggestion' });
@@ -786,6 +1022,11 @@ router.patch('/:id/charity-suggestions/:suggestionId/approve', async (req, res) 
 // Reject charity suggestion
 router.patch('/:id/charity-suggestions/:suggestionId/reject', async (req, res) => {
   try {
+    const role = await getCommunityRole(req.params.id, req.auth!.userId);
+    if (!isAdminRole(role)) {
+      return res.status(403).json({ error: 'Only community admins can reject suggestions' });
+    }
+
     const suggestion = await prisma.charitySuggestion.update({
       where: { id: req.params.suggestionId },
       data: { status: 'rejected', adminFeedback: req.body.feedback },
@@ -794,6 +1035,48 @@ router.patch('/:id/charity-suggestions/:suggestionId/reject', async (req, res) =
   } catch (error: any) {
     console.error('[API Error] 500:', error);
     return res.status(500).json({ error: error.message || 'Failed to reject suggestion' });
+  }
+});
+
+router.get('/:id/cat-hub', async (req, res) => {
+  try {
+    const catTx = (prisma as any).catTransaction;
+    if (!catTx) {
+      return res.json({
+        totalCATGenerated: 0,
+        totalRaisedForCharity: 0,
+        activeCycleCharity: null,
+        catCycleActive: false,
+        recentTransactions: [],
+      });
+    }
+
+    const [community, txAggregate, charityAggregate, recentTransactions] = await Promise.all([
+      prisma.community.findUnique({ where: { id: req.params.id } }),
+      catTx.aggregate({ where: { communityId: req.params.id }, _sum: { catAmount: true } }),
+      catTx.aggregate({ where: { communityId: req.params.id, charityId: { not: null } }, _sum: { catAmount: true } }),
+      catTx.findMany({
+        where: { communityId: req.params.id },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+      }),
+    ]);
+
+    const featuredId = (community as any)?.catFeaturedCharityId as string | null | undefined;
+    const activeCycleCharity = featuredId
+      ? await prisma.charity.findUnique({ where: { id: featuredId } })
+      : null;
+
+    return res.json({
+      totalCATGenerated: Number(txAggregate?._sum?.catAmount ?? 0),
+      totalRaisedForCharity: Number(charityAggregate?._sum?.catAmount ?? 0),
+      activeCycleCharity,
+      catCycleActive: Boolean((community as any)?.catCycleActive),
+      recentTransactions,
+    });
+  } catch (error: any) {
+    console.error('[API Error] 500:', error);
+    return res.status(500).json({ error: error.message || 'Failed to fetch CAT hub data' });
   }
 });
 

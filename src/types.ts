@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type UserRole = 'MEMBER' | 'MODERATOR' | 'ADMIN' | 'LIAISON';
+export type UserRole = 'MEMBER' | 'MODERATOR' | 'ADMIN' | 'OWNER' | 'LIAISON';
 
 export interface CommunityNotice {
   id: string;
@@ -22,7 +22,7 @@ export interface CommunityNotice {
   isPublic?: boolean;
   price?: number;
   communityPrice?: number;
-  status?: 'Active' | 'Pinned' | 'deleted' | 'Archived' | 'PendingPublic' | 'Rejected' | 'ChangesRequested';
+  status?: 'Active' | 'active' | 'Pinned' | 'deleted' | 'Deleted' | 'Archived' | 'PendingPublic' | 'Rejected' | 'ChangesRequested' | 'SOLD';
   deletedAt?: string;
   expiresAt?: string;
   expiredAt?: string;
@@ -279,6 +279,8 @@ export interface Community {
   guidedSetupRequired?: boolean;
   activatedAt?: string;
   isPaid?: boolean;
+  catCycleActive?: boolean;
+  catFeaturedCharityId?: string | null;
 }
 
 export interface UserBusiness {
@@ -330,9 +332,29 @@ export interface Charity {
   raisedAmount?: number;
   fundraisingGoal?: number;
   campaignCompleted?: boolean;
+  isCATCharity?: boolean;
   createdAt: any;
   isApprovedSuggestion?: boolean;
   suggestedById?: string;
+}
+
+export interface CatTransaction {
+  id: string;
+  communityId: string;
+  postId: string;
+  sellerId: string;
+  catAmount: number;
+  catPercentage: number;
+  charityId?: string | null;
+  createdAt: string;
+}
+
+export interface CatHubSummary {
+  totalCATGenerated: number;
+  totalRaisedForCharity: number;
+  catCycleActive: boolean;
+  activeCycleCharity: Charity | null;
+  recentTransactions: CatTransaction[];
 }
 
 export interface CharitySuggestion {
@@ -513,6 +535,9 @@ export interface CommunityContextType {
   addCharitySuggestion: (suggestion: Omit<CharitySuggestion, 'id' | 'status' | 'createdAt'> & { suggestedDonationAmount: number }) => Promise<void>;
   approveCharitySuggestion: (suggestionId: string, feedback: string, charityData: Omit<Charity, 'id' | 'createdAt'>) => Promise<void>;
   rejectCharitySuggestion: (suggestionId: string, feedback: string) => Promise<void>;
+  setCatCycle: (active: boolean, featuredCharityId?: string) => Promise<void>;
+  markPostSold: (postId: string) => Promise<{ catTriggered: boolean; catAmount?: number; pooledToCharity?: boolean }>;
+  getCatHub: () => Promise<CatHubSummary>;
   syncAllUsersToSearch: () => Promise<void>;
   // Invitation & Notification Integration
   userInvitations: CommunityInvitation[];

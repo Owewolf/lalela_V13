@@ -89,6 +89,11 @@ export type Charity = $Result.DefaultSelection<Prisma.$CharityPayload>
  */
 export type CharitySuggestion = $Result.DefaultSelection<Prisma.$CharitySuggestionPayload>
 /**
+ * Model CatTransaction
+ * 
+ */
+export type CatTransaction = $Result.DefaultSelection<Prisma.$CatTransactionPayload>
+/**
  * Model Business
  * 
  */
@@ -419,6 +424,16 @@ export class PrismaClient<
     * ```
     */
   get charitySuggestion(): Prisma.CharitySuggestionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.catTransaction`: Exposes CRUD operations for the **CatTransaction** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CatTransactions
+    * const catTransactions = await prisma.catTransaction.findMany()
+    * ```
+    */
+  get catTransaction(): Prisma.CatTransactionDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.business`: Exposes CRUD operations for the **Business** model.
@@ -988,6 +1003,7 @@ export namespace Prisma {
     Post: 'Post',
     Charity: 'Charity',
     CharitySuggestion: 'CharitySuggestion',
+    CatTransaction: 'CatTransaction',
     Business: 'Business',
     Report: 'Report',
     CommunityInvitation: 'CommunityInvitation',
@@ -1015,7 +1031,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "emailVerificationToken" | "passwordResetToken" | "otpCode" | "blacklistedEmail" | "userSession" | "auditLog" | "community" | "communityMember" | "memberLocation" | "securityLocation" | "message" | "post" | "charity" | "charitySuggestion" | "business" | "report" | "communityInvitation" | "communityInviteLink" | "conversation" | "conversationParticipant" | "notification" | "license" | "moderationLog" | "securityEvent" | "billingRecord" | "invoice"
+      modelProps: "user" | "emailVerificationToken" | "passwordResetToken" | "otpCode" | "blacklistedEmail" | "userSession" | "auditLog" | "community" | "communityMember" | "memberLocation" | "securityLocation" | "message" | "post" | "charity" | "charitySuggestion" | "catTransaction" | "business" | "report" | "communityInvitation" | "communityInviteLink" | "conversation" | "conversationParticipant" | "notification" | "license" | "moderationLog" | "securityEvent" | "billingRecord" | "invoice"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2129,6 +2145,80 @@ export namespace Prisma {
           }
         }
       }
+      CatTransaction: {
+        payload: Prisma.$CatTransactionPayload<ExtArgs>
+        fields: Prisma.CatTransactionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CatTransactionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CatTransactionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>
+          }
+          findFirst: {
+            args: Prisma.CatTransactionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CatTransactionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>
+          }
+          findMany: {
+            args: Prisma.CatTransactionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>[]
+          }
+          create: {
+            args: Prisma.CatTransactionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>
+          }
+          createMany: {
+            args: Prisma.CatTransactionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CatTransactionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>[]
+          }
+          delete: {
+            args: Prisma.CatTransactionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>
+          }
+          update: {
+            args: Prisma.CatTransactionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>
+          }
+          deleteMany: {
+            args: Prisma.CatTransactionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CatTransactionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CatTransactionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>[]
+          }
+          upsert: {
+            args: Prisma.CatTransactionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CatTransactionPayload>
+          }
+          aggregate: {
+            args: Prisma.CatTransactionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCatTransaction>
+          }
+          groupBy: {
+            args: Prisma.CatTransactionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CatTransactionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CatTransactionCountArgs<ExtArgs>
+            result: $Utils.Optional<CatTransactionCountAggregateOutputType> | number
+          }
+        }
+      }
       Business: {
         payload: Prisma.$BusinessPayload<ExtArgs>
         fields: Prisma.BusinessFieldRefs
@@ -3140,6 +3230,7 @@ export namespace Prisma {
     post?: PostOmit
     charity?: CharityOmit
     charitySuggestion?: CharitySuggestionOmit
+    catTransaction?: CatTransactionOmit
     business?: BusinessOmit
     report?: ReportOmit
     communityInvitation?: CommunityInvitationOmit
@@ -3252,6 +3343,7 @@ export namespace Prisma {
     licenses: number
     billingRecords: number
     invoices: number
+    catTransactions: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3275,6 +3367,7 @@ export namespace Prisma {
     licenses?: boolean | UserCountOutputTypeCountLicensesArgs
     billingRecords?: boolean | UserCountOutputTypeCountBillingRecordsArgs
     invoices?: boolean | UserCountOutputTypeCountInvoicesArgs
+    catTransactions?: boolean | UserCountOutputTypeCountCatTransactionsArgs
   }
 
   // Custom InputTypes
@@ -3428,6 +3521,13 @@ export namespace Prisma {
     where?: InvoiceWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCatTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CatTransactionWhereInput
+  }
+
 
   /**
    * Count Type CommunityCountOutputType
@@ -3448,6 +3548,7 @@ export namespace Prisma {
     securityEvents: number
     licenses: number
     billingRecords: number
+    catTransactions: number
   }
 
   export type CommunityCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3465,6 +3566,7 @@ export namespace Prisma {
     securityEvents?: boolean | CommunityCountOutputTypeCountSecurityEventsArgs
     licenses?: boolean | CommunityCountOutputTypeCountLicensesArgs
     billingRecords?: boolean | CommunityCountOutputTypeCountBillingRecordsArgs
+    catTransactions?: boolean | CommunityCountOutputTypeCountCatTransactionsArgs
   }
 
   // Custom InputTypes
@@ -3576,6 +3678,13 @@ export namespace Prisma {
     where?: BillingRecordWhereInput
   }
 
+  /**
+   * CommunityCountOutputType without action
+   */
+  export type CommunityCountOutputTypeCountCatTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CatTransactionWhereInput
+  }
+
 
   /**
    * Count Type MessageCountOutputType
@@ -3609,15 +3718,48 @@ export namespace Prisma {
 
 
   /**
+   * Count Type PostCountOutputType
+   */
+
+  export type PostCountOutputType = {
+    catTransactions: number
+  }
+
+  export type PostCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    catTransactions?: boolean | PostCountOutputTypeCountCatTransactionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PostCountOutputType without action
+   */
+  export type PostCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PostCountOutputType
+     */
+    select?: PostCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PostCountOutputType without action
+   */
+  export type PostCountOutputTypeCountCatTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CatTransactionWhereInput
+  }
+
+
+  /**
    * Count Type CharityCountOutputType
    */
 
   export type CharityCountOutputType = {
     charitySuggestions: number
+    catTransactions: number
   }
 
   export type CharityCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     charitySuggestions?: boolean | CharityCountOutputTypeCountCharitySuggestionsArgs
+    catTransactions?: boolean | CharityCountOutputTypeCountCatTransactionsArgs
   }
 
   // Custom InputTypes
@@ -3636,6 +3778,13 @@ export namespace Prisma {
    */
   export type CharityCountOutputTypeCountCharitySuggestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CharitySuggestionWhereInput
+  }
+
+  /**
+   * CharityCountOutputType without action
+   */
+  export type CharityCountOutputTypeCountCatTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CatTransactionWhereInput
   }
 
 
@@ -4229,6 +4378,7 @@ export namespace Prisma {
     licenses?: boolean | User$licensesArgs<ExtArgs>
     billingRecords?: boolean | User$billingRecordsArgs<ExtArgs>
     invoices?: boolean | User$invoicesArgs<ExtArgs>
+    catTransactions?: boolean | User$catTransactionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4401,6 +4551,7 @@ export namespace Prisma {
     licenses?: boolean | User$licensesArgs<ExtArgs>
     billingRecords?: boolean | User$billingRecordsArgs<ExtArgs>
     invoices?: boolean | User$invoicesArgs<ExtArgs>
+    catTransactions?: boolean | User$catTransactionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4429,6 +4580,7 @@ export namespace Prisma {
       licenses: Prisma.$LicensePayload<ExtArgs>[]
       billingRecords: Prisma.$BillingRecordPayload<ExtArgs>[]
       invoices: Prisma.$InvoicePayload<ExtArgs>[]
+      catTransactions: Prisma.$CatTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4891,6 +5043,7 @@ export namespace Prisma {
     licenses<T extends User$licensesArgs<ExtArgs> = {}>(args?: Subset<T, User$licensesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LicensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billingRecords<T extends User$billingRecordsArgs<ExtArgs> = {}>(args?: Subset<T, User$billingRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invoices<T extends User$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, User$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    catTransactions<T extends User$catTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$catTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5836,6 +5989,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * User.catTransactions
+   */
+  export type User$catTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    where?: CatTransactionWhereInput
+    orderBy?: CatTransactionOrderByWithRelationInput | CatTransactionOrderByWithRelationInput[]
+    cursor?: CatTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CatTransactionScalarFieldEnum | CatTransactionScalarFieldEnum[]
   }
 
   /**
@@ -12359,6 +12536,8 @@ export namespace Prisma {
     activeEmergencyId: string | null
     guidedSetupRequired: boolean | null
     isPublic: boolean | null
+    catCycleActive: boolean | null
+    catFeaturedCharityId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -12381,6 +12560,8 @@ export namespace Prisma {
     activeEmergencyId: string | null
     guidedSetupRequired: boolean | null
     isPublic: boolean | null
+    catCycleActive: boolean | null
+    catFeaturedCharityId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -12405,6 +12586,8 @@ export namespace Prisma {
     onboardingStepsCompleted: number
     guidedSetupRequired: number
     isPublic: number
+    catCycleActive: number
+    catFeaturedCharityId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -12441,6 +12624,8 @@ export namespace Prisma {
     activeEmergencyId?: true
     guidedSetupRequired?: true
     isPublic?: true
+    catCycleActive?: true
+    catFeaturedCharityId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -12463,6 +12648,8 @@ export namespace Prisma {
     activeEmergencyId?: true
     guidedSetupRequired?: true
     isPublic?: true
+    catCycleActive?: true
+    catFeaturedCharityId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -12487,6 +12674,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: true
     guidedSetupRequired?: true
     isPublic?: true
+    catCycleActive?: true
+    catFeaturedCharityId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -12598,6 +12787,8 @@ export namespace Prisma {
     onboardingStepsCompleted: string[]
     guidedSetupRequired: boolean
     isPublic: boolean
+    catCycleActive: boolean
+    catFeaturedCharityId: string | null
     createdAt: Date
     updatedAt: Date
     _count: CommunityCountAggregateOutputType | null
@@ -12641,6 +12832,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: boolean
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -12658,6 +12851,7 @@ export namespace Prisma {
     securityEvents?: boolean | Community$securityEventsArgs<ExtArgs>
     licenses?: boolean | Community$licensesArgs<ExtArgs>
     billingRecords?: boolean | Community$billingRecordsArgs<ExtArgs>
+    catTransactions?: boolean | Community$catTransactionsArgs<ExtArgs>
     _count?: boolean | CommunityCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["community"]>
 
@@ -12681,6 +12875,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: boolean
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -12706,6 +12902,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: boolean
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -12731,11 +12929,13 @@ export namespace Prisma {
     onboardingStepsCompleted?: boolean
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CommunityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "ownerId" | "type" | "status" | "isEmergencyMode" | "coverageLat" | "coverageLng" | "coverageRadius" | "coverageLocation" | "enabledCategories" | "trialExpiresAt" | "isPaid" | "activatedAt" | "activeEmergencyId" | "onboardingStepsCompleted" | "guidedSetupRequired" | "isPublic" | "createdAt" | "updatedAt", ExtArgs["result"]["community"]>
+  export type CommunityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "ownerId" | "type" | "status" | "isEmergencyMode" | "coverageLat" | "coverageLng" | "coverageRadius" | "coverageLocation" | "enabledCategories" | "trialExpiresAt" | "isPaid" | "activatedAt" | "activeEmergencyId" | "onboardingStepsCompleted" | "guidedSetupRequired" | "isPublic" | "catCycleActive" | "catFeaturedCharityId" | "createdAt" | "updatedAt", ExtArgs["result"]["community"]>
   export type CommunityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     members?: boolean | Community$membersArgs<ExtArgs>
@@ -12752,6 +12952,7 @@ export namespace Prisma {
     securityEvents?: boolean | Community$securityEventsArgs<ExtArgs>
     licenses?: boolean | Community$licensesArgs<ExtArgs>
     billingRecords?: boolean | Community$billingRecordsArgs<ExtArgs>
+    catTransactions?: boolean | Community$catTransactionsArgs<ExtArgs>
     _count?: boolean | CommunityCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CommunityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -12779,6 +12980,7 @@ export namespace Prisma {
       securityEvents: Prisma.$SecurityEventPayload<ExtArgs>[]
       licenses: Prisma.$LicensePayload<ExtArgs>[]
       billingRecords: Prisma.$BillingRecordPayload<ExtArgs>[]
+      catTransactions: Prisma.$CatTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -12800,6 +13002,8 @@ export namespace Prisma {
       onboardingStepsCompleted: string[]
       guidedSetupRequired: boolean
       isPublic: boolean
+      catCycleActive: boolean
+      catFeaturedCharityId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["community"]>
@@ -13211,6 +13415,7 @@ export namespace Prisma {
     securityEvents<T extends Community$securityEventsArgs<ExtArgs> = {}>(args?: Subset<T, Community$securityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     licenses<T extends Community$licensesArgs<ExtArgs> = {}>(args?: Subset<T, Community$licensesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LicensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billingRecords<T extends Community$billingRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Community$billingRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    catTransactions<T extends Community$catTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Community$catTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13259,6 +13464,8 @@ export namespace Prisma {
     readonly onboardingStepsCompleted: FieldRef<"Community", 'String[]'>
     readonly guidedSetupRequired: FieldRef<"Community", 'Boolean'>
     readonly isPublic: FieldRef<"Community", 'Boolean'>
+    readonly catCycleActive: FieldRef<"Community", 'Boolean'>
+    readonly catFeaturedCharityId: FieldRef<"Community", 'String'>
     readonly createdAt: FieldRef<"Community", 'DateTime'>
     readonly updatedAt: FieldRef<"Community", 'DateTime'>
   }
@@ -13995,6 +14202,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BillingRecordScalarFieldEnum | BillingRecordScalarFieldEnum[]
+  }
+
+  /**
+   * Community.catTransactions
+   */
+  export type Community$catTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    where?: CatTransactionWhereInput
+    orderBy?: CatTransactionOrderByWithRelationInput | CatTransactionOrderByWithRelationInput[]
+    cursor?: CatTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CatTransactionScalarFieldEnum | CatTransactionScalarFieldEnum[]
   }
 
   /**
@@ -18829,6 +19060,7 @@ export namespace Prisma {
     rejectionReason: string | null
     changesRequestedNote: string | null
     expiresAt: Date | null
+    soldAt: Date | null
     expiredAt: Date | null
     deletedAt: Date | null
     createdAt: Date | null
@@ -18868,6 +19100,7 @@ export namespace Prisma {
     rejectionReason: string | null
     changesRequestedNote: string | null
     expiresAt: Date | null
+    soldAt: Date | null
     expiredAt: Date | null
     deletedAt: Date | null
     createdAt: Date | null
@@ -18907,6 +19140,7 @@ export namespace Prisma {
     rejectionReason: number
     changesRequestedNote: number
     expiresAt: number
+    soldAt: number
     expiredAt: number
     deletedAt: number
     createdAt: number
@@ -18968,6 +19202,7 @@ export namespace Prisma {
     rejectionReason?: true
     changesRequestedNote?: true
     expiresAt?: true
+    soldAt?: true
     expiredAt?: true
     deletedAt?: true
     createdAt?: true
@@ -19007,6 +19242,7 @@ export namespace Prisma {
     rejectionReason?: true
     changesRequestedNote?: true
     expiresAt?: true
+    soldAt?: true
     expiredAt?: true
     deletedAt?: true
     createdAt?: true
@@ -19046,6 +19282,7 @@ export namespace Prisma {
     rejectionReason?: true
     changesRequestedNote?: true
     expiresAt?: true
+    soldAt?: true
     expiredAt?: true
     deletedAt?: true
     createdAt?: true
@@ -19172,6 +19409,7 @@ export namespace Prisma {
     rejectionReason: string | null
     changesRequestedNote: string | null
     expiresAt: Date | null
+    soldAt: Date | null
     expiredAt: Date | null
     deletedAt: Date | null
     createdAt: Date
@@ -19230,12 +19468,15 @@ export namespace Prisma {
     rejectionReason?: boolean
     changesRequestedNote?: boolean
     expiresAt?: boolean
+    soldAt?: boolean
     expiredAt?: boolean
     deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
+    catTransactions?: boolean | Post$catTransactionsArgs<ExtArgs>
+    _count?: boolean | PostCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["post"]>
 
   export type PostSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -19271,6 +19512,7 @@ export namespace Prisma {
     rejectionReason?: boolean
     changesRequestedNote?: boolean
     expiresAt?: boolean
+    soldAt?: boolean
     expiredAt?: boolean
     deletedAt?: boolean
     createdAt?: boolean
@@ -19312,6 +19554,7 @@ export namespace Prisma {
     rejectionReason?: boolean
     changesRequestedNote?: boolean
     expiresAt?: boolean
+    soldAt?: boolean
     expiredAt?: boolean
     deletedAt?: boolean
     createdAt?: boolean
@@ -19353,16 +19596,19 @@ export namespace Prisma {
     rejectionReason?: boolean
     changesRequestedNote?: boolean
     expiresAt?: boolean
+    soldAt?: boolean
     expiredAt?: boolean
     deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "authorId" | "type" | "title" | "description" | "category" | "subtype" | "urgency" | "urgencyLevel" | "price" | "communityPrice" | "publicPrice" | "charityAmount" | "charityPercentage" | "imageUrl" | "postsImage" | "isPublic" | "isCommunityPick" | "isCharity" | "charityId" | "authorName" | "authorRole" | "authorImage" | "locationName" | "latitude" | "longitude" | "source" | "status" | "rejectionReason" | "changesRequestedNote" | "expiresAt" | "expiredAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
+  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "authorId" | "type" | "title" | "description" | "category" | "subtype" | "urgency" | "urgencyLevel" | "price" | "communityPrice" | "publicPrice" | "charityAmount" | "charityPercentage" | "imageUrl" | "postsImage" | "isPublic" | "isCommunityPick" | "isCharity" | "charityId" | "authorName" | "authorRole" | "authorImage" | "locationName" | "latitude" | "longitude" | "source" | "status" | "rejectionReason" | "changesRequestedNote" | "expiresAt" | "soldAt" | "expiredAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
   export type PostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
+    catTransactions?: boolean | Post$catTransactionsArgs<ExtArgs>
+    _count?: boolean | PostCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PostIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
@@ -19378,6 +19624,7 @@ export namespace Prisma {
     objects: {
       community: Prisma.$CommunityPayload<ExtArgs>
       author: Prisma.$UserPayload<ExtArgs>
+      catTransactions: Prisma.$CatTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -19412,6 +19659,7 @@ export namespace Prisma {
       rejectionReason: string | null
       changesRequestedNote: string | null
       expiresAt: Date | null
+      soldAt: Date | null
       expiredAt: Date | null
       deletedAt: Date | null
       createdAt: Date
@@ -19812,6 +20060,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     community<T extends CommunityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CommunityDefaultArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     author<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    catTransactions<T extends Post$catTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Post$catTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -19873,6 +20122,7 @@ export namespace Prisma {
     readonly rejectionReason: FieldRef<"Post", 'String'>
     readonly changesRequestedNote: FieldRef<"Post", 'String'>
     readonly expiresAt: FieldRef<"Post", 'DateTime'>
+    readonly soldAt: FieldRef<"Post", 'DateTime'>
     readonly expiredAt: FieldRef<"Post", 'DateTime'>
     readonly deletedAt: FieldRef<"Post", 'DateTime'>
     readonly createdAt: FieldRef<"Post", 'DateTime'>
@@ -20278,6 +20528,30 @@ export namespace Prisma {
   }
 
   /**
+   * Post.catTransactions
+   */
+  export type Post$catTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    where?: CatTransactionWhereInput
+    orderBy?: CatTransactionOrderByWithRelationInput | CatTransactionOrderByWithRelationInput[]
+    cursor?: CatTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CatTransactionScalarFieldEnum | CatTransactionScalarFieldEnum[]
+  }
+
+  /**
    * Post without action
    */
   export type PostDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20346,6 +20620,7 @@ export namespace Prisma {
     longitude: number | null
     isVerified: boolean | null
     isFeatured: boolean | null
+    isCATCharity: boolean | null
     campaignCompleted: boolean | null
     isApprovedSuggestion: boolean | null
     suggestedById: string | null
@@ -20375,6 +20650,7 @@ export namespace Prisma {
     longitude: number | null
     isVerified: boolean | null
     isFeatured: boolean | null
+    isCATCharity: boolean | null
     campaignCompleted: boolean | null
     isApprovedSuggestion: boolean | null
     suggestedById: string | null
@@ -20404,6 +20680,7 @@ export namespace Prisma {
     longitude: number
     isVerified: number
     isFeatured: number
+    isCATCharity: number
     tags: number
     linkedBusinessIds: number
     campaignCompleted: number
@@ -20453,6 +20730,7 @@ export namespace Prisma {
     longitude?: true
     isVerified?: true
     isFeatured?: true
+    isCATCharity?: true
     campaignCompleted?: true
     isApprovedSuggestion?: true
     suggestedById?: true
@@ -20482,6 +20760,7 @@ export namespace Prisma {
     longitude?: true
     isVerified?: true
     isFeatured?: true
+    isCATCharity?: true
     campaignCompleted?: true
     isApprovedSuggestion?: true
     suggestedById?: true
@@ -20511,6 +20790,7 @@ export namespace Prisma {
     longitude?: true
     isVerified?: true
     isFeatured?: true
+    isCATCharity?: true
     tags?: true
     linkedBusinessIds?: true
     campaignCompleted?: true
@@ -20629,6 +20909,7 @@ export namespace Prisma {
     longitude: number | null
     isVerified: boolean
     isFeatured: boolean
+    isCATCharity: boolean
     tags: string[]
     linkedBusinessIds: string[]
     campaignCompleted: boolean
@@ -20679,6 +20960,7 @@ export namespace Prisma {
     longitude?: boolean
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: boolean
     linkedBusinessIds?: boolean
     campaignCompleted?: boolean
@@ -20688,6 +20970,7 @@ export namespace Prisma {
     updatedAt?: boolean
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     charitySuggestions?: boolean | Charity$charitySuggestionsArgs<ExtArgs>
+    catTransactions?: boolean | Charity$catTransactionsArgs<ExtArgs>
     _count?: boolean | CharityCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["charity"]>
 
@@ -20713,6 +20996,7 @@ export namespace Prisma {
     longitude?: boolean
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: boolean
     linkedBusinessIds?: boolean
     campaignCompleted?: boolean
@@ -20745,6 +21029,7 @@ export namespace Prisma {
     longitude?: boolean
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: boolean
     linkedBusinessIds?: boolean
     campaignCompleted?: boolean
@@ -20777,6 +21062,7 @@ export namespace Prisma {
     longitude?: boolean
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: boolean
     linkedBusinessIds?: boolean
     campaignCompleted?: boolean
@@ -20786,10 +21072,11 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type CharityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "name" | "description" | "category" | "percentage" | "status" | "urgency" | "fundraisingGoal" | "raisedAmount" | "imageUrl" | "logo" | "coverImage" | "contactPhone" | "contactEmail" | "website" | "locationName" | "latitude" | "longitude" | "isVerified" | "isFeatured" | "tags" | "linkedBusinessIds" | "campaignCompleted" | "isApprovedSuggestion" | "suggestedById" | "createdAt" | "updatedAt", ExtArgs["result"]["charity"]>
+  export type CharityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "name" | "description" | "category" | "percentage" | "status" | "urgency" | "fundraisingGoal" | "raisedAmount" | "imageUrl" | "logo" | "coverImage" | "contactPhone" | "contactEmail" | "website" | "locationName" | "latitude" | "longitude" | "isVerified" | "isFeatured" | "isCATCharity" | "tags" | "linkedBusinessIds" | "campaignCompleted" | "isApprovedSuggestion" | "suggestedById" | "createdAt" | "updatedAt", ExtArgs["result"]["charity"]>
   export type CharityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     charitySuggestions?: boolean | Charity$charitySuggestionsArgs<ExtArgs>
+    catTransactions?: boolean | Charity$catTransactionsArgs<ExtArgs>
     _count?: boolean | CharityCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CharityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20804,6 +21091,7 @@ export namespace Prisma {
     objects: {
       community: Prisma.$CommunityPayload<ExtArgs>
       charitySuggestions: Prisma.$CharitySuggestionPayload<ExtArgs>[]
+      catTransactions: Prisma.$CatTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -20827,6 +21115,7 @@ export namespace Prisma {
       longitude: number | null
       isVerified: boolean
       isFeatured: boolean
+      isCATCharity: boolean
       tags: string[]
       linkedBusinessIds: string[]
       campaignCompleted: boolean
@@ -21230,6 +21519,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     community<T extends CommunityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CommunityDefaultArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     charitySuggestions<T extends Charity$charitySuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, Charity$charitySuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharitySuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    catTransactions<T extends Charity$catTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Charity$catTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -21280,6 +21570,7 @@ export namespace Prisma {
     readonly longitude: FieldRef<"Charity", 'Float'>
     readonly isVerified: FieldRef<"Charity", 'Boolean'>
     readonly isFeatured: FieldRef<"Charity", 'Boolean'>
+    readonly isCATCharity: FieldRef<"Charity", 'Boolean'>
     readonly tags: FieldRef<"Charity", 'String[]'>
     readonly linkedBusinessIds: FieldRef<"Charity", 'String[]'>
     readonly campaignCompleted: FieldRef<"Charity", 'Boolean'>
@@ -21709,6 +22000,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: CharitySuggestionScalarFieldEnum | CharitySuggestionScalarFieldEnum[]
+  }
+
+  /**
+   * Charity.catTransactions
+   */
+  export type Charity$catTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    where?: CatTransactionWhereInput
+    orderBy?: CatTransactionOrderByWithRelationInput | CatTransactionOrderByWithRelationInput[]
+    cursor?: CatTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CatTransactionScalarFieldEnum | CatTransactionScalarFieldEnum[]
   }
 
   /**
@@ -22950,6 +23265,1189 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CharitySuggestionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CatTransaction
+   */
+
+  export type AggregateCatTransaction = {
+    _count: CatTransactionCountAggregateOutputType | null
+    _avg: CatTransactionAvgAggregateOutputType | null
+    _sum: CatTransactionSumAggregateOutputType | null
+    _min: CatTransactionMinAggregateOutputType | null
+    _max: CatTransactionMaxAggregateOutputType | null
+  }
+
+  export type CatTransactionAvgAggregateOutputType = {
+    catAmount: number | null
+    catPercentage: number | null
+  }
+
+  export type CatTransactionSumAggregateOutputType = {
+    catAmount: number | null
+    catPercentage: number | null
+  }
+
+  export type CatTransactionMinAggregateOutputType = {
+    id: string | null
+    communityId: string | null
+    postId: string | null
+    sellerId: string | null
+    catAmount: number | null
+    catPercentage: number | null
+    charityId: string | null
+    createdAt: Date | null
+  }
+
+  export type CatTransactionMaxAggregateOutputType = {
+    id: string | null
+    communityId: string | null
+    postId: string | null
+    sellerId: string | null
+    catAmount: number | null
+    catPercentage: number | null
+    charityId: string | null
+    createdAt: Date | null
+  }
+
+  export type CatTransactionCountAggregateOutputType = {
+    id: number
+    communityId: number
+    postId: number
+    sellerId: number
+    catAmount: number
+    catPercentage: number
+    charityId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type CatTransactionAvgAggregateInputType = {
+    catAmount?: true
+    catPercentage?: true
+  }
+
+  export type CatTransactionSumAggregateInputType = {
+    catAmount?: true
+    catPercentage?: true
+  }
+
+  export type CatTransactionMinAggregateInputType = {
+    id?: true
+    communityId?: true
+    postId?: true
+    sellerId?: true
+    catAmount?: true
+    catPercentage?: true
+    charityId?: true
+    createdAt?: true
+  }
+
+  export type CatTransactionMaxAggregateInputType = {
+    id?: true
+    communityId?: true
+    postId?: true
+    sellerId?: true
+    catAmount?: true
+    catPercentage?: true
+    charityId?: true
+    createdAt?: true
+  }
+
+  export type CatTransactionCountAggregateInputType = {
+    id?: true
+    communityId?: true
+    postId?: true
+    sellerId?: true
+    catAmount?: true
+    catPercentage?: true
+    charityId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type CatTransactionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CatTransaction to aggregate.
+     */
+    where?: CatTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CatTransactions to fetch.
+     */
+    orderBy?: CatTransactionOrderByWithRelationInput | CatTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CatTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CatTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CatTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CatTransactions
+    **/
+    _count?: true | CatTransactionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CatTransactionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CatTransactionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CatTransactionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CatTransactionMaxAggregateInputType
+  }
+
+  export type GetCatTransactionAggregateType<T extends CatTransactionAggregateArgs> = {
+        [P in keyof T & keyof AggregateCatTransaction]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCatTransaction[P]>
+      : GetScalarType<T[P], AggregateCatTransaction[P]>
+  }
+
+
+
+
+  export type CatTransactionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CatTransactionWhereInput
+    orderBy?: CatTransactionOrderByWithAggregationInput | CatTransactionOrderByWithAggregationInput[]
+    by: CatTransactionScalarFieldEnum[] | CatTransactionScalarFieldEnum
+    having?: CatTransactionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CatTransactionCountAggregateInputType | true
+    _avg?: CatTransactionAvgAggregateInputType
+    _sum?: CatTransactionSumAggregateInputType
+    _min?: CatTransactionMinAggregateInputType
+    _max?: CatTransactionMaxAggregateInputType
+  }
+
+  export type CatTransactionGroupByOutputType = {
+    id: string
+    communityId: string
+    postId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
+    charityId: string | null
+    createdAt: Date
+    _count: CatTransactionCountAggregateOutputType | null
+    _avg: CatTransactionAvgAggregateOutputType | null
+    _sum: CatTransactionSumAggregateOutputType | null
+    _min: CatTransactionMinAggregateOutputType | null
+    _max: CatTransactionMaxAggregateOutputType | null
+  }
+
+  type GetCatTransactionGroupByPayload<T extends CatTransactionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CatTransactionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CatTransactionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CatTransactionGroupByOutputType[P]>
+            : GetScalarType<T[P], CatTransactionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CatTransactionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    postId?: boolean
+    sellerId?: boolean
+    catAmount?: boolean
+    catPercentage?: boolean
+    charityId?: boolean
+    createdAt?: boolean
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    charity?: boolean | CatTransaction$charityArgs<ExtArgs>
+  }, ExtArgs["result"]["catTransaction"]>
+
+  export type CatTransactionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    postId?: boolean
+    sellerId?: boolean
+    catAmount?: boolean
+    catPercentage?: boolean
+    charityId?: boolean
+    createdAt?: boolean
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    charity?: boolean | CatTransaction$charityArgs<ExtArgs>
+  }, ExtArgs["result"]["catTransaction"]>
+
+  export type CatTransactionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    postId?: boolean
+    sellerId?: boolean
+    catAmount?: boolean
+    catPercentage?: boolean
+    charityId?: boolean
+    createdAt?: boolean
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    charity?: boolean | CatTransaction$charityArgs<ExtArgs>
+  }, ExtArgs["result"]["catTransaction"]>
+
+  export type CatTransactionSelectScalar = {
+    id?: boolean
+    communityId?: boolean
+    postId?: boolean
+    sellerId?: boolean
+    catAmount?: boolean
+    catPercentage?: boolean
+    charityId?: boolean
+    createdAt?: boolean
+  }
+
+  export type CatTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "postId" | "sellerId" | "catAmount" | "catPercentage" | "charityId" | "createdAt", ExtArgs["result"]["catTransaction"]>
+  export type CatTransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    charity?: boolean | CatTransaction$charityArgs<ExtArgs>
+  }
+  export type CatTransactionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    charity?: boolean | CatTransaction$charityArgs<ExtArgs>
+  }
+  export type CatTransactionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    charity?: boolean | CatTransaction$charityArgs<ExtArgs>
+  }
+
+  export type $CatTransactionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CatTransaction"
+    objects: {
+      community: Prisma.$CommunityPayload<ExtArgs>
+      post: Prisma.$PostPayload<ExtArgs>
+      seller: Prisma.$UserPayload<ExtArgs>
+      charity: Prisma.$CharityPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      communityId: string
+      postId: string
+      sellerId: string
+      catAmount: number
+      catPercentage: number
+      charityId: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["catTransaction"]>
+    composites: {}
+  }
+
+  type CatTransactionGetPayload<S extends boolean | null | undefined | CatTransactionDefaultArgs> = $Result.GetResult<Prisma.$CatTransactionPayload, S>
+
+  type CatTransactionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CatTransactionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CatTransactionCountAggregateInputType | true
+    }
+
+  export interface CatTransactionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CatTransaction'], meta: { name: 'CatTransaction' } }
+    /**
+     * Find zero or one CatTransaction that matches the filter.
+     * @param {CatTransactionFindUniqueArgs} args - Arguments to find a CatTransaction
+     * @example
+     * // Get one CatTransaction
+     * const catTransaction = await prisma.catTransaction.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CatTransactionFindUniqueArgs>(args: SelectSubset<T, CatTransactionFindUniqueArgs<ExtArgs>>): Prisma__CatTransactionClient<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CatTransaction that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CatTransactionFindUniqueOrThrowArgs} args - Arguments to find a CatTransaction
+     * @example
+     * // Get one CatTransaction
+     * const catTransaction = await prisma.catTransaction.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CatTransactionFindUniqueOrThrowArgs>(args: SelectSubset<T, CatTransactionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CatTransactionClient<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CatTransaction that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CatTransactionFindFirstArgs} args - Arguments to find a CatTransaction
+     * @example
+     * // Get one CatTransaction
+     * const catTransaction = await prisma.catTransaction.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CatTransactionFindFirstArgs>(args?: SelectSubset<T, CatTransactionFindFirstArgs<ExtArgs>>): Prisma__CatTransactionClient<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CatTransaction that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CatTransactionFindFirstOrThrowArgs} args - Arguments to find a CatTransaction
+     * @example
+     * // Get one CatTransaction
+     * const catTransaction = await prisma.catTransaction.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CatTransactionFindFirstOrThrowArgs>(args?: SelectSubset<T, CatTransactionFindFirstOrThrowArgs<ExtArgs>>): Prisma__CatTransactionClient<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CatTransactions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CatTransactionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CatTransactions
+     * const catTransactions = await prisma.catTransaction.findMany()
+     * 
+     * // Get first 10 CatTransactions
+     * const catTransactions = await prisma.catTransaction.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const catTransactionWithIdOnly = await prisma.catTransaction.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CatTransactionFindManyArgs>(args?: SelectSubset<T, CatTransactionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CatTransaction.
+     * @param {CatTransactionCreateArgs} args - Arguments to create a CatTransaction.
+     * @example
+     * // Create one CatTransaction
+     * const CatTransaction = await prisma.catTransaction.create({
+     *   data: {
+     *     // ... data to create a CatTransaction
+     *   }
+     * })
+     * 
+     */
+    create<T extends CatTransactionCreateArgs>(args: SelectSubset<T, CatTransactionCreateArgs<ExtArgs>>): Prisma__CatTransactionClient<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CatTransactions.
+     * @param {CatTransactionCreateManyArgs} args - Arguments to create many CatTransactions.
+     * @example
+     * // Create many CatTransactions
+     * const catTransaction = await prisma.catTransaction.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CatTransactionCreateManyArgs>(args?: SelectSubset<T, CatTransactionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CatTransactions and returns the data saved in the database.
+     * @param {CatTransactionCreateManyAndReturnArgs} args - Arguments to create many CatTransactions.
+     * @example
+     * // Create many CatTransactions
+     * const catTransaction = await prisma.catTransaction.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CatTransactions and only return the `id`
+     * const catTransactionWithIdOnly = await prisma.catTransaction.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CatTransactionCreateManyAndReturnArgs>(args?: SelectSubset<T, CatTransactionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CatTransaction.
+     * @param {CatTransactionDeleteArgs} args - Arguments to delete one CatTransaction.
+     * @example
+     * // Delete one CatTransaction
+     * const CatTransaction = await prisma.catTransaction.delete({
+     *   where: {
+     *     // ... filter to delete one CatTransaction
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CatTransactionDeleteArgs>(args: SelectSubset<T, CatTransactionDeleteArgs<ExtArgs>>): Prisma__CatTransactionClient<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CatTransaction.
+     * @param {CatTransactionUpdateArgs} args - Arguments to update one CatTransaction.
+     * @example
+     * // Update one CatTransaction
+     * const catTransaction = await prisma.catTransaction.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CatTransactionUpdateArgs>(args: SelectSubset<T, CatTransactionUpdateArgs<ExtArgs>>): Prisma__CatTransactionClient<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CatTransactions.
+     * @param {CatTransactionDeleteManyArgs} args - Arguments to filter CatTransactions to delete.
+     * @example
+     * // Delete a few CatTransactions
+     * const { count } = await prisma.catTransaction.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CatTransactionDeleteManyArgs>(args?: SelectSubset<T, CatTransactionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CatTransactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CatTransactionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CatTransactions
+     * const catTransaction = await prisma.catTransaction.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CatTransactionUpdateManyArgs>(args: SelectSubset<T, CatTransactionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CatTransactions and returns the data updated in the database.
+     * @param {CatTransactionUpdateManyAndReturnArgs} args - Arguments to update many CatTransactions.
+     * @example
+     * // Update many CatTransactions
+     * const catTransaction = await prisma.catTransaction.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CatTransactions and only return the `id`
+     * const catTransactionWithIdOnly = await prisma.catTransaction.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CatTransactionUpdateManyAndReturnArgs>(args: SelectSubset<T, CatTransactionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CatTransaction.
+     * @param {CatTransactionUpsertArgs} args - Arguments to update or create a CatTransaction.
+     * @example
+     * // Update or create a CatTransaction
+     * const catTransaction = await prisma.catTransaction.upsert({
+     *   create: {
+     *     // ... data to create a CatTransaction
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CatTransaction we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CatTransactionUpsertArgs>(args: SelectSubset<T, CatTransactionUpsertArgs<ExtArgs>>): Prisma__CatTransactionClient<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CatTransactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CatTransactionCountArgs} args - Arguments to filter CatTransactions to count.
+     * @example
+     * // Count the number of CatTransactions
+     * const count = await prisma.catTransaction.count({
+     *   where: {
+     *     // ... the filter for the CatTransactions we want to count
+     *   }
+     * })
+    **/
+    count<T extends CatTransactionCountArgs>(
+      args?: Subset<T, CatTransactionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CatTransactionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CatTransaction.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CatTransactionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CatTransactionAggregateArgs>(args: Subset<T, CatTransactionAggregateArgs>): Prisma.PrismaPromise<GetCatTransactionAggregateType<T>>
+
+    /**
+     * Group by CatTransaction.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CatTransactionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CatTransactionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CatTransactionGroupByArgs['orderBy'] }
+        : { orderBy?: CatTransactionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CatTransactionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCatTransactionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CatTransaction model
+   */
+  readonly fields: CatTransactionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CatTransaction.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CatTransactionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    community<T extends CommunityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CommunityDefaultArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    post<T extends PostDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PostDefaultArgs<ExtArgs>>): Prisma__PostClient<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    charity<T extends CatTransaction$charityArgs<ExtArgs> = {}>(args?: Subset<T, CatTransaction$charityArgs<ExtArgs>>): Prisma__CharityClient<$Result.GetResult<Prisma.$CharityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CatTransaction model
+   */
+  interface CatTransactionFieldRefs {
+    readonly id: FieldRef<"CatTransaction", 'String'>
+    readonly communityId: FieldRef<"CatTransaction", 'String'>
+    readonly postId: FieldRef<"CatTransaction", 'String'>
+    readonly sellerId: FieldRef<"CatTransaction", 'String'>
+    readonly catAmount: FieldRef<"CatTransaction", 'Float'>
+    readonly catPercentage: FieldRef<"CatTransaction", 'Float'>
+    readonly charityId: FieldRef<"CatTransaction", 'String'>
+    readonly createdAt: FieldRef<"CatTransaction", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CatTransaction findUnique
+   */
+  export type CatTransactionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CatTransaction to fetch.
+     */
+    where: CatTransactionWhereUniqueInput
+  }
+
+  /**
+   * CatTransaction findUniqueOrThrow
+   */
+  export type CatTransactionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CatTransaction to fetch.
+     */
+    where: CatTransactionWhereUniqueInput
+  }
+
+  /**
+   * CatTransaction findFirst
+   */
+  export type CatTransactionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CatTransaction to fetch.
+     */
+    where?: CatTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CatTransactions to fetch.
+     */
+    orderBy?: CatTransactionOrderByWithRelationInput | CatTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CatTransactions.
+     */
+    cursor?: CatTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CatTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CatTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CatTransactions.
+     */
+    distinct?: CatTransactionScalarFieldEnum | CatTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * CatTransaction findFirstOrThrow
+   */
+  export type CatTransactionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CatTransaction to fetch.
+     */
+    where?: CatTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CatTransactions to fetch.
+     */
+    orderBy?: CatTransactionOrderByWithRelationInput | CatTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CatTransactions.
+     */
+    cursor?: CatTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CatTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CatTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CatTransactions.
+     */
+    distinct?: CatTransactionScalarFieldEnum | CatTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * CatTransaction findMany
+   */
+  export type CatTransactionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CatTransactions to fetch.
+     */
+    where?: CatTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CatTransactions to fetch.
+     */
+    orderBy?: CatTransactionOrderByWithRelationInput | CatTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CatTransactions.
+     */
+    cursor?: CatTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CatTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CatTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CatTransactions.
+     */
+    distinct?: CatTransactionScalarFieldEnum | CatTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * CatTransaction create
+   */
+  export type CatTransactionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CatTransaction.
+     */
+    data: XOR<CatTransactionCreateInput, CatTransactionUncheckedCreateInput>
+  }
+
+  /**
+   * CatTransaction createMany
+   */
+  export type CatTransactionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CatTransactions.
+     */
+    data: CatTransactionCreateManyInput | CatTransactionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CatTransaction createManyAndReturn
+   */
+  export type CatTransactionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * The data used to create many CatTransactions.
+     */
+    data: CatTransactionCreateManyInput | CatTransactionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CatTransaction update
+   */
+  export type CatTransactionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CatTransaction.
+     */
+    data: XOR<CatTransactionUpdateInput, CatTransactionUncheckedUpdateInput>
+    /**
+     * Choose, which CatTransaction to update.
+     */
+    where: CatTransactionWhereUniqueInput
+  }
+
+  /**
+   * CatTransaction updateMany
+   */
+  export type CatTransactionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CatTransactions.
+     */
+    data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyInput>
+    /**
+     * Filter which CatTransactions to update
+     */
+    where?: CatTransactionWhereInput
+    /**
+     * Limit how many CatTransactions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CatTransaction updateManyAndReturn
+   */
+  export type CatTransactionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * The data used to update CatTransactions.
+     */
+    data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyInput>
+    /**
+     * Filter which CatTransactions to update
+     */
+    where?: CatTransactionWhereInput
+    /**
+     * Limit how many CatTransactions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CatTransaction upsert
+   */
+  export type CatTransactionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CatTransaction to update in case it exists.
+     */
+    where: CatTransactionWhereUniqueInput
+    /**
+     * In case the CatTransaction found by the `where` argument doesn't exist, create a new CatTransaction with this data.
+     */
+    create: XOR<CatTransactionCreateInput, CatTransactionUncheckedCreateInput>
+    /**
+     * In case the CatTransaction was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CatTransactionUpdateInput, CatTransactionUncheckedUpdateInput>
+  }
+
+  /**
+   * CatTransaction delete
+   */
+  export type CatTransactionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
+    /**
+     * Filter which CatTransaction to delete.
+     */
+    where: CatTransactionWhereUniqueInput
+  }
+
+  /**
+   * CatTransaction deleteMany
+   */
+  export type CatTransactionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CatTransactions to delete
+     */
+    where?: CatTransactionWhereInput
+    /**
+     * Limit how many CatTransactions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CatTransaction.charity
+   */
+  export type CatTransaction$charityArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Charity
+     */
+    select?: CharitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Charity
+     */
+    omit?: CharityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityInclude<ExtArgs> | null
+    where?: CharityWhereInput
+  }
+
+  /**
+   * CatTransaction without action
+   */
+  export type CatTransactionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CatTransaction
+     */
+    select?: CatTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CatTransaction
+     */
+    omit?: CatTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CatTransactionInclude<ExtArgs> | null
   }
 
 
@@ -36796,6 +38294,8 @@ export namespace Prisma {
     onboardingStepsCompleted: 'onboardingStepsCompleted',
     guidedSetupRequired: 'guidedSetupRequired',
     isPublic: 'isPublic',
+    catCycleActive: 'catCycleActive',
+    catFeaturedCharityId: 'catFeaturedCharityId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -36902,6 +38402,7 @@ export namespace Prisma {
     rejectionReason: 'rejectionReason',
     changesRequestedNote: 'changesRequestedNote',
     expiresAt: 'expiresAt',
+    soldAt: 'soldAt',
     expiredAt: 'expiredAt',
     deletedAt: 'deletedAt',
     createdAt: 'createdAt',
@@ -36933,6 +38434,7 @@ export namespace Prisma {
     longitude: 'longitude',
     isVerified: 'isVerified',
     isFeatured: 'isFeatured',
+    isCATCharity: 'isCATCharity',
     tags: 'tags',
     linkedBusinessIds: 'linkedBusinessIds',
     campaignCompleted: 'campaignCompleted',
@@ -36961,6 +38463,20 @@ export namespace Prisma {
   };
 
   export type CharitySuggestionScalarFieldEnum = (typeof CharitySuggestionScalarFieldEnum)[keyof typeof CharitySuggestionScalarFieldEnum]
+
+
+  export const CatTransactionScalarFieldEnum: {
+    id: 'id',
+    communityId: 'communityId',
+    postId: 'postId',
+    sellerId: 'sellerId',
+    catAmount: 'catAmount',
+    catPercentage: 'catPercentage',
+    charityId: 'charityId',
+    createdAt: 'createdAt'
+  };
+
+  export type CatTransactionScalarFieldEnum = (typeof CatTransactionScalarFieldEnum)[keyof typeof CatTransactionScalarFieldEnum]
 
 
   export const BusinessScalarFieldEnum: {
@@ -37337,6 +38853,7 @@ export namespace Prisma {
     licenses?: LicenseListRelationFilter
     billingRecords?: BillingRecordListRelationFilter
     invoices?: InvoiceListRelationFilter
+    catTransactions?: CatTransactionListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -37406,6 +38923,7 @@ export namespace Prisma {
     licenses?: LicenseOrderByRelationAggregateInput
     billingRecords?: BillingRecordOrderByRelationAggregateInput
     invoices?: InvoiceOrderByRelationAggregateInput
+    catTransactions?: CatTransactionOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -37478,6 +38996,7 @@ export namespace Prisma {
     licenses?: LicenseListRelationFilter
     billingRecords?: BillingRecordListRelationFilter
     invoices?: InvoiceListRelationFilter
+    catTransactions?: CatTransactionListRelationFilter
   }, "id" | "email" | "phone">
 
   export type UserOrderByWithAggregationInput = {
@@ -37986,6 +39505,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: StringNullableListFilter<"Community">
     guidedSetupRequired?: BoolFilter<"Community"> | boolean
     isPublic?: BoolFilter<"Community"> | boolean
+    catCycleActive?: BoolFilter<"Community"> | boolean
+    catFeaturedCharityId?: StringNullableFilter<"Community"> | string | null
     createdAt?: DateTimeFilter<"Community"> | Date | string
     updatedAt?: DateTimeFilter<"Community"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -38003,6 +39524,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventListRelationFilter
     licenses?: LicenseListRelationFilter
     billingRecords?: BillingRecordListRelationFilter
+    catTransactions?: CatTransactionListRelationFilter
   }
 
   export type CommunityOrderByWithRelationInput = {
@@ -38025,6 +39547,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: SortOrder
     guidedSetupRequired?: SortOrder
     isPublic?: SortOrder
+    catCycleActive?: SortOrder
+    catFeaturedCharityId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     owner?: UserOrderByWithRelationInput
@@ -38042,6 +39566,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventOrderByRelationAggregateInput
     licenses?: LicenseOrderByRelationAggregateInput
     billingRecords?: BillingRecordOrderByRelationAggregateInput
+    catTransactions?: CatTransactionOrderByRelationAggregateInput
   }
 
   export type CommunityWhereUniqueInput = Prisma.AtLeast<{
@@ -38067,6 +39592,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: StringNullableListFilter<"Community">
     guidedSetupRequired?: BoolFilter<"Community"> | boolean
     isPublic?: BoolFilter<"Community"> | boolean
+    catCycleActive?: BoolFilter<"Community"> | boolean
+    catFeaturedCharityId?: StringNullableFilter<"Community"> | string | null
     createdAt?: DateTimeFilter<"Community"> | Date | string
     updatedAt?: DateTimeFilter<"Community"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -38084,6 +39611,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventListRelationFilter
     licenses?: LicenseListRelationFilter
     billingRecords?: BillingRecordListRelationFilter
+    catTransactions?: CatTransactionListRelationFilter
   }, "id">
 
   export type CommunityOrderByWithAggregationInput = {
@@ -38106,6 +39634,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: SortOrder
     guidedSetupRequired?: SortOrder
     isPublic?: SortOrder
+    catCycleActive?: SortOrder
+    catFeaturedCharityId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: CommunityCountOrderByAggregateInput
@@ -38138,6 +39668,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: StringNullableListFilter<"Community">
     guidedSetupRequired?: BoolWithAggregatesFilter<"Community"> | boolean
     isPublic?: BoolWithAggregatesFilter<"Community"> | boolean
+    catCycleActive?: BoolWithAggregatesFilter<"Community"> | boolean
+    catFeaturedCharityId?: StringNullableWithAggregatesFilter<"Community"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Community"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Community"> | Date | string
   }
@@ -38530,12 +40062,14 @@ export namespace Prisma {
     rejectionReason?: StringNullableFilter<"Post"> | string | null
     changesRequestedNote?: StringNullableFilter<"Post"> | string | null
     expiresAt?: DateTimeNullableFilter<"Post"> | Date | string | null
+    soldAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     expiredAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     createdAt?: DateTimeFilter<"Post"> | Date | string
     updatedAt?: DateTimeFilter<"Post"> | Date | string
     community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
     author?: XOR<UserScalarRelationFilter, UserWhereInput>
+    catTransactions?: CatTransactionListRelationFilter
   }
 
   export type PostOrderByWithRelationInput = {
@@ -38571,12 +40105,14 @@ export namespace Prisma {
     rejectionReason?: SortOrderInput | SortOrder
     changesRequestedNote?: SortOrderInput | SortOrder
     expiresAt?: SortOrderInput | SortOrder
+    soldAt?: SortOrderInput | SortOrder
     expiredAt?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     community?: CommunityOrderByWithRelationInput
     author?: UserOrderByWithRelationInput
+    catTransactions?: CatTransactionOrderByRelationAggregateInput
   }
 
   export type PostWhereUniqueInput = Prisma.AtLeast<{
@@ -38615,12 +40151,14 @@ export namespace Prisma {
     rejectionReason?: StringNullableFilter<"Post"> | string | null
     changesRequestedNote?: StringNullableFilter<"Post"> | string | null
     expiresAt?: DateTimeNullableFilter<"Post"> | Date | string | null
+    soldAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     expiredAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     createdAt?: DateTimeFilter<"Post"> | Date | string
     updatedAt?: DateTimeFilter<"Post"> | Date | string
     community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
     author?: XOR<UserScalarRelationFilter, UserWhereInput>
+    catTransactions?: CatTransactionListRelationFilter
   }, "id">
 
   export type PostOrderByWithAggregationInput = {
@@ -38656,6 +40194,7 @@ export namespace Prisma {
     rejectionReason?: SortOrderInput | SortOrder
     changesRequestedNote?: SortOrderInput | SortOrder
     expiresAt?: SortOrderInput | SortOrder
+    soldAt?: SortOrderInput | SortOrder
     expiredAt?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -38703,6 +40242,7 @@ export namespace Prisma {
     rejectionReason?: StringNullableWithAggregatesFilter<"Post"> | string | null
     changesRequestedNote?: StringNullableWithAggregatesFilter<"Post"> | string | null
     expiresAt?: DateTimeNullableWithAggregatesFilter<"Post"> | Date | string | null
+    soldAt?: DateTimeNullableWithAggregatesFilter<"Post"> | Date | string | null
     expiredAt?: DateTimeNullableWithAggregatesFilter<"Post"> | Date | string | null
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Post"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Post"> | Date | string
@@ -38734,6 +40274,7 @@ export namespace Prisma {
     longitude?: FloatNullableFilter<"Charity"> | number | null
     isVerified?: BoolFilter<"Charity"> | boolean
     isFeatured?: BoolFilter<"Charity"> | boolean
+    isCATCharity?: BoolFilter<"Charity"> | boolean
     tags?: StringNullableListFilter<"Charity">
     linkedBusinessIds?: StringNullableListFilter<"Charity">
     campaignCompleted?: BoolFilter<"Charity"> | boolean
@@ -38743,6 +40284,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Charity"> | Date | string
     community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
     charitySuggestions?: CharitySuggestionListRelationFilter
+    catTransactions?: CatTransactionListRelationFilter
   }
 
   export type CharityOrderByWithRelationInput = {
@@ -38767,6 +40309,7 @@ export namespace Prisma {
     longitude?: SortOrderInput | SortOrder
     isVerified?: SortOrder
     isFeatured?: SortOrder
+    isCATCharity?: SortOrder
     tags?: SortOrder
     linkedBusinessIds?: SortOrder
     campaignCompleted?: SortOrder
@@ -38776,6 +40319,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     community?: CommunityOrderByWithRelationInput
     charitySuggestions?: CharitySuggestionOrderByRelationAggregateInput
+    catTransactions?: CatTransactionOrderByRelationAggregateInput
   }
 
   export type CharityWhereUniqueInput = Prisma.AtLeast<{
@@ -38803,6 +40347,7 @@ export namespace Prisma {
     longitude?: FloatNullableFilter<"Charity"> | number | null
     isVerified?: BoolFilter<"Charity"> | boolean
     isFeatured?: BoolFilter<"Charity"> | boolean
+    isCATCharity?: BoolFilter<"Charity"> | boolean
     tags?: StringNullableListFilter<"Charity">
     linkedBusinessIds?: StringNullableListFilter<"Charity">
     campaignCompleted?: BoolFilter<"Charity"> | boolean
@@ -38812,6 +40357,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Charity"> | Date | string
     community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
     charitySuggestions?: CharitySuggestionListRelationFilter
+    catTransactions?: CatTransactionListRelationFilter
   }, "id">
 
   export type CharityOrderByWithAggregationInput = {
@@ -38836,6 +40382,7 @@ export namespace Prisma {
     longitude?: SortOrderInput | SortOrder
     isVerified?: SortOrder
     isFeatured?: SortOrder
+    isCATCharity?: SortOrder
     tags?: SortOrder
     linkedBusinessIds?: SortOrder
     campaignCompleted?: SortOrder
@@ -38875,6 +40422,7 @@ export namespace Prisma {
     longitude?: FloatNullableWithAggregatesFilter<"Charity"> | number | null
     isVerified?: BoolWithAggregatesFilter<"Charity"> | boolean
     isFeatured?: BoolWithAggregatesFilter<"Charity"> | boolean
+    isCATCharity?: BoolWithAggregatesFilter<"Charity"> | boolean
     tags?: StringNullableListFilter<"Charity">
     linkedBusinessIds?: StringNullableListFilter<"Charity">
     campaignCompleted?: BoolWithAggregatesFilter<"Charity"> | boolean
@@ -38980,6 +40528,87 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"CharitySuggestion"> | string
     adminFeedback?: StringNullableWithAggregatesFilter<"CharitySuggestion"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"CharitySuggestion"> | Date | string
+  }
+
+  export type CatTransactionWhereInput = {
+    AND?: CatTransactionWhereInput | CatTransactionWhereInput[]
+    OR?: CatTransactionWhereInput[]
+    NOT?: CatTransactionWhereInput | CatTransactionWhereInput[]
+    id?: StringFilter<"CatTransaction"> | string
+    communityId?: StringFilter<"CatTransaction"> | string
+    postId?: StringFilter<"CatTransaction"> | string
+    sellerId?: StringFilter<"CatTransaction"> | string
+    catAmount?: FloatFilter<"CatTransaction"> | number
+    catPercentage?: FloatFilter<"CatTransaction"> | number
+    charityId?: StringNullableFilter<"CatTransaction"> | string | null
+    createdAt?: DateTimeFilter<"CatTransaction"> | Date | string
+    community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
+    post?: XOR<PostScalarRelationFilter, PostWhereInput>
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    charity?: XOR<CharityNullableScalarRelationFilter, CharityWhereInput> | null
+  }
+
+  export type CatTransactionOrderByWithRelationInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    postId?: SortOrder
+    sellerId?: SortOrder
+    catAmount?: SortOrder
+    catPercentage?: SortOrder
+    charityId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    community?: CommunityOrderByWithRelationInput
+    post?: PostOrderByWithRelationInput
+    seller?: UserOrderByWithRelationInput
+    charity?: CharityOrderByWithRelationInput
+  }
+
+  export type CatTransactionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CatTransactionWhereInput | CatTransactionWhereInput[]
+    OR?: CatTransactionWhereInput[]
+    NOT?: CatTransactionWhereInput | CatTransactionWhereInput[]
+    communityId?: StringFilter<"CatTransaction"> | string
+    postId?: StringFilter<"CatTransaction"> | string
+    sellerId?: StringFilter<"CatTransaction"> | string
+    catAmount?: FloatFilter<"CatTransaction"> | number
+    catPercentage?: FloatFilter<"CatTransaction"> | number
+    charityId?: StringNullableFilter<"CatTransaction"> | string | null
+    createdAt?: DateTimeFilter<"CatTransaction"> | Date | string
+    community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
+    post?: XOR<PostScalarRelationFilter, PostWhereInput>
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    charity?: XOR<CharityNullableScalarRelationFilter, CharityWhereInput> | null
+  }, "id">
+
+  export type CatTransactionOrderByWithAggregationInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    postId?: SortOrder
+    sellerId?: SortOrder
+    catAmount?: SortOrder
+    catPercentage?: SortOrder
+    charityId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: CatTransactionCountOrderByAggregateInput
+    _avg?: CatTransactionAvgOrderByAggregateInput
+    _max?: CatTransactionMaxOrderByAggregateInput
+    _min?: CatTransactionMinOrderByAggregateInput
+    _sum?: CatTransactionSumOrderByAggregateInput
+  }
+
+  export type CatTransactionScalarWhereWithAggregatesInput = {
+    AND?: CatTransactionScalarWhereWithAggregatesInput | CatTransactionScalarWhereWithAggregatesInput[]
+    OR?: CatTransactionScalarWhereWithAggregatesInput[]
+    NOT?: CatTransactionScalarWhereWithAggregatesInput | CatTransactionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CatTransaction"> | string
+    communityId?: StringWithAggregatesFilter<"CatTransaction"> | string
+    postId?: StringWithAggregatesFilter<"CatTransaction"> | string
+    sellerId?: StringWithAggregatesFilter<"CatTransaction"> | string
+    catAmount?: FloatWithAggregatesFilter<"CatTransaction"> | number
+    catPercentage?: FloatWithAggregatesFilter<"CatTransaction"> | number
+    charityId?: StringNullableWithAggregatesFilter<"CatTransaction"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"CatTransaction"> | Date | string
   }
 
   export type BusinessWhereInput = {
@@ -39974,6 +41603,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -40043,6 +41673,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserUpdateInput = {
@@ -40112,6 +41743,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -40181,6 +41813,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -40750,6 +42383,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -40767,6 +42402,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateInput = {
@@ -40789,6 +42425,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -40805,6 +42443,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUpdateInput = {
@@ -40826,6 +42465,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -40843,6 +42484,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateInput = {
@@ -40865,6 +42507,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -40881,6 +42525,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateManyInput = {
@@ -40903,6 +42548,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -40926,6 +42573,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40950,6 +42599,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41359,12 +43010,14 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     community: CommunityCreateNestedOneWithoutPostsInput
     author: UserCreateNestedOneWithoutPostsInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutPostInput
   }
 
   export type PostUncheckedCreateInput = {
@@ -41400,10 +43053,12 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type PostUpdateInput = {
@@ -41437,12 +43092,14 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutPostsNestedInput
     author?: UserUpdateOneRequiredWithoutPostsNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateInput = {
@@ -41478,10 +43135,12 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type PostCreateManyInput = {
@@ -41517,6 +43176,7 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -41554,6 +43214,7 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41593,6 +43254,7 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41620,6 +43282,7 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -41629,6 +43292,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     community: CommunityCreateNestedOneWithoutCharitiesInput
     charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCharityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUncheckedCreateInput = {
@@ -41653,6 +43317,7 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -41661,6 +43326,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUpdateInput = {
@@ -41684,6 +43350,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -41693,6 +43360,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutCharitiesNestedInput
     charitySuggestions?: CharitySuggestionUpdateManyWithoutCharityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateInput = {
@@ -41717,6 +43385,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -41725,6 +43394,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityCreateManyInput = {
@@ -41749,6 +43419,7 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -41779,6 +43450,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -41810,6 +43482,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -41918,6 +43591,79 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     adminFeedback?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CatTransactionCreateInput = {
+    id?: string
+    catAmount: number
+    catPercentage: number
+    createdAt?: Date | string
+    community: CommunityCreateNestedOneWithoutCatTransactionsInput
+    post: PostCreateNestedOneWithoutCatTransactionsInput
+    seller: UserCreateNestedOneWithoutCatTransactionsInput
+    charity?: CharityCreateNestedOneWithoutCatTransactionsInput
+  }
+
+  export type CatTransactionUncheckedCreateInput = {
+    id?: string
+    communityId: string
+    postId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
+    charityId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type CatTransactionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput
+    post?: PostUpdateOneRequiredWithoutCatTransactionsNestedInput
+    seller?: UserUpdateOneRequiredWithoutCatTransactionsNestedInput
+    charity?: CharityUpdateOneWithoutCatTransactionsNestedInput
+  }
+
+  export type CatTransactionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CatTransactionCreateManyInput = {
+    id?: string
+    communityId: string
+    postId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
+    charityId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type CatTransactionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CatTransactionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -43110,6 +44856,12 @@ export namespace Prisma {
     none?: InvoiceWhereInput
   }
 
+  export type CatTransactionListRelationFilter = {
+    every?: CatTransactionWhereInput
+    some?: CatTransactionWhereInput
+    none?: CatTransactionWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -43188,6 +44940,10 @@ export namespace Prisma {
   }
 
   export type InvoiceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CatTransactionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -43720,6 +45476,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: SortOrder
     guidedSetupRequired?: SortOrder
     isPublic?: SortOrder
+    catCycleActive?: SortOrder
+    catFeaturedCharityId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43748,6 +45506,8 @@ export namespace Prisma {
     activeEmergencyId?: SortOrder
     guidedSetupRequired?: SortOrder
     isPublic?: SortOrder
+    catCycleActive?: SortOrder
+    catFeaturedCharityId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43770,6 +45530,8 @@ export namespace Prisma {
     activeEmergencyId?: SortOrder
     guidedSetupRequired?: SortOrder
     isPublic?: SortOrder
+    catCycleActive?: SortOrder
+    catFeaturedCharityId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -44055,6 +45817,7 @@ export namespace Prisma {
     rejectionReason?: SortOrder
     changesRequestedNote?: SortOrder
     expiresAt?: SortOrder
+    soldAt?: SortOrder
     expiredAt?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
@@ -44104,6 +45867,7 @@ export namespace Prisma {
     rejectionReason?: SortOrder
     changesRequestedNote?: SortOrder
     expiresAt?: SortOrder
+    soldAt?: SortOrder
     expiredAt?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
@@ -44143,6 +45907,7 @@ export namespace Prisma {
     rejectionReason?: SortOrder
     changesRequestedNote?: SortOrder
     expiresAt?: SortOrder
+    soldAt?: SortOrder
     expiredAt?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
@@ -44181,6 +45946,7 @@ export namespace Prisma {
     longitude?: SortOrder
     isVerified?: SortOrder
     isFeatured?: SortOrder
+    isCATCharity?: SortOrder
     tags?: SortOrder
     linkedBusinessIds?: SortOrder
     campaignCompleted?: SortOrder
@@ -44220,6 +45986,7 @@ export namespace Prisma {
     longitude?: SortOrder
     isVerified?: SortOrder
     isFeatured?: SortOrder
+    isCATCharity?: SortOrder
     campaignCompleted?: SortOrder
     isApprovedSuggestion?: SortOrder
     suggestedById?: SortOrder
@@ -44249,6 +46016,7 @@ export namespace Prisma {
     longitude?: SortOrder
     isVerified?: SortOrder
     isFeatured?: SortOrder
+    isCATCharity?: SortOrder
     campaignCompleted?: SortOrder
     isApprovedSuggestion?: SortOrder
     suggestedById?: SortOrder
@@ -44320,6 +46088,54 @@ export namespace Prisma {
 
   export type CharitySuggestionSumOrderByAggregateInput = {
     suggestedDonationAmount?: SortOrder
+  }
+
+  export type PostScalarRelationFilter = {
+    is?: PostWhereInput
+    isNot?: PostWhereInput
+  }
+
+  export type CatTransactionCountOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    postId?: SortOrder
+    sellerId?: SortOrder
+    catAmount?: SortOrder
+    catPercentage?: SortOrder
+    charityId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CatTransactionAvgOrderByAggregateInput = {
+    catAmount?: SortOrder
+    catPercentage?: SortOrder
+  }
+
+  export type CatTransactionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    postId?: SortOrder
+    sellerId?: SortOrder
+    catAmount?: SortOrder
+    catPercentage?: SortOrder
+    charityId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CatTransactionMinOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    postId?: SortOrder
+    sellerId?: SortOrder
+    catAmount?: SortOrder
+    catPercentage?: SortOrder
+    charityId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CatTransactionSumOrderByAggregateInput = {
+    catAmount?: SortOrder
+    catPercentage?: SortOrder
   }
 
   export type BusinessCountOrderByAggregateInput = {
@@ -44994,6 +46810,13 @@ export namespace Prisma {
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
   }
 
+  export type CatTransactionCreateNestedManyWithoutSellerInput = {
+    create?: XOR<CatTransactionCreateWithoutSellerInput, CatTransactionUncheckedCreateWithoutSellerInput> | CatTransactionCreateWithoutSellerInput[] | CatTransactionUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutSellerInput | CatTransactionCreateOrConnectWithoutSellerInput[]
+    createMany?: CatTransactionCreateManySellerInputEnvelope
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+  }
+
   export type CommunityMemberUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<CommunityMemberCreateWithoutUserInput, CommunityMemberUncheckedCreateWithoutUserInput> | CommunityMemberCreateWithoutUserInput[] | CommunityMemberUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CommunityMemberCreateOrConnectWithoutUserInput | CommunityMemberCreateOrConnectWithoutUserInput[]
@@ -45132,6 +46955,13 @@ export namespace Prisma {
     connectOrCreate?: InvoiceCreateOrConnectWithoutUserInput | InvoiceCreateOrConnectWithoutUserInput[]
     createMany?: InvoiceCreateManyUserInputEnvelope
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+  }
+
+  export type CatTransactionUncheckedCreateNestedManyWithoutSellerInput = {
+    create?: XOR<CatTransactionCreateWithoutSellerInput, CatTransactionUncheckedCreateWithoutSellerInput> | CatTransactionCreateWithoutSellerInput[] | CatTransactionUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutSellerInput | CatTransactionCreateOrConnectWithoutSellerInput[]
+    createMany?: CatTransactionCreateManySellerInputEnvelope
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -45442,6 +47272,20 @@ export namespace Prisma {
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
   }
 
+  export type CatTransactionUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<CatTransactionCreateWithoutSellerInput, CatTransactionUncheckedCreateWithoutSellerInput> | CatTransactionCreateWithoutSellerInput[] | CatTransactionUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutSellerInput | CatTransactionCreateOrConnectWithoutSellerInput[]
+    upsert?: CatTransactionUpsertWithWhereUniqueWithoutSellerInput | CatTransactionUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: CatTransactionCreateManySellerInputEnvelope
+    set?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    disconnect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    delete?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    update?: CatTransactionUpdateWithWhereUniqueWithoutSellerInput | CatTransactionUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: CatTransactionUpdateManyWithWhereWithoutSellerInput | CatTransactionUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
   export type CommunityMemberUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<CommunityMemberCreateWithoutUserInput, CommunityMemberUncheckedCreateWithoutUserInput> | CommunityMemberCreateWithoutUserInput[] | CommunityMemberUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CommunityMemberCreateOrConnectWithoutUserInput | CommunityMemberCreateOrConnectWithoutUserInput[]
@@ -45722,6 +47566,20 @@ export namespace Prisma {
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
   }
 
+  export type CatTransactionUncheckedUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<CatTransactionCreateWithoutSellerInput, CatTransactionUncheckedCreateWithoutSellerInput> | CatTransactionCreateWithoutSellerInput[] | CatTransactionUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutSellerInput | CatTransactionCreateOrConnectWithoutSellerInput[]
+    upsert?: CatTransactionUpsertWithWhereUniqueWithoutSellerInput | CatTransactionUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: CatTransactionCreateManySellerInputEnvelope
+    set?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    disconnect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    delete?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    update?: CatTransactionUpdateWithWhereUniqueWithoutSellerInput | CatTransactionUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: CatTransactionUpdateManyWithWhereWithoutSellerInput | CatTransactionUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutEmailTokensInput = {
     create?: XOR<UserCreateWithoutEmailTokensInput, UserUncheckedCreateWithoutEmailTokensInput>
     connectOrCreate?: UserCreateOrConnectWithoutEmailTokensInput
@@ -45906,6 +47764,13 @@ export namespace Prisma {
     connect?: BillingRecordWhereUniqueInput | BillingRecordWhereUniqueInput[]
   }
 
+  export type CatTransactionCreateNestedManyWithoutCommunityInput = {
+    create?: XOR<CatTransactionCreateWithoutCommunityInput, CatTransactionUncheckedCreateWithoutCommunityInput> | CatTransactionCreateWithoutCommunityInput[] | CatTransactionUncheckedCreateWithoutCommunityInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutCommunityInput | CatTransactionCreateOrConnectWithoutCommunityInput[]
+    createMany?: CatTransactionCreateManyCommunityInputEnvelope
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+  }
+
   export type CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput = {
     create?: XOR<CommunityMemberCreateWithoutCommunityInput, CommunityMemberUncheckedCreateWithoutCommunityInput> | CommunityMemberCreateWithoutCommunityInput[] | CommunityMemberUncheckedCreateWithoutCommunityInput[]
     connectOrCreate?: CommunityMemberCreateOrConnectWithoutCommunityInput | CommunityMemberCreateOrConnectWithoutCommunityInput[]
@@ -46002,6 +47867,13 @@ export namespace Prisma {
     connectOrCreate?: BillingRecordCreateOrConnectWithoutCommunityInput | BillingRecordCreateOrConnectWithoutCommunityInput[]
     createMany?: BillingRecordCreateManyCommunityInputEnvelope
     connect?: BillingRecordWhereUniqueInput | BillingRecordWhereUniqueInput[]
+  }
+
+  export type CatTransactionUncheckedCreateNestedManyWithoutCommunityInput = {
+    create?: XOR<CatTransactionCreateWithoutCommunityInput, CatTransactionUncheckedCreateWithoutCommunityInput> | CatTransactionCreateWithoutCommunityInput[] | CatTransactionUncheckedCreateWithoutCommunityInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutCommunityInput | CatTransactionCreateOrConnectWithoutCommunityInput[]
+    createMany?: CatTransactionCreateManyCommunityInputEnvelope
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
   }
 
   export type CommunityUpdateenabledCategoriesInput = {
@@ -46218,6 +48090,20 @@ export namespace Prisma {
     deleteMany?: BillingRecordScalarWhereInput | BillingRecordScalarWhereInput[]
   }
 
+  export type CatTransactionUpdateManyWithoutCommunityNestedInput = {
+    create?: XOR<CatTransactionCreateWithoutCommunityInput, CatTransactionUncheckedCreateWithoutCommunityInput> | CatTransactionCreateWithoutCommunityInput[] | CatTransactionUncheckedCreateWithoutCommunityInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutCommunityInput | CatTransactionCreateOrConnectWithoutCommunityInput[]
+    upsert?: CatTransactionUpsertWithWhereUniqueWithoutCommunityInput | CatTransactionUpsertWithWhereUniqueWithoutCommunityInput[]
+    createMany?: CatTransactionCreateManyCommunityInputEnvelope
+    set?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    disconnect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    delete?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    update?: CatTransactionUpdateWithWhereUniqueWithoutCommunityInput | CatTransactionUpdateWithWhereUniqueWithoutCommunityInput[]
+    updateMany?: CatTransactionUpdateManyWithWhereWithoutCommunityInput | CatTransactionUpdateManyWithWhereWithoutCommunityInput[]
+    deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
   export type CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput = {
     create?: XOR<CommunityMemberCreateWithoutCommunityInput, CommunityMemberUncheckedCreateWithoutCommunityInput> | CommunityMemberCreateWithoutCommunityInput[] | CommunityMemberUncheckedCreateWithoutCommunityInput[]
     connectOrCreate?: CommunityMemberCreateOrConnectWithoutCommunityInput | CommunityMemberCreateOrConnectWithoutCommunityInput[]
@@ -46414,6 +48300,20 @@ export namespace Prisma {
     deleteMany?: BillingRecordScalarWhereInput | BillingRecordScalarWhereInput[]
   }
 
+  export type CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput = {
+    create?: XOR<CatTransactionCreateWithoutCommunityInput, CatTransactionUncheckedCreateWithoutCommunityInput> | CatTransactionCreateWithoutCommunityInput[] | CatTransactionUncheckedCreateWithoutCommunityInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutCommunityInput | CatTransactionCreateOrConnectWithoutCommunityInput[]
+    upsert?: CatTransactionUpsertWithWhereUniqueWithoutCommunityInput | CatTransactionUpsertWithWhereUniqueWithoutCommunityInput[]
+    createMany?: CatTransactionCreateManyCommunityInputEnvelope
+    set?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    disconnect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    delete?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    update?: CatTransactionUpdateWithWhereUniqueWithoutCommunityInput | CatTransactionUpdateWithWhereUniqueWithoutCommunityInput[]
+    updateMany?: CatTransactionUpdateManyWithWhereWithoutCommunityInput | CatTransactionUpdateManyWithWhereWithoutCommunityInput[]
+    deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
   export type CommunityCreateNestedOneWithoutMembersInput = {
     create?: XOR<CommunityCreateWithoutMembersInput, CommunityUncheckedCreateWithoutMembersInput>
     connectOrCreate?: CommunityCreateOrConnectWithoutMembersInput
@@ -46605,6 +48505,20 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type CatTransactionCreateNestedManyWithoutPostInput = {
+    create?: XOR<CatTransactionCreateWithoutPostInput, CatTransactionUncheckedCreateWithoutPostInput> | CatTransactionCreateWithoutPostInput[] | CatTransactionUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutPostInput | CatTransactionCreateOrConnectWithoutPostInput[]
+    createMany?: CatTransactionCreateManyPostInputEnvelope
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+  }
+
+  export type CatTransactionUncheckedCreateNestedManyWithoutPostInput = {
+    create?: XOR<CatTransactionCreateWithoutPostInput, CatTransactionUncheckedCreateWithoutPostInput> | CatTransactionCreateWithoutPostInput[] | CatTransactionUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutPostInput | CatTransactionCreateOrConnectWithoutPostInput[]
+    createMany?: CatTransactionCreateManyPostInputEnvelope
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+  }
+
   export type CommunityUpdateOneRequiredWithoutPostsNestedInput = {
     create?: XOR<CommunityCreateWithoutPostsInput, CommunityUncheckedCreateWithoutPostsInput>
     connectOrCreate?: CommunityCreateOrConnectWithoutPostsInput
@@ -46619,6 +48533,34 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutPostsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPostsInput, UserUpdateWithoutPostsInput>, UserUncheckedUpdateWithoutPostsInput>
+  }
+
+  export type CatTransactionUpdateManyWithoutPostNestedInput = {
+    create?: XOR<CatTransactionCreateWithoutPostInput, CatTransactionUncheckedCreateWithoutPostInput> | CatTransactionCreateWithoutPostInput[] | CatTransactionUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutPostInput | CatTransactionCreateOrConnectWithoutPostInput[]
+    upsert?: CatTransactionUpsertWithWhereUniqueWithoutPostInput | CatTransactionUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: CatTransactionCreateManyPostInputEnvelope
+    set?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    disconnect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    delete?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    update?: CatTransactionUpdateWithWhereUniqueWithoutPostInput | CatTransactionUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: CatTransactionUpdateManyWithWhereWithoutPostInput | CatTransactionUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
+  export type CatTransactionUncheckedUpdateManyWithoutPostNestedInput = {
+    create?: XOR<CatTransactionCreateWithoutPostInput, CatTransactionUncheckedCreateWithoutPostInput> | CatTransactionCreateWithoutPostInput[] | CatTransactionUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutPostInput | CatTransactionCreateOrConnectWithoutPostInput[]
+    upsert?: CatTransactionUpsertWithWhereUniqueWithoutPostInput | CatTransactionUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: CatTransactionCreateManyPostInputEnvelope
+    set?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    disconnect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    delete?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    update?: CatTransactionUpdateWithWhereUniqueWithoutPostInput | CatTransactionUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: CatTransactionUpdateManyWithWhereWithoutPostInput | CatTransactionUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
   }
 
   export type CharityCreatetagsInput = {
@@ -46642,11 +48584,25 @@ export namespace Prisma {
     connect?: CharitySuggestionWhereUniqueInput | CharitySuggestionWhereUniqueInput[]
   }
 
+  export type CatTransactionCreateNestedManyWithoutCharityInput = {
+    create?: XOR<CatTransactionCreateWithoutCharityInput, CatTransactionUncheckedCreateWithoutCharityInput> | CatTransactionCreateWithoutCharityInput[] | CatTransactionUncheckedCreateWithoutCharityInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutCharityInput | CatTransactionCreateOrConnectWithoutCharityInput[]
+    createMany?: CatTransactionCreateManyCharityInputEnvelope
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+  }
+
   export type CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput = {
     create?: XOR<CharitySuggestionCreateWithoutCharityInput, CharitySuggestionUncheckedCreateWithoutCharityInput> | CharitySuggestionCreateWithoutCharityInput[] | CharitySuggestionUncheckedCreateWithoutCharityInput[]
     connectOrCreate?: CharitySuggestionCreateOrConnectWithoutCharityInput | CharitySuggestionCreateOrConnectWithoutCharityInput[]
     createMany?: CharitySuggestionCreateManyCharityInputEnvelope
     connect?: CharitySuggestionWhereUniqueInput | CharitySuggestionWhereUniqueInput[]
+  }
+
+  export type CatTransactionUncheckedCreateNestedManyWithoutCharityInput = {
+    create?: XOR<CatTransactionCreateWithoutCharityInput, CatTransactionUncheckedCreateWithoutCharityInput> | CatTransactionCreateWithoutCharityInput[] | CatTransactionUncheckedCreateWithoutCharityInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutCharityInput | CatTransactionCreateOrConnectWithoutCharityInput[]
+    createMany?: CatTransactionCreateManyCharityInputEnvelope
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
   }
 
   export type CharityUpdatetagsInput = {
@@ -46681,6 +48637,20 @@ export namespace Prisma {
     deleteMany?: CharitySuggestionScalarWhereInput | CharitySuggestionScalarWhereInput[]
   }
 
+  export type CatTransactionUpdateManyWithoutCharityNestedInput = {
+    create?: XOR<CatTransactionCreateWithoutCharityInput, CatTransactionUncheckedCreateWithoutCharityInput> | CatTransactionCreateWithoutCharityInput[] | CatTransactionUncheckedCreateWithoutCharityInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutCharityInput | CatTransactionCreateOrConnectWithoutCharityInput[]
+    upsert?: CatTransactionUpsertWithWhereUniqueWithoutCharityInput | CatTransactionUpsertWithWhereUniqueWithoutCharityInput[]
+    createMany?: CatTransactionCreateManyCharityInputEnvelope
+    set?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    disconnect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    delete?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    update?: CatTransactionUpdateWithWhereUniqueWithoutCharityInput | CatTransactionUpdateWithWhereUniqueWithoutCharityInput[]
+    updateMany?: CatTransactionUpdateManyWithWhereWithoutCharityInput | CatTransactionUpdateManyWithWhereWithoutCharityInput[]
+    deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
   export type CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput = {
     create?: XOR<CharitySuggestionCreateWithoutCharityInput, CharitySuggestionUncheckedCreateWithoutCharityInput> | CharitySuggestionCreateWithoutCharityInput[] | CharitySuggestionUncheckedCreateWithoutCharityInput[]
     connectOrCreate?: CharitySuggestionCreateOrConnectWithoutCharityInput | CharitySuggestionCreateOrConnectWithoutCharityInput[]
@@ -46693,6 +48663,20 @@ export namespace Prisma {
     update?: CharitySuggestionUpdateWithWhereUniqueWithoutCharityInput | CharitySuggestionUpdateWithWhereUniqueWithoutCharityInput[]
     updateMany?: CharitySuggestionUpdateManyWithWhereWithoutCharityInput | CharitySuggestionUpdateManyWithWhereWithoutCharityInput[]
     deleteMany?: CharitySuggestionScalarWhereInput | CharitySuggestionScalarWhereInput[]
+  }
+
+  export type CatTransactionUncheckedUpdateManyWithoutCharityNestedInput = {
+    create?: XOR<CatTransactionCreateWithoutCharityInput, CatTransactionUncheckedCreateWithoutCharityInput> | CatTransactionCreateWithoutCharityInput[] | CatTransactionUncheckedCreateWithoutCharityInput[]
+    connectOrCreate?: CatTransactionCreateOrConnectWithoutCharityInput | CatTransactionCreateOrConnectWithoutCharityInput[]
+    upsert?: CatTransactionUpsertWithWhereUniqueWithoutCharityInput | CatTransactionUpsertWithWhereUniqueWithoutCharityInput[]
+    createMany?: CatTransactionCreateManyCharityInputEnvelope
+    set?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    disconnect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    delete?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+    update?: CatTransactionUpdateWithWhereUniqueWithoutCharityInput | CatTransactionUpdateWithWhereUniqueWithoutCharityInput[]
+    updateMany?: CatTransactionUpdateManyWithWhereWithoutCharityInput | CatTransactionUpdateManyWithWhereWithoutCharityInput[]
+    deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
   }
 
   export type CommunityCreateNestedOneWithoutCharitySuggestionsInput = {
@@ -46737,6 +48721,64 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutCharitySuggestionsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCharitySuggestionsInput, UserUpdateWithoutCharitySuggestionsInput>, UserUncheckedUpdateWithoutCharitySuggestionsInput>
+  }
+
+  export type CommunityCreateNestedOneWithoutCatTransactionsInput = {
+    create?: XOR<CommunityCreateWithoutCatTransactionsInput, CommunityUncheckedCreateWithoutCatTransactionsInput>
+    connectOrCreate?: CommunityCreateOrConnectWithoutCatTransactionsInput
+    connect?: CommunityWhereUniqueInput
+  }
+
+  export type PostCreateNestedOneWithoutCatTransactionsInput = {
+    create?: XOR<PostCreateWithoutCatTransactionsInput, PostUncheckedCreateWithoutCatTransactionsInput>
+    connectOrCreate?: PostCreateOrConnectWithoutCatTransactionsInput
+    connect?: PostWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutCatTransactionsInput = {
+    create?: XOR<UserCreateWithoutCatTransactionsInput, UserUncheckedCreateWithoutCatTransactionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCatTransactionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type CharityCreateNestedOneWithoutCatTransactionsInput = {
+    create?: XOR<CharityCreateWithoutCatTransactionsInput, CharityUncheckedCreateWithoutCatTransactionsInput>
+    connectOrCreate?: CharityCreateOrConnectWithoutCatTransactionsInput
+    connect?: CharityWhereUniqueInput
+  }
+
+  export type CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput = {
+    create?: XOR<CommunityCreateWithoutCatTransactionsInput, CommunityUncheckedCreateWithoutCatTransactionsInput>
+    connectOrCreate?: CommunityCreateOrConnectWithoutCatTransactionsInput
+    upsert?: CommunityUpsertWithoutCatTransactionsInput
+    connect?: CommunityWhereUniqueInput
+    update?: XOR<XOR<CommunityUpdateToOneWithWhereWithoutCatTransactionsInput, CommunityUpdateWithoutCatTransactionsInput>, CommunityUncheckedUpdateWithoutCatTransactionsInput>
+  }
+
+  export type PostUpdateOneRequiredWithoutCatTransactionsNestedInput = {
+    create?: XOR<PostCreateWithoutCatTransactionsInput, PostUncheckedCreateWithoutCatTransactionsInput>
+    connectOrCreate?: PostCreateOrConnectWithoutCatTransactionsInput
+    upsert?: PostUpsertWithoutCatTransactionsInput
+    connect?: PostWhereUniqueInput
+    update?: XOR<XOR<PostUpdateToOneWithWhereWithoutCatTransactionsInput, PostUpdateWithoutCatTransactionsInput>, PostUncheckedUpdateWithoutCatTransactionsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutCatTransactionsNestedInput = {
+    create?: XOR<UserCreateWithoutCatTransactionsInput, UserUncheckedCreateWithoutCatTransactionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCatTransactionsInput
+    upsert?: UserUpsertWithoutCatTransactionsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCatTransactionsInput, UserUpdateWithoutCatTransactionsInput>, UserUncheckedUpdateWithoutCatTransactionsInput>
+  }
+
+  export type CharityUpdateOneWithoutCatTransactionsNestedInput = {
+    create?: XOR<CharityCreateWithoutCatTransactionsInput, CharityUncheckedCreateWithoutCatTransactionsInput>
+    connectOrCreate?: CharityCreateOrConnectWithoutCatTransactionsInput
+    upsert?: CharityUpsertWithoutCatTransactionsInput
+    disconnect?: CharityWhereInput | boolean
+    delete?: CharityWhereInput | boolean
+    connect?: CharityWhereUniqueInput
+    update?: XOR<XOR<CharityUpdateToOneWithWhereWithoutCatTransactionsInput, CharityUpdateWithoutCatTransactionsInput>, CharityUncheckedUpdateWithoutCatTransactionsInput>
   }
 
   export type BusinessCreatecommunityIdsInput = {
@@ -47485,11 +49527,13 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     community: CommunityCreateNestedOneWithoutPostsInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutPostInput
   }
 
   export type PostUncheckedCreateWithoutAuthorInput = {
@@ -47524,10 +49568,12 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type PostCreateOrConnectWithoutAuthorInput = {
@@ -47631,6 +49677,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberCreateNestedManyWithoutCommunityInput
@@ -47647,6 +49695,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutOwnerInput = {
@@ -47668,6 +49717,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -47684,6 +49735,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutOwnerInput = {
@@ -48116,6 +50168,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CatTransactionCreateWithoutSellerInput = {
+    id?: string
+    catAmount: number
+    catPercentage: number
+    createdAt?: Date | string
+    community: CommunityCreateNestedOneWithoutCatTransactionsInput
+    post: PostCreateNestedOneWithoutCatTransactionsInput
+    charity?: CharityCreateNestedOneWithoutCatTransactionsInput
+  }
+
+  export type CatTransactionUncheckedCreateWithoutSellerInput = {
+    id?: string
+    communityId: string
+    postId: string
+    catAmount: number
+    catPercentage: number
+    charityId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type CatTransactionCreateOrConnectWithoutSellerInput = {
+    where: CatTransactionWhereUniqueInput
+    create: XOR<CatTransactionCreateWithoutSellerInput, CatTransactionUncheckedCreateWithoutSellerInput>
+  }
+
+  export type CatTransactionCreateManySellerInputEnvelope = {
+    data: CatTransactionCreateManySellerInput | CatTransactionCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CommunityMemberUpsertWithWhereUniqueWithoutUserInput = {
     where: CommunityMemberWhereUniqueInput
     update: XOR<CommunityMemberUpdateWithoutUserInput, CommunityMemberUncheckedUpdateWithoutUserInput>
@@ -48244,6 +50326,7 @@ export namespace Prisma {
     rejectionReason?: StringNullableFilter<"Post"> | string | null
     changesRequestedNote?: StringNullableFilter<"Post"> | string | null
     expiresAt?: DateTimeNullableFilter<"Post"> | Date | string | null
+    soldAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     expiredAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Post"> | Date | string | null
     createdAt?: DateTimeFilter<"Post"> | Date | string
@@ -48354,6 +50437,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: StringNullableListFilter<"Community">
     guidedSetupRequired?: BoolFilter<"Community"> | boolean
     isPublic?: BoolFilter<"Community"> | boolean
+    catCycleActive?: BoolFilter<"Community"> | boolean
+    catFeaturedCharityId?: StringNullableFilter<"Community"> | string | null
     createdAt?: DateTimeFilter<"Community"> | Date | string
     updatedAt?: DateTimeFilter<"Community"> | Date | string
   }
@@ -48762,6 +50847,36 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Invoice"> | Date | string
   }
 
+  export type CatTransactionUpsertWithWhereUniqueWithoutSellerInput = {
+    where: CatTransactionWhereUniqueInput
+    update: XOR<CatTransactionUpdateWithoutSellerInput, CatTransactionUncheckedUpdateWithoutSellerInput>
+    create: XOR<CatTransactionCreateWithoutSellerInput, CatTransactionUncheckedCreateWithoutSellerInput>
+  }
+
+  export type CatTransactionUpdateWithWhereUniqueWithoutSellerInput = {
+    where: CatTransactionWhereUniqueInput
+    data: XOR<CatTransactionUpdateWithoutSellerInput, CatTransactionUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type CatTransactionUpdateManyWithWhereWithoutSellerInput = {
+    where: CatTransactionScalarWhereInput
+    data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type CatTransactionScalarWhereInput = {
+    AND?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+    OR?: CatTransactionScalarWhereInput[]
+    NOT?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+    id?: StringFilter<"CatTransaction"> | string
+    communityId?: StringFilter<"CatTransaction"> | string
+    postId?: StringFilter<"CatTransaction"> | string
+    sellerId?: StringFilter<"CatTransaction"> | string
+    catAmount?: FloatFilter<"CatTransaction"> | number
+    catPercentage?: FloatFilter<"CatTransaction"> | number
+    charityId?: StringNullableFilter<"CatTransaction"> | string | null
+    createdAt?: DateTimeFilter<"CatTransaction"> | Date | string
+  }
+
   export type UserCreateWithoutEmailTokensInput = {
     id?: string
     email?: string | null
@@ -48828,6 +50943,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutEmailTokensInput = {
@@ -48896,6 +51012,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutEmailTokensInput = {
@@ -48980,6 +51097,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmailTokensInput = {
@@ -49048,6 +51166,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutPasswordResetTokensInput = {
@@ -49116,6 +51235,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -49184,6 +51304,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -49268,6 +51389,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -49336,6 +51458,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutOtpCodesInput = {
@@ -49404,6 +51527,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutOtpCodesInput = {
@@ -49472,6 +51596,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutOtpCodesInput = {
@@ -49556,6 +51681,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOtpCodesInput = {
@@ -49624,6 +51750,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -49692,6 +51819,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -49760,6 +51888,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -49844,6 +51973,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -49912,6 +52042,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutAuditLogsInput = {
@@ -49980,6 +52111,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -50048,6 +52180,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -50132,6 +52265,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -50200,6 +52334,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutOwnedCommunitiesInput = {
@@ -50268,6 +52403,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutOwnedCommunitiesInput = {
@@ -50336,6 +52472,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutOwnedCommunitiesInput = {
@@ -50412,11 +52549,13 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     author: UserCreateNestedOneWithoutPostsInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutPostInput
   }
 
   export type PostUncheckedCreateWithoutCommunityInput = {
@@ -50451,10 +52590,12 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type PostCreateOrConnectWithoutCommunityInput = {
@@ -50530,6 +52671,7 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -50538,6 +52680,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCharityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUncheckedCreateWithoutCommunityInput = {
@@ -50561,6 +52704,7 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -50569,6 +52713,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCharityInput
   }
 
   export type CharityCreateOrConnectWithoutCommunityInput = {
@@ -50893,6 +53038,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CatTransactionCreateWithoutCommunityInput = {
+    id?: string
+    catAmount: number
+    catPercentage: number
+    createdAt?: Date | string
+    post: PostCreateNestedOneWithoutCatTransactionsInput
+    seller: UserCreateNestedOneWithoutCatTransactionsInput
+    charity?: CharityCreateNestedOneWithoutCatTransactionsInput
+  }
+
+  export type CatTransactionUncheckedCreateWithoutCommunityInput = {
+    id?: string
+    postId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
+    charityId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type CatTransactionCreateOrConnectWithoutCommunityInput = {
+    where: CatTransactionWhereUniqueInput
+    create: XOR<CatTransactionCreateWithoutCommunityInput, CatTransactionUncheckedCreateWithoutCommunityInput>
+  }
+
+  export type CatTransactionCreateManyCommunityInputEnvelope = {
+    data: CatTransactionCreateManyCommunityInput | CatTransactionCreateManyCommunityInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutOwnedCommunitiesInput = {
     update: XOR<UserUpdateWithoutOwnedCommunitiesInput, UserUncheckedUpdateWithoutOwnedCommunitiesInput>
     create: XOR<UserCreateWithoutOwnedCommunitiesInput, UserUncheckedCreateWithoutOwnedCommunitiesInput>
@@ -50970,6 +53145,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedCommunitiesInput = {
@@ -51038,6 +53214,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type CommunityMemberUpsertWithWhereUniqueWithoutCommunityInput = {
@@ -51129,6 +53306,7 @@ export namespace Prisma {
     longitude?: FloatNullableFilter<"Charity"> | number | null
     isVerified?: BoolFilter<"Charity"> | boolean
     isFeatured?: BoolFilter<"Charity"> | boolean
+    isCATCharity?: BoolFilter<"Charity"> | boolean
     tags?: StringNullableListFilter<"Charity">
     linkedBusinessIds?: StringNullableListFilter<"Charity">
     campaignCompleted?: BoolFilter<"Charity"> | boolean
@@ -51355,6 +53533,22 @@ export namespace Prisma {
     data: XOR<BillingRecordUpdateManyMutationInput, BillingRecordUncheckedUpdateManyWithoutCommunityInput>
   }
 
+  export type CatTransactionUpsertWithWhereUniqueWithoutCommunityInput = {
+    where: CatTransactionWhereUniqueInput
+    update: XOR<CatTransactionUpdateWithoutCommunityInput, CatTransactionUncheckedUpdateWithoutCommunityInput>
+    create: XOR<CatTransactionCreateWithoutCommunityInput, CatTransactionUncheckedCreateWithoutCommunityInput>
+  }
+
+  export type CatTransactionUpdateWithWhereUniqueWithoutCommunityInput = {
+    where: CatTransactionWhereUniqueInput
+    data: XOR<CatTransactionUpdateWithoutCommunityInput, CatTransactionUncheckedUpdateWithoutCommunityInput>
+  }
+
+  export type CatTransactionUpdateManyWithWhereWithoutCommunityInput = {
+    where: CatTransactionScalarWhereInput
+    data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyWithoutCommunityInput>
+  }
+
   export type CommunityCreateWithoutMembersInput = {
     id?: string
     name: string
@@ -51374,6 +53568,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -51390,6 +53586,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutMembersInput = {
@@ -51412,6 +53609,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     posts?: PostUncheckedCreateNestedManyWithoutCommunityInput
@@ -51427,6 +53626,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutMembersInput = {
@@ -51500,6 +53700,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutCommunitiesInput = {
@@ -51568,6 +53769,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutCommunitiesInput = {
@@ -51605,6 +53807,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -51621,6 +53825,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutMembersInput = {
@@ -51643,6 +53848,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     posts?: PostUncheckedUpdateManyWithoutCommunityNestedInput
@@ -51658,6 +53865,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutCommunitiesInput = {
@@ -51737,6 +53945,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCommunitiesInput = {
@@ -51805,6 +54014,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type CommunityCreateWithoutMemberLocationsInput = {
@@ -51826,6 +54036,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -51842,6 +54054,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutMemberLocationsInput = {
@@ -51864,6 +54077,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -51879,6 +54094,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutMemberLocationsInput = {
@@ -51916,6 +54132,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -51932,6 +54150,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutMemberLocationsInput = {
@@ -51954,6 +54173,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -51969,6 +54190,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutSecurityLocationsInput = {
@@ -51990,6 +54212,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -52006,6 +54230,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutSecurityLocationsInput = {
@@ -52028,6 +54253,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -52043,6 +54270,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutSecurityLocationsInput = {
@@ -52080,6 +54308,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -52096,6 +54326,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutSecurityLocationsInput = {
@@ -52118,6 +54349,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -52133,6 +54366,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutMessagesInput = {
@@ -52154,6 +54388,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -52170,6 +54406,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutMessagesInput = {
@@ -52192,6 +54429,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -52207,6 +54446,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutMessagesInput = {
@@ -52311,6 +54551,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -52379,6 +54620,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -52495,6 +54737,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -52511,6 +54755,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutMessagesInput = {
@@ -52533,6 +54778,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -52548,6 +54795,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type ConversationUpsertWithoutMessagesInput = {
@@ -52664,6 +54912,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -52732,6 +54981,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type MessageUpsertWithoutRepliesInput = {
@@ -52812,6 +55062,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -52828,6 +55080,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutPostsInput = {
@@ -52850,6 +55103,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -52865,6 +55120,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutPostsInput = {
@@ -52938,6 +55194,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutPostsInput = {
@@ -53006,11 +55263,42 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutPostsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutPostsInput, UserUncheckedCreateWithoutPostsInput>
+  }
+
+  export type CatTransactionCreateWithoutPostInput = {
+    id?: string
+    catAmount: number
+    catPercentage: number
+    createdAt?: Date | string
+    community: CommunityCreateNestedOneWithoutCatTransactionsInput
+    seller: UserCreateNestedOneWithoutCatTransactionsInput
+    charity?: CharityCreateNestedOneWithoutCatTransactionsInput
+  }
+
+  export type CatTransactionUncheckedCreateWithoutPostInput = {
+    id?: string
+    communityId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
+    charityId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type CatTransactionCreateOrConnectWithoutPostInput = {
+    where: CatTransactionWhereUniqueInput
+    create: XOR<CatTransactionCreateWithoutPostInput, CatTransactionUncheckedCreateWithoutPostInput>
+  }
+
+  export type CatTransactionCreateManyPostInputEnvelope = {
+    data: CatTransactionCreateManyPostInput | CatTransactionCreateManyPostInput[]
+    skipDuplicates?: boolean
   }
 
   export type CommunityUpsertWithoutPostsInput = {
@@ -53043,6 +55331,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -53059,6 +55349,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutPostsInput = {
@@ -53081,6 +55372,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -53096,6 +55389,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutPostsInput = {
@@ -53175,6 +55469,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPostsInput = {
@@ -53243,6 +55538,23 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type CatTransactionUpsertWithWhereUniqueWithoutPostInput = {
+    where: CatTransactionWhereUniqueInput
+    update: XOR<CatTransactionUpdateWithoutPostInput, CatTransactionUncheckedUpdateWithoutPostInput>
+    create: XOR<CatTransactionCreateWithoutPostInput, CatTransactionUncheckedCreateWithoutPostInput>
+  }
+
+  export type CatTransactionUpdateWithWhereUniqueWithoutPostInput = {
+    where: CatTransactionWhereUniqueInput
+    data: XOR<CatTransactionUpdateWithoutPostInput, CatTransactionUncheckedUpdateWithoutPostInput>
+  }
+
+  export type CatTransactionUpdateManyWithWhereWithoutPostInput = {
+    where: CatTransactionScalarWhereInput
+    data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyWithoutPostInput>
   }
 
   export type CommunityCreateWithoutCharitiesInput = {
@@ -53264,6 +55576,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -53280,6 +55594,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutCharitiesInput = {
@@ -53302,6 +55617,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -53317,6 +55634,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutCharitiesInput = {
@@ -53362,6 +55680,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CatTransactionCreateWithoutCharityInput = {
+    id?: string
+    catAmount: number
+    catPercentage: number
+    createdAt?: Date | string
+    community: CommunityCreateNestedOneWithoutCatTransactionsInput
+    post: PostCreateNestedOneWithoutCatTransactionsInput
+    seller: UserCreateNestedOneWithoutCatTransactionsInput
+  }
+
+  export type CatTransactionUncheckedCreateWithoutCharityInput = {
+    id?: string
+    communityId: string
+    postId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
+    createdAt?: Date | string
+  }
+
+  export type CatTransactionCreateOrConnectWithoutCharityInput = {
+    where: CatTransactionWhereUniqueInput
+    create: XOR<CatTransactionCreateWithoutCharityInput, CatTransactionUncheckedCreateWithoutCharityInput>
+  }
+
+  export type CatTransactionCreateManyCharityInputEnvelope = {
+    data: CatTransactionCreateManyCharityInput | CatTransactionCreateManyCharityInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CommunityUpsertWithoutCharitiesInput = {
     update: XOR<CommunityUpdateWithoutCharitiesInput, CommunityUncheckedUpdateWithoutCharitiesInput>
     create: XOR<CommunityCreateWithoutCharitiesInput, CommunityUncheckedCreateWithoutCharitiesInput>
@@ -53392,6 +55740,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -53408,6 +55758,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutCharitiesInput = {
@@ -53430,6 +55781,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -53445,6 +55798,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CharitySuggestionUpsertWithWhereUniqueWithoutCharityInput = {
@@ -53461,6 +55815,22 @@ export namespace Prisma {
   export type CharitySuggestionUpdateManyWithWhereWithoutCharityInput = {
     where: CharitySuggestionScalarWhereInput
     data: XOR<CharitySuggestionUpdateManyMutationInput, CharitySuggestionUncheckedUpdateManyWithoutCharityInput>
+  }
+
+  export type CatTransactionUpsertWithWhereUniqueWithoutCharityInput = {
+    where: CatTransactionWhereUniqueInput
+    update: XOR<CatTransactionUpdateWithoutCharityInput, CatTransactionUncheckedUpdateWithoutCharityInput>
+    create: XOR<CatTransactionCreateWithoutCharityInput, CatTransactionUncheckedCreateWithoutCharityInput>
+  }
+
+  export type CatTransactionUpdateWithWhereUniqueWithoutCharityInput = {
+    where: CatTransactionWhereUniqueInput
+    data: XOR<CatTransactionUpdateWithoutCharityInput, CatTransactionUncheckedUpdateWithoutCharityInput>
+  }
+
+  export type CatTransactionUpdateManyWithWhereWithoutCharityInput = {
+    where: CatTransactionScalarWhereInput
+    data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyWithoutCharityInput>
   }
 
   export type CommunityCreateWithoutCharitySuggestionsInput = {
@@ -53482,6 +55852,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -53498,6 +55870,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutCharitySuggestionsInput = {
@@ -53520,6 +55893,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -53535,6 +55910,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutCharitySuggestionsInput = {
@@ -53563,6 +55939,7 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -53571,6 +55948,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     community: CommunityCreateNestedOneWithoutCharitiesInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUncheckedCreateWithoutCharitySuggestionsInput = {
@@ -53595,6 +55973,7 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -53602,6 +55981,7 @@ export namespace Prisma {
     suggestedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCharityInput
   }
 
   export type CharityCreateOrConnectWithoutCharitySuggestionsInput = {
@@ -53675,6 +56055,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutCharitySuggestionsInput = {
@@ -53743,6 +56124,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutCharitySuggestionsInput = {
@@ -53780,6 +56162,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -53796,6 +56180,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutCharitySuggestionsInput = {
@@ -53818,6 +56203,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -53833,6 +56220,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CharityUpsertWithoutCharitySuggestionsInput = {
@@ -53867,6 +56255,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -53875,6 +56264,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutCharitiesNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateWithoutCharitySuggestionsInput = {
@@ -53899,6 +56289,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -53906,6 +56297,7 @@ export namespace Prisma {
     suggestedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type UserUpsertWithoutCharitySuggestionsInput = {
@@ -53985,6 +56377,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCharitySuggestionsInput = {
@@ -54053,6 +56446,799 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type CommunityCreateWithoutCatTransactionsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    status?: string
+    isEmergencyMode?: boolean
+    coverageLat?: number | null
+    coverageLng?: number | null
+    coverageRadius?: number | null
+    coverageLocation?: string | null
+    enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
+    activeEmergencyId?: string | null
+    onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: boolean
+    isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
+    members?: CommunityMemberCreateNestedManyWithoutCommunityInput
+    posts?: PostCreateNestedManyWithoutCommunityInput
+    messages?: MessageCreateNestedManyWithoutCommunityInput
+    charities?: CharityCreateNestedManyWithoutCommunityInput
+    charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCommunityInput
+    reports?: ReportCreateNestedManyWithoutCommunityInput
+    invitations?: CommunityInvitationCreateNestedManyWithoutCommunityInput
+    inviteLinks?: CommunityInviteLinkCreateNestedManyWithoutCommunityInput
+    memberLocations?: MemberLocationCreateNestedManyWithoutCommunityInput
+    securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
+    securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    licenses?: LicenseCreateNestedManyWithoutCommunityInput
+    billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+  }
+
+  export type CommunityUncheckedCreateWithoutCatTransactionsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    ownerId: string
+    type?: string
+    status?: string
+    isEmergencyMode?: boolean
+    coverageLat?: number | null
+    coverageLng?: number | null
+    coverageRadius?: number | null
+    coverageLocation?: string | null
+    enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
+    activeEmergencyId?: string | null
+    onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: boolean
+    isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
+    posts?: PostUncheckedCreateNestedManyWithoutCommunityInput
+    messages?: MessageUncheckedCreateNestedManyWithoutCommunityInput
+    charities?: CharityUncheckedCreateNestedManyWithoutCommunityInput
+    charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCommunityInput
+    reports?: ReportUncheckedCreateNestedManyWithoutCommunityInput
+    invitations?: CommunityInvitationUncheckedCreateNestedManyWithoutCommunityInput
+    inviteLinks?: CommunityInviteLinkUncheckedCreateNestedManyWithoutCommunityInput
+    memberLocations?: MemberLocationUncheckedCreateNestedManyWithoutCommunityInput
+    securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
+    securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
+    billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+  }
+
+  export type CommunityCreateOrConnectWithoutCatTransactionsInput = {
+    where: CommunityWhereUniqueInput
+    create: XOR<CommunityCreateWithoutCatTransactionsInput, CommunityUncheckedCreateWithoutCatTransactionsInput>
+  }
+
+  export type PostCreateWithoutCatTransactionsInput = {
+    id?: string
+    type: string
+    title: string
+    description: string
+    category: string
+    subtype?: string | null
+    urgency?: string
+    urgencyLevel?: string | null
+    price?: number | null
+    communityPrice?: number | null
+    publicPrice?: number | null
+    charityAmount?: number | null
+    charityPercentage?: number | null
+    imageUrl?: string | null
+    postsImage?: string | null
+    isPublic?: boolean
+    isCommunityPick?: boolean
+    isCharity?: boolean
+    charityId?: string | null
+    authorName?: string | null
+    authorRole?: string | null
+    authorImage?: string | null
+    locationName?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    source?: string | null
+    status?: string
+    rejectionReason?: string | null
+    changesRequestedNote?: string | null
+    expiresAt?: Date | string | null
+    soldAt?: Date | string | null
+    expiredAt?: Date | string | null
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    community: CommunityCreateNestedOneWithoutPostsInput
+    author: UserCreateNestedOneWithoutPostsInput
+  }
+
+  export type PostUncheckedCreateWithoutCatTransactionsInput = {
+    id?: string
+    communityId: string
+    authorId: string
+    type: string
+    title: string
+    description: string
+    category: string
+    subtype?: string | null
+    urgency?: string
+    urgencyLevel?: string | null
+    price?: number | null
+    communityPrice?: number | null
+    publicPrice?: number | null
+    charityAmount?: number | null
+    charityPercentage?: number | null
+    imageUrl?: string | null
+    postsImage?: string | null
+    isPublic?: boolean
+    isCommunityPick?: boolean
+    isCharity?: boolean
+    charityId?: string | null
+    authorName?: string | null
+    authorRole?: string | null
+    authorImage?: string | null
+    locationName?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    source?: string | null
+    status?: string
+    rejectionReason?: string | null
+    changesRequestedNote?: string | null
+    expiresAt?: Date | string | null
+    soldAt?: Date | string | null
+    expiredAt?: Date | string | null
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PostCreateOrConnectWithoutCatTransactionsInput = {
+    where: PostWhereUniqueInput
+    create: XOR<PostCreateWithoutCatTransactionsInput, PostUncheckedCreateWithoutCatTransactionsInput>
+  }
+
+  export type UserCreateWithoutCatTransactionsInput = {
+    id?: string
+    email?: string | null
+    name: string
+    phone?: string | null
+    passwordHash?: string | null
+    emailVerified?: boolean
+    phoneVerified?: boolean
+    profileCompleted?: boolean
+    communityCreated?: boolean
+    onboardingCompleted?: boolean
+    licenseStatus?: string
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
+    autoRenew?: boolean
+    status?: string
+    role?: string
+    profileImage?: string | null
+    fcmToken?: string | null
+    pushToken?: string | null
+    pushPlatform?: string | null
+    firstName?: string | null
+    lastName?: string | null
+    mobileNumber?: string | null
+    address?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    locationSharing?: boolean
+    isSecurityMember?: boolean
+    emergencyLocationOptIn?: boolean
+    lastCommunityId?: string | null
+    agreedToTerms?: boolean
+    marketingConsent?: boolean
+    profileVisibility?: string | null
+    piiVisibility?: string | null
+    lastPasswordChanged?: Date | string | null
+    securityScore?: string | null
+    notificationPreferences?: NullableJsonNullValueInput | InputJsonValue
+    twoFactorEnabled?: boolean
+    twoFactorMethod?: string | null
+    loginAlertsEnabled?: boolean
+    pendingInviteCode?: string | null
+    deleted?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    communities?: CommunityMemberCreateNestedManyWithoutUserInput
+    businesses?: BusinessCreateNestedManyWithoutOwnerInput
+    posts?: PostCreateNestedManyWithoutAuthorInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    ownedCommunities?: CommunityCreateNestedManyWithoutOwnerInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutUserInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    emailTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    otpCodes?: OtpCodeCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    charitySuggestions?: CharitySuggestionCreateNestedManyWithoutUserInput
+    sentInvitations?: CommunityInvitationCreateNestedManyWithoutInvitedByInput
+    receivedInvitations?: CommunityInvitationCreateNestedManyWithoutInvitedUserInput
+    inviteLinks?: CommunityInviteLinkCreateNestedManyWithoutCreatorInput
+    conversations?: ConversationParticipantCreateNestedManyWithoutUserInput
+    licenses?: LicenseCreateNestedManyWithoutUserInput
+    billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
+    invoices?: InvoiceCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutCatTransactionsInput = {
+    id?: string
+    email?: string | null
+    name: string
+    phone?: string | null
+    passwordHash?: string | null
+    emailVerified?: boolean
+    phoneVerified?: boolean
+    profileCompleted?: boolean
+    communityCreated?: boolean
+    onboardingCompleted?: boolean
+    licenseStatus?: string
+    trialExpiresAt?: Date | string | null
+    subscriptionActive?: boolean
+    subscriptionRenewalDate?: Date | string | null
+    autoRenew?: boolean
+    status?: string
+    role?: string
+    profileImage?: string | null
+    fcmToken?: string | null
+    pushToken?: string | null
+    pushPlatform?: string | null
+    firstName?: string | null
+    lastName?: string | null
+    mobileNumber?: string | null
+    address?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    locationSharing?: boolean
+    isSecurityMember?: boolean
+    emergencyLocationOptIn?: boolean
+    lastCommunityId?: string | null
+    agreedToTerms?: boolean
+    marketingConsent?: boolean
+    profileVisibility?: string | null
+    piiVisibility?: string | null
+    lastPasswordChanged?: Date | string | null
+    securityScore?: string | null
+    notificationPreferences?: NullableJsonNullValueInput | InputJsonValue
+    twoFactorEnabled?: boolean
+    twoFactorMethod?: string | null
+    loginAlertsEnabled?: boolean
+    pendingInviteCode?: string | null
+    deleted?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    communities?: CommunityMemberUncheckedCreateNestedManyWithoutUserInput
+    businesses?: BusinessUncheckedCreateNestedManyWithoutOwnerInput
+    posts?: PostUncheckedCreateNestedManyWithoutAuthorInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    ownedCommunities?: CommunityUncheckedCreateNestedManyWithoutOwnerInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    emailTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    otpCodes?: OtpCodeUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutUserInput
+    sentInvitations?: CommunityInvitationUncheckedCreateNestedManyWithoutInvitedByInput
+    receivedInvitations?: CommunityInvitationUncheckedCreateNestedManyWithoutInvitedUserInput
+    inviteLinks?: CommunityInviteLinkUncheckedCreateNestedManyWithoutCreatorInput
+    conversations?: ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+    licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
+    billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutCatTransactionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCatTransactionsInput, UserUncheckedCreateWithoutCatTransactionsInput>
+  }
+
+  export type CharityCreateWithoutCatTransactionsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: string | null
+    percentage?: number
+    status?: string
+    urgency?: string | null
+    fundraisingGoal?: number | null
+    raisedAmount?: number
+    imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
+    locationName?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    isFeatured?: boolean
+    isCATCharity?: boolean
+    tags?: CharityCreatetagsInput | string[]
+    linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
+    campaignCompleted?: boolean
+    isApprovedSuggestion?: boolean
+    suggestedById?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    community: CommunityCreateNestedOneWithoutCharitiesInput
+    charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCharityInput
+  }
+
+  export type CharityUncheckedCreateWithoutCatTransactionsInput = {
+    id?: string
+    communityId: string
+    name: string
+    description?: string | null
+    category?: string | null
+    percentage?: number
+    status?: string
+    urgency?: string | null
+    fundraisingGoal?: number | null
+    raisedAmount?: number
+    imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
+    locationName?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    isFeatured?: boolean
+    isCATCharity?: boolean
+    tags?: CharityCreatetagsInput | string[]
+    linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
+    campaignCompleted?: boolean
+    isApprovedSuggestion?: boolean
+    suggestedById?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput
+  }
+
+  export type CharityCreateOrConnectWithoutCatTransactionsInput = {
+    where: CharityWhereUniqueInput
+    create: XOR<CharityCreateWithoutCatTransactionsInput, CharityUncheckedCreateWithoutCatTransactionsInput>
+  }
+
+  export type CommunityUpsertWithoutCatTransactionsInput = {
+    update: XOR<CommunityUpdateWithoutCatTransactionsInput, CommunityUncheckedUpdateWithoutCatTransactionsInput>
+    create: XOR<CommunityCreateWithoutCatTransactionsInput, CommunityUncheckedCreateWithoutCatTransactionsInput>
+    where?: CommunityWhereInput
+  }
+
+  export type CommunityUpdateToOneWithWhereWithoutCatTransactionsInput = {
+    where?: CommunityWhereInput
+    data: XOR<CommunityUpdateWithoutCatTransactionsInput, CommunityUncheckedUpdateWithoutCatTransactionsInput>
+  }
+
+  export type CommunityUpdateWithoutCatTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    isEmergencyMode?: BoolFieldUpdateOperationsInput | boolean
+    coverageLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
+    members?: CommunityMemberUpdateManyWithoutCommunityNestedInput
+    posts?: PostUpdateManyWithoutCommunityNestedInput
+    messages?: MessageUpdateManyWithoutCommunityNestedInput
+    charities?: CharityUpdateManyWithoutCommunityNestedInput
+    charitySuggestions?: CharitySuggestionUpdateManyWithoutCommunityNestedInput
+    reports?: ReportUpdateManyWithoutCommunityNestedInput
+    invitations?: CommunityInvitationUpdateManyWithoutCommunityNestedInput
+    inviteLinks?: CommunityInviteLinkUpdateManyWithoutCommunityNestedInput
+    memberLocations?: MemberLocationUpdateManyWithoutCommunityNestedInput
+    securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
+    securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    licenses?: LicenseUpdateManyWithoutCommunityNestedInput
+    billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+  }
+
+  export type CommunityUncheckedUpdateWithoutCatTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    ownerId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    isEmergencyMode?: BoolFieldUpdateOperationsInput | boolean
+    coverageLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
+    posts?: PostUncheckedUpdateManyWithoutCommunityNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutCommunityNestedInput
+    charities?: CharityUncheckedUpdateManyWithoutCommunityNestedInput
+    charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCommunityNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutCommunityNestedInput
+    invitations?: CommunityInvitationUncheckedUpdateManyWithoutCommunityNestedInput
+    inviteLinks?: CommunityInviteLinkUncheckedUpdateManyWithoutCommunityNestedInput
+    memberLocations?: MemberLocationUncheckedUpdateManyWithoutCommunityNestedInput
+    securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
+    securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
+    billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+  }
+
+  export type PostUpsertWithoutCatTransactionsInput = {
+    update: XOR<PostUpdateWithoutCatTransactionsInput, PostUncheckedUpdateWithoutCatTransactionsInput>
+    create: XOR<PostCreateWithoutCatTransactionsInput, PostUncheckedCreateWithoutCatTransactionsInput>
+    where?: PostWhereInput
+  }
+
+  export type PostUpdateToOneWithWhereWithoutCatTransactionsInput = {
+    where?: PostWhereInput
+    data: XOR<PostUpdateWithoutCatTransactionsInput, PostUncheckedUpdateWithoutCatTransactionsInput>
+  }
+
+  export type PostUpdateWithoutCatTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    subtype?: NullableStringFieldUpdateOperationsInput | string | null
+    urgency?: StringFieldUpdateOperationsInput | string
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
+    communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    postsImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
+    isCharity?: BoolFieldUpdateOperationsInput | boolean
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorName?: NullableStringFieldUpdateOperationsInput | string | null
+    authorRole?: NullableStringFieldUpdateOperationsInput | string | null
+    authorImage?: NullableStringFieldUpdateOperationsInput | string | null
+    locationName?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutPostsNestedInput
+    author?: UserUpdateOneRequiredWithoutPostsNestedInput
+  }
+
+  export type PostUncheckedUpdateWithoutCatTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    subtype?: NullableStringFieldUpdateOperationsInput | string | null
+    urgency?: StringFieldUpdateOperationsInput | string
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
+    communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    postsImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
+    isCharity?: BoolFieldUpdateOperationsInput | boolean
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorName?: NullableStringFieldUpdateOperationsInput | string | null
+    authorRole?: NullableStringFieldUpdateOperationsInput | string | null
+    authorImage?: NullableStringFieldUpdateOperationsInput | string | null
+    locationName?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserUpsertWithoutCatTransactionsInput = {
+    update: XOR<UserUpdateWithoutCatTransactionsInput, UserUncheckedUpdateWithoutCatTransactionsInput>
+    create: XOR<UserCreateWithoutCatTransactionsInput, UserUncheckedCreateWithoutCatTransactionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCatTransactionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCatTransactionsInput, UserUncheckedUpdateWithoutCatTransactionsInput>
+  }
+
+  export type UserUpdateWithoutCatTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
+    communityCreated?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
+    licenseStatus?: StringFieldUpdateOperationsInput | string
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    autoRenew?: BoolFieldUpdateOperationsInput | boolean
+    status?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
+    pushToken?: NullableStringFieldUpdateOperationsInput | string | null
+    pushPlatform?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    mobileNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationSharing?: BoolFieldUpdateOperationsInput | boolean
+    isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
+    emergencyLocationOptIn?: BoolFieldUpdateOperationsInput | boolean
+    lastCommunityId?: NullableStringFieldUpdateOperationsInput | string | null
+    agreedToTerms?: BoolFieldUpdateOperationsInput | boolean
+    marketingConsent?: BoolFieldUpdateOperationsInput | boolean
+    profileVisibility?: NullableStringFieldUpdateOperationsInput | string | null
+    piiVisibility?: NullableStringFieldUpdateOperationsInput | string | null
+    lastPasswordChanged?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    securityScore?: NullableStringFieldUpdateOperationsInput | string | null
+    notificationPreferences?: NullableJsonNullValueInput | InputJsonValue
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    loginAlertsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    pendingInviteCode?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    communities?: CommunityMemberUpdateManyWithoutUserNestedInput
+    businesses?: BusinessUpdateManyWithoutOwnerNestedInput
+    posts?: PostUpdateManyWithoutAuthorNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    ownedCommunities?: CommunityUpdateManyWithoutOwnerNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    emailTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    otpCodes?: OtpCodeUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    charitySuggestions?: CharitySuggestionUpdateManyWithoutUserNestedInput
+    sentInvitations?: CommunityInvitationUpdateManyWithoutInvitedByNestedInput
+    receivedInvitations?: CommunityInvitationUpdateManyWithoutInvitedUserNestedInput
+    inviteLinks?: CommunityInviteLinkUpdateManyWithoutCreatorNestedInput
+    conversations?: ConversationParticipantUpdateManyWithoutUserNestedInput
+    licenses?: LicenseUpdateManyWithoutUserNestedInput
+    billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
+    invoices?: InvoiceUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCatTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
+    communityCreated?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
+    licenseStatus?: StringFieldUpdateOperationsInput | string
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionRenewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    autoRenew?: BoolFieldUpdateOperationsInput | boolean
+    status?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
+    pushToken?: NullableStringFieldUpdateOperationsInput | string | null
+    pushPlatform?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    mobileNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationSharing?: BoolFieldUpdateOperationsInput | boolean
+    isSecurityMember?: BoolFieldUpdateOperationsInput | boolean
+    emergencyLocationOptIn?: BoolFieldUpdateOperationsInput | boolean
+    lastCommunityId?: NullableStringFieldUpdateOperationsInput | string | null
+    agreedToTerms?: BoolFieldUpdateOperationsInput | boolean
+    marketingConsent?: BoolFieldUpdateOperationsInput | boolean
+    profileVisibility?: NullableStringFieldUpdateOperationsInput | string | null
+    piiVisibility?: NullableStringFieldUpdateOperationsInput | string | null
+    lastPasswordChanged?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    securityScore?: NullableStringFieldUpdateOperationsInput | string | null
+    notificationPreferences?: NullableJsonNullValueInput | InputJsonValue
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    loginAlertsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    pendingInviteCode?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    communities?: CommunityMemberUncheckedUpdateManyWithoutUserNestedInput
+    businesses?: BusinessUncheckedUpdateManyWithoutOwnerNestedInput
+    posts?: PostUncheckedUpdateManyWithoutAuthorNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    ownedCommunities?: CommunityUncheckedUpdateManyWithoutOwnerNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    emailTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    otpCodes?: OtpCodeUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutUserNestedInput
+    sentInvitations?: CommunityInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+    receivedInvitations?: CommunityInvitationUncheckedUpdateManyWithoutInvitedUserNestedInput
+    inviteLinks?: CommunityInviteLinkUncheckedUpdateManyWithoutCreatorNestedInput
+    conversations?: ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+    licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
+    billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type CharityUpsertWithoutCatTransactionsInput = {
+    update: XOR<CharityUpdateWithoutCatTransactionsInput, CharityUncheckedUpdateWithoutCatTransactionsInput>
+    create: XOR<CharityCreateWithoutCatTransactionsInput, CharityUncheckedCreateWithoutCatTransactionsInput>
+    where?: CharityWhereInput
+  }
+
+  export type CharityUpdateToOneWithWhereWithoutCatTransactionsInput = {
+    where?: CharityWhereInput
+    data: XOR<CharityUpdateWithoutCatTransactionsInput, CharityUncheckedUpdateWithoutCatTransactionsInput>
+  }
+
+  export type CharityUpdateWithoutCatTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    percentage?: FloatFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    urgency?: NullableStringFieldUpdateOperationsInput | string | null
+    fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
+    raisedAmount?: FloatFieldUpdateOperationsInput | number
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    locationName?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    tags?: CharityUpdatetagsInput | string[]
+    linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
+    campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
+    isApprovedSuggestion?: BoolFieldUpdateOperationsInput | boolean
+    suggestedById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutCharitiesNestedInput
+    charitySuggestions?: CharitySuggestionUpdateManyWithoutCharityNestedInput
+  }
+
+  export type CharityUncheckedUpdateWithoutCatTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    percentage?: FloatFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    urgency?: NullableStringFieldUpdateOperationsInput | string | null
+    fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
+    raisedAmount?: FloatFieldUpdateOperationsInput | number
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    locationName?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    tags?: CharityUpdatetagsInput | string[]
+    linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
+    campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
+    isApprovedSuggestion?: BoolFieldUpdateOperationsInput | boolean
+    suggestedById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type UserCreateWithoutBusinessesInput = {
@@ -54121,6 +57307,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutBusinessesInput = {
@@ -54189,6 +57376,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutBusinessesInput = {
@@ -54273,6 +57461,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBusinessesInput = {
@@ -54341,6 +57530,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type CommunityCreateWithoutReportsInput = {
@@ -54362,6 +57552,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -54378,6 +57570,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutReportsInput = {
@@ -54400,6 +57593,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -54415,6 +57610,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutReportsInput = {
@@ -54488,6 +57684,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutReportsInput = {
@@ -54556,6 +57753,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutReportsInput = {
@@ -54593,6 +57791,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -54609,6 +57809,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutReportsInput = {
@@ -54631,6 +57832,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -54646,6 +57849,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutReportsInput = {
@@ -54725,6 +57929,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportsInput = {
@@ -54793,6 +57998,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type CommunityCreateWithoutInvitationsInput = {
@@ -54814,6 +58020,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -54830,6 +58038,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutInvitationsInput = {
@@ -54852,6 +58061,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -54867,6 +58078,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutInvitationsInput = {
@@ -54940,6 +58152,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutSentInvitationsInput = {
@@ -55008,6 +58221,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutSentInvitationsInput = {
@@ -55081,6 +58295,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutReceivedInvitationsInput = {
@@ -55149,6 +58364,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutReceivedInvitationsInput = {
@@ -55186,6 +58402,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -55202,6 +58420,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutInvitationsInput = {
@@ -55224,6 +58443,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -55239,6 +58460,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutSentInvitationsInput = {
@@ -55318,6 +58540,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentInvitationsInput = {
@@ -55386,6 +58609,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUpsertWithoutReceivedInvitationsInput = {
@@ -55465,6 +58689,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedInvitationsInput = {
@@ -55533,6 +58758,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type CommunityCreateWithoutInviteLinksInput = {
@@ -55554,6 +58780,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -55570,6 +58798,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutInviteLinksInput = {
@@ -55592,6 +58821,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -55607,6 +58838,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutInviteLinksInput = {
@@ -55680,6 +58912,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutInviteLinksInput = {
@@ -55748,6 +58981,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutInviteLinksInput = {
@@ -55785,6 +59019,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -55801,6 +59037,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutInviteLinksInput = {
@@ -55823,6 +59060,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -55838,6 +59077,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutInviteLinksInput = {
@@ -55917,6 +59157,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInviteLinksInput = {
@@ -55985,6 +59226,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type ConversationParticipantCreateWithoutConversationInput = {
@@ -56182,6 +59424,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutConversationsInput = {
@@ -56250,6 +59493,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutConversationsInput = {
@@ -56371,6 +59615,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutConversationsInput = {
@@ -56439,6 +59684,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutNotificationsInput = {
@@ -56507,6 +59753,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -56575,6 +59822,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -56659,6 +59907,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -56727,6 +59976,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutLicensesInput = {
@@ -56795,6 +60045,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutLicensesInput = {
@@ -56863,6 +60114,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutLicensesInput = {
@@ -56889,6 +60141,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -56905,6 +60159,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutLicensesInput = {
@@ -56927,6 +60182,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -56942,6 +60199,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutLicensesInput = {
@@ -57026,6 +60284,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutLicensesInput = {
@@ -57094,6 +60353,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type CommunityUpsertWithoutLicensesInput = {
@@ -57126,6 +60386,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -57142,6 +60404,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutLicensesInput = {
@@ -57164,6 +60427,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -57179,6 +60444,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutModerationLogsInput = {
@@ -57200,6 +60466,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -57216,6 +60484,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutModerationLogsInput = {
@@ -57238,6 +60507,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -57253,6 +60524,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutModerationLogsInput = {
@@ -57290,6 +60562,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -57306,6 +60580,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutModerationLogsInput = {
@@ -57328,6 +60603,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -57343,6 +60620,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutSecurityEventsInput = {
@@ -57364,6 +60642,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -57380,6 +60660,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutSecurityEventsInput = {
@@ -57402,6 +60683,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -57417,6 +60700,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutSecurityEventsInput = {
@@ -57454,6 +60738,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -57470,6 +60756,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutSecurityEventsInput = {
@@ -57492,6 +60779,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -57507,6 +60796,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserCreateWithoutBillingRecordsInput = {
@@ -57575,6 +60865,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantCreateNestedManyWithoutUserInput
     licenses?: LicenseCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutBillingRecordsInput = {
@@ -57643,6 +60934,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutBillingRecordsInput = {
@@ -57669,6 +60961,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
@@ -57685,6 +60979,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutBillingRecordsInput = {
@@ -57707,6 +61002,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
@@ -57722,6 +61019,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutBillingRecordsInput = {
@@ -57806,6 +61104,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUpdateManyWithoutUserNestedInput
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBillingRecordsInput = {
@@ -57874,6 +61173,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type CommunityUpsertWithoutBillingRecordsInput = {
@@ -57906,6 +61206,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
@@ -57922,6 +61224,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutBillingRecordsInput = {
@@ -57944,6 +61247,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -57959,6 +61264,7 @@ export namespace Prisma {
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserCreateWithoutInvoicesInput = {
@@ -58027,6 +61333,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantCreateNestedManyWithoutUserInput
     licenses?: LicenseCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutInvoicesInput = {
@@ -58095,6 +61402,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutUserInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutUserInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutInvoicesInput = {
@@ -58179,6 +61487,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUpdateManyWithoutUserNestedInput
     licenses?: LicenseUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInvoicesInput = {
@@ -58247,6 +61556,7 @@ export namespace Prisma {
     conversations?: ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutUserNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutUserNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type CommunityMemberCreateManyUserInput = {
@@ -58317,6 +61627,7 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -58367,6 +61678,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: boolean
     isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -58511,6 +61824,16 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type CatTransactionCreateManySellerInput = {
+    id?: string
+    communityId: string
+    postId: string
+    catAmount: number
+    catPercentage: number
+    charityId?: string | null
+    createdAt?: Date | string
+  }
+
   export type CommunityMemberUpdateWithoutUserInput = {
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -58650,11 +61973,13 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutPostsNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateWithoutAuthorInput = {
@@ -58689,10 +62014,12 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateManyWithoutAuthorInput = {
@@ -58727,6 +62054,7 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -58829,6 +62157,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUpdateManyWithoutCommunityNestedInput
@@ -58845,6 +62175,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutOwnerInput = {
@@ -58866,6 +62197,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
@@ -58882,6 +62215,7 @@ export namespace Prisma {
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateManyWithoutOwnerInput = {
@@ -58903,6 +62237,8 @@ export namespace Prisma {
     onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
     guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
     isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -59327,6 +62663,36 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CatTransactionUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput
+    post?: PostUpdateOneRequiredWithoutCatTransactionsNestedInput
+    charity?: CharityUpdateOneWithoutCatTransactionsNestedInput
+  }
+
+  export type CatTransactionUncheckedUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CatTransactionUncheckedUpdateManyWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CommunityMemberCreateManyCommunityInput = {
     userId: string
     role?: string
@@ -59373,6 +62739,7 @@ export namespace Prisma {
     rejectionReason?: string | null
     changesRequestedNote?: string | null
     expiresAt?: Date | string | null
+    soldAt?: Date | string | null
     expiredAt?: Date | string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -59415,6 +62782,7 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     isFeatured?: boolean
+    isCATCharity?: boolean
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -59530,6 +62898,16 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type CatTransactionCreateManyCommunityInput = {
+    id?: string
+    postId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
+    charityId?: string | null
+    createdAt?: Date | string
+  }
+
   export type CommunityMemberUpdateWithoutCommunityInput = {
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -59603,11 +62981,13 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     author?: UserUpdateOneRequiredWithoutPostsNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateWithoutCommunityInput = {
@@ -59642,10 +63022,12 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateManyWithoutCommunityInput = {
@@ -59680,6 +63062,7 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     changesRequestedNote?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    soldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -59754,6 +63137,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -59762,6 +63146,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     charitySuggestions?: CharitySuggestionUpdateManyWithoutCharityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateWithoutCommunityInput = {
@@ -59785,6 +63170,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -59793,6 +63179,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateManyWithoutCommunityInput = {
@@ -59816,6 +63203,7 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -60143,6 +63531,36 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CatTransactionUpdateWithoutCommunityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    post?: PostUpdateOneRequiredWithoutCatTransactionsNestedInput
+    seller?: UserUpdateOneRequiredWithoutCatTransactionsNestedInput
+    charity?: CharityUpdateOneWithoutCatTransactionsNestedInput
+  }
+
+  export type CatTransactionUncheckedUpdateWithoutCommunityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CatTransactionUncheckedUpdateManyWithoutCommunityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MessageCreateManyReplyToInput = {
     id?: string
     communityId?: string | null
@@ -60205,6 +63623,46 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CatTransactionCreateManyPostInput = {
+    id?: string
+    communityId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
+    charityId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type CatTransactionUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput
+    seller?: UserUpdateOneRequiredWithoutCatTransactionsNestedInput
+    charity?: CharityUpdateOneWithoutCatTransactionsNestedInput
+  }
+
+  export type CatTransactionUncheckedUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CatTransactionUncheckedUpdateManyWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CharitySuggestionCreateManyCharityInput = {
     id?: string
     communityId: string
@@ -60216,6 +63674,16 @@ export namespace Prisma {
     website?: string | null
     status?: string
     adminFeedback?: string | null
+    createdAt?: Date | string
+  }
+
+  export type CatTransactionCreateManyCharityInput = {
+    id?: string
+    communityId: string
+    postId: string
+    sellerId: string
+    catAmount: number
+    catPercentage: number
     createdAt?: Date | string
   }
 
@@ -60258,6 +63726,36 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     adminFeedback?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CatTransactionUpdateWithoutCharityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput
+    post?: PostUpdateOneRequiredWithoutCatTransactionsNestedInput
+    seller?: UserUpdateOneRequiredWithoutCatTransactionsNestedInput
+  }
+
+  export type CatTransactionUncheckedUpdateWithoutCharityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CatTransactionUncheckedUpdateManyWithoutCharityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    catAmount?: FloatFieldUpdateOperationsInput | number
+    catPercentage?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
