@@ -136,7 +136,18 @@ const OnboardingCreate: React.FC = () => {
   );
 
   // Step 4 — Businesses (optional)
-  const [pendingBusinesses, setPendingBusinesses] = useState<{ name: string; category: string }[]>([]);
+  type PendingBusiness = {
+    name: string;
+    category: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+    phone?: string | null;
+    website?: string | null;
+    rating?: number | null;
+    imageUrl?: string;
+  };
+  const [pendingBusinesses, setPendingBusinesses] = useState<PendingBusiness[]>([]);
   const [newBizName, setNewBizName] = useState('');
   const [isDiscovering, setIsDiscovering] = useState(false);
   const [discoveredBusinesses, setDiscoveredBusinesses] = useState<Array<{
@@ -266,9 +277,18 @@ const OnboardingCreate: React.FC = () => {
   };
 
   const handleAddDiscovered = () => {
-    const toAdd = discoveredBusinesses
+    const toAdd: PendingBusiness[] = discoveredBusinesses
       .filter((_, i) => selectedDiscovered.has(i))
-      .map(b => ({ name: b.name, category: b.category }));
+      .map(b => ({
+        name: b.name,
+        category: b.category,
+        address: b.address,
+        latitude: b.latitude,
+        longitude: b.longitude,
+        phone: b.phone ?? null,
+        website: b.website ?? null,
+        rating: b.rating ?? null,
+      }));
     setPendingBusinesses(prev => {
       const existing = new Set(prev.map(p => p.name.toLowerCase()));
       return [...prev, ...toAdd.filter(b => !existing.has(b.name.toLowerCase()))];
@@ -379,6 +399,30 @@ const OnboardingCreate: React.FC = () => {
         enabledCategories: selectedCategories,
         onboardingStepsCompleted: COMMUNITY_STEPS,
       });
+
+      // 1b. Persist any businesses the user added during onboarding so they
+      //     show up in the Marketplace and the admin Business Management view.
+      if (pendingBusinesses.length > 0) {
+        try {
+          await api.post('/businesses/import', {
+            communityId,
+            businesses: pendingBusinesses.map((b) => ({
+              name: b.name,
+              category: b.category,
+              address: b.address,
+              latitude: b.latitude,
+              longitude: b.longitude,
+              phone: b.phone ?? undefined,
+              website: b.website ?? undefined,
+              imageUrl: b.imageUrl,
+            })),
+          });
+        } catch (importErr) {
+          // Don't fail the entire onboarding if business import has an issue,
+          // but surface it so the user knows to retry from the admin dashboard.
+          console.error('Onboarding business import failed:', importErr);
+        }
+      }
 
       // 2. Save profile + completion flags.
       movedPastProfile.current = true;
