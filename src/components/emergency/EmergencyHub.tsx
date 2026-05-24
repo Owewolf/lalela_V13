@@ -20,7 +20,7 @@ import {
   Navigation,
   ArrowLeft,
 } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { EmergencyMap } from './EmergencyMap';
@@ -36,6 +36,7 @@ const MAP_COLLAPSED_HEIGHT = 72;
 
 export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
   const router = useRouter();
+  const { forceCenter } = useLocalSearchParams<{ forceCenter?: string }>();
   const {
     posts,
     securityResponders,
@@ -50,7 +51,15 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
 
   const [isMapExpanded, setIsMapExpanded] = useState(true);
   const [resetTrigger, setResetTrigger] = useState(0);
-  const { query } = router;
+  const mapHeightAnim = useRef(new Animated.Value(MAP_EXPANDED_HEIGHT)).current;
+  const mapRef = useRef<MapView | null>(null);
+
+  // Find the emergency post from the posts list
+  const emergencyPost = useMemo(
+    () => posts.find((p) => p.id === emergencyId) ?? null,
+    [posts, emergencyId],
+  );
+
   // Always recenter map on mount or when emergencyId changes, or if forceCenter param is present
   useEffect(() => {
     if (emergencyPost?.latitude && emergencyPost?.longitude && mapRef.current) {
@@ -64,15 +73,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
     } else {
       setResetTrigger((t) => t + 1);
     }
-  }, [emergencyId, emergencyPost?.id, query?.forceCenter]);
-  const mapHeightAnim = useRef(new Animated.Value(MAP_EXPANDED_HEIGHT)).current;
-  const mapRef = useRef<MapView | null>(null);
-
-  // Find the emergency post from the posts list
-  const emergencyPost = useMemo(
-    () => posts.find((p) => p.id === emergencyId) ?? null,
-    [posts, emergencyId],
-  );
+  }, [emergencyId, emergencyPost?.id, forceCenter]);
 
   // Animate map height when expanded/collapsed
   useEffect(() => {
