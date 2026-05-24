@@ -1210,17 +1210,17 @@ export const HomePage: React.FC<HomePageProps> = ({
             }}
             disabled={currentCommunity?.status === 'READ-ONLY'}
             className={cn(
-              'flex-1 flex-col items-center justify-center py-5 rounded-3xl gap-2 shadow-md',
+              'flex-1 flex-col items-center justify-center py-3 rounded-2xl gap-1.5 shadow-md',
               currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
             )}
-            style={{ backgroundColor: '#0d3d47' }}
+            style={{ backgroundColor: '#dc2626' }}
           >
             <Siren
-              size={24}
+              size={20}
               color="#fff"
               fill={isEmergencyActive ? '#fff' : 'transparent'}
             />
-            <Text className="text-white font-bold text-sm text-center">
+            <Text className="text-white font-bold text-base text-center">
               {isEmergencyActive ? 'ACTIVE EMERGENCY' : 'Emergency Help'}
             </Text>
             {isEmergencyActive && (
@@ -1235,13 +1235,13 @@ export const HomePage: React.FC<HomePageProps> = ({
               onPress={() => setShowIncidentMenu(true)}
               disabled={currentCommunity?.status === 'READ-ONLY'}
               className={cn(
-                'flex-col items-center justify-center py-5 rounded-3xl gap-2 shadow-md',
+                'flex-col items-center justify-center py-3 rounded-2xl gap-1.5 shadow-md',
                 currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
               )}
               style={{ backgroundColor: '#1e5667' }}
             >
-              <Plus size={24} color="#fff" />
-              <Text className="text-white font-bold text-sm">
+              <Plus size={20} color="#fff" />
+              <Text className="text-white font-bold text-base">
                 Create Notice
               </Text>
             </TouchableOpacity>

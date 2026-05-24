@@ -50,6 +50,21 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
 
   const [isMapExpanded, setIsMapExpanded] = useState(true);
   const [resetTrigger, setResetTrigger] = useState(0);
+  const { query } = router;
+  // Always recenter map on mount or when emergencyId changes, or if forceCenter param is present
+  useEffect(() => {
+    if (emergencyPost?.latitude && emergencyPost?.longitude && mapRef.current) {
+      const region = {
+        latitude: emergencyPost.latitude,
+        longitude: emergencyPost.longitude,
+        latitudeDelta: 0.02, // Zoom in close
+        longitudeDelta: 0.02,
+      };
+      mapRef.current.animateToRegion(region, 1000);
+    } else {
+      setResetTrigger((t) => t + 1);
+    }
+  }, [emergencyId, emergencyPost?.id, query?.forceCenter]);
   const mapHeightAnim = useRef(new Animated.Value(MAP_EXPANDED_HEIGHT)).current;
   const mapRef = useRef<MapView | null>(null);
 

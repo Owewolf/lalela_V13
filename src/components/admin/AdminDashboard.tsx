@@ -10,6 +10,8 @@ import {
   TextInput,
   ActivityIndicator,
   StyleSheet,
+  Animated,
+  Easing,
 } from 'react-native';
 import {
   LayoutDashboard,
@@ -33,6 +35,7 @@ import {
   Siren,
   Navigation,
   CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -112,7 +115,74 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setMapUnlocked,
     resetCommunityMapView,
     findLatestEmergencyPost,
+    findLatestWarningPost,
   } = useCommunityMap();
+
+  // Derived security-panel state (emergency takes precedence over warning).
+  const latestEmergencyPost = isEmergencyActive ? findLatestEmergencyPost() : undefined;
+  const latestWarningPost = !isEmergencyActive ? findLatestWarningPost() : undefined;
+  const hasWarning = !isEmergencyActive && !!latestWarningPost;
+  const respondersOnline = liveInsights?.counts?.respondersOnline ?? 0;
+  const emergencyCount = React.useMemo(
+    () => (posts || []).filter(
+      (p: any) => p.urgencyLevel === 'emergency' || p.urgency === 'emergency'
+    ).length,
+    [posts]
+  );
+  const warningCount = React.useMemo(
+    () => (posts || []).filter(
+      (p: any) => p.urgencyLevel === 'warning' || p.urgency === 'high'
+    ).length,
+    [posts]
+  );
+  const openAlertsDisplay = isEmergencyActive
+    ? Math.max(activeAlertsCount, emergencyCount)
+    : activeAlertsCount;
+
+  // Pulse animation for the Security Panel (red on emergency, amber on warning).
+  const securityPulse = useRef(new Animated.Value(0)).current;
+  React.useEffect(() => {
+    if (!isEmergencyActive && !hasWarning) {
+      securityPulse.stopAnimation();
+      securityPulse.setValue(0);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(securityPulse, {
+          toValue: 1,
+          duration: 700,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: false,
+        }),
+        Animated.timing(securityPulse, {
+          toValue: 0,
+          duration: 700,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: false,
+        }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [isEmergencyActive, hasWarning, securityPulse]);
+
+  const securityPulseBg = securityPulse.interpolate({
+    inputRange: [0, 1],
+    outputRange: isEmergencyActive
+      ? ['#fef2f2', '#fecaca']
+      : hasWarning
+        ? ['#fffbeb', '#fde68a']
+        : ['#ffffff', '#ffffff'],
+  });
+
+  const handleSecurityPanelPress = () => {
+    if (isEmergencyActive && latestEmergencyPost?.id) {
+      router.push(`/emergency/${latestEmergencyPost.id}` as any);
+    } else if (hasWarning && latestWarningPost?.id) {
+      router.push(`/emergency/${latestWarningPost.id}` as any);
+    }
+  };
   const moderationRef = useRef<ModerationCenterHandle>(null);
 
   const handleBack = () => {
@@ -531,50 +601,103 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <CommunityInsightPanels insights={liveInsights?.insights ?? null} />
 
       {/* Security Panel */}
-      <View style={styles.bentoCard}>
-        <View style={styles.bentoHeader}>
-          <Shield size={22} color={SECONDARY} />
-          <Text style={styles.bentoTitle}>Security Panel</Text>
-          {currentCommunity?.isEmergencyMode && (
-            <View style={styles.emergencyBadge}>
-              <View style={styles.emergencyDot} />
-              <Text style={styles.emergencyText}>Emergency Active</Text>
-            </View>
-          )}
-        </View>
-
-        {currentCommunity?.isEmergencyMode ? (
-          <View style={styles.emergencyInfo}>
-            <Siren size={16} color={ERROR} />
-            <Text style={[styles.bentoDesc, { color: ERROR, fontWeight: '700' }]}>
-              Emergency mode is active. Check alerts for details.
+      <TouchableOpacity
+        activeOpacity={isEmergencyActive || hasWarning ? 0.85 : 1}
+        disabled={!isEmergencyActive && !hasWarning}
+        onPress={handleSecurityPanelPress}
+      >
+        <Animated.View
+          style={[
+            styles.bentoCard,
+            (isEmergencyActive || hasWarning) && { backgroundColor: securityPulseBg },
+            isEmergencyActive && { borderColor: '#fecaca' },
+            hasWarning && { borderColor: '#fde68a' },
+          ]}
+        >
+          <View style={styles.bentoHeader}>
+            <Shield
+              size={22}
+              color={isEmergencyActive ? ERROR : hasWarning ? '#d97706' : SECONDARY}
+            />
+            <Text
+              style={[
+                styles.bentoTitle,
+                isEmergencyActive && { color: ERROR },
+                hasWarning && { color: '#d97706' },
+              ]}
+            >
+              Security Panel
             </Text>
+            {isEmergencyActive && (
+              <View style={styles.emergencyBadge}>
+                <View style={styles.emergencyDot} />
+                <Text style={styles.emergencyText}>Emergency Active</Text>
+              </View>
+            )}
+            {hasWarning && (
+              <View style={styles.warningBadge}>
+                <View style={styles.warningDot} />
+                <Text style={styles.warningText}>Warning Active</Text>
+              </View>
+            )}
           </View>
-        ) : (
-          <View style={styles.securityStats}>
-            <View style={styles.securityStat}>
-              <Text style={styles.securityStatLabel}>SECURITY MEMBERS</Text>
-              <View style={styles.securityValueRow}>
-                <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
-                {(liveInsights?.counts?.respondersOnline ?? 0) > 0 && (
-                  <View style={styles.onlinePulseDot} />
+
+          {isEmergencyActive ? (
+            <View style={styles.securityStats}>
+              <View style={styles.securityStat}>
+                <Text style={styles.securityStatLabel}>RESPONDERS</Text>
+                <View style={styles.securityValueRow}>
+                  <Text style={[styles.securityStatValue, { color: ERROR }]}>
+                    {respondersOnline}
+                  </Text>
+                  {respondersOnline > 0 && <View style={styles.onlinePulseDot} />}
+                </View>
+                {respondersOnline > 0 && (
+                  <Text style={styles.onlineHint}>online now</Text>
                 )}
               </View>
-              {(liveInsights?.counts?.respondersOnline ?? 0) > 0 && (
-                <Text style={styles.onlineHint}>
-                  {liveInsights?.counts.respondersOnline} online now
+              <View style={styles.securityStat}>
+                <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
+                <Text style={[styles.securityStatValue, { color: ERROR }]}>
+                  {openAlertsDisplay}
                 </Text>
-              )}
+              </View>
             </View>
-            <View style={styles.securityStat}>
-              <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
-              <Text style={[styles.securityStatValue, activeAlertsCount > 0 && { color: ERROR }]}>
-                {activeAlertsCount}
-              </Text>
+          ) : hasWarning ? (
+            <View style={styles.securityStats}>
+              <View style={styles.securityStat}>
+                <Text style={styles.securityStatLabel}>OPEN WARNINGS</Text>
+                <Text style={[styles.securityStatValue, { color: '#d97706' }]}>
+                  {warningCount}
+                </Text>
+              </View>
             </View>
-          </View>
-        )}
-      </View>
+          ) : (
+            <View style={styles.securityStats}>
+              <View style={styles.securityStat}>
+                <Text style={styles.securityStatLabel}>SECURITY MEMBERS</Text>
+                <View style={styles.securityValueRow}>
+                  <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
+                  {respondersOnline > 0 && (
+                    <View style={styles.onlinePulseDot} />
+                  )}
+                </View>
+                {respondersOnline > 0 && (
+                  <Text style={styles.onlineHint}>
+                    {respondersOnline} online now
+                  </Text>
+                )}
+              </View>
+              <View style={styles.securityStat}>
+                <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
+                <Text style={[styles.securityStatValue, activeAlertsCount > 0 && { color: ERROR }]}>
+                  {activeAlertsCount}
+                </Text>
+              </View>
+            </View>
+          )}
+        </Animated.View>
+      </TouchableOpacity>
 
       {/* System Health */}
       <View style={styles.bentoCard}>
@@ -861,6 +984,12 @@ const styles = StyleSheet.create({
   emergencyDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: ERROR },
   emergencyText: { fontSize: 10, fontWeight: '900', color: ERROR, textTransform: 'uppercase', letterSpacing: 0.8 },
   emergencyInfo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  warningBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: '#fffbeb', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99,
+  },
+  warningDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#d97706' },
+  warningText: { fontSize: 10, fontWeight: '900', color: '#d97706', textTransform: 'uppercase', letterSpacing: 0.8 },
   securityStats: { flexDirection: 'row', gap: 24, marginTop: 8 },
   securityStat: { gap: 4 },
   securityStatLabel: { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1 },

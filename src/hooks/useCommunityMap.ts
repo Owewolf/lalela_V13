@@ -93,6 +93,12 @@ export function useCommunityMap() {
     );
   }, [posts]);
 
+  const findLatestWarningPost = useCallback(() => {
+    return posts.find(
+      (p: any) => p.urgencyLevel === 'warning' || p.urgency === 'high'
+    );
+  }, [posts]);
+
   return {
     // state
     mapCenter,
@@ -107,5 +113,6 @@ export function useCommunityMap() {
     // helpers
     resetCommunityMapView,
     findLatestEmergencyPost,
+    findLatestWarningPost,
   };
 }

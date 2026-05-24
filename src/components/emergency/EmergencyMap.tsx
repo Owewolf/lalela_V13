@@ -17,7 +17,19 @@ interface EmergencyMapProps {
   mapRef?: React.RefObject<MapView | null>;
 }
 
-const EMERGENCY_RADIUS = 20000; // 20km in meters
+const EMERGENCY_RADIUS = 10000; // 10km in meters
+
+// ~111 km per degree of latitude. Pad slightly so the circle isn't flush to the edge.
+const regionForRadius = (lat: number, lng: number, radiusMeters: number) => {
+  const latDelta = ((radiusMeters * 2.4) / 1000) / 111;
+  const lonDelta = latDelta / Math.max(Math.cos((lat * Math.PI) / 180), 0.1);
+  return {
+    latitude: lat,
+    longitude: lng,
+    latitudeDelta: latDelta,
+    longitudeDelta: lonDelta,
+  };
+};
 
 const calculateDistance = (
   lat1: number,
@@ -52,12 +64,7 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
   const emergencyLat = emergencyPost.latitude ?? -26.2041;
   const emergencyLng = emergencyPost.longitude ?? 28.0473;
 
-  const initialRegion = {
-    latitude: emergencyLat,
-    longitude: emergencyLng,
-    latitudeDelta: 0.35,
-    longitudeDelta: 0.35,
-  };
+  const initialRegion = regionForRadius(emergencyLat, emergencyLng, EMERGENCY_RADIUS);
 
   // Recenter when resetTrigger changes
   React.useEffect(() => {
@@ -112,9 +119,17 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
 
   React.useEffect(() => {
     if (!ref.current) return;
-    // Keep the map focused on the active emergency scene as member/responder locations update.
-    fitToAllMarkers();
-  }, [activeResponders, visibleMembers, emergencyLat, emergencyLng]);
+    // Keep the map locked on the 10km emergency view as the emergency coords change.
+    if (Platform.OS === 'web') return;
+    try {
+      ref.current.animateToRegion(
+        regionForRadius(emergencyLat, emergencyLng, EMERGENCY_RADIUS),
+        400,
+      );
+    } catch (error) {
+      console.warn('Map animation error:', error);
+    }
+  }, [emergencyLat, emergencyLng]);
 
   return (
     <View className="flex-1 relative">
@@ -128,12 +143,12 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
         showsCompass={false}
         showsMyLocationButton={false}
       >
-        {/* Emergency 20km zone circle */}
+        {/* 10km emergency radius */}
         <Circle
           center={{ latitude: emergencyLat, longitude: emergencyLng }}
           radius={EMERGENCY_RADIUS}
-          strokeColor="rgba(179,38,30,0.3)"
-          fillColor="rgba(179,38,30,0.1)"
+          strokeColor="rgba(220, 38, 38, 0.45)"
+          fillColor="rgba(220, 38, 38, 0.08)"
           strokeWidth={2}
         />
 
