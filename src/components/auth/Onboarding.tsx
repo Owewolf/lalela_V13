@@ -27,10 +27,8 @@ import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/uploadImage';
 import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, { Marker, MapPressEvent } from 'react-native-maps';
-import { defaultMapViewProps } from '../../lib/mapViewProps';
+import LocationPickerSection from '../shared/LocationPickerSection';
 
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
@@ -97,7 +95,6 @@ const OnboardingInvite: React.FC = () => {
   const [locationName, setLocationName] = useState('');
   const [locationLat, setLocationLat] = useState(0);
   const [locationLng, setLocationLng] = useState(0);
-  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
   const [invitedCommunityName, setInvitedCommunityName] = useState<string | null>(null);
   const [inviteCoverageArea, setInviteCoverageArea] = useState<InviteCoverageArea | null>(null);
@@ -219,39 +216,6 @@ const OnboardingInvite: React.FC = () => {
       }
     } catch {
       setError('Failed to open image picker.');
-    }
-  };
-
-  const handleGetCurrentLocation = async () => {
-    try {
-      const servicesEnabled = await Location.hasServicesEnabledAsync();
-      if (!servicesEnabled) {
-        Alert.alert('Location Services Off', 'Please go to Settings → Location and enable Location Services, then try again.');
-        return;
-      }
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Please grant location permission for this app in Settings, then try again.');
-        return;
-      }
-      setIsFetchingLocation(true);
-      const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const { latitude, longitude } = position.coords;
-      setLocationLat(latitude);
-      setLocationLng(longitude);
-      const [place] = await Location.reverseGeocodeAsync({ latitude, longitude });
-      if (place) {
-        const parts = [place.streetNumber, place.street, place.district || place.subregion, place.city, place.region, place.country].filter(Boolean);
-        const addr = parts.join(', ');
-        setLocationName(addr);
-      } else {
-        const coords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-        setLocationName(coords);
-      }
-    } catch {
-      setError('Failed to get current location. Please try again or continue with the community default location.');
-    } finally {
-      setIsFetchingLocation(false);
     }
   };
 
@@ -438,76 +402,38 @@ const OnboardingInvite: React.FC = () => {
             </View>
 
             {/* Default Location */}
-            <View className="gap-1" style={{ zIndex: 10, elevation: 10 }}>
+            <View className="gap-2" style={{ zIndex: 10, elevation: 10 }}>
               <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
                 Default Location <Text className="text-red-500">*</Text>
               </Text>
-              <View className="bg-gray-100 rounded-2xl px-4 py-4 gap-2">
+              <View className="bg-gray-100 rounded-2xl px-4 py-4">
                 <View className="flex-row items-start gap-3">
                   <View className="w-9 h-9 rounded-xl bg-white items-center justify-center">
                     <MapPin size={16} color="#0d3d47" />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-sm font-bold text-[#0d3d47]">
-                      {locationName || inviteCoverageArea?.locationName || 'Waiting for community coverage'}
-                    </Text>
-                    <Text className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+                    <Text className="text-[11px] text-gray-500 leading-relaxed">
                       {inviteCoverageArea
-                        ? 'Your profile starts with the community coverage area. You can update this later in settings or use your current device location now.'
-                        : 'Your community needs a coverage area before we can set a default location automatically.'}
+                        ? 'Your profile starts with the community coverage area. You can update it below or use your current device location.'
+                        : 'Search for an address, drop a pin, or use your current location.'}
                     </Text>
                   </View>
                 </View>
               </View>
-              <TouchableOpacity
-                onPress={handleGetCurrentLocation}
-                disabled={isFetchingLocation}
-                className="flex-row items-center gap-2 py-3 px-4 bg-surface-container-low border border-outline-variant rounded-2xl mt-1"
-              >
-                {isFetchingLocation ? <ActivityIndicator size="small" color="#0d3d47" /> : <MapPin size={16} color="#0d3d47" />}
-                <Text className="text-xs font-bold text-[#0d3d47]">
-                  {isFetchingLocation ? 'Getting location...' : 'Use current location instead'}
-                </Text>
-              </TouchableOpacity>
 
-              {/* Map picker — fine-tune pin (parity with Android profile editor / LocationSettings) */}
-              {locationLat !== 0 && locationLng !== 0 && (
-                <View className="gap-1 mt-2">
-                  <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
-                    Refine With Pin
-                  </Text>
-                  <View style={{ height: 240, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb' }}>
-                    <MapView
-                      {...defaultMapViewProps}
-                      style={{ flex: 1 }}
-                      region={{
-                        latitude: locationLat,
-                        longitude: locationLng,
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.01,
-                      }}
-                      onPress={(event: MapPressEvent) => {
-                        const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
-                        setLocationLat(lat);
-                        setLocationLng(lng);
-                      }}
-                    >
-                      <Marker
-                        coordinate={{ latitude: locationLat, longitude: locationLng }}
-                        draggable
-                        onDragEnd={(event) => {
-                          const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
-                          setLocationLat(lat);
-                          setLocationLng(lng);
-                        }}
-                      />
-                    </MapView>
-                  </View>
-                  <Text className="text-[10px] text-gray-500 italic px-1 mt-1">
-                    Tap or drag the pin to fine-tune your exact location.
-                  </Text>
-                </View>
-              )}
+              <LocationPickerSection
+                value={{
+                  address: locationName,
+                  latitude: locationLat !== 0 ? locationLat : undefined,
+                  longitude: locationLng !== 0 ? locationLng : undefined,
+                }}
+                onChange={(next) => {
+                  setLocationName(next.address);
+                  setLocationLat(next.latitude ?? 0);
+                  setLocationLng(next.longitude ?? 0);
+                }}
+                hint="Search first, then tap or drag the pin to fine-tune your exact location."
+              />
 
               {locationName && locationLat !== 0 ? (
                 <View className="flex-row items-center gap-1 mt-1 ml-1">

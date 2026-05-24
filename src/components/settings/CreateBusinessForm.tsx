@@ -1,4 +1,3 @@
-import { defaultMapViewProps } from "../../lib/mapViewProps";
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,14 +14,12 @@ import {
   View,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import MapView, { MapPressEvent, Marker, Region } from 'react-native-maps';
-import { Camera, ImagePlus, Mail, MapPin, Phone, X } from 'lucide-react-native';
-import { BUSINESS_CATEGORIES, GOOGLE_PLACES_API_KEY } from '../../constants';
+import { Camera, ImagePlus, Mail, Phone, X } from 'lucide-react-native';
+import { BUSINESS_CATEGORIES } from '../../constants';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/uploadImage';
+import LocationPickerSection from '../shared/LocationPickerSection';
 import { Community, UserBusiness } from '../../types';
 
 interface CreateBusinessFormProps {
@@ -75,12 +72,6 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
   const [isActive, setIsActive] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [mapRegion, setMapRegion] = useState<Region>({
-    latitude: -33.9249,
-    longitude: 18.4241,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  });
 
   const defaultLocation = useMemo(() => {
     if (business) {
@@ -136,39 +127,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
             : []
     );
     setIsActive((business?.status ?? 'ACTIVE') === 'ACTIVE');
-
-    const parsedLat = Number(defaultLocation.latitude);
-    const parsedLng = Number(defaultLocation.longitude);
-    if (Number.isFinite(parsedLat) && Number.isFinite(parsedLng)) {
-      setMapRegion((prev) => ({
-        ...prev,
-        latitude: parsedLat,
-        longitude: parsedLng,
-      }));
-    }
   }, [business, communities, currentCommunity?.id, defaultLocation, visible]);
-
-  const reverseGeocodeName = async (lat: number, lng: number): Promise<string> => {
-    try {
-      const geo = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
-      const place = geo[0];
-      if (place) {
-        const parts = [place.name, place.street, place.subregion, place.city, place.region].filter(Boolean);
-        if (parts.length > 0) return parts.join(', ');
-      }
-    } catch {
-      // Geocoding unavailable — fall back to coordinates
-    }
-    return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  };
-
-  const applyBusinessLocation = async (lat: number, lng: number, preferredName?: string) => {
-    const resolvedName = preferredName || (await reverseGeocodeName(lat, lng));
-    setAddress(resolvedName);
-    setLatitude(String(lat));
-    setLongitude(String(lng));
-    setMapRegion((prev) => ({ ...prev, latitude: lat, longitude: lng }));
-  };
 
   const toggleCommunity = (communityId: string) => {
     setCommunityIds((currentIds) =>
@@ -176,47 +135,6 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
         ? currentIds.filter((id) => id !== communityId)
         : [...currentIds, communityId]
     );
-  };
-
-  const handleUseCurrentLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission denied', 'Location permission is required.');
-        return;
-      }
-
-      const loc = await Location.getCurrentPositionAsync({});
-      await applyBusinessLocation(loc.coords.latitude, loc.coords.longitude);
-    } catch {
-      Alert.alert('Location error', 'Could not get your current location.');
-    }
-  };
-
-  const handleLatitudeChange = (value: string) => {
-    setLatitude(value);
-    const parsed = Number(value);
-    const parsedLng = Number(longitude);
-    if (Number.isFinite(parsed) && Number.isFinite(parsedLng)) {
-      setMapRegion((prev) => ({ ...prev, latitude: parsed, longitude: parsedLng }));
-    }
-  };
-
-  const handleLongitudeChange = (value: string) => {
-    setLongitude(value);
-    const parsed = Number(value);
-    const parsedLat = Number(latitude);
-    if (Number.isFinite(parsedLat) && Number.isFinite(parsed)) {
-      setMapRegion((prev) => ({ ...prev, latitude: parsedLat, longitude: parsed }));
-    }
-  };
-
-  const handleMapSelection = async (lat: number, lng: number) => {
-    try {
-      await applyBusinessLocation(lat, lng);
-    } catch {
-      Alert.alert('Location error', 'Could not resolve the selected map location.');
-    }
   };
 
   const handlePickImage = async () => {
@@ -396,104 +314,19 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                 />
               </View>
 
-              <View>
-                <Text style={labelStyle}>Address</Text>
-                <TextInput value={address} onChangeText={setAddress} placeholder="Street address or area name" placeholderTextColor="#9ca3af" style={inputStyle} />
-              </View>
-
-              <View style={{ gap: 10, zIndex: 9999, elevation: 999 }}>
-                <Text style={labelStyle}>Search Address</Text>
-                <GooglePlacesAutocomplete
-                  placeholder="Search with Google"
-                  fetchDetails
-                  // @ts-ignore
-                  scrollEnabled={false}
-                  onPress={(data, details) => {
-                    const lat = details?.geometry?.location?.lat;
-                    const lng = details?.geometry?.location?.lng;
-                    if (typeof lat !== 'number' || typeof lng !== 'number') return;
-                    applyBusinessLocation(lat, lng, data.description);
-                  }}
-                  query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
-                  textInputProps={{
-                    placeholderTextColor: '#9ca3af',
-                    returnKeyType: 'search',
-                  }}
-                  styles={{
-                    container: { flex: 1 },
-                    textInput: {
-                      backgroundColor: '#ffffff',
-                      borderRadius: 14,
-                      borderWidth: 1,
-                      borderColor: 'rgba(0,0,0,0.08)',
-                      paddingHorizontal: 14,
-                      paddingVertical: 12,
-                      fontSize: 14,
-                      color: '#1a1a1a',
-                      marginBottom: 0,
-                    },
-                    listView: {
-                      position: 'absolute',
-                      top: 50,
-                      width: '100%',
-                      backgroundColor: '#fff',
-                      borderRadius: 12,
-                      elevation: 5,
-                      shadowColor: '#000',
-                      shadowOpacity: 0.1,
-                      shadowRadius: 5,
-                      zIndex: 9999,
-                    },
-                    row: { paddingVertical: 12, paddingHorizontal: 16 },
-                    description: { fontSize: 14, color: '#374151' },
-                  }}
-                  enablePoweredByContainer={false}
-                  keyboardShouldPersistTaps="handled"
-                />
-              </View>
-
-              <View style={{ gap: 10 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Text style={labelStyle}>Location Coordinates</Text>
-                  <TouchableOpacity onPress={handleUseCurrentLocation} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <MapPin size={14} color="#0d3d47" />
-                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#0d3d47' }}>Use current location</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={{ flexDirection: 'row', gap: 10 }}>
-                  <TextInput value={latitude} onChangeText={handleLatitudeChange} keyboardType="numeric" placeholder="Latitude" placeholderTextColor="#9ca3af" style={[inputStyle, { flex: 1 }]} />
-                  <TextInput value={longitude} onChangeText={handleLongitudeChange} keyboardType="numeric" placeholder="Longitude" placeholderTextColor="#9ca3af" style={[inputStyle, { flex: 1 }]} />
-                </View>
-              </View>
-
-              <View style={{ gap: 8 }}>
-                <Text style={labelStyle}>Refine With Pin</Text>
-                <View style={{ height: 240, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
-                  <MapView {...defaultMapViewProps}
-                    style={{ flex: 1 }}
-                    region={mapRegion}
-                    onPress={(event: MapPressEvent) => {
-                      const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
-                      handleMapSelection(lat, lng);
-                    }}
-                  >
-                    {Number.isFinite(Number(latitude)) && Number(latitude) !== 0 &&
-                     Number.isFinite(Number(longitude)) && Number(longitude) !== 0 && (
-                      <Marker
-                        coordinate={{ latitude: Number(latitude), longitude: Number(longitude) }}
-                        draggable
-                        onDragEnd={(event) => {
-                          const { latitude: lat, longitude: lng } = event.nativeEvent.coordinate;
-                          handleMapSelection(lat, lng);
-                        }}
-                      />
-                    )}
-                  </MapView>
-                </View>
-                <Text style={{ fontSize: 11, color: '#6b7280' }}>
-                  Search first, then tap or drag the pin to set the exact business location.
-                </Text>
-              </View>
+              <LocationPickerSection
+                value={{
+                  address,
+                  latitude: latitude && Number.isFinite(Number(latitude)) && Number(latitude) !== 0 ? Number(latitude) : undefined,
+                  longitude: longitude && Number.isFinite(Number(longitude)) && Number(longitude) !== 0 ? Number(longitude) : undefined,
+                }}
+                onChange={(next) => {
+                  setAddress(next.address);
+                  setLatitude(next.latitude !== undefined ? String(next.latitude) : '');
+                  setLongitude(next.longitude !== undefined ? String(next.longitude) : '');
+                }}
+                hint="Search first, then tap or drag the pin to set the exact business location."
+              />
 
               <View style={{ gap: 10 }}>
                 <Text style={labelStyle}>Contact Details</Text>

@@ -35,6 +35,7 @@ import { BUSINESS_CATEGORIES } from '../../constants';
 import CreateWarningNotice from './CreateWarningNotice';
 import CreateInfoNotice from './CreateInfoNotice';
 import CreateGeneralNotice from './CreateGeneralNotice';
+import LocationPickerSection from '../shared/LocationPickerSection';
 import type { CommunityNotice } from '../../types';
 
 type PostType = 'listing' | 'notice';
@@ -863,25 +864,21 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     </TouchableOpacity>
                   </View>
 
-                  {/* Location */}
-                  <View className="gap-1">
-                    <Text className="text-sm font-semibold text-primary ml-1">Location</Text>
-                    <View className="flex-row items-center bg-gray-50 border-b-2 border-gray-200 rounded-t-xl px-4">
-                      <MapPin size={16} color="#6B7280" />
-                      <TextInput
-                        value={locationName}
-                        onChangeText={setLocationName}
-                        placeholder="Set location"
-                        placeholderTextColor="#9CA3AF"
-                        className="flex-1 py-3 px-2 text-sm text-gray-800"
-                      />
-                      <TouchableOpacity onPress={handleUseCurrentLocation}>
-                        <Text className="text-xs font-bold text-primary bg-surface-container-low px-2 py-1 rounded-lg">
-                          Use Current
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                  {/* Location — shared picker (Address + Search + Coordinates + Refine With Pin) */}
+                  <LocationPickerSection
+                    value={{ address: locationName, latitude, longitude }}
+                    onChange={(next, source) => {
+                      setLocationName(next.address);
+                      setLatitude(next.latitude);
+                      setLongitude(next.longitude);
+                      if (source === 'current_location') {
+                        setLocationSource('current_location');
+                      } else if (source === 'places' || source === 'map' || source === 'manual') {
+                        setLocationSource('user_selected');
+                      }
+                    }}
+                    hint="Search first, then tap or drag the pin to set the exact listing location."
+                  />
                 </View>
 
                 {/* Guidelines */}

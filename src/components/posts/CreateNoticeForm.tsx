@@ -33,6 +33,7 @@ import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { POST_SUBTYPE_CONFIG } from '../../constants';
 import { uploadImage } from '../../lib/uploadImage';
+import LocationPickerSection from '../shared/LocationPickerSection';
 import type { CommunityNotice } from '../../types';
 
 type NoticeSubtype = 'warning' | 'normal' | 'information';
@@ -467,28 +468,38 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
           </View>
 
           {/* Location */}
-          <View className="space-y-2">
-            <Text className="text-sm font-semibold ml-1 text-gray-500">Location</Text>
-            <View className="relative">
-              <View className="flex-row items-center bg-gray-50 border-b-2 border-gray-200 rounded-t-2xl px-4">
-                <MapPin size={16} color="#6B7280" />
-                <TextInput
-                  value={locationName}
-                  onChangeText={setLocationName}
-                  placeholder={postSubtype === 'warning' ? 'Location set via map above' : 'Set location (optional)'}
-                  placeholderTextColor="#9CA3AF"
-                  className="flex-1 py-4 px-2 text-sm text-gray-800"
-                />
-                {postSubtype !== 'warning' && (
-                  <TouchableOpacity onPress={handleUseCurrentLocation}>
-                    <Text className="text-xs font-bold text-primary bg-surface-container-low px-2 py-1 rounded-lg">
-                      Use Current
-                    </Text>
-                  </TouchableOpacity>
-                )}
+          {postSubtype === 'warning' ? (
+            <View className="space-y-2">
+              <Text className="text-sm font-semibold ml-1 text-gray-500">Location</Text>
+              <View className="relative">
+                <View className="flex-row items-center bg-gray-50 border-b-2 border-gray-200 rounded-t-2xl px-4">
+                  <MapPin size={16} color="#6B7280" />
+                  <TextInput
+                    value={locationName}
+                    onChangeText={setLocationName}
+                    placeholder="Location set via map above"
+                    placeholderTextColor="#9CA3AF"
+                    className="flex-1 py-4 px-2 text-sm text-gray-800"
+                  />
+                </View>
               </View>
             </View>
-          </View>
+          ) : (
+            <LocationPickerSection
+              value={{ address: locationName, latitude, longitude }}
+              onChange={(next, source) => {
+                setLocationName(next.address);
+                setLatitude(next.latitude);
+                setLongitude(next.longitude);
+                if (source === 'current_location') {
+                  setLocationSource('current_location');
+                } else if (source === 'places' || source === 'map' || source === 'manual') {
+                  setLocationSource('user_selected');
+                }
+              }}
+              hint="Search first, then tap or drag the pin to set the exact notice location."
+            />
+          )}
 
           {/* Expiry Date — not for warning */}
           {postSubtype !== 'warning' && (

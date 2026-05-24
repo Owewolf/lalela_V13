@@ -45,9 +45,26 @@ app.use('/api', apiRouter);
 
 // ─── Socket.io ────────────────────────────────────────────────────────────────
 
+// Cap a single WebSocket frame at 256 KB. Anything larger should go over REST
+// (image/file uploads return a URL; the URL is what travels over the socket).
+// This prevents a single oversized frame from OOM-killing the okhttp reader
+// on Android clients (see java.lang.OutOfMemoryError in WebSocketReader).
+const SOCKET_MAX_PAYLOAD_BYTES = 256 * 1024;
+
 const io = new SocketServer(httpServer, {
   cors: { origin: corsOriginFn, methods: ['GET', 'POST'], credentials: true },
+  maxHttpBufferSize: SOCKET_MAX_PAYLOAD_BYTES,
 });
+
+// Bound any free-form text we pass through over the socket so a single buggy
+// or malicious client cannot broadcast multi-megabyte strings to every peer.
+const MAX_MESSAGE_TEXT = 8 * 1024;       // chat message body
+const MAX_POST_JSON = 64 * 1024;          // serialized post / emergency payload
+const truncate = (s: unknown, n: number) =>
+  typeof s === 'string' && s.length > n ? s.slice(0, n) : s;
+const jsonByteLength = (v: unknown) => {
+  try { return Buffer.byteLength(JSON.stringify(v) ?? '', 'utf8'); } catch { return Infinity; }
+};
 
 // Auth middleware — verify JWT on socket handshake
 io.use((socket, next) => {
@@ -99,9 +116,15 @@ io.on('connection', (socket) => {
     type?: string;
     attachmentUrl?: string;
   }) => {
-    // Broadcast to all participants in the conversation room (excluding sender)
-    socket.to(`conversation:${data.conversationId}`).emit('message:new', {
+    if (!data?.conversationId) return;
+    // Bound text to keep frames small for every recipient.
+    const safe = {
       ...data,
+      text: truncate(data.text, MAX_MESSAGE_TEXT) as string | undefined,
+      attachmentUrl: truncate(data.attachmentUrl, 2048) as string | undefined,
+    };
+    socket.to(`conversation:${safe.conversationId}`).emit('message:new', {
+      ...safe,
       senderId: userId,
       createdAt: new Date().toISOString(),
     });
@@ -141,10 +164,20 @@ io.on('connection', (socket) => {
   // ── Community broadcasts ─────────────────────────────────────────────────
 
   socket.on('post:new', (data: { communityId: string; post: unknown }) => {
+    if (!data?.communityId) return;
+    if (jsonByteLength(data.post) > MAX_POST_JSON) {
+      console.warn(`[socket] dropped oversized post:new from ${userId}`);
+      return;
+    }
     socket.to(`community:${data.communityId}`).emit('post:new', data.post);
   });
 
   socket.on('emergency:update', (data: { communityId: string; emergency: unknown }) => {
+    if (!data?.communityId) return;
+    if (jsonByteLength(data.emergency) > MAX_POST_JSON) {
+      console.warn(`[socket] dropped oversized emergency:update from ${userId}`);
+      return;
+    }
     socket.to(`community:${data.communityId}`).emit('emergency:update', data.emergency);
   });
 

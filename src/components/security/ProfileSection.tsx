@@ -295,26 +295,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
           )}
         </View>
 
-        <View className="gap-y-1">
-          <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Physical Address</Text>
-          {isEditing ? (
-            <View className="gap-y-1">
-              <TextInput
-                value={formData.address}
-                editable={false}
-                className="bg-gray-100 rounded-xl px-4 py-2 text-sm text-gray-400"
-                placeholder="Use the location picker below"
-              />
-              <Text className="text-[10px] text-gray-400 italic px-1">
-                Use the location picker below to update your address.
-              </Text>
-            </View>
-          ) : (
-            <View className="p-3 bg-gray-50 rounded-xl">
-              <Text className="text-sm font-bold text-gray-900">{userProfile?.address || 'Not set'}</Text>
-            </View>
-          )}
-        </View>
       </View>
 
       {/* Emergency Responder */}
