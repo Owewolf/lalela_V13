@@ -17,6 +17,40 @@ const CAT_MIN_PERCENTAGE = 15;
 
 const isAdminRole = (role?: string | null) => role === 'OWNER' || role === 'ADMIN';
 
+function serializeCharitySuggestion(
+  suggestion: any
+): {
+  id: string;
+  communityId: string;
+  charityId?: string;
+  suggestedById: string;
+  suggestedByName: string;
+  name: string;
+  description: string;
+  suggestedDonationAmount?: number;
+  reason: string;
+  website?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  adminFeedback?: string;
+  createdAt: Date;
+} {
+  return {
+    id: suggestion.id,
+    communityId: suggestion.communityId,
+    charityId: suggestion.charityId ?? undefined,
+    suggestedById: suggestion.suggestedBy,
+    suggestedByName: suggestion.user?.name ?? suggestion.suggestedByName ?? 'Community Member',
+    name: suggestion.name,
+    description: suggestion.description ?? '',
+    suggestedDonationAmount: suggestion.suggestedDonationAmount ?? undefined,
+    reason: suggestion.reason ?? '',
+    website: suggestion.website ?? undefined,
+    status: (suggestion.status ?? 'pending').toLowerCase(),
+    adminFeedback: suggestion.adminFeedback ?? undefined,
+    createdAt: suggestion.createdAt,
+  };
+}
+
 async function getCommunityRole(communityId: string, userId: string): Promise<string | null> {
   const member = await prisma.communityMember.findUnique({
     where: { communityId_userId: { communityId, userId } },
@@ -948,8 +982,12 @@ router.get('/:id/security-events', async (_req, res) => {
 
 router.get('/:id/charity-suggestions', async (req, res) => {
   try {
-    const suggestions = await prisma.charitySuggestion.findMany({ where: { communityId: req.params.id } });
-    return res.json(suggestions);
+    const suggestions = await prisma.charitySuggestion.findMany({
+      where: { communityId: req.params.id },
+      include: { user: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    return res.json(suggestions.map(serializeCharitySuggestion));
   } catch (error: any) {
     console.error('[API Error] 500:', error);
     return res.status(500).json({ error: error.message || 'Failed to fetch suggestions' });
@@ -958,10 +996,36 @@ router.get('/:id/charity-suggestions', async (req, res) => {
 
 router.post('/:id/charity-suggestions', async (req, res) => {
   try {
+    const {
+      name,
+      description,
+      reason,
+      website,
+      suggestedDonationAmount,
+    } = req.body ?? {};
+
+    if (!name?.trim() || !description?.trim() || !reason?.trim()) {
+      return res.status(400).json({ error: 'name, description, and reason are required' });
+    }
+
+    const normalizedAmount = Number(suggestedDonationAmount);
+    if (!Number.isFinite(normalizedAmount) || normalizedAmount < 1 || normalizedAmount > 100) {
+      return res.status(400).json({ error: 'suggestedDonationAmount must be between 1 and 100' });
+    }
+
     const suggestion = await prisma.charitySuggestion.create({
-      data: { communityId: req.params.id, suggestedBy: req.auth!.userId, ...req.body },
+      data: {
+        communityId: req.params.id,
+        suggestedBy: req.auth!.userId,
+        name: name.trim(),
+        description: description.trim(),
+        reason: reason.trim(),
+        website: website?.trim() || null,
+        suggestedDonationAmount: normalizedAmount,
+      },
+      include: { user: { select: { name: true } } },
     });
-    return res.status(201).json(suggestion);
+    return res.status(201).json(serializeCharitySuggestion(suggestion));
   } catch (error: any) {
     console.error('[API Error] 500:', error);
     return res.status(500).json({ error: error.message || 'Failed to create charity suggestion' });
@@ -989,6 +1053,7 @@ router.patch('/:id/charity-suggestions/:suggestionId/approve', async (req, res) 
 
     const existingSuggestion = await prisma.charitySuggestion.findFirst({
       where: { id: req.params.suggestionId, communityId: req.params.id },
+      include: { user: { select: { name: true } } },
     });
     if (!existingSuggestion) return res.status(404).json({ error: 'Suggestion not found' });
 
@@ -1011,8 +1076,9 @@ router.patch('/:id/charity-suggestions/:suggestionId/approve', async (req, res) 
         adminFeedback: req.body.feedback,
         charityId: createdCharity?.id ?? existingSuggestion.charityId,
       },
+      include: { user: { select: { name: true } } },
     });
-    return res.json({ suggestion, charity: createdCharity });
+    return res.json({ suggestion: serializeCharitySuggestion(suggestion), charity: createdCharity });
   } catch (error: any) {
     console.error('[API Error] 500:', error);
     return res.status(500).json({ error: error.message || 'Failed to approve suggestion' });
@@ -1030,8 +1096,9 @@ router.patch('/:id/charity-suggestions/:suggestionId/reject', async (req, res) =
     const suggestion = await prisma.charitySuggestion.update({
       where: { id: req.params.suggestionId },
       data: { status: 'rejected', adminFeedback: req.body.feedback },
+      include: { user: { select: { name: true } } },
     });
-    return res.json(suggestion);
+    return res.json(serializeCharitySuggestion(suggestion));
   } catch (error: any) {
     console.error('[API Error] 500:', error);
     return res.status(500).json({ error: error.message || 'Failed to reject suggestion' });
