@@ -16,6 +16,7 @@ import {
   buildInviteMessage,
 } from '../services/smsService.js';
 import { getFrontendUrl } from '../lib/urls.js';
+import { ME_USER_SELECT, serializeMeUser } from '../lib/userProfile.js';
 
 const router = Router();
 
@@ -147,7 +148,10 @@ router.post('/login', async (req, res) => {
 
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
-  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+  const user = await prisma.user.findUnique({
+    where: { email: email.toLowerCase() },
+    select: ME_USER_SELECT,
+  });
   if (!user || !user.passwordHash) return res.status(401).json({ error: 'Invalid email or password' });
 
   const valid = await bcrypt.compare(password, user.passwordHash);
@@ -184,26 +188,7 @@ router.post('/login', async (req, res) => {
   return res.json({
     accessToken,
     refreshToken,
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      profileImage: user.profileImage,
-      profileCompleted: user.profileCompleted,
-      communityCreated: user.communityCreated,
-      onboardingCompleted: user.onboardingCompleted,
-      lastCommunityId: user.lastCommunityId,
-      licenseStatus: user.licenseStatus,
-      role: user.role,
-      status: user.status,
-      latitude: user.latitude,
-      longitude: user.longitude,
-      address: user.address,
-      defaultLocation:
-        user.latitude != null && user.longitude != null
-          ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
-          : undefined,
-    },
+    user: serializeMeUser(user),
   });
 });
 
@@ -382,31 +367,18 @@ router.post('/phone/verify-otp', async (req, res) => {
     },
   });
 
+  const hydratedUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: ME_USER_SELECT,
+  });
+  if (!hydratedUser) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
   return res.json({
     accessToken,
     refreshToken,
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      phone: user.phone,
-      phoneVerified: user.phoneVerified,
-      profileImage: user.profileImage,
-      profileCompleted: user.profileCompleted,
-      communityCreated: user.communityCreated,
-      onboardingCompleted: user.onboardingCompleted,
-      lastCommunityId: user.lastCommunityId,
-      licenseStatus: user.licenseStatus,
-      role: user.role,
-      status: user.status,
-      latitude: user.latitude,
-      longitude: user.longitude,
-      address: user.address,
-      defaultLocation:
-        user.latitude != null && user.longitude != null
-          ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
-          : undefined,
-    },
+    user: serializeMeUser(hydratedUser),
   });
 });
 

@@ -18,7 +18,11 @@ import {
   Shield,
   AlertTriangle,
   Clock,
+  Tag,
+  Megaphone,
+  HeartHandshake,
 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { PostConfirmationModal } from './PostConfirmationModal';
 
@@ -36,6 +40,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   onClose,
   onAcknowledgeAlert,
 }) => {
+  const router = useRouter();
   const {
     notifications,
     markNotificationAsRead,
@@ -46,6 +51,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   } = useCommunity();
 
   const unreadCount = notifications.filter((n: any) => !n.read).length;
+  const unreadLabel = unreadCount > 99 ? '99+' : String(unreadCount);
   const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
   const [pendingDeleteTitle, setPendingDeleteTitle] = React.useState('');
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -68,6 +74,59 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       }).start();
     }
   }, [isOpen]);
+
+  const navigateFromNotification = React.useCallback(async (notification: any) => {
+    const meta = notification.metadata ?? {};
+
+    await markNotificationAsRead(notification.id);
+
+    if (meta.communityId) {
+      setCurrentCommunity(meta.communityId);
+    }
+
+    if (notification.type === 'alert') {
+      if (meta.communityId && onAcknowledgeAlert) {
+        const postData = {
+          id: meta.postId,
+          title: meta.postTitle || 'Emergency',
+          description: meta.postDescription || '',
+          authorName: meta.authorName || 'Community Member',
+          urgency: 'emergency',
+          urgency_level: 'emergency',
+          timestamp: new Date().toISOString(),
+        };
+        onAcknowledgeAlert(meta.communityId, postData);
+      } else if (meta.emergencyId || meta.postId) {
+        router.push(`/emergency/${meta.emergencyId || meta.postId}` as any);
+      }
+      onClose();
+      return;
+    }
+
+    if (notification.type === 'listing' && meta.postId) {
+      router.push(`/(tabs)/market?listingId=${encodeURIComponent(String(meta.postId))}` as any);
+      onClose();
+      return;
+    }
+
+    if (notification.type === 'notice' && meta.postId) {
+      router.push(`/(tabs)/posts?noticeId=${encodeURIComponent(String(meta.postId))}` as any);
+      onClose();
+      return;
+    }
+
+    if (notification.type === 'charity_suggestion') {
+      router.push('/settings?charityMode=manage' as any);
+      onClose();
+      return;
+    }
+
+    if (typeof meta.route === 'string' && meta.route.length > 0) {
+      router.push(meta.route as any);
+    }
+
+    onClose();
+  }, [markNotificationAsRead, onAcknowledgeAlert, onClose, router, setCurrentCommunity]);
 
   const handleAction = async (notification: any, action: 'accept' | 'decline') => {
     if (notification.type === 'invitation' && notification.metadata?.invitationId) {
@@ -123,6 +182,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     switch (type) {
       case 'invitation': return <Mail size={16} color={PRIMARY} />;
       case 'alert': return <AlertTriangle size={16} color={ERROR} />;
+      case 'listing': return <Tag size={16} color="#2563eb" />;
+      case 'notice': return <Megaphone size={16} color="#b45309" />;
+      case 'charity_suggestion': return <HeartHandshake size={16} color="#16a34a" />;
       case 'system': return <Shield size={16} color="#6750a4" />;
       default: return <Bell size={16} color="#94a3b8" />;
     }
@@ -133,6 +195,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     switch (type) {
       case 'invitation': return '#f0fdf4';
       case 'alert': return '#fef2f2';
+      case 'listing': return '#eff6ff';
+      case 'notice': return '#fffbeb';
+      case 'charity_suggestion': return '#f0fdf4';
       case 'system': return '#f5f3ff';
       default: return '#f8fafc';
     }
@@ -154,7 +219,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         styles.notifCard,
         notification.read ? styles.notifCardRead : styles.notifCardUnread,
       ]}
-      onPress={() => markNotificationAsRead(notification.id)}
+      onPress={() => navigateFromNotification(notification)}
       activeOpacity={0.8}
     >
       <View style={styles.notifRow}>
@@ -232,7 +297,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           {/* Time */}
           <View style={styles.timeRow}>
             <Clock size={12} color="#94a3b8" />
-            <Text style={styles.timeText}>{formatTime(notification.created_at)}</Text>
+            <Text style={styles.timeText}>{formatTime(notification.createdAt ?? notification.created_at)}</Text>
           </View>
         </View>
       </View>
@@ -263,7 +328,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 <Bell size={24} color={PRIMARY} />
                 {unreadCount > 0 && (
                   <View style={styles.unreadBadge}>
-                    <Text style={styles.unreadBadgeText}>{unreadCount}</Text>
+                    <Text style={styles.unreadBadgeText}>{unreadLabel}</Text>
                   </View>
                 )}
               </View>

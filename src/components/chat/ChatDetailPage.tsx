@@ -23,6 +23,19 @@ interface ChatDetailPageProps {
   conversationId: string;
 }
 
+function getParticipantId(participant: any): string | null {
+  if (typeof participant === 'string') return participant;
+  if (participant && typeof participant === 'object') {
+    return participant.userId ?? participant.user?.id ?? participant.id ?? null;
+  }
+  return null;
+}
+
+function getParticipantProfile(participant: any): { name?: string; profileImage?: string; mobileNumber?: string; phone?: string } | null {
+  if (!participant || typeof participant !== 'object') return null;
+  return participant.user ?? participant;
+}
+
 export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }) => {
   const router = useRouter();
   const { userProfile } = useAuth();
@@ -57,7 +70,17 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
     };
   }, [conversationId]);
 
-  const otherId = chat?.otherParticipant?.id ?? chat?.participants?.find((p, i) => i === 1);
+  const otherParticipantFromList = useMemo(() => {
+    if (!chat || !userProfile?.id) return null;
+    return (chat.participants as any[]).find((participant) => {
+      const id = getParticipantId(participant);
+      return !!id && id !== userProfile.id;
+    }) ?? null;
+  }, [chat, userProfile?.id]);
+
+  const otherId =
+    chat?.otherParticipant?.id ??
+    getParticipantId(otherParticipantFromList);
   const member = useMemo(
     () => members.find((m) => m.userId === otherId),
     [members, otherId]
@@ -78,12 +101,17 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
   const isDirectConversation = chat?.type === 'direct' || chat?.type === 'listing';
   const isNoticeConversation = chat?.type === 'notice';
 
+  const otherParticipantProfile = getParticipantProfile(otherParticipantFromList);
+
   const name =
     member?.name ||
+    otherParticipantProfile?.name ||
     chat?.otherParticipant?.name ||
     'Conversation';
-  const image = member?.image || chat?.otherParticipant?.profileImage;
+  const image = member?.image || otherParticipantProfile?.profileImage || chat?.otherParticipant?.profileImage;
   const directPhone =
+    otherParticipantProfile?.mobileNumber ||
+    otherParticipantProfile?.phone ||
     chat?.otherParticipant?.mobileNumber ||
     chat?.otherParticipant?.phone ||
     null;
@@ -266,16 +294,34 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                 </View>
               </>
             ) : isDirectConversation ? (
-              <View className="flex-1 min-w-0">
-                <Text numberOfLines={1} className="font-black text-gray-900 text-[18px] leading-[22px]">
-                  {name}
-                </Text>
-                {directSubtitleParts.length > 0 ? (
-                  <Text numberOfLines={1} className="text-[12px] text-gray-500 mt-0.5">
-                    {directSubtitleParts.join(' · ')}
+              <>
+                <View className="relative flex-shrink-0">
+                  {image ? (
+                    <Image
+                      source={{ uri: image }}
+                      className="w-12 h-12 rounded-2xl"
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View className="w-12 h-12 rounded-2xl bg-surface items-center justify-center">
+                      <Text className="text-primary font-bold text-lg">
+                        {name[0].toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                <View className="flex-1 min-w-0">
+                  <Text numberOfLines={1} className="font-black text-gray-900 text-[18px] leading-[22px]">
+                    {name}
                   </Text>
-                ) : null}
-              </View>
+                  {directSubtitleParts.length > 0 ? (
+                    <Text numberOfLines={1} className="text-[12px] text-gray-500 mt-0.5">
+                      {directSubtitleParts.join(' · ')}
+                    </Text>
+                  ) : null}
+                </View>
+              </>
             ) : (
               <>
                 {/* Avatar */}

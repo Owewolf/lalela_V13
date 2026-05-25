@@ -29,11 +29,19 @@ const defaultPreferences: NotificationPreferences = {
   listingUpdates: true,
   communityActivity: true,
   businessActivity: true,
+  charitySuggestions: true,
+  securityAlerts: true,
   priorityCommunityIds: [],
   communityOverrides: {},
 };
 
-type NotifTypeKey = 'generalNotices' | 'listingUpdates' | 'communityActivity' | 'businessActivity';
+type NotifTypeKey =
+  | 'generalNotices'
+  | 'listingUpdates'
+  | 'communityActivity'
+  | 'businessActivity'
+  | 'charitySuggestions'
+  | 'securityAlerts';
 
 const NOTIFICATION_TYPES: {
   key: NotifTypeKey;
@@ -45,12 +53,14 @@ const NOTIFICATION_TYPES: {
   { key: 'listingUpdates', Icon: Tag, label: 'Listing Updates', description: 'New listings, price changes, and marketplace activity' },
   { key: 'communityActivity', Icon: MessageSquare, label: 'Community Activity', description: 'Posts, comments, and member activity' },
   { key: 'businessActivity', Icon: Building2, label: 'Business Activity', description: 'Business updates, promotions, and reviews' },
+  { key: 'charitySuggestions', Icon: Bell, label: 'Charity Suggestions', description: 'Member charity suggestions and review activity' },
+  { key: 'securityAlerts', Icon: ShieldAlert, label: 'Security Alerts', description: 'Security and high-priority system alerts' },
 ];
 
 const NotificationSettingsPage: React.FC = () => {
   const router = useRouter();
   const { communities, updateNotificationPreferences } = useCommunity();
-  const { userProfile } = useAuth();
+  const { userProfile, refreshProfile } = useAuth();
   const [prefs, setPrefs] = useState<NotificationPreferences>(defaultPreferences);
   const [saving, setSaving] = useState(false);
   const [expandedCommunityId, setExpandedCommunityId] = useState<string | null>(null);
@@ -66,6 +76,7 @@ const NotificationSettingsPage: React.FC = () => {
     setSaving(true);
     try {
       await updateNotificationPreferences(updated);
+      await refreshProfile();
     } finally {
       setSaving(false);
     }
@@ -84,7 +95,9 @@ const NotificationSettingsPage: React.FC = () => {
       (newOverride.generalNotices ?? prefs.generalNotices) === prefs.generalNotices &&
       (newOverride.listingUpdates ?? prefs.listingUpdates) === prefs.listingUpdates &&
       (newOverride.communityActivity ?? prefs.communityActivity) === prefs.communityActivity &&
-      (newOverride.businessActivity ?? prefs.businessActivity) === prefs.businessActivity;
+      (newOverride.businessActivity ?? prefs.businessActivity) === prefs.businessActivity &&
+      (newOverride.charitySuggestions ?? prefs.charitySuggestions) === prefs.charitySuggestions &&
+      (newOverride.securityAlerts ?? prefs.securityAlerts) === prefs.securityAlerts;
 
     const updatedOverrides = { ...(prefs.communityOverrides ?? {}) };
     if (matchesGlobal) {
@@ -98,11 +111,11 @@ const NotificationSettingsPage: React.FC = () => {
   const getCommunityStatus = (communityId: string): { label: string; color: string } => {
     const override = prefs.communityOverrides?.[communityId];
     if (!override) return { label: 'Follows global', color: '#9ca3af' };
-    const types: NotifTypeKey[] = ['generalNotices', 'listingUpdates', 'communityActivity', 'businessActivity'];
+    const types: NotifTypeKey[] = ['generalNotices', 'listingUpdates', 'communityActivity', 'businessActivity', 'charitySuggestions', 'securityAlerts'];
     const onCount = types.filter((k) => override[k] ?? prefs[k]).length;
     if (onCount === 0) return { label: 'Muted', color: '#ef4444' };
-    if (onCount === 4) return { label: 'All on', color: '#0d3d47' };
-    return { label: `${onCount} of 4 on`, color: '#f59e0b' };
+    if (onCount === types.length) return { label: 'All on', color: '#0d3d47' };
+    return { label: `${onCount} of ${types.length} on`, color: '#f59e0b' };
   };
 
   return (

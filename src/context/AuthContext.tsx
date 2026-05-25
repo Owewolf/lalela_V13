@@ -126,8 +126,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = useCallback(async (email: string, password: string) => {
     const { data } = await api.post('/auth/login', { email, password });
     await storeTokens(data.accessToken, data.refreshToken);
-    setUserProfile(data.user);
-    await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+    // Refetch canonical profile so cache always matches /users/me shape.
+    try {
+      const { data: fresh } = await api.get<UserProfile>('/users/me');
+      setUserProfile(fresh);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
+    } catch {
+      setUserProfile(data.user);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+    }
   }, []);
 
   // ── Sign out ──────────────────────────────────────────────

@@ -431,7 +431,16 @@ export interface AppNotification {
   userId: string;
   title: string;
   message: string;
-  type: 'invitation' | 'system' | 'alert' | 'trial_expiry' | 'payment_reminder';
+  type:
+    | 'invitation'
+    | 'system'
+    | 'alert'
+    | 'trial_expiry'
+    | 'payment_reminder'
+    | 'listing'
+    | 'notice'
+    | 'charity_suggestion'
+    | 'security';
   link?: string;
   read: boolean;
   createdAt: any;
@@ -443,6 +452,8 @@ export interface CommunityNotificationOverride {
   listingUpdates?: boolean;
   communityActivity?: boolean;
   businessActivity?: boolean;
+  charitySuggestions?: boolean;
+  securityAlerts?: boolean;
 }
 
 export interface NotificationPreferences {
@@ -451,6 +462,8 @@ export interface NotificationPreferences {
   listingUpdates: boolean;
   communityActivity: boolean;
   businessActivity: boolean;
+  charitySuggestions: boolean;
+  securityAlerts: boolean;
   priorityCommunityIds: string[];
   communityOverrides?: Record<string, CommunityNotificationOverride>;
 }

@@ -29,6 +29,17 @@ import { useAuth } from '../../context/AuthContext';
 import { isCommunityActive, isCommunityTrial, isCommunityLicensed, isUserLicensed } from '../../lib/licensing';
 import { NotificationPreferences } from '../../types';
 
+const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
+  globalEnabled: true,
+  generalNotices: true,
+  listingUpdates: true,
+  communityActivity: true,
+  businessActivity: true,
+  charitySuggestions: true,
+  securityAlerts: true,
+  priorityCommunityIds: [],
+  communityOverrides: {},
+};
 
 const APP_LOGO = require('../../../assets/lalela_logo.png');
 const APP_LOGO_SELECTED = require('../../../assets/lalela_logo_transparent.png');
@@ -37,8 +48,8 @@ import ManageCommunityCharity from './ManageCommunityCharity';
 const SettingsPage: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams<{ charityMode?: string | string[] }>();
-  const { userProfile, updateUserProfile } = useAuth();
-  const { currentCommunity, communities, setCurrentCommunity } = useCommunity();
+  const { userProfile, updateUserProfile, refreshProfile } = useAuth();
+  const { currentCommunity, communities, setCurrentCommunity, updateNotificationPreferences } = useCommunity();
 
   const routeCharityMode = Array.isArray(params.charityMode)
     ? params.charityMode[0]
@@ -62,11 +73,22 @@ const SettingsPage: React.FC = () => {
 
   const handleNotificationToggle = async (val: boolean) => {
     setGlobalNotificationsEnabled(val);
-    if (val) {
-      router.push('/notifications-settings');
-    } else {
-      // Just disable — keep other prefs intact
-      // This mirrors the web behaviour
+    const currentPrefs: NotificationPreferences = {
+      ...DEFAULT_NOTIFICATION_PREFERENCES,
+      ...((userProfile as any)?.notificationPreferences ?? {}),
+    };
+
+    try {
+      await updateNotificationPreferences({
+        ...currentPrefs,
+        globalEnabled: val,
+      });
+      await refreshProfile();
+      if (val) {
+        router.push('/notifications-settings');
+      }
+    } catch {
+      setGlobalNotificationsEnabled(currentPrefs.globalEnabled);
     }
   };
 

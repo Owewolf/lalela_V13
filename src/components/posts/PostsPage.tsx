@@ -1,7 +1,7 @@
 import { defaultMapViewProps } from "../../lib/mapViewProps";
 import { resolveMediaUrl } from "../../lib/config";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -38,6 +38,10 @@ import { useAuth } from '../../context/AuthContext';
 import type { CommunityNotice } from '../../types';
 
 const PRIMARY = '#0d3d47';
+
+interface PostsPageProps {
+  initialNoticeId?: string;
+}
 
 function getUrgencyPriority(level?: string, urgency?: string): number {
   const l =
@@ -135,7 +139,7 @@ function calculateDistance(lat?: number, lng?: number, baseLat?: number, baseLng
   return (R * c).toFixed(1);
 }
 
-export default function PostsPage() {
+export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   const router = useRouter();
     const { posts, currentCommunity, removePost, charities, startConversation, setActiveConversation, members } = useCommunity();
     const { userProfile } = useAuth();
@@ -144,6 +148,8 @@ export default function PostsPage() {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [mapPost, setMapPost] = useState<CommunityNotice | null>(null);
+  const [highlightedNoticeId, setHighlightedNoticeId] = useState<string | null>(null);
+  const feedListRef = useRef<FlatList<FeedSection> | null>(null);
 
   const baseLat = currentCommunity?.coverageArea?.latitude;
   const baseLng = currentCommunity?.coverageArea?.longitude;
@@ -256,7 +262,14 @@ export default function PostsPage() {
       return (
         <View
           className="rounded-2xl bg-white overflow-hidden mb-3"
-          style={{ borderWidth: 1, borderColor, shadowColor: borderColor, shadowOpacity: 0.2, shadowRadius: 4, elevation: 2 }}
+          style={{
+            borderWidth: 1,
+            borderColor: highlightedNoticeId === notice.id ? PRIMARY : borderColor,
+            shadowColor: highlightedNoticeId === notice.id ? PRIMARY : borderColor,
+            shadowOpacity: highlightedNoticeId === notice.id ? 0.35 : 0.2,
+            shadowRadius: highlightedNoticeId === notice.id ? 10 : 4,
+            elevation: highlightedNoticeId === notice.id ? 5 : 2,
+          }}
         >
           {/* Inline map for emergency/warning */}
           {showMap ? (
@@ -448,7 +461,7 @@ export default function PostsPage() {
         </View>
       );
     },
-    [activeMenuId, userProfile?.id, currentCommunity?.userRole, baseLat, baseLng]
+    [activeMenuId, userProfile?.id, currentCommunity?.userRole, baseLat, baseLng, highlightedNoticeId]
   );
 
   const renderListing = useCallback(
@@ -699,25 +712,61 @@ export default function PostsPage() {
     | { kind: 'listing'; item: CommunityNotice }
     | { kind: 'emptyListings' };
 
-  const feedData: FeedSection[] = [];
+  const feedData = useMemo(() => {
+    const data: FeedSection[] = [];
 
-  if (filter === 'all' || filter === 'notice') {
-    if (notices.length > 0) {
-      feedData.push({ kind: 'noticeHeader' });
-      notices.forEach(n => feedData.push({ kind: 'notice', item: n }));
+    if (filter === 'all' || filter === 'notice') {
+      if (notices.length > 0) {
+        data.push({ kind: 'noticeHeader' });
+        notices.forEach(n => data.push({ kind: 'notice', item: n }));
+      }
     }
-  }
-  if (filter === 'all' && notices.length > 0 && listings.length > 0) {
-    feedData.push({ kind: 'divider' });
-  }
-  if (filter === 'all' || filter === 'listing') {
-    feedData.push({ kind: 'listingHeader' });
-    if (listings.length > 0) {
-      listings.forEach(l => feedData.push({ kind: 'listing', item: l }));
-    } else {
-      feedData.push({ kind: 'emptyListings' });
+    if (filter === 'all' && notices.length > 0 && listings.length > 0) {
+      data.push({ kind: 'divider' });
     }
-  }
+    if (filter === 'all' || filter === 'listing') {
+      data.push({ kind: 'listingHeader' });
+      if (listings.length > 0) {
+        listings.forEach(l => data.push({ kind: 'listing', item: l }));
+      } else {
+        data.push({ kind: 'emptyListings' });
+      }
+    }
+
+    return data;
+  }, [filter, listings, notices]);
+
+  useEffect(() => {
+    if (!initialNoticeId || notices.length === 0) return;
+
+    const targetNotice = notices.find((notice) => notice.id === initialNoticeId);
+    if (!targetNotice) return;
+
+    setFilter('notice');
+    setHighlightedNoticeId(initialNoticeId);
+
+    const timer = setTimeout(() => {
+      const targetIndex = feedData.findIndex(
+        (item) => item.kind === 'notice' && item.item.id === initialNoticeId,
+      );
+
+      if (targetIndex >= 0) {
+        feedListRef.current?.scrollToIndex({
+          index: targetIndex,
+          animated: true,
+          viewPosition: 0.15,
+        });
+      }
+    }, 120);
+
+    return () => clearTimeout(timer);
+  }, [feedData, initialNoticeId, notices]);
+
+  useEffect(() => {
+    if (!highlightedNoticeId) return;
+    const timer = setTimeout(() => setHighlightedNoticeId(null), 4000);
+    return () => clearTimeout(timer);
+  }, [highlightedNoticeId]);
 
   const renderFeedItem = ({ item }: { item: FeedSection }) => {
     switch (item.kind) {
@@ -822,12 +871,21 @@ export default function PostsPage() {
 
       {/* Feed */}
       <FlatList
+        ref={feedListRef}
         data={feedData}
         keyExtractor={(item, index) => {
           if (item.kind === 'notice' || item.kind === 'listing') return item.item.id;
           return `${item.kind}-${index}`;
         }}
         renderItem={renderFeedItem}
+        onScrollToIndexFailed={({ index }) => {
+          setTimeout(() => {
+            feedListRef.current?.scrollToOffset({
+              offset: Math.max(0, index * 220),
+              animated: true,
+            });
+          }, 120);
+        }}
         contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       />

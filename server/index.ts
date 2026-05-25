@@ -7,6 +7,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import apiRouter from './api.js';
 import { sendPushToUser } from './services/pushService.js';
+import { registerNotificationEmitter } from './services/notificationService.js';
 import prisma from './db.js';
 import { startCronJobs } from './billing/cronService.js';
 
@@ -54,6 +55,10 @@ const SOCKET_MAX_PAYLOAD_BYTES = 256 * 1024;
 const io = new SocketServer(httpServer, {
   cors: { origin: corsOriginFn, methods: ['GET', 'POST'], credentials: true },
   maxHttpBufferSize: SOCKET_MAX_PAYLOAD_BYTES,
+});
+
+registerNotificationEmitter((targetUserId, notification) => {
+  io.to(`user:${targetUserId}`).emit('notification:new', notification);
 });
 
 // Bound any free-form text we pass through over the socket so a single buggy

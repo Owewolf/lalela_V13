@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Animated, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Shield, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -62,40 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
   const showTrialWarning = daysUntilTrialExpiry !== null && daysUntilTrialExpiry <= 5;
 
   const unreadCount = notifications.filter((n: any) => !n.read).length;
-
-  const pulseAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (unreadCount > 0) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 1500,
-            useNativeDriver: Platform.OS !== 'web',
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 0,
-            duration: 0,
-            useNativeDriver: Platform.OS !== 'web',
-          }),
-        ])
-      ).start();
-    } else {
-      pulseAnim.stopAnimation();
-      pulseAnim.setValue(0);
-    }
-  }, [unreadCount, pulseAnim]);
-
-  const pulseScale = pulseAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 2],
-  });
-  
-  const pulseOpacity = pulseAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.4, 0],
-  });
+  const unreadLabel = unreadCount > 99 ? '99+' : String(unreadCount);
 
   const handleBack = () => {
     if (onBack) {
@@ -187,18 +154,12 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right: bell + avatar */}
         <View style={styles.rightSection}>
           <TouchableOpacity style={styles.bellBtn} onPress={onToggleNotifications} activeOpacity={0.7}>
+            <Bell size={24} color={PRIMARY} />
             {unreadCount > 0 && (
-              <Animated.View
-                style={[
-                  styles.bellPulse,
-                  {
-                    transform: [{ scale: pulseScale }],
-                    opacity: pulseOpacity,
-                  },
-                ]}
-              />
+              <View style={styles.bellBadge}>
+                <Text style={styles.bellBadgeText}>{unreadLabel}</Text>
+              </View>
             )}
-            <Bell size={24} color={unreadCount > 0 ? '#16a34a' : PRIMARY} />
           </TouchableOpacity>
 
           <View style={styles.avatarWrapper}>
@@ -309,14 +270,25 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 20,
   },
-  bellPulse: {
+  bellBadge: {
     position: 'absolute',
-    top: 8,
-    left: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    top: 2,
+    right: 1,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#22c55e',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#ffffff',
+  },
+  bellBadgeText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '900',
+    lineHeight: 12,
   },
   avatarWrapper: {
     paddingLeft: 4,

@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import prisma from '../db.js';
+import { createNotificationForUsers } from '../services/notificationService.js';
 import { requireAuth } from '../middleware/auth.js';
+import { ME_USER_SELECT, serializeMeUser } from '../lib/userProfile.js';
 
 const router = Router();
 
@@ -12,35 +14,10 @@ router.use(requireAuth);
 router.get('/me', async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
-    select: {
-      id: true, email: true, name: true, firstName: true, lastName: true,
-      phone: true, mobileNumber: true, address: true, profileImage: true,
-      emailVerified: true, phoneVerified: true, status: true, role: true,
-      profileCompleted: true, communityCreated: true, onboardingCompleted: true,
-      licenseStatus: true, trialExpiresAt: true,
-      subscriptionActive: true, subscriptionRenewalDate: true, autoRenew: true,
-      twoFactorEnabled: true, twoFactorMethod: true, loginAlertsEnabled: true,
-      profileVisibility: true, piiVisibility: true,
-      lastPasswordChanged: true, securityScore: true,
-      locationSharing: true, isSecurityMember: true, emergencyLocationOptIn: true,
-      latitude: true, longitude: true, lastCommunityId: true,
-      agreedToTerms: true, marketingConsent: true,
-      notificationPreferences: true,
-      fcmToken: true, pushToken: true, pushPlatform: true,
-      pendingInviteCode: true,
-      passwordHash: true, // selected only to compute hasPassword; stripped from response below
-      createdAt: true, updatedAt: true,
-    },
+    select: ME_USER_SELECT,
   });
   if (!user) return res.status(404).json({ error: 'User not found' });
-  // Reconstruct defaultLocation from flat lat/lng columns
-  const defaultLocation =
-    user.latitude != null && user.longitude != null
-      ? { name: user.address ?? '', latitude: user.latitude, longitude: user.longitude }
-      : undefined;
-  // Never leak the password hash to clients; expose a boolean flag instead.
-  const { passwordHash, ...safeUser } = user;
-  return res.json({ ...safeUser, hasPassword: passwordHash != null, defaultLocation });
+  return res.json(serializeMeUser(user));
 });
 
 router.put('/me', async (req, res) => {
@@ -194,15 +171,19 @@ router.post('/me/notifications', async (req, res) => {
     return res.status(400).json({ error: 'target_userId, title, message and type are required' });
   }
 
-  const notification = await prisma.notification.create({
-    data: {
-      userId: target_userId,
-      title,
-      message,
-      type,
-      metadata: metadata as any,
-    },
+  const [notification] = await createNotificationForUsers({
+    recipientUserIds: [target_userId],
+    type,
+    title,
+    message,
+    metadata: metadata as Record<string, unknown> | undefined,
+    category: type === 'alert' ? 'securityAlerts' : 'communityActivity',
   });
+
+  if (!notification) {
+    return res.status(404).json({ error: 'Notification recipient not found or notifications disabled' });
+  }
+
   return res.status(201).json(notification);
 });
 

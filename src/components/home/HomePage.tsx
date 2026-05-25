@@ -1251,7 +1251,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               'flex-1 flex-col items-center justify-center py-3 rounded-2xl gap-1.5 shadow-md',
               currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
             )}
-            style={{ backgroundColor: '#dc2626' }}
+            style={{ backgroundColor: '#fc7127' }}
           >
             <Siren
               size={20}

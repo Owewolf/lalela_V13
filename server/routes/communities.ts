@@ -9,6 +9,7 @@ import {
 } from '../services/emailService.js';
 import { handlePaymentSuccess } from '../billing/paymentService.js';
 import { getOrCreateCommunityInviteLink } from '../billing/inviteService.js';
+import { notifyCommunityMembers } from '../services/notificationService.js';
 // UserRole is a string enum in Prisma schema; reference it as a string literal type
 type UserRole = 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER';
 
@@ -534,6 +535,73 @@ router.post('/:id/posts', async (req, res) => {
       authorRole: authorMembership?.role ?? null,
     },
   });
+
+  const authorDisplayName = post.authorName || authorUser?.name || 'A community member';
+  const isEmergencyNotice =
+    type === 'notice' &&
+    (String(urgencyLevel ?? '').toLowerCase() === 'emergency' ||
+      String(urgency ?? '').toLowerCase() === 'emergency' ||
+      String(subtype ?? postSubtype ?? '').toLowerCase() === 'emergency');
+
+  if (type === 'listing') {
+    await notifyCommunityMembers({
+      communityId: req.params.id,
+      actorUserId: req.auth!.userId,
+      category: 'listingUpdates',
+      type: 'listing',
+      title: `New listing: ${post.title}`,
+      message: `${authorDisplayName} posted a new listing for the community.`,
+      metadata: {
+        communityId: req.params.id,
+        postId: post.id,
+        postType: type,
+        route: '/market',
+      },
+      push: {
+        title: 'New community listing',
+        body: `${authorDisplayName}: ${post.title}`,
+        data: {
+          type: 'listing',
+          route: '/market',
+          communityId: req.params.id,
+          postId: post.id,
+        },
+      },
+    });
+  } else {
+    await notifyCommunityMembers({
+      communityId: req.params.id,
+      actorUserId: req.auth!.userId,
+      category: isEmergencyNotice ? 'securityAlerts' : 'generalNotices',
+      mandatory: isEmergencyNotice,
+      type: isEmergencyNotice ? 'alert' : 'notice',
+      title: isEmergencyNotice ? `Emergency alert: ${post.title}` : `New notice: ${post.title}`,
+      message: isEmergencyNotice
+        ? `${authorDisplayName} raised an emergency alert for the community.`
+        : `${authorDisplayName} posted a new community notice.`,
+      metadata: {
+        communityId: req.params.id,
+        postId: post.id,
+        postTitle: post.title,
+        postDescription: post.description ?? '',
+        authorName: authorDisplayName,
+        emergencyId: isEmergencyNotice ? post.id : undefined,
+        route: isEmergencyNotice ? `/emergency/${post.id}` : '/(tabs)/posts',
+      },
+      push: {
+        title: isEmergencyNotice ? 'Emergency alert' : 'New community notice',
+        body: `${authorDisplayName}: ${post.title}`,
+        data: {
+          type: isEmergencyNotice ? 'alert' : 'notice',
+          route: isEmergencyNotice ? `/emergency/${post.id}` : '/(tabs)/posts',
+          communityId: req.params.id,
+          emergencyId: isEmergencyNotice ? post.id : '',
+          postId: post.id,
+        },
+      },
+    });
+  }
+
   return res.status(201).json({
     ...post,
     timestamp: post.createdAt,
@@ -775,27 +843,33 @@ router.post('/:id/cat-cycle', async (req, res) => {
       } as any,
     });
 
-    const members = await prisma.communityMember.findMany({
-      where: { communityId: req.params.id, status: 'ACTIVE' },
-      select: { userId: true },
-    });
-    if (members.length > 0) {
-      await prisma.notification.createMany({
-        data: members.map((member) => ({
-          userId: member.userId,
+    await notifyCommunityMembers({
+      communityId: req.params.id,
+      actorUserId: req.auth!.userId,
+      category: 'communityActivity',
+      type: 'system',
+      title: active ? 'Charity cycle activated' : 'Charity cycle paused',
+      message: active
+        ? 'CAT contributions from public sold listings are now pooled to the featured charity.'
+        : 'CAT contributions from sold public listings now remain as seller earnings.',
+      metadata: {
+        communityId: req.params.id,
+        catCycleActive: active,
+        featuredCharityId: resolvedFeaturedId,
+        route: '/settings',
+      },
+      push: {
+        title: active ? 'Charity cycle activated' : 'Charity cycle paused',
+        body: active
+          ? 'Public CAT contributions are now pooled to the featured charity.'
+          : 'Public CAT contributions now remain seller earnings.',
+        data: {
           type: 'system',
-          title: active ? 'Charity cycle activated' : 'Charity cycle paused',
-          message: active
-            ? 'CAT contributions from public sold listings are now pooled to the featured charity.'
-            : 'CAT contributions from sold public listings now remain as seller earnings.',
-          metadata: {
-            communityId: req.params.id,
-            catCycleActive: active,
-            featuredCharityId: resolvedFeaturedId,
-          },
-        })),
-      });
-    }
+          route: '/settings',
+          communityId: req.params.id,
+        },
+      },
+    });
 
     return res.json({
       community,
@@ -1025,6 +1099,33 @@ router.post('/:id/charity-suggestions', async (req, res) => {
       },
       include: { user: { select: { name: true } } },
     });
+
+    const suggesterName = suggestion.user?.name ?? 'A community member';
+    await notifyCommunityMembers({
+      communityId: req.params.id,
+      actorUserId: req.auth!.userId,
+      category: 'charitySuggestions',
+      type: 'charity_suggestion',
+      title: 'New charity suggestion',
+      message: `${suggesterName} suggested ${suggestion.name} for community support.`,
+      metadata: {
+        communityId: req.params.id,
+        suggestionId: suggestion.id,
+        charitySuggestionName: suggestion.name,
+        route: '/settings',
+      },
+      push: {
+        title: 'New charity suggestion',
+        body: `${suggesterName}: ${suggestion.name}`,
+        data: {
+          type: 'charity_suggestion',
+          route: '/settings',
+          communityId: req.params.id,
+          suggestionId: suggestion.id,
+        },
+      },
+    });
+
     return res.status(201).json(serializeCharitySuggestion(suggestion));
   } catch (error: any) {
     console.error('[API Error] 500:', error);
