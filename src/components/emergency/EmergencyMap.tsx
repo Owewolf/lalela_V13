@@ -177,6 +177,17 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
                 latitude: responder.latitude,
                 longitude: responder.longitude,
               }}
+              onSelect={() =>
+                setFocusedPerson({
+                  id: responder.userId,
+                  name: responder.name,
+                  role: 'Responder',
+                  distanceKm,
+                })
+              }
+              onDeselect={() => {
+                setFocusedPerson((prev) => (prev?.id === responder.userId ? null : prev));
+              }}
               onPress={() =>
                 setFocusedPerson({
                   id: responder.userId,
@@ -189,19 +200,6 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
               <View
                 className="bg-teal-700 p-1.5 rounded-full border-2 border-white"
                 style={{ shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 4 }}
-                onMouseEnter={() => {
-                  if (Platform.OS !== 'web') return;
-                  setFocusedPerson({
-                    id: responder.userId,
-                    name: responder.name,
-                    role: 'Responder',
-                    distanceKm,
-                  });
-                }}
-                onMouseLeave={() => {
-                  if (Platform.OS !== 'web') return;
-                  setFocusedPerson((prev) => (prev?.id === responder.userId ? null : prev));
-                }}
               >
                 <Shield color="white" size={14} />
               </View>
@@ -235,6 +233,17 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
                 latitude: member.latitude!,
                 longitude: member.longitude!,
               }}
+              onSelect={() =>
+                setFocusedPerson({
+                  id: member.userId,
+                  name: member.name || 'Community Member',
+                  role: 'Member',
+                  distanceKm,
+                })
+              }
+              onDeselect={() => {
+                setFocusedPerson((prev) => (prev?.id === member.userId ? null : prev));
+              }}
               onPress={() =>
                 setFocusedPerson({
                   id: member.userId,
@@ -247,19 +256,6 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
               <View
                 className="bg-emerald-500 rounded-full border-2 border-white"
                 style={{ width: 14, height: 14, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 3 }}
-                onMouseEnter={() => {
-                  if (Platform.OS !== 'web') return;
-                  setFocusedPerson({
-                    id: member.userId,
-                    name: member.name || 'Community Member',
-                    role: 'Member',
-                    distanceKm,
-                  });
-                }}
-                onMouseLeave={() => {
-                  if (Platform.OS !== 'web') return;
-                  setFocusedPerson((prev) => (prev?.id === member.userId ? null : prev));
-                }}
               />
               <Callout tooltip>
                 <View className="bg-white rounded-2xl p-3 min-w-[180px] shadow-lg">
