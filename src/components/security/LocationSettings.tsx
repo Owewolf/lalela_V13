@@ -62,11 +62,11 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
         </View>
         <View className="flex-row items-center gap-2">
           <Text className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-            {userProfile?.locationSharingEnabled ? 'On' : 'Off'}
+            {userProfile?.locationSharing ? 'On' : 'Off'}
           </Text>
           <Switch
-            value={!!userProfile?.locationSharingEnabled}
-            onValueChange={(val) => updateUserProfile({ locationSharingEnabled: val })}
+            value={!!userProfile?.locationSharing}
+            onValueChange={(val) => updateUserProfile({ locationSharing: val })}
             trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
             thumbColor="#ffffff"
           />

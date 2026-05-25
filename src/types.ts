@@ -203,7 +203,7 @@ export interface UserProfile {
   accessType?: 'Trial' | '1-Year Member' | 'Lifetime Access';
   expiryDate?: any;
   createdAt?: any;
-  locationSharingEnabled?: boolean;
+  locationSharing?: boolean;
   isSecurityMember?: boolean;
   emergencyLocationOptIn?: boolean;
   liveLocation?: {

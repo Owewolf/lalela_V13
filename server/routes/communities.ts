@@ -70,7 +70,11 @@ router.get('/', async (req, res) => {
     where: { userId: req.auth!.userId, status: 'ACTIVE' },
     include: { community: true },
   });
-  return res.json(memberships.map((m) => ({ ...m.community, userRole: m.role })));
+  return res.json(memberships.map((m) => ({
+    ...m.community,
+    userRole: m.role,
+    isSecurityMember: m.isSecurityMember,
+  })));
 });
 
 // ─── Get community ────────────────────────────────────────────────────────────
@@ -134,7 +138,7 @@ router.post('/', async (req, res) => {
     // Add creator as Admin member — populate cached display fields immediately
     const creator = await prisma.user.findUnique({
       where: { id: req.auth!.userId },
-      select: { name: true, profileImage: true, email: true },
+      select: { name: true, profileImage: true, email: true, licenseStatus: true },
     });
     await prisma.communityMember.create({
       data: {
@@ -147,8 +151,13 @@ router.post('/', async (req, res) => {
       },
     });
 
-    // 30-day trial
+    // Community has a 30-day trial, while the creator gets a 1-year platform trial.
     const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const creatorTrialEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+    const creatorLicenseUpdate = creator?.licenseStatus === 'ACTIVE'
+      ? { communityCreated: true }
+      : { communityCreated: true, trialExpiresAt: creatorTrialEnd, licenseStatus: 'TRIAL' };
+
     await prisma.$transaction([
       prisma.community.update({
         where: { id: community.id },
@@ -156,7 +165,7 @@ router.post('/', async (req, res) => {
       }),
       prisma.user.update({
         where: { id: req.auth!.userId },
-        data: { communityCreated: true, trialExpiresAt: trialEnd, licenseStatus: 'TRIAL' },
+        data: creatorLicenseUpdate,
       }),
     ]);
 
@@ -197,8 +206,17 @@ router.post('/:id/license', async (req, res) => {
     return res.status(403).json({ error: 'Only community admins can license a community' });
   }
 
-  const licenseExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+  const creator = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { licenseStatus: true },
+  });
+
+  const creatorTrialEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
   const activatedAt = new Date();
+
+  const creatorLicenseUpdate = creator?.licenseStatus === 'ACTIVE'
+    ? { communityCreated: true }
+    : { communityCreated: true, trialExpiresAt: creatorTrialEnd, licenseStatus: 'TRIAL' };
 
   const [community] = await prisma.$transaction([
     prisma.community.update({
@@ -207,11 +225,7 @@ router.post('/:id/license', async (req, res) => {
     }),
     prisma.user.update({
       where: { id: userId },
-      data: {
-        licenseStatus: 'ACTIVE',
-        subscriptionActive: true,
-        subscriptionRenewalDate: licenseExpiry,
-      },
+      data: creatorLicenseUpdate,
     }),
   ]);
 
@@ -248,7 +262,7 @@ router.put('/:id', async (req, res) => {
 router.get('/:id/members', async (req, res) => {
   const members = await prisma.communityMember.findMany({
     where: { communityId: req.params.id },
-    include: { user: { select: { id: true, name: true, profileImage: true, email: true, latitude: true, longitude: true, isSecurityMember: true, locationSharing: true } } },
+    include: { user: { select: { id: true, name: true, profileImage: true, email: true, latitude: true, longitude: true, locationSharing: true } } },
   });
   // Flatten: cached member fields take priority; fall back to live user fields
   // Always include the user's default location so map pins are always visible
@@ -259,16 +273,38 @@ router.get('/:id/members', async (req, res) => {
     email: m.email || user?.email || null,
     latitude: user?.latitude ?? null,
     longitude: user?.longitude ?? null,
-    isSecurityMember: user?.isSecurityMember ?? false,
+    isSecurityMember: m.isSecurityMember ?? false,
     locationSharingEnabled: user?.locationSharing ?? false,
   })));
 });
 
 router.put('/:id/members/:userId', async (req, res) => {
-  const { role, status } = req.body as { role?: string; status?: string };
-  const member = await prisma.communityMember.updateMany({
-    where: { communityId: req.params.id, userId: req.params.userId },
-    data: { ...(role ? { role: role as never } : {}), ...(status ? { status: status as never } : {}) },
+  const { role, status, isSecurityMember } = req.body as {
+    role?: string;
+    status?: string;
+    isSecurityMember?: boolean;
+  };
+
+  const isSelfUpdate = req.auth!.userId === req.params.userId;
+  if (!isSelfUpdate) {
+    const actorRole = await getCommunityRole(req.params.id, req.auth!.userId);
+    if (!isAdminRole(actorRole)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+  }
+
+  const data: Record<string, unknown> = {
+    ...(role ? { role: role as never } : {}),
+    ...(status ? { status: status as never } : {}),
+    ...(typeof isSecurityMember === 'boolean' ? { isSecurityMember } : {}),
+  };
+  if (Object.keys(data).length === 0) {
+    return res.status(400).json({ error: 'No valid fields provided' });
+  }
+
+  const member = await prisma.communityMember.update({
+    where: { communityId_userId: { communityId: req.params.id, userId: req.params.userId } },
+    data,
   });
   return res.json(member);
 });

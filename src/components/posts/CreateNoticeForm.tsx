@@ -155,15 +155,15 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
         setLongitude(currentCommunity.coverageArea.longitude);
         setLocationName(currentCommunity.coverageArea.locationName || 'Community Area');
         setLocationSource('profile_default');
-      } else if (userProfile?.defaultLocation) {
+      } else if (userProfile?.locationSharing && userProfile?.defaultLocation) {
         setLatitude(userProfile.defaultLocation.latitude);
         setLongitude(userProfile.defaultLocation.longitude);
         setLocationName(userProfile.defaultLocation.name);
-      } else if (userProfile?.locationSharingEnabled) {
+      } else if (userProfile?.locationSharing) {
         handleUseCurrentLocation();
       }
     }
-  }, [currentCommunity?.coverageArea, userProfile?.defaultLocation, userProfile?.locationSharingEnabled, postToEdit]);
+  }, [currentCommunity?.coverageArea, userProfile?.defaultLocation, userProfile?.locationSharing, postToEdit]);
 
   const handleUseCurrentLocation = async () => {
     try {

@@ -579,7 +579,26 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, []);
 
   const toggleCommunityResponder = useCallback(async (communityId: string, isResponder: boolean) => {
-    await api.put(`/communities/${communityId}/members/${userId}`, { is_responder: isResponder });
+    if (!userId) return;
+    let previousResponder: boolean | undefined;
+    setCommunities((prev) => prev.map((community) => (
+      community.id === communityId
+        ? (() => {
+            previousResponder = !!community.isSecurityMember;
+            return { ...community, isSecurityMember: isResponder };
+          })()
+        : community
+    )));
+    try {
+      await api.put(`/communities/${communityId}/members/${userId}`, { isSecurityMember: isResponder });
+    } catch (error) {
+      setCommunities((prev) => prev.map((community) => (
+        community.id === communityId
+          ? { ...community, isSecurityMember: previousResponder ?? false }
+          : community
+      )));
+      throw error;
+    }
   }, [userId]);
 
   const updateLiveLocation = useCallback(async (latitude: number, longitude: number) => {

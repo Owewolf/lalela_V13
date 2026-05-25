@@ -175,14 +175,14 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   // ── Default location ────────────────────────────────────────────────────────
   useEffect(() => {
     if (postToEdit) return;
-    if (userProfile?.defaultLocation) {
+    if (userProfile?.locationSharing && userProfile?.defaultLocation) {
       setLatitude(userProfile.defaultLocation.latitude);
       setLongitude(userProfile.defaultLocation.longitude);
       setLocationName(userProfile.defaultLocation.name);
-    } else if (userProfile?.locationSharingEnabled) {
+    } else if (userProfile?.locationSharing) {
       handleUseCurrentLocation();
     }
-  }, [userProfile?.defaultLocation, userProfile?.locationSharingEnabled, postToEdit]);
+  }, [userProfile?.defaultLocation, userProfile?.locationSharing, postToEdit]);
 
   const handleUseCurrentLocation = async () => {
     try {

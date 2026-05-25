@@ -106,13 +106,12 @@ router.post('/simulate-payment', async (req, res) => {
       const activatedAt = new Date();
       const owner = await prisma.user.findUnique({
         where: { id: userId },
-        select: { trialExpiresAt: true },
+        select: { licenseStatus: true },
       });
-      const userUpdate: Record<string, unknown> = {};
-      if (!owner?.trialExpiresAt) {
-        userUpdate.trialExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-        userUpdate.licenseStatus = 'TRIAL';
-      }
+      const creatorTrialEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+      const userUpdate = owner?.licenseStatus === 'ACTIVE'
+        ? { communityCreated: true }
+        : { communityCreated: true, trialExpiresAt: creatorTrialEnd, licenseStatus: 'TRIAL' };
 
       const [community] = await prisma.$transaction([
         prisma.community.update({

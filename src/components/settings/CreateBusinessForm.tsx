@@ -82,7 +82,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
       };
     }
 
-    if (userProfile?.defaultLocation) {
+    if (userProfile?.locationSharing && userProfile?.defaultLocation) {
       return {
         address: userProfile.defaultLocation.name,
         latitude: String(userProfile.defaultLocation.latitude),
@@ -103,7 +103,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
       latitude: '',
       longitude: '',
     };
-  }, [business, currentCommunity?.coverageArea, userProfile?.defaultLocation]);
+  }, [business, currentCommunity?.coverageArea, userProfile?.defaultLocation, userProfile?.locationSharing]);
 
   useEffect(() => {
     if (!visible) return;

@@ -301,77 +301,47 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
       <View className="pt-4 border-t border-gray-100 gap-y-3">
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-3">
-            <View className={`w-10 h-10 rounded-full items-center justify-center ${userProfile?.isSecurityMember ? 'bg-red-600' : 'bg-red-50'}`}>
-              <Siren size={18} color={userProfile?.isSecurityMember ? '#fff' : '#ef4444'} />
+            <View className="w-10 h-10 rounded-full items-center justify-center bg-red-50">
+              <Siren size={18} color="#ef4444" />
             </View>
             <View>
               <Text className="text-sm font-bold text-gray-900">Emergency Responder</Text>
               <Text className="text-[10px] text-gray-500">Receive and respond to community alerts</Text>
             </View>
           </View>
-          <View className="flex-row items-center gap-3">
-            <TouchableOpacity
-              onPress={() => setShowResponderSelector(!showResponderSelector)}
-              className={`px-3 py-1.5 rounded-xl ${showResponderSelector ? 'bg-primary' : 'bg-gray-100'}`}
-            >
-              <Text className={`text-[10px] font-black uppercase tracking-widest ${showResponderSelector ? 'text-white' : 'text-gray-500'}`}>
-                Manage
-              </Text>
-            </TouchableOpacity>
-            <Switch
-              value={!!userProfile?.isSecurityMember}
-              onValueChange={(val) => updateUserProfile({ isSecurityMember: val })}
-              trackColor={{ false: '#d1d5db', true: '#2563eb' }}
-              thumbColor="#ffffff"
-            />
-          </View>
+          <TouchableOpacity
+            onPress={() => setShowResponderSelector(!showResponderSelector)}
+            className={`px-3 py-1.5 rounded-xl ${showResponderSelector ? 'bg-primary' : 'bg-gray-100'}`}
+          >
+            <Text className={`text-[10px] font-black uppercase tracking-widest ${showResponderSelector ? 'text-white' : 'text-gray-500'}`}>
+              Manage
+            </Text>
+          </TouchableOpacity>
         </View>
-
-        {userProfile?.isSecurityMember && (
-          <View className="gap-y-2">
-            <View className="bg-gray-50 rounded-xl p-4 flex-row items-center justify-between border border-red-100">
-              <View className="flex-row items-center gap-3">
-                <ShieldCheck size={16} color="#2563eb" />
-                <Text className="text-[10px] font-bold text-gray-500">
-                  Status: {communities.some((c) => c.isEmergencyMode) ? 'ACTIVE RESPONSE' : 'On-Call'}
-                </Text>
-              </View>
-              <View className="flex-row items-center gap-2">
-                <View className={`w-2 h-2 rounded-full ${communities.some((c) => c.isEmergencyMode) ? 'bg-red-500' : 'bg-blue-500'}`} />
-                <Text className="text-[10px] font-black uppercase tracking-widest text-gray-800">
-                  {communities.some((c) => c.isEmergencyMode) ? 'Emergency Active' : 'Ready'}
-                </Text>
-              </View>
-            </View>
-
-            <View className="bg-gray-50 rounded-2xl p-4 flex-row items-center justify-between border border-gray-200">
-              <View>
-                <Text className="text-xs font-bold text-primary">Emergency Location Visibility</Text>
-                <Text className="text-[10px] text-gray-500">Show my live location on emergency maps</Text>
-              </View>
-              <Switch
-                value={!!userProfile?.emergencyLocationOptIn}
-                onValueChange={(val) => updateUserProfile({ emergencyLocationOptIn: val })}
-                trackColor={{ false: '#d1d5db', true: '#ef4444' }}
-                thumbColor="#ffffff"
-              />
-            </View>
-          </View>
-        )}
 
         {showResponderSelector && (
           <View className="bg-gray-50 rounded-2xl p-4 gap-y-2">
             <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Select Communities</Text>
+            <Text className="text-[10px] text-gray-500 mb-2">
+              Enabling a community makes your emergency location visible in that community during emergencies. Disable to hide your location and opt out there.
+            </Text>
             {communities.map((community) => (
               <View
                 key={community.id}
                 className="flex-row items-center justify-between p-3 bg-white rounded-xl border border-gray-100"
               >
-                <View className="flex-row items-center gap-3">
+                <View className="flex-row items-center gap-3 flex-1">
                   <View className="w-8 h-8 rounded-lg bg-surface-container-low items-center justify-center">
                     <ShieldCheck size={16} color="#0d3d47" />
                   </View>
-                  <Text className="text-sm font-bold text-gray-900">{community.name}</Text>
+                  <View className="flex-1">
+                    <Text className="text-sm font-bold text-gray-900">{community.name}</Text>
+                    <Text className="text-[10px] text-gray-500">
+                      {community.isSecurityMember
+                        ? 'Emergency location visible for this community'
+                        : 'Emergency location hidden for this community'}
+                    </Text>
+                  </View>
                 </View>
                 <Switch
                   value={!!community.isSecurityMember}
