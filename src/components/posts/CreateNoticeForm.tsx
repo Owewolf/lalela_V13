@@ -1,5 +1,5 @@
 import { defaultMapViewProps } from "../../lib/mapViewProps";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -33,6 +33,7 @@ import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { POST_SUBTYPE_CONFIG } from '../../constants';
 import { uploadImage } from '../../lib/uploadImage';
+import { resolveCreatePostLocationDefaults } from '../../lib/postLocationDefaults';
 import LocationPickerSection from '../shared/LocationPickerSection';
 import type { CommunityNotice } from '../../types';
 
@@ -139,6 +140,10 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
 
   const theme = SUBTYPE_THEME[postSubtype];
   const config = POST_SUBTYPE_CONFIG[postSubtype];
+  const locationDefaults = useMemo(
+    () => resolveCreatePostLocationDefaults(currentCommunity, userProfile),
+    [currentCommunity?.coverageArea, userProfile?.defaultLocation, userProfile?.locationSharing],
+  );
 
   const handleBack = () => {
     if (onBack) {
@@ -149,21 +154,17 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
   };
 
   useEffect(() => {
-    if (!postToEdit) {
-      if (currentCommunity?.coverageArea) {
-        setLatitude(currentCommunity.coverageArea.latitude);
-        setLongitude(currentCommunity.coverageArea.longitude);
-        setLocationName(currentCommunity.coverageArea.locationName || 'Community Area');
-        setLocationSource('profile_default');
-      } else if (userProfile?.locationSharing && userProfile?.defaultLocation) {
-        setLatitude(userProfile.defaultLocation.latitude);
-        setLongitude(userProfile.defaultLocation.longitude);
-        setLocationName(userProfile.defaultLocation.name);
-      } else if (userProfile?.locationSharing) {
-        handleUseCurrentLocation();
-      }
+    if (postToEdit) return;
+
+    setLatitude(locationDefaults.initialState.latitude);
+    setLongitude(locationDefaults.initialState.longitude);
+    setLocationName(locationDefaults.initialState.locationName);
+    setLocationSource(locationDefaults.initialState.source);
+
+    if (locationDefaults.shouldUseCurrentLocation) {
+      handleUseCurrentLocation();
     }
-  }, [currentCommunity?.coverageArea, userProfile?.defaultLocation, userProfile?.locationSharing, postToEdit]);
+  }, [locationDefaults, postToEdit]);
 
   const handleUseCurrentLocation = async () => {
     try {
@@ -263,8 +264,8 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
 
   const canSubmit = !!title && (postSubtype === 'warning' || !!expiresAt);
   const mapRegion = {
-    latitude: latitude || currentCommunity?.coverageArea?.latitude || -26.2041,
-    longitude: longitude || currentCommunity?.coverageArea?.longitude || 28.0473,
+    latitude: latitude || locationDefaults.mapFallback.latitude,
+    longitude: longitude || locationDefaults.mapFallback.longitude,
     latitudeDelta: 0.06,
     longitudeDelta: 0.06,
   };
@@ -334,16 +335,18 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
                   <Text className="text-sm font-semibold text-gray-600">Warning Location</Text>
                 </View>
                 <View className="flex-row gap-2">
-                  {locationSource !== 'profile_default' && currentCommunity?.coverageArea && (
+                  {locationSource !== 'profile_default' && locationDefaults.resetTarget && (
                     <TouchableOpacity
                       onPress={() => {
-                        setLatitude(currentCommunity.coverageArea!.latitude);
-                        setLongitude(currentCommunity.coverageArea!.longitude);
-                        setLocationName(currentCommunity.coverageArea!.locationName || 'Community Area');
-                        setLocationSource('profile_default');
+                        setLatitude(locationDefaults.resetTarget!.latitude);
+                        setLongitude(locationDefaults.resetTarget!.longitude);
+                        setLocationName(locationDefaults.resetTarget!.locationName);
+                        setLocationSource(locationDefaults.resetTarget!.source);
                       }}
                     >
-                      <Text className="text-xs font-bold text-primary">Reset</Text>
+                      <Text className="text-xs font-bold text-primary">
+                        {locationDefaults.resetTarget.kind === 'community_default' ? 'Reset' : 'Reset to Profile'}
+                      </Text>
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity onPress={handleUseCurrentLocation}>

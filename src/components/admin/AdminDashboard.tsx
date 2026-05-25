@@ -115,34 +115,43 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setMapUnlocked,
     resetCommunityMapView,
     findLatestEmergencyPost,
-    findLatestWarningPost,
   } = useCommunityMap();
 
-  // Derived security-panel state (emergency takes precedence over warning).
-  const latestEmergencyPost = isEmergencyActive ? findLatestEmergencyPost() : undefined;
-  const latestWarningPost = !isEmergencyActive ? findLatestWarningPost() : undefined;
-  const hasWarning = !isEmergencyActive && !!latestWarningPost;
+  const isEmergencyPost = React.useCallback(
+    (p: any) => p?.urgencyLevel === 'emergency' || p?.urgency === 'emergency',
+    []
+  );
+  const isWarningPost = React.useCallback(
+    (p: any) => !isEmergencyPost(p) && (p?.urgencyLevel === 'warning' || p?.urgency === 'high'),
+    [isEmergencyPost]
+  );
+  const byNewest = React.useCallback((a: any, b: any) => {
+    const aTime = new Date(a?.createdAt || 0).getTime();
+    const bTime = new Date(b?.createdAt || 0).getTime();
+    return bTime - aTime;
+  }, []);
+
+  const activeEmergencyPosts = React.useMemo(
+    () => (posts || []).filter(isEmergencyPost).slice().sort(byNewest),
+    [posts, isEmergencyPost, byNewest]
+  );
+  const activeWarningPosts = React.useMemo(
+    () => (posts || []).filter(isWarningPost).slice().sort(byNewest),
+    [posts, isWarningPost, byNewest]
+  );
+  const hasEmergencies = activeEmergencyPosts.length > 0 || isEmergencyActive;
+  const hasWarnings = activeWarningPosts.length > 0;
+  const hasAnyIncidents = hasEmergencies || hasWarnings;
+
   const respondersOnline = liveInsights?.counts?.respondersOnline ?? 0;
-  const emergencyCount = React.useMemo(
-    () => (posts || []).filter(
-      (p: any) => p.urgencyLevel === 'emergency' || p.urgency === 'emergency'
-    ).length,
-    [posts]
-  );
-  const warningCount = React.useMemo(
-    () => (posts || []).filter(
-      (p: any) => p.urgencyLevel === 'warning' || p.urgency === 'high'
-    ).length,
-    [posts]
-  );
-  const openAlertsDisplay = isEmergencyActive
-    ? Math.max(activeAlertsCount, emergencyCount)
-    : activeAlertsCount;
+  const emergencyCount = activeEmergencyPosts.length;
+  const warningCount = activeWarningPosts.length;
+  const openAlertsDisplay = Math.max(activeAlertsCount, emergencyCount + warningCount);
 
   // Pulse animation for the Security Panel (red on emergency, amber on warning).
   const securityPulse = useRef(new Animated.Value(0)).current;
   React.useEffect(() => {
-    if (!isEmergencyActive && !hasWarning) {
+    if (!hasAnyIncidents) {
       securityPulse.stopAnimation();
       securityPulse.setValue(0);
       return;
@@ -165,24 +174,37 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     );
     loop.start();
     return () => loop.stop();
-  }, [isEmergencyActive, hasWarning, securityPulse]);
+  }, [hasAnyIncidents, securityPulse]);
 
   const securityPulseBg = securityPulse.interpolate({
     inputRange: [0, 1],
-    outputRange: isEmergencyActive
+    outputRange: hasEmergencies
       ? ['#fef2f2', '#fecaca']
-      : hasWarning
+      : hasWarnings
         ? ['#fffbeb', '#fde68a']
         : ['#ffffff', '#ffffff'],
   });
 
-  const handleSecurityPanelPress = () => {
-    if (isEmergencyActive && latestEmergencyPost?.id) {
-      router.push(`/emergency/${latestEmergencyPost.id}` as any);
-    } else if (hasWarning && latestWarningPost?.id) {
-      router.push(`/emergency/${latestWarningPost.id}` as any);
-    }
-  };
+  const formatIncidentTime = React.useCallback((value?: string) => {
+    if (!value) return '';
+    const dt = new Date(value);
+    if (Number.isNaN(dt.getTime())) return '';
+    return dt.toLocaleString([], {
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }, []);
+
+  const handleOpenIncident = React.useCallback((incidentId?: string) => {
+    if (!incidentId) return;
+    router.push({
+      pathname: `/emergency/${incidentId}` as any,
+      params: { from: 'security-panel' },
+    } as any);
+  }, [router]);
+
   const moderationRef = useRef<ModerationCenterHandle>(null);
 
   const handleBack = () => {
@@ -467,12 +489,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             bg: string;
             count: number;
           }> = [
+            { id: 'moderation-center', label: 'Moderation Center', tab: 'members', Icon: Gavel, color: PRIMARY, bg: '#f0fdf4', count: c?.respondersOnline ?? 0 },
             { id: 'members', label: 'Members', tab: 'members', Icon: Users, color: PRIMARY, bg: '#f0fdf4', count: memberCount },
             { id: 'alerts', label: 'Alerts', tab: 'logs', Icon: Bell, color: ERROR, bg: '#fef2f2', count: c?.alertsActive ?? activeAlertsCount },
             { id: 'charity', label: 'Charity', tab: 'charity', Icon: HeartHandshake, color: SECONDARY, bg: '#f5f3ff', count: availableCharities.length },
             { id: 'reports', label: 'Reports', tab: 'content', Icon: FileWarning, color: '#fc7127', bg: '#fff7ed', count: c?.activeReports ?? 0 },
             { id: 'rules', label: 'Rules', tab: 'rules', Icon: ScrollText, color: PRIMARY, bg: '#f0fdf4', count: 0 },
-            { id: 'security', label: 'Security', tab: 'members', Icon: Shield, color: SECONDARY, bg: '#f5f3ff', count: c?.respondersOnline ?? 0 },
           ];
           return (
             <View style={styles.tileGrid}>
@@ -492,7 +514,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <t.Icon size={18} color={t.color} />
                   </View>
                   <Text style={styles.tileLabel}>{t.label}</Text>
-                  <Text style={[styles.tileCount, { color: t.color }]}>{t.count}</Text>
                   {readOnly && (
                     <View style={styles.tileLockBadge}>
                       <Lock size={10} color="#94a3b8" />
@@ -618,103 +639,149 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <CommunityInsightPanels insights={liveInsights?.insights ?? null} />
 
       {/* Security Panel */}
-      <TouchableOpacity
-        activeOpacity={isEmergencyActive || hasWarning ? 0.85 : 1}
-        disabled={!isEmergencyActive && !hasWarning}
-        onPress={handleSecurityPanelPress}
+      <Animated.View
+        style={[
+          styles.bentoCard,
+          hasAnyIncidents && { backgroundColor: securityPulseBg },
+          hasEmergencies && { borderColor: '#fecaca' },
+          !hasEmergencies && hasWarnings && { borderColor: '#fde68a' },
+        ]}
       >
-        <Animated.View
-          style={[
-            styles.bentoCard,
-            (isEmergencyActive || hasWarning) && { backgroundColor: securityPulseBg },
-            isEmergencyActive && { borderColor: '#fecaca' },
-            hasWarning && { borderColor: '#fde68a' },
-          ]}
-        >
-          <View style={styles.bentoHeader}>
-            <Shield
-              size={22}
-              color={isEmergencyActive ? ERROR : hasWarning ? '#d97706' : SECONDARY}
-            />
-            <Text
-              style={[
-                styles.bentoTitle,
-                isEmergencyActive && { color: ERROR },
-                hasWarning && { color: '#d97706' },
-              ]}
-            >
-              Security Panel
+        <View style={styles.bentoHeader}>
+          <Shield
+            size={22}
+            color={hasEmergencies ? ERROR : hasWarnings ? '#d97706' : SECONDARY}
+          />
+          <Text
+            style={[
+              styles.bentoTitle,
+              hasEmergencies && { color: ERROR },
+              !hasEmergencies && hasWarnings && { color: '#d97706' },
+            ]}
+          >
+            Security Panel
+          </Text>
+          {hasEmergencies && (
+            <View style={styles.emergencyBadge}>
+              <View style={styles.emergencyDot} />
+              <Text style={styles.emergencyText}>
+                {hasWarnings ? 'Emergency + Warning Active' : 'Emergency Active'}
+              </Text>
+            </View>
+          )}
+          {!hasEmergencies && hasWarnings && (
+            <View style={styles.warningBadge}>
+              <View style={styles.warningDot} />
+              <Text style={styles.warningText}>Warning Active</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.securityStats}>
+          <View style={styles.securityStat}>
+            <Text style={styles.securityStatLabel}>EMERGENCIES</Text>
+            <Text style={[styles.securityStatValue, hasEmergencies && { color: ERROR }]}>
+              {emergencyCount}
             </Text>
-            {isEmergencyActive && (
-              <View style={styles.emergencyBadge}>
-                <View style={styles.emergencyDot} />
-                <Text style={styles.emergencyText}>Emergency Active</Text>
+          </View>
+          <View style={styles.securityStat}>
+            <Text style={styles.securityStatLabel}>WARNINGS</Text>
+            <Text style={[styles.securityStatValue, hasWarnings && { color: '#d97706' }]}>
+              {warningCount}
+            </Text>
+          </View>
+          <View style={styles.securityStat}>
+            <Text style={styles.securityStatLabel}>RESPONDERS</Text>
+            <View style={styles.securityValueRow}>
+              <Text style={styles.securityStatValue}>{respondersOnline}</Text>
+              {respondersOnline > 0 && <View style={styles.onlinePulseDot} />}
+            </View>
+          </View>
+        </View>
+
+        {hasAnyIncidents && (
+          <View style={styles.incidentListWrap}>
+            {hasEmergencies && (
+              <View style={styles.incidentSection}>
+                <Text style={[styles.incidentSectionLabel, { color: ERROR }]}>Active Emergencies</Text>
+                {activeEmergencyPosts.map((incident: any) => (
+                  <TouchableOpacity
+                    key={incident.id}
+                    style={[styles.incidentRow, styles.incidentRowEmergency]}
+                    activeOpacity={0.85}
+                    onPress={() => handleOpenIncident(incident.id)}
+                    accessibilityLabel={`Open emergency ${incident.title || 'incident'}`}
+                  >
+                    <View style={styles.incidentMain}>
+                      <Text style={styles.incidentTitle} numberOfLines={1}>
+                        {incident.title || 'Emergency alert'}
+                      </Text>
+                      <Text style={styles.incidentMeta} numberOfLines={1}>
+                        {incident.locationName || 'Unknown location'}
+                      </Text>
+                    </View>
+                    <Text style={[styles.incidentTime, { color: ERROR }]}>
+                      {formatIncidentTime(incident.createdAt)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             )}
-            {hasWarning && (
-              <View style={styles.warningBadge}>
-                <View style={styles.warningDot} />
-                <Text style={styles.warningText}>Warning Active</Text>
+
+            {hasWarnings && (
+              <View style={styles.incidentSection}>
+                <Text style={[styles.incidentSectionLabel, { color: '#d97706' }]}>Active Warnings</Text>
+                {activeWarningPosts.map((incident: any) => (
+                  <TouchableOpacity
+                    key={incident.id}
+                    style={[styles.incidentRow, styles.incidentRowWarning]}
+                    activeOpacity={0.85}
+                    onPress={() => handleOpenIncident(incident.id)}
+                    accessibilityLabel={`Open warning ${incident.title || 'incident'}`}
+                  >
+                    <View style={styles.incidentMain}>
+                      <Text style={styles.incidentTitle} numberOfLines={1}>
+                        {incident.title || 'Warning notice'}
+                      </Text>
+                      <Text style={styles.incidentMeta} numberOfLines={1}>
+                        {incident.locationName || 'Unknown location'}
+                      </Text>
+                    </View>
+                    <Text style={[styles.incidentTime, { color: '#d97706' }]}>
+                      {formatIncidentTime(incident.createdAt)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             )}
           </View>
+        )}
 
-          {isEmergencyActive ? (
-            <View style={styles.securityStats}>
-              <View style={styles.securityStat}>
-                <Text style={styles.securityStatLabel}>RESPONDERS</Text>
-                <View style={styles.securityValueRow}>
-                  <Text style={[styles.securityStatValue, { color: ERROR }]}>
-                    {respondersOnline}
-                  </Text>
-                  {respondersOnline > 0 && <View style={styles.onlinePulseDot} />}
-                </View>
+        {!hasAnyIncidents && (
+          <View style={styles.securityStats}>
+            <View style={styles.securityStat}>
+              <Text style={styles.securityStatLabel}>SECURITY MEMBERS</Text>
+              <View style={styles.securityValueRow}>
+                <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
                 {respondersOnline > 0 && (
-                  <Text style={styles.onlineHint}>online now</Text>
+                  <View style={styles.onlinePulseDot} />
                 )}
               </View>
-              <View style={styles.securityStat}>
-                <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
-                <Text style={[styles.securityStatValue, { color: ERROR }]}>
-                  {openAlertsDisplay}
+              {respondersOnline > 0 && (
+                <Text style={styles.onlineHint}>
+                  {respondersOnline} online now
                 </Text>
-              </View>
+              )}
             </View>
-          ) : hasWarning ? (
-            <View style={styles.securityStats}>
-              <View style={styles.securityStat}>
-                <Text style={styles.securityStatLabel}>OPEN WARNINGS</Text>
-                <Text style={[styles.securityStatValue, { color: '#d97706' }]}>
-                  {warningCount}
-                </Text>
-              </View>
+            <View style={styles.securityStat}>
+              <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
+              <Text style={[styles.securityStatValue, activeAlertsCount > 0 && { color: ERROR }]}> 
+                {openAlertsDisplay}
+              </Text>
             </View>
-          ) : (
-            <View style={styles.securityStats}>
-              <View style={styles.securityStat}>
-                <Text style={styles.securityStatLabel}>SECURITY MEMBERS</Text>
-                <View style={styles.securityValueRow}>
-                  <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
-                  {respondersOnline > 0 && (
-                    <View style={styles.onlinePulseDot} />
-                  )}
-                </View>
-                {respondersOnline > 0 && (
-                  <Text style={styles.onlineHint}>
-                    {respondersOnline} online now
-                  </Text>
-                )}
-              </View>
-              <View style={styles.securityStat}>
-                <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
-                <Text style={[styles.securityStatValue, activeAlertsCount > 0 && { color: ERROR }]}>
-                  {activeAlertsCount}
-                </Text>
-              </View>
-            </View>
-          )}
-        </Animated.View>
-      </TouchableOpacity>
+          </View>
+        )}
+      </Animated.View>
 
       {/* System Health */}
       <View style={styles.bentoCard}>
@@ -1032,6 +1099,7 @@ const styles = StyleSheet.create({
   emergencyInfo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   warningBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
+    marginLeft: 'auto',
     backgroundColor: '#fffbeb', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99,
   },
   warningDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#d97706' },
@@ -1040,6 +1108,56 @@ const styles = StyleSheet.create({
   securityStat: { gap: 4 },
   securityStatLabel: { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1 },
   securityStatValue: { fontSize: 28, fontWeight: '900', color: PRIMARY },
+  incidentListWrap: {
+    marginTop: 10,
+    gap: 10,
+  },
+  incidentSection: {
+    gap: 6,
+  },
+  incidentSectionLabel: {
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 0.9,
+  },
+  incidentRow: {
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  incidentRowEmergency: {
+    backgroundColor: 'rgba(254,242,242,0.8)',
+    borderColor: '#fecaca',
+  },
+  incidentRowWarning: {
+    backgroundColor: 'rgba(255,251,235,0.8)',
+    borderColor: '#fde68a',
+  },
+  incidentMain: {
+    flex: 1,
+    minWidth: 0,
+  },
+  incidentTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  incidentMeta: {
+    fontSize: 11,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  incidentTime: {
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
 
   healthRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   healthLabel: { fontSize: 11, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.8 },

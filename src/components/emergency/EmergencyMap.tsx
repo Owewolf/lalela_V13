@@ -2,14 +2,14 @@ import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   Platform,
 } from 'react-native';
 import MapView, { Marker, Circle, Callout } from 'react-native-maps';
-import { Shield, Siren, Users, Navigation } from 'lucide-react-native';
+import { Shield, Siren, Users } from 'lucide-react-native';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
 import { useCommunity } from '../../context/CommunityContext';
 import { CommunityNotice } from '../../types';
+import { deriveEmergencyResponders } from './responderUtils';
 
 interface EmergencyMapProps {
   emergencyPost: CommunityNotice;
@@ -56,7 +56,12 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
   mapRef,
 }) => {
   const { members, securityResponders } = useCommunity();
-  const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
+  const [focusedPerson, setFocusedPerson] = useState<{
+    id: string;
+    name: string;
+    role: 'Responder' | 'Member';
+    distanceKm: string;
+  } | null>(null);
 
   const internalRef = React.useRef<MapView>(null);
   const ref = mapRef ?? internalRef;
@@ -66,24 +71,37 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
 
   const initialRegion = regionForRadius(emergencyLat, emergencyLng, EMERGENCY_RADIUS);
 
+  const recenterToEmergencyRadius = React.useCallback(() => {
+    if (!ref.current) return;
+    if (Platform.OS === 'web') return;
+    try {
+      ref.current.animateToRegion(
+        regionForRadius(emergencyLat, emergencyLng, EMERGENCY_RADIUS),
+        450,
+      );
+    } catch (error) {
+      console.warn('Map animation error:', error);
+    }
+  }, [ref, emergencyLat, emergencyLng]);
+
   // Recenter when resetTrigger changes
   React.useEffect(() => {
     if (resetTrigger === undefined) return;
-    fitToAllMarkers();
-  }, [resetTrigger]);
-
-  const responderIds = useMemo(
-    () => new Set(securityResponders.map((r) => r.userId)),
-    [securityResponders],
-  );
+    recenterToEmergencyRadius();
+  }, [resetTrigger, recenterToEmergencyRadius]);
 
   const activeResponders = useMemo(
     () =>
-      securityResponders.filter(
-        (responder) =>
-          Number.isFinite(responder.latitude) && Number.isFinite(responder.longitude),
-      ),
-    [securityResponders],
+      deriveEmergencyResponders(securityResponders, members, {
+        latitude: emergencyLat,
+        longitude: emergencyLng,
+      }),
+    [securityResponders, members, emergencyLat, emergencyLng],
+  );
+
+  const responderIds = useMemo(
+    () => new Set(activeResponders.map((r) => r.userId)),
+    [activeResponders],
   );
 
   const visibleMembers = useMemo(
@@ -96,40 +114,9 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
     [members, responderIds],
   );
 
-  const fitToAllMarkers = () => {
-    if (Platform.OS === 'web') return;
-    const markerPoints = [
-      { latitude: emergencyLat, longitude: emergencyLng },
-      ...activeResponders.map((r) => ({ latitude: r.latitude, longitude: r.longitude })),
-      ...visibleMembers.map((m) => ({ latitude: m.latitude!, longitude: m.longitude! })),
-    ];
-    try {
-      if (markerPoints.length <= 1) {
-        ref.current?.animateToRegion(initialRegion, 400);
-        return;
-      }
-      ref.current?.fitToCoordinates(markerPoints, {
-        edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
-        animated: true,
-      });
-    } catch (error) {
-      console.warn('Map animation error on web:', error);
-    }
-  };
-
   React.useEffect(() => {
-    if (!ref.current) return;
-    // Keep the map locked on the 10km emergency view as the emergency coords change.
-    if (Platform.OS === 'web') return;
-    try {
-      ref.current.animateToRegion(
-        regionForRadius(emergencyLat, emergencyLng, EMERGENCY_RADIUS),
-        400,
-      );
-    } catch (error) {
-      console.warn('Map animation error:', error);
-    }
-  }, [emergencyLat, emergencyLng]);
+    recenterToEmergencyRadius();
+  }, [recenterToEmergencyRadius]);
 
   return (
     <View className="flex-1 relative">
@@ -156,7 +143,6 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
         <Marker
           coordinate={{ latitude: emergencyLat, longitude: emergencyLng }}
           pinColor="#B3261E"
-          onPress={() => setSelectedMarkerId('emergency')}
         >
           <Callout tooltip>
             <View className="bg-white rounded-2xl p-3 min-w-[180px] max-w-[260px] shadow-lg">
@@ -176,80 +162,130 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
         </Marker>
 
         {/* Security responders */}
-        {activeResponders.map((responder) => (
-          <Marker
-            key={`resp-${responder.userId}`}
-            coordinate={{
-              latitude: responder.latitude,
-              longitude: responder.longitude,
-            }}
-          >
-            <View
-              className="bg-teal-700 p-1.5 rounded-full border-2 border-white"
-              style={{ shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 4 }}
+        {activeResponders.map((responder) => {
+          const distanceKm = calculateDistance(
+            responder.latitude,
+            responder.longitude,
+            emergencyLat,
+            emergencyLng,
+          );
+
+          return (
+            <Marker
+              key={`resp-${responder.userId}`}
+              coordinate={{
+                latitude: responder.latitude,
+                longitude: responder.longitude,
+              }}
+              onPress={() =>
+                setFocusedPerson({
+                  id: responder.userId,
+                  name: responder.name,
+                  role: 'Responder',
+                  distanceKm,
+                })
+              }
             >
-              <Shield color="white" size={14} />
-            </View>
-            <Callout tooltip>
-              <View className="bg-white rounded-2xl p-3 min-w-[160px] shadow-lg">
-                <View className="flex-row items-center gap-2 mb-2">
-                  <Shield color="#0D9488" size={14} />
-                  <Text className="text-xs font-black text-teal-700 uppercase tracking-widest">Responder</Text>
-                </View>
-                <Text className="text-sm font-bold text-primary">{responder.name}</Text>
-                <Text className="text-xs text-emerald-600 font-bold uppercase tracking-widest mt-0.5">En Route</Text>
-                <Text className="text-xs text-gray-400 mt-1">
-                  {calculateDistance(responder.latitude, responder.longitude, emergencyLat, emergencyLng)}km away
-                </Text>
+              <View
+                className="bg-teal-700 p-1.5 rounded-full border-2 border-white"
+                style={{ shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 4 }}
+                onMouseEnter={() => {
+                  if (Platform.OS !== 'web') return;
+                  setFocusedPerson({
+                    id: responder.userId,
+                    name: responder.name,
+                    role: 'Responder',
+                    distanceKm,
+                  });
+                }}
+                onMouseLeave={() => {
+                  if (Platform.OS !== 'web') return;
+                  setFocusedPerson((prev) => (prev?.id === responder.userId ? null : prev));
+                }}
+              >
+                <Shield color="white" size={14} />
               </View>
-            </Callout>
-          </Marker>
-        ))}
+              <Callout tooltip>
+                <View className="bg-white rounded-2xl p-3 min-w-[180px] shadow-lg">
+                  <View className="flex-row items-center gap-2 mb-2">
+                    <Shield color="#0D9488" size={14} />
+                    <Text className="text-xs font-black text-teal-700 uppercase tracking-widest">Responder</Text>
+                  </View>
+                  <Text className="text-sm font-bold text-primary">{responder.name}</Text>
+                  <Text className="text-xs text-gray-400 mt-1">{distanceKm}km from emergency</Text>
+                </View>
+              </Callout>
+            </Marker>
+          );
+        })}
 
         {/* Community members with location */}
-        {visibleMembers.map((member) => (
-          <Marker
-            key={`mem-${member.userId}`}
-            coordinate={{
-              latitude: member.latitude!,
-              longitude: member.longitude!,
-            }}
-          >
-            <View
-              className="bg-emerald-500 rounded-full border-2 border-white"
-              style={{ width: 14, height: 14, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 3 }}
-            />
-            <Callout tooltip>
-              <View className="bg-white rounded-2xl p-3 min-w-[160px] shadow-lg">
-                <View className="flex-row items-center gap-2 mb-2">
-                  <Users color="#10B981" size={14} />
-                  <Text className="text-xs font-black text-emerald-600 uppercase tracking-widest">Community Member</Text>
+        {visibleMembers.map((member) => {
+          const distanceKm = calculateDistance(
+            member.latitude!,
+            member.longitude!,
+            emergencyLat,
+            emergencyLng,
+          );
+
+          return (
+            <Marker
+              key={`mem-${member.userId}`}
+              coordinate={{
+                latitude: member.latitude!,
+                longitude: member.longitude!,
+              }}
+              onPress={() =>
+                setFocusedPerson({
+                  id: member.userId,
+                  name: member.name || 'Community Member',
+                  role: 'Member',
+                  distanceKm,
+                })
+              }
+            >
+              <View
+                className="bg-emerald-500 rounded-full border-2 border-white"
+                style={{ width: 14, height: 14, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 3 }}
+                onMouseEnter={() => {
+                  if (Platform.OS !== 'web') return;
+                  setFocusedPerson({
+                    id: member.userId,
+                    name: member.name || 'Community Member',
+                    role: 'Member',
+                    distanceKm,
+                  });
+                }}
+                onMouseLeave={() => {
+                  if (Platform.OS !== 'web') return;
+                  setFocusedPerson((prev) => (prev?.id === member.userId ? null : prev));
+                }}
+              />
+              <Callout tooltip>
+                <View className="bg-white rounded-2xl p-3 min-w-[180px] shadow-lg">
+                  <View className="flex-row items-center gap-2 mb-2">
+                    <Users color="#10B981" size={14} />
+                    <Text className="text-xs font-black text-emerald-600 uppercase tracking-widest">Community Member</Text>
+                  </View>
+                  <Text className="text-sm font-bold text-primary">{member.name || 'Community Member'}</Text>
+                  <Text className="text-xs text-gray-400 mt-1">{distanceKm}km from emergency</Text>
                 </View>
-                <Text className="text-sm font-bold text-primary">{member.name}</Text>
-                <Text className="text-xs text-gray-400 mt-1">
-                  {calculateDistance(member.latitude!, member.longitude!, emergencyLat, emergencyLng)}km from emergency
-                </Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
+              </Callout>
+            </Marker>
+          );
+        })}
       </MapView>
 
-      {/* Legend overlay */}
-      <View className="absolute top-20 left-4 bg-white/90 p-3 rounded-2xl shadow-lg gap-2">
-        <View className="flex-row items-center gap-2">
-          <View className="w-3 h-3 rounded-full bg-red-600" />
-          <Text className="text-xs font-black text-primary-container uppercase tracking-widest">Source</Text>
+      {focusedPerson && (
+        <View className="absolute bottom-4 left-4 right-4 bg-white/95 border border-gray-200 rounded-2xl px-4 py-3 shadow">
+          <Text className="text-sm font-black text-primary" numberOfLines={1}>
+            {focusedPerson.name}
+          </Text>
+          <Text className="text-xs text-gray-500 mt-0.5">
+            {focusedPerson.role} • {focusedPerson.distanceKm}km from emergency
+          </Text>
         </View>
-        <View className="flex-row items-center gap-2">
-          <View className="w-3 h-3 rounded-full bg-teal-700" />
-          <Text className="text-xs font-black text-primary-container uppercase tracking-widest">Responders</Text>
-        </View>
-        <View className="flex-row items-center gap-2">
-          <View className="w-3 h-3 rounded-full bg-emerald-500" />
-          <Text className="text-xs font-black text-primary-container uppercase tracking-widest">Members</Text>
-        </View>
-      </View>
+      )}
     </View>
   );
 };

@@ -9,21 +9,23 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import MapView from 'react-native-maps';
 import {
   MapPin,
-  Siren,
   ChevronUp,
   ChevronDown,
-  Shield,
   Navigation,
   ArrowLeft,
+  AlertTriangle,
+  Users,
 } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { EmergencyMap } from './EmergencyMap';
+import { deriveEmergencyResponders } from './responderUtils';
 import { ChatWindow } from '../chat/ChatWindow';
 import { ChatComposer } from '../chat/ChatComposer';
 
@@ -59,20 +61,41 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
     () => posts.find((p) => p.id === emergencyId) ?? null,
     [posts, emergencyId],
   );
+  const isEmergencyPost = React.useCallback(
+    (p: any) => p?.urgencyLevel === 'emergency' || p?.urgency === 'emergency',
+    []
+  );
+  const isWarningPost = React.useCallback(
+    (p: any) => !isEmergencyPost(p) && (p?.urgencyLevel === 'warning' || p?.urgency === 'high'),
+    [isEmergencyPost]
+  );
+  const activeIncidentPosts = useMemo(() => {
+    const emergencies = posts
+      .filter((p: any) => isEmergencyPost(p))
+      .slice()
+      .sort((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime())
+      .map((p: any) => ({ ...p, incidentType: 'emergency' as const }));
+    const warnings = posts
+      .filter((p: any) => isWarningPost(p))
+      .slice()
+      .sort((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime())
+      .map((p: any) => ({ ...p, incidentType: 'warning' as const }));
+    return [...emergencies, ...warnings];
+  }, [posts, isEmergencyPost, isWarningPost]);
+
+  const unifiedResponders = useMemo(() => {
+    const latitude = emergencyPost?.latitude;
+    const longitude = emergencyPost?.longitude;
+    const referenceLocation =
+      Number.isFinite(latitude) && Number.isFinite(longitude)
+        ? { latitude: latitude as number, longitude: longitude as number }
+        : undefined;
+    return deriveEmergencyResponders(securityResponders, members, referenceLocation);
+  }, [securityResponders, members, emergencyPost?.latitude, emergencyPost?.longitude]);
 
   // Always recenter map on mount or when emergencyId changes, or if forceCenter param is present
   useEffect(() => {
-    if (emergencyPost?.latitude && emergencyPost?.longitude && mapRef.current) {
-      const region = {
-        latitude: emergencyPost.latitude,
-        longitude: emergencyPost.longitude,
-        latitudeDelta: 0.02, // Zoom in close
-        longitudeDelta: 0.02,
-      };
-      mapRef.current.animateToRegion(region, 1000);
-    } else {
-      setResetTrigger((t) => t + 1);
-    }
+    setResetTrigger((t) => t + 1);
   }, [emergencyId, emergencyPost?.id, forceCenter]);
 
   // Animate map height when expanded/collapsed
@@ -148,7 +171,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
       const participantSet = new Set(allMemberIds);
       if (emergencyPost.authorId) participantSet.add(emergencyPost.authorId);
       if (userProfile?.id) participantSet.add(userProfile.id);
-      securityResponders.forEach((r) => participantSet.add(r.userId));
+      unifiedResponders.forEach((r) => participantSet.add(r.userId));
 
       const convId = await startConversation({
         participants: Array.from(participantSet),
@@ -164,7 +187,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
 
     initChat();
     return () => setActiveConversation(null);
-  }, [emergencyId, members.length, securityResponders.length]);
+  }, [emergencyId, members.length, unifiedResponders.length]);
 
   const handleSendLocation = () => {
     if (userProfile?.liveLocation) {
@@ -184,6 +207,12 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
     );
   }
 
+  const authorInitial = emergencyPost.authorName?.trim()?.charAt(0)?.toUpperCase() || 'E';
+  const isWarningIncident = isWarningPost(emergencyPost);
+  const accentColor = isWarningIncident ? '#d97706' : '#dc2626';
+  const accentBg = isWarningIncident ? '#fffbeb' : '#fef2f2';
+  const incidentLabel = isWarningIncident ? 'Warning' : 'Emergency';
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -200,8 +229,8 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
           />
         ) : (
           <View className="absolute inset-0 flex-row items-center px-5 bg-white/80">
-            <View className="bg-red-100 p-2 rounded-full mr-3">
-              <MapPin color="#DC2626" size={16} />
+            <View className="p-2 rounded-full mr-3" style={{ backgroundColor: accentBg }}>
+              <MapPin color={accentColor} size={16} />
             </View>
             <View>
               <Text className="text-xs font-bold text-primary">Map Minimized</Text>
@@ -253,15 +282,84 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
 
       {/* Chat section */}
       <View className="flex-1 bg-white overflow-hidden">
-        {/* Channel header */}
-        <View className="py-2.5 bg-white/70 border-b border-gray-100 items-center">
-          <View className="flex-row items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full">
-            <Shield color="#DC2626" size={12} />
-            <Text className="text-xs font-black text-gray-600 uppercase tracking-widest">
-              Coordination Channel
-            </Text>
+        {/* Emergency header */}
+        <View className="px-4 py-3 bg-white border-b border-gray-100">
+          <View className="flex-row items-center gap-3">
+            {emergencyPost.authorImage ? (
+              <Image
+                source={{ uri: emergencyPost.authorImage }}
+                className="w-12 h-12 rounded-2xl"
+                resizeMode="cover"
+              />
+            ) : (
+              <View className="w-12 h-12 rounded-2xl bg-surface items-center justify-center">
+                <Text className="text-primary font-bold text-lg">{authorInitial}</Text>
+              </View>
+            )}
+
+            <View className="flex-1 min-w-0">
+              <Text numberOfLines={1} className="font-black text-gray-900 text-[18px] leading-[22px]">
+                {emergencyPost.authorName || 'Emergency Source'}
+              </Text>
+              <View className="flex-row items-center gap-1.5 mt-0.5 flex-wrap">
+                <View className="px-1.5 py-0.5 rounded flex-row items-center gap-1" style={{ backgroundColor: accentBg }}>
+                  <AlertTriangle size={10} color={accentColor} />
+                  <Text className="text-[10px] font-bold uppercase tracking-wider" style={{ color: accentColor }}>
+                    {incidentLabel}
+                  </Text>
+                </View>
+                {!!emergencyPost.locationName && (
+                  <View className="flex-row items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100">
+                    <MapPin size={10} color="#4b5563" />
+                    <Text numberOfLines={1} className="text-[10px] text-gray-600 font-semibold max-w-[150px]">
+                      {emergencyPost.locationName}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <Text numberOfLines={1} className="text-[11px] text-gray-500 mt-1 font-semibold">
+                {emergencyPost.title}
+              </Text>
+            </View>
           </View>
         </View>
+
+        {activeIncidentPosts.length > 1 && (
+          <View className="px-4 py-2 bg-white border-b border-gray-100">
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View className="flex-row gap-2">
+                {activeIncidentPosts.map((incident: any) => {
+                  const active = incident.id === emergencyId;
+                  const emergency = incident.incidentType === 'emergency';
+                  const chipBg = active
+                    ? emergency
+                      ? '#dc2626'
+                      : '#fde047'
+                    : '#ffffff';
+                  const chipBorder = emergency ? '#dc2626' : '#f59e0b';
+                  const chipText = active
+                    ? emergency
+                      ? '#ffffff'
+                      : '#713f12'
+                    : '#334155';
+                  return (
+                    <TouchableOpacity
+                      key={incident.id}
+                      onPress={() => router.replace(`/emergency/${incident.id}?forceCenter=1` as any)}
+                      className="px-3 py-2 rounded-full"
+                      style={{ backgroundColor: chipBg, borderWidth: 1, borderColor: chipBorder }}
+                      activeOpacity={0.8}
+                    >
+                      <Text className="text-[11px] font-bold" style={{ color: chipText }} numberOfLines={1}>
+                        {incident.title || 'Incident'}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </View>
+        )}
 
         {/* Chat messages */}
         <View className="flex-1 overflow-hidden">
@@ -269,6 +367,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
             <ChatWindow
               messages={enrichedMessages}
               conversation={activeConversation}
+              emptyStateText="No updates yet. Responders can post status and location updates here."
             />
           ) : (
             <View className="flex-1 items-center justify-center">
@@ -277,29 +376,13 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
           )}
         </View>
 
-        {/* Responder count + priority bar */}
-        <View className="px-4 py-2 bg-white border-t border-gray-100 flex-row items-center justify-between">
-          <View className="flex-row items-center gap-2">
-            <View className="flex-row" style={{ marginRight: 4 }}>
-              {securityResponders.slice(0, 3).map((r) => (
-                <View
-                  key={r.userId}
-                  className="w-6 h-6 rounded-full border-2 border-white bg-gray-100 overflow-hidden"
-                  style={{ marginLeft: -6 }}
-                >
-                  {r.image ? (
-                    <Image source={{ uri: r.image }} className="w-full h-full" resizeMode="cover" />
-                  ) : null}
-                </View>
-              ))}
-            </View>
-            <Text className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              {securityResponders.length} Responders Active
+        {/* Active responders strip */}
+        <View className="px-4 py-2 bg-white border-t border-gray-100">
+          <View className="flex-row items-center gap-2 mb-1.5">
+            <Users color="#0d3d47" size={13} />
+            <Text className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+              Active Responders ({unifiedResponders.length})
             </Text>
-          </View>
-          <View className="flex-row items-center gap-1">
-            <Siren color="#DC2626" size={12} />
-            <Text className="text-xs font-bold text-red-600">High Priority</Text>
           </View>
         </View>
 

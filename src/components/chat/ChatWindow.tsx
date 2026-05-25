@@ -7,6 +7,7 @@ interface ChatWindowProps {
   messages: Message[];
   conversation: Conversation;
   isTyping?: boolean;
+  emptyStateText?: string;
 }
 
 type TimelineItem =
@@ -90,7 +91,12 @@ function TypingIndicator() {
   );
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({ messages, conversation, isTyping }) => {
+export const ChatWindow: React.FC<ChatWindowProps> = ({
+  messages,
+  conversation,
+  isTyping,
+  emptyStateText,
+}) => {
   const flatListRef = useRef<FlatList>(null);
   const timelineItems = useMemo<TimelineItem[]>(() => {
     const items: TimelineItem[] = [];
@@ -170,7 +176,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ messages, conversation, 
         <Text className="text-2xl">👋</Text>
       </View>
       <Text className="text-sm font-medium text-gray-500 text-center">
-        Say hello to start the conversation!
+        {emptyStateText || 'Say hello to start the conversation!'}
       </Text>
     </View>
   );

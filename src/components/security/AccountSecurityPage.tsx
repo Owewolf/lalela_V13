@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -33,15 +33,51 @@ const TABS: { key: Tab; label: string }[] = [
 
 const AccountSecurityPage: React.FC = () => {
   const router = useRouter();
-  const params = useLocalSearchParams<{ edit?: string | string[]; tab?: string | string[] }>();
+  const params = useLocalSearchParams<{
+    edit?: string | string[];
+    tab?: string | string[];
+    warningMode?: string | string[];
+    securityHandoff?: string | string[];
+    emergencyId?: string | string[];
+  }>();
   const routeEdit = Array.isArray(params.edit) ? params.edit[0] : params.edit;
   const routeTab = Array.isArray(params.tab) ? params.tab[0] : params.tab;
+  const routeWarningMode = Array.isArray(params.warningMode) ? params.warningMode[0] : params.warningMode;
+  const routeSecurityHandoff = Array.isArray(params.securityHandoff) ? params.securityHandoff[0] : params.securityHandoff;
+  const routeEmergencyId = Array.isArray(params.emergencyId) ? params.emergencyId[0] : params.emergencyId;
   const initialProfileEdit = routeEdit === 'true';
   const validTabs: Tab[] = ['profile', 'businesses', 'security', 'sessions', 'licensing', 'activity', 'danger'];
   const [activeTab, setActiveTab] = useState<Tab>(
     validTabs.includes(routeTab as Tab) ? (routeTab as Tab) : 'profile'
   );
-  const { communities, currentCommunity } = useCommunity();
+  const { communities, currentCommunity, posts } = useCommunity();
+  const hasProcessedHandoff = useRef(false);
+
+  const fallbackActiveEmergencyId = useMemo(() => {
+    const exact = currentCommunity?.activeEmergencyId;
+    if (exact) return exact;
+
+    const emergencyPost = posts.find(
+      (p) => p.urgencyLevel === 'emergency' || p.urgency === 'emergency'
+    );
+    if (emergencyPost?.id) return emergencyPost.id;
+
+    const warningPost = posts.find(
+      (p) => p.urgencyLevel === 'warning' || p.urgency === 'high'
+    );
+    return warningPost?.id;
+  }, [currentCommunity?.activeEmergencyId, posts]);
+
+  useEffect(() => {
+    const shouldHandoff = routeSecurityHandoff === '1' && routeWarningMode === '1';
+    if (!shouldHandoff || hasProcessedHandoff.current) return;
+
+    const targetEmergencyId = routeEmergencyId || fallbackActiveEmergencyId;
+    if (!targetEmergencyId) return;
+
+    hasProcessedHandoff.current = true;
+    router.replace(`/emergency/${targetEmergencyId}?forceCenter=1` as any);
+  }, [routeSecurityHandoff, routeWarningMode, routeEmergencyId, fallbackActiveEmergencyId, router]);
 
   const renderContent = () => {
     switch (activeTab) {

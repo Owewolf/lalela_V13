@@ -31,6 +31,7 @@ import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/uploadImage';
+import { resolveCreatePostLocationDefaults } from '../../lib/postLocationDefaults';
 import { BUSINESS_CATEGORIES } from '../../constants';
 import CreateWarningNotice from './CreateWarningNotice';
 import CreateInfoNotice from './CreateInfoNotice';
@@ -87,7 +88,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   onEmergencyPosted,
 }) => {
   const router = useRouter();
-  const { currentCommunity, charities, addPost, updatePost, securityResponders } = useCommunity();
+  const { currentCommunity, charities, addPost, updatePost } = useCommunity();
   const { userProfile } = useAuth();
 
   const handleBack = () => {
@@ -171,18 +172,24 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const numericPrice = parseFloat(price) || 0;
   const charityAmount = (numericPrice * charityPercentage) / 100;
   const publicPrice = numericPrice + charityAmount;
+  const locationDefaults = useMemo(
+    () => resolveCreatePostLocationDefaults(currentCommunity, userProfile),
+    [currentCommunity?.coverageArea, userProfile?.defaultLocation, userProfile?.locationSharing],
+  );
 
   // ── Default location ────────────────────────────────────────────────────────
   useEffect(() => {
     if (postToEdit) return;
-    if (userProfile?.locationSharing && userProfile?.defaultLocation) {
-      setLatitude(userProfile.defaultLocation.latitude);
-      setLongitude(userProfile.defaultLocation.longitude);
-      setLocationName(userProfile.defaultLocation.name);
-    } else if (userProfile?.locationSharing) {
+
+    setLatitude(locationDefaults.initialState.latitude);
+    setLongitude(locationDefaults.initialState.longitude);
+    setLocationName(locationDefaults.initialState.locationName);
+    setLocationSource(locationDefaults.initialState.source);
+
+    if (locationDefaults.shouldUseCurrentLocation) {
       handleUseCurrentLocation();
     }
-  }, [userProfile?.defaultLocation, userProfile?.locationSharing, postToEdit]);
+  }, [locationDefaults, postToEdit]);
 
   const handleUseCurrentLocation = async () => {
     try {
@@ -318,11 +325,14 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const canSubmit = isEmergency ? !!emergencyCategory : !!title && !!description;
 
   const mapRegion = {
-    latitude: latitude ?? -26.2041,
-    longitude: longitude ?? 28.0473,
+    latitude: latitude ?? locationDefaults.mapFallback.latitude,
+    longitude: longitude ?? locationDefaults.mapFallback.longitude,
     latitudeDelta: 0.08,
     longitudeDelta: 0.08,
   };
+  const coverageRadius = currentCommunity?.coverageArea?.radius
+    ? currentCommunity.coverageArea.radius * 1000
+    : 5000;
 
   if (postType === 'notice') {
     if (urgency === 'warning') {
@@ -465,30 +475,38 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                   <View className="flex-row items-center justify-between px-1 mb-2">
                     <View className="flex-row items-center gap-2">
                       <MapPin size={16} color="#6B7280" />
-                      <Text className="text-sm font-bold text-gray-600">Your Location</Text>
+                      <Text className="text-sm font-semibold text-gray-600">Emergency Location</Text>
                     </View>
-                    {locationSource !== 'profile_default' && userProfile?.defaultLocation && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (userProfile.defaultLocation) {
-                            setLatitude(userProfile.defaultLocation.latitude);
-                            setLongitude(userProfile.defaultLocation.longitude);
-                            setLocationName(userProfile.defaultLocation.name);
-                            setLocationSource('profile_default');
-                          }
-                        }}
-                      >
-                        <Text className="text-xs font-bold text-blue-600">Reset to Profile</Text>
+                    <View className="flex-row gap-2">
+                      {locationSource !== 'profile_default' && locationDefaults.resetTarget && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setLatitude(locationDefaults.resetTarget!.latitude);
+                            setLongitude(locationDefaults.resetTarget!.longitude);
+                            setLocationName(locationDefaults.resetTarget!.locationName);
+                            setLocationSource(locationDefaults.resetTarget!.source);
+                          }}
+                        >
+                          <Text className="text-xs font-bold text-primary">
+                            {locationDefaults.resetTarget.kind === 'community_default' ? 'Reset' : 'Reset to Profile'}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                      <TouchableOpacity onPress={handleUseCurrentLocation}>
+                        <Text className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg">
+                          My Location
+                        </Text>
                       </TouchableOpacity>
-                    )}
+                    </View>
                   </View>
                   <View
-                    className="w-full rounded-3xl overflow-hidden border-2 border-slate-200"
+                    className="w-full rounded-3xl overflow-hidden border-2 border-amber-300"
                     style={{ height: 220 }}
                   >
                     <MapView {...defaultMapViewProps}
                       style={{ flex: 1 }}
                       region={mapRegion}
+                      showsUserLocation={false}
                       onPress={(e) => {
                         const { latitude: lat, longitude: lng } = e.nativeEvent.coordinate;
                         setLatitude(lat);
@@ -512,56 +530,25 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                           />
                           <Circle
                             center={{ latitude, longitude }}
-                            radius={10000}
-                            strokeColor="#6B8DD640"
-                            fillColor="#6B8DD610"
-                            strokeWidth={1}
-                          />
-                          <Circle
-                            center={{ latitude, longitude }}
-                            radius={20000}
-                            strokeColor="#6B8DD620"
-                            fillColor="#6B8DD608"
+                            radius={coverageRadius}
+                            strokeColor="#F59E0B"
+                            fillColor="#F59E0B10"
                             strokeWidth={1}
                           />
                         </>
                       )}
-                      {securityResponders.map((r) => (
-                        <Marker
-                          key={r.userId}
-                          coordinate={{ latitude: r.latitude, longitude: r.longitude }}
-                          pinColor="#0D9488"
-                        />
-                      ))}
                     </MapView>
 
                     <View className="absolute top-3 left-3 right-3">
-                      <View className="bg-white/90 px-3 py-2 rounded-2xl flex-row items-center justify-between">
-                        <View>
-                          <Text className="text-xs font-bold text-slate-600 uppercase tracking-widest">
-                            {locationSource === 'profile_default'
-                              ? 'Default Location'
-                              : 'Custom Location Active'}
-                          </Text>
-                          <Text className="text-xs text-slate-400">Tap map to pin or drag marker</Text>
-                        </View>
-                        {locationSource === 'user_selected' && (
-                          <View className="flex-row items-center gap-1">
-                            <View className="w-2 h-2 rounded-full bg-blue-500" />
-                            <Text className="text-xs font-bold text-blue-600 uppercase">Set</Text>
-                          </View>
-                        )}
-                      </View>
-                    </View>
-
-                    <View className="absolute bottom-3 left-3 right-3">
-                      <View className="bg-white/90 px-3 py-2 rounded-2xl">
-                        <Text className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-0.5">
-                          Situational View
+                      <View className="bg-white/90 px-3 py-2 rounded-2xl border border-amber-200 flex-row items-center justify-between">
+                        <Text className="text-xs font-bold text-amber-700 uppercase tracking-wider">
+                          {locationSource === 'profile_default'
+                            ? 'Community Default'
+                            : locationSource === 'current_location'
+                            ? 'Your Location'
+                            : 'Custom Location'}
                         </Text>
-                        <Text className="text-xs text-slate-400">
-                          Showing 10km &amp; 20km radii and active security personnel.
-                        </Text>
+                        <Text className="text-xs text-gray-400">Tap to pin</Text>
                       </View>
                     </View>
                   </View>
