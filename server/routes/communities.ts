@@ -725,8 +725,24 @@ router.post('/:id/posts/:postId/sold', async (req, res) => {
   const community = await prisma.community.findUnique({ where: { id: req.params.id } });
   const catAmount = Number(post.charityAmount ?? 0);
   const catPercentage = Number(post.charityPercentage ?? CAT_MIN_PERCENTAGE);
-  const poolToCharity = Boolean((community as any)?.catCycleActive) && Boolean((community as any)?.catFeaturedCharityId);
-  const targetCharityId = poolToCharity ? (community as any).catFeaturedCharityId : null;
+
+  // Attribution rule:
+  // 1) If there is a currently featured charity, sold public listings pool to it.
+  // 2) If no featured charity exists, CAT is recorded without charity attribution.
+  let targetCharityId: string | null = (community as any)?.catFeaturedCharityId ?? null;
+
+  if (!targetCharityId) {
+    const featuredCharity = await prisma.charity.findFirst({
+      where: {
+        communityId: req.params.id,
+        isFeatured: true,
+        NOT: { status: { in: ['Archived', 'ARCHIVED'] } },
+      },
+      select: { id: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    targetCharityId = featuredCharity?.id ?? null;
+  }
 
   const catTx = (prisma as any).catTransaction;
   const transaction = catTx

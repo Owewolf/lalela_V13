@@ -13,6 +13,7 @@ import {
   StatusBar,
   Modal,
   Alert,
+  Share as NativeShare,
 } from 'react-native';
 import {
   Plus,
@@ -141,14 +142,15 @@ function calculateDistance(lat?: number, lng?: number, baseLat?: number, baseLng
 
 export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   const router = useRouter();
-    const { posts, currentCommunity, removePost, charities, startConversation, setActiveConversation, members } = useCommunity();
-    const { userProfile } = useAuth();
+  const { posts, currentCommunity, removePost, charities, startConversation, setActiveConversation, members, markPostSold } = useCommunity();
+  const { userProfile } = useAuth();
   const [filter, setFilter] = useState<'all' | 'listing' | 'notice'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [mapPost, setMapPost] = useState<CommunityNotice | null>(null);
   const [highlightedNoticeId, setHighlightedNoticeId] = useState<string | null>(null);
+  const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
   const feedListRef = useRef<FlatList<FeedSection> | null>(null);
 
   const baseLat = currentCommunity?.coverageArea?.latitude;
@@ -164,7 +166,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
     });
 
   const listings = posts
-    .filter(p => p.type === 'listing')
+    .filter(p => p.type === 'listing' && String(p.status || '').toUpperCase() !== 'SOLD')
     .filter(
       p =>
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -191,6 +193,66 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   React.useEffect(() => {
     if (postToDelete) confirmDelete();
   }, [postToDelete]);
+
+  const handleShareListing = useCallback(async (listing: CommunityNotice) => {
+    const route = `/market?listingId=${listing.id}`;
+    const communityName = currentCommunity?.name || 'your community';
+    const localPrice = typeof listing.price === 'number' ? `R${listing.price.toLocaleString()}` : 'Price on request';
+    const message = [
+      `${listing.title}`,
+      listing.description || 'Community listing on Lalela.',
+      `Local price: ${localPrice}`,
+      `Community: ${communityName}`,
+      `Open in Lalela: ${route}`,
+    ].join('\n');
+
+    try {
+      await NativeShare.share({
+        title: listing.title,
+        message,
+      });
+    } catch {
+      Alert.alert('Unable to share', 'Please try again.');
+    }
+  }, [currentCommunity?.name]);
+
+  const handleMarkListingSold = useCallback(
+    (listing: CommunityNotice) => {
+      const isOwner = listing.authorId && userProfile?.id && listing.authorId === userProfile.id;
+      const isSold = String(listing.status || '').toUpperCase() === 'SOLD';
+      if (!isOwner || isSold) return;
+
+      Alert.alert(
+        'Mark as sold',
+        listing.isPublic
+          ? 'This will mark the listing sold and trigger CAT accounting for this public listing.'
+          : 'This will mark the listing sold. Local listing sales do not trigger CAT.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Confirm',
+            onPress: async () => {
+              setMarkingSoldId(listing.id);
+              try {
+                const result = await markPostSold(listing.id);
+                Alert.alert(
+                  'Listing updated',
+                  result.catTriggered
+                    ? `Sold marked. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
+                    : 'Sold marked with no CAT trigger (local listing).'
+                );
+              } catch {
+                Alert.alert('Unable to mark sold', 'Please try again.');
+              } finally {
+                setMarkingSoldId(null);
+              }
+            },
+          },
+        ]
+      );
+    },
+    [markPostSold, userProfile?.id]
+  );
 
   const handleOpenContextChat = useCallback(
     async (post: CommunityNotice) => {
@@ -471,6 +533,8 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       const charity = charities.find(c => c.id === post.charityId);
       const isOwner = post.authorId === userProfile?.id;
       const isAdmin = currentCommunity?.userRole === 'ADMIN';
+      const isSold = String(post.status || '').toUpperCase() === 'SOLD';
+      const isMarkingSold = markingSoldId === post.id;
 
       return (
         <View className="bg-gray-50 rounded-[2rem] overflow-hidden border border-gray-100 mb-6 shadow-sm">
@@ -568,7 +632,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         activeOpacity={0.8}
                       >
                         <Pencil size={16} color="#0d3d47" />
-                        <Text className="text-primary text-sm font-bold">Edit Post</Text>
+                        <Text className="text-primary text-sm font-bold">Edit Listing</Text>
                       </TouchableOpacity>
                     )}
                     {(isOwner || isAdmin) && (
@@ -581,17 +645,38 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         activeOpacity={0.8}
                       >
                         <AlertTriangle size={16} color="#dc2626" />
-                        <Text className="text-red-600 text-sm font-bold">Delete Post</Text>
+                        <Text className="text-red-600 text-sm font-bold">Delete Listing</Text>
                       </TouchableOpacity>
                     )}
-                    <TouchableOpacity
-                      onPress={() => setActiveMenuId(null)}
-                      className="flex-row items-center gap-2 px-4 py-2"
-                      activeOpacity={0.8}
-                    >
-                      <Share2 size={16} color="#6b7280" />
-                      <Text className="text-gray-500 text-sm font-bold">Share</Text>
-                    </TouchableOpacity>
+                    {isOwner && !isSold && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setActiveMenuId(null);
+                          handleMarkListingSold(post);
+                        }}
+                        className="flex-row items-center gap-2 px-4 py-2"
+                        activeOpacity={0.8}
+                        disabled={isMarkingSold}
+                      >
+                        <CheckCircle2 size={16} color="#059669" />
+                        <Text className="text-green-600 text-sm font-bold">
+                          {isMarkingSold ? 'Marking...' : 'Mark as Sold'}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                    {!isOwner && (
+                      <TouchableOpacity
+                        onPress={async () => {
+                          setActiveMenuId(null);
+                          await handleShareListing(post);
+                        }}
+                        className="flex-row items-center gap-2 px-4 py-2"
+                        activeOpacity={0.8}
+                      >
+                        <Share2 size={16} color="#6b7280" />
+                        <Text className="text-gray-500 text-sm font-bold">Share</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )}
               </View>
@@ -694,7 +779,17 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         </View>
       );
     },
-    [activeMenuId, userProfile?.id, currentCommunity?.userRole, charities, handleOpenContextChat]
+    [
+      activeMenuId,
+      userProfile?.id,
+      currentCommunity?.userRole,
+      charities,
+      handleOpenContextChat,
+      handleMarkListingSold,
+      handleShareListing,
+      markingSoldId,
+      router,
+    ]
   );
 
   const filterTabs = [

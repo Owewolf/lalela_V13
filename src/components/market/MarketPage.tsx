@@ -65,9 +65,10 @@ const PRIMARY = '#0d3d47';
 
 interface MarketPageProps {
   initialListingId?: string;
+  initialBusinessId?: string;
 }
 
-export default function MarketPage({ initialListingId }: MarketPageProps) {
+export default function MarketPage({ initialListingId, initialBusinessId }: MarketPageProps) {
   const router = useRouter();
   const { userProfile } = useAuth();
   const {
@@ -81,12 +82,13 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
     markPostSold,
   } = useCommunity();
 
-  const [activeTab, setActiveTab] = useState<'featured' | 'listings' | 'businesses'>('businesses');
+  const [activeTab, setActiveTab] = useState<'featured' | 'listings' | 'businesses' | 'sold'>('businesses');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedListing, setSelectedListing] = useState<(typeof listings)[0] | null>(null);
   const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
+  const [focusedBusinessId, setFocusedBusinessId] = useState<string | null>(null);
 
   const coverageArea = currentCommunity?.coverageArea;
   const cycleFeaturedCharity = charities.find((charity) => charity.id === currentCommunity?.catFeaturedCharityId);
@@ -101,15 +103,37 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
     return l;
   }, [posts]);
 
+  const soldListings = useMemo(
+    () => listings.filter((listing) => String(listing.status || '').toUpperCase() === 'SOLD'),
+    [listings]
+  );
+
+  const activeListings = useMemo(
+    () => listings.filter((listing) => String(listing.status || '').toUpperCase() !== 'SOLD'),
+    [listings]
+  );
+
   useEffect(() => {
     if (initialListingId && posts.length > 0) {
       const listing = posts.find(p => p.type === 'listing' && p.id === initialListingId);
       if (listing) {
-        setActiveTab('listings');
+        const isSold = String((listing as any).status || '').toUpperCase() === 'SOLD';
+        setActiveTab(isSold ? 'sold' : 'listings');
         setSelectedListing(listing as any);
       }
     }
   }, [initialListingId, posts]);
+
+  useEffect(() => {
+    if (!initialBusinessId || (communityBusinesses || []).length === 0) return;
+    const target = (communityBusinesses || []).find((b) => b.id === initialBusinessId);
+    if (!target) return;
+    setActiveTab('businesses');
+    setViewMode('list');
+    setSelectedCategory(null);
+    setSearchQuery(target.name || '');
+    setFocusedBusinessId(target.id);
+  }, [initialBusinessId, communityBusinesses]);
 
   const handleOpenListingChat = useCallback(
     async (listing: (typeof listings)[0]) => {
@@ -225,6 +249,10 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
 
     // Sort: member businesses first, then by distance
     combined.sort((a, b) => {
+      if (focusedBusinessId) {
+        if (a.id === focusedBusinessId && b.id !== focusedBusinessId) return -1;
+        if (a.id !== focusedBusinessId && b.id === focusedBusinessId) return 1;
+      }
       if (a.isMemberBusiness && !b.isMemberBusiness) return -1;
       if (!a.isMemberBusiness && b.isMemberBusiness) return 1;
       return parseFloat(a.distance || '0') - parseFloat(b.distance || '0');
@@ -242,6 +270,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
     searchQuery,
     enabledCategories,
     userProfile?.id,
+    focusedBusinessId,
   ]);
 
   const renderBusiness = useCallback(
@@ -610,6 +639,7 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
     { id: 'featured', label: 'Featured' },
     { id: 'listings', label: 'Listings' },
     { id: 'businesses', label: 'Businesses' },
+    { id: 'sold', label: 'Sold' },
   ] as const;
 
   const headingText =
@@ -617,14 +647,16 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
       ? 'Admin Picks'
       : activeTab === 'businesses'
       ? 'Community Businesses'
+      : activeTab === 'sold'
+      ? 'Sold Items'
       : 'Items for Sale';
 
   const subText =
     activeTab === 'businesses'
       ? `${filteredBusinesses.length} business${filteredBusinesses.length !== 1 ? 'es' : ''} in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`
-      : `Showing ${activeTab === 'listings' ? listings.length : filteredBusinesses.length} ${activeTab === 'listings' ? 'listings' : 'businesses'} in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`;
-
-  const currentData = activeTab === 'listings' ? listings : filteredBusinesses;
+      : activeTab === 'sold'
+      ? `Showing ${soldListings.length} sold item${soldListings.length !== 1 ? 's' : ''} in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`
+      : `Showing ${activeListings.length} listings in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`;
 
   return (
     <View className="flex-1 bg-white">
@@ -829,9 +861,9 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
           }
         />
       ) : (
-        /* Listings tab */
+        /* Listings/Sold tabs */
         <FlatList
-          data={listings}
+          data={activeTab === 'sold' ? soldListings : activeListings}
           keyExtractor={item => item.id}
           renderItem={renderListing}
           contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 }}
@@ -841,9 +873,13 @@ export default function MarketPage({ initialListingId }: MarketPageProps) {
               <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center">
                 <MapPin size={40} color="#d1d5db" />
               </View>
-              <Text className="text-primary font-bold text-lg">No listings yet</Text>
+              <Text className="text-primary font-bold text-lg">
+                {activeTab === 'sold' ? 'No sold items yet' : 'No listings yet'}
+              </Text>
               <Text className="text-gray-400 text-sm text-center max-w-[240px]">
-                Community members haven't posted any listings yet.
+                {activeTab === 'sold'
+                  ? 'Sold listings will appear here once items are marked as sold.'
+                  : 'Community members haven\'t posted any listings yet.'}
               </Text>
             </View>
           }

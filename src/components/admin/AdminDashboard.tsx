@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import {
   LayoutDashboard,
-  Gavel,
   HeartHandshake,
   Shield,
   Users,
@@ -47,7 +46,7 @@ import { useLiveInsights } from '../../hooks/useLiveInsights';
 import { CommunityInsightPanels } from './CommunityInsightPanels';
 import { InteractiveCoverageMap } from '../home/InteractiveCoverageMap';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
-import { Lock, ScrollText, FileWarning } from 'lucide-react-native';
+import type { CatHubSummary } from '../../types';
 
 const PRIMARY = '#0d3d47';
 const ERROR = '#dc2626';
@@ -86,7 +85,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { userProfile, updateUserProfile } = useAuth();
-  const { currentCommunity, updateCommunityCoverage, posts, members, securityResponders, charities } = useCommunity();
+  const {
+    currentCommunity,
+    updateCommunityCoverage,
+    posts,
+    members,
+    securityResponders,
+    charities,
+    communityBusinesses,
+    getCatHub,
+    startConversation,
+    setActiveConversation,
+  } = useCommunity();
   const { data: liveInsights } = useLiveInsights(currentCommunity?.id);
   const previousRaisedRef = useRef<number | null>(null);
   const previousLiveDonationsRef = useRef<number | null>(null);
@@ -102,6 +112,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [systemUptime, setSystemUptime] = React.useState(99.9);
   const [securityThreats, setSecurityThreats] = React.useState(0);
   const [activeVolunteersCount, setActiveVolunteersCount] = React.useState(0);
+  const [catHubSummary, setCatHubSummary] = React.useState<CatHubSummary | null>(null);
 
   // Guided setup
   const [setupStepIndex, setSetupStepIndex] = React.useState(0);
@@ -142,10 +153,123 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const hasWarnings = activeWarningPosts.length > 0;
   const hasAnyIncidents = hasEmergencies || hasWarnings;
 
+  const formatInsightTime = React.useCallback((value?: string) => {
+    if (!value) return 'No time';
+    const dt = new Date(value);
+    if (Number.isNaN(dt.getTime())) return 'No time';
+    return dt.toLocaleString([], {
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }, []);
+
+  const communityResponderInsights = React.useMemo(() => {
+    const unique = new Map<string, { id: string; name: string }>();
+
+    for (const responder of securityResponders || []) {
+      const key = String((responder as any)?.userId || (responder as any)?.id || (responder as any)?.name || '');
+      if (!key) continue;
+      const name = ((responder as any)?.name || 'Security Responder').trim();
+      if (!unique.has(key)) {
+        unique.set(key, { id: key, name });
+      }
+    }
+
+    for (const member of members || []) {
+      if (!(member as any)?.isSecurityMember) continue;
+      const key = String((member as any)?.userId || (member as any)?.id || (member as any)?.email || (member as any)?.name || '');
+      if (!key || unique.has(key)) continue;
+      const name = ((member as any)?.name || (member as any)?.email || 'Security Member').trim();
+      unique.set(key, { id: key, name });
+    }
+
+    return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [members, securityResponders]);
+
+  const recentIncidentInsights = React.useMemo(() => {
+    const combined = [...activeEmergencyPosts, ...activeWarningPosts];
+    return combined
+      .slice()
+      .sort(byNewest)
+      .slice(0, 3)
+      .map((incident: any) => ({
+        id: incident.id,
+        title: incident.title || 'Incident update',
+        location: incident.locationName || 'Unknown location',
+        kind: isEmergencyPost(incident) ? 'emergency' as const : 'warning' as const,
+        time: formatInsightTime(incident.createdAt || incident.timestamp),
+      }));
+  }, [activeEmergencyPosts, activeWarningPosts, byNewest, formatInsightTime, isEmergencyPost]);
+
+  const recentListingInsights = React.useMemo(() => {
+    return (posts || [])
+      .filter((post: any) => {
+        if (post?.type !== 'listing') return false;
+        const status = typeof post?.status === 'string' ? post.status.toLowerCase() : '';
+        return status !== 'deleted' && status !== 'archived';
+      })
+      .slice()
+      .sort(byNewest)
+      .slice(0, 3)
+      .map((listing: any) => ({
+        id: listing.id,
+        title: listing.title || 'Untitled listing',
+        meta: `${listing.locationName || listing.authorName || 'Unknown location'} • ${formatInsightTime(listing.createdAt || listing.timestamp)}`,
+      }));
+  }, [posts, byNewest, formatInsightTime]);
+
+  const recentMemberBusinessInsights = React.useMemo(() => {
+    return (communityBusinesses || [])
+      .filter((business: any) => (business?.source || 'MEMBER') === 'MEMBER')
+      .slice()
+      .sort((a: any, b: any) => {
+        const aTime = new Date(a?.createdAt || 0).getTime();
+        const bTime = new Date(b?.createdAt || 0).getTime();
+        if (aTime === bTime) return String(a?.name || '').localeCompare(String(b?.name || ''));
+        return bTime - aTime;
+      })
+      .slice(0, 3)
+      .map((business: any) => ({
+        id: business.id,
+        name: business.name || 'Unnamed business',
+        meta: business.category || business.address || 'Community member business',
+      }));
+  }, [communityBusinesses]);
+
   const respondersOnline = liveInsights?.counts?.respondersOnline ?? 0;
+  const responderTotal = communityResponderInsights.length;
   const emergencyCount = activeEmergencyPosts.length;
   const warningCount = activeWarningPosts.length;
   const openAlertsDisplay = Math.max(activeAlertsCount, emergencyCount + warningCount);
+
+  const activeNoticeCount = React.useMemo(() => {
+    return (posts || []).filter((post: any) => {
+      if (post?.type !== 'notice') return false;
+      const status = typeof post?.status === 'string' ? post.status.toLowerCase() : '';
+      return status !== 'deleted' && status !== 'archived';
+    }).length;
+  }, [posts]);
+
+  const activeListingCount = React.useMemo(() => {
+    return (posts || []).filter((post: any) => {
+      if (post?.type !== 'listing') return false;
+      if (post?.soldAt) return false;
+      const status = typeof post?.status === 'string' ? post.status.toLowerCase() : 'active';
+      return status === 'active' || status === 'pinned';
+    }).length;
+  }, [posts]);
+
+  const activeMemberBusinessCount = React.useMemo(() => {
+    return (communityBusinesses || []).filter((business: any) => {
+      if ((business?.source || 'MEMBER') === 'IMPORT') return false;
+      const status = typeof business?.status === 'string' ? business.status.toUpperCase() : 'ACTIVE';
+      return status !== 'INACTIVE';
+    }).length;
+  }, [communityBusinesses]);
+
+  const activeTotalCount = emergencyCount + warningCount + activeNoticeCount + activeListingCount + activeMemberBusinessCount;
 
   // Pulse animation for the Security Panel (red on emergency, amber on warning).
   const securityPulse = useRef(new Animated.Value(0)).current;
@@ -204,6 +328,61 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     } as any);
   }, [router]);
 
+  const responderNameById = React.useMemo(() => {
+    const index = new Map<string, string>();
+    for (const responder of communityResponderInsights) {
+      index.set(responder.id, responder.name);
+    }
+    return index;
+  }, [communityResponderInsights]);
+
+  const handleInsightResponderPress = React.useCallback(async (responderId: string) => {
+    if (!responderId || !userProfile?.id) return;
+
+    if (responderId === userProfile.id) {
+      Alert.alert('Cannot open chat', 'You cannot chat with yourself.');
+      return;
+    }
+
+    try {
+      const conversationId = await startConversation({
+        participants: [userProfile.id, responderId],
+        type: 'direct',
+        communityId: currentCommunity?.id,
+        metadata: {
+          type: 'security',
+          title: `Security Responder: ${responderNameById.get(responderId) || 'Responder'}`,
+        },
+      });
+      setActiveConversation(conversationId);
+      router.push(`/chat/${conversationId}` as any);
+    } catch (error) {
+      console.error('Failed to open responder chat:', error);
+      Alert.alert('Chat unavailable', 'Could not open chat with this responder right now.');
+    }
+  }, [
+    currentCommunity?.id,
+    responderNameById,
+    router,
+    setActiveConversation,
+    startConversation,
+    userProfile?.id,
+  ]);
+
+  const handleInsightIncidentPress = React.useCallback((incidentId: string) => {
+    handleOpenIncident(incidentId);
+  }, [handleOpenIncident]);
+
+  const handleInsightListingPress = React.useCallback((listingId: string) => {
+    if (!listingId) return;
+    router.push(`/(tabs)/market?listingId=${encodeURIComponent(String(listingId))}` as any);
+  }, [router]);
+
+  const handleInsightBusinessPress = React.useCallback((businessId: string) => {
+    if (!businessId) return;
+    router.push(`/(tabs)/market?businessId=${encodeURIComponent(String(businessId))}` as any);
+  }, [router]);
+
   const moderationRef = useRef<ModerationCenterHandle>(null);
 
   const handleBack = () => {
@@ -244,12 +423,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       ).length
     );
   }, [members]);
-
-  // Derive charity totals directly from the context charities list
-  const totalCharityRaised = React.useMemo(
-    () => charities.reduce((s: number, c: any) => s + (c.raisedAmount || c.totalRaised || 0), 0),
-    [charities],
-  );
 
   // Track donation deltas from featured charity (no donor identity) → ephemeral ticker chips
   React.useEffect(() => {
@@ -308,6 +481,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setSecurityThreats(Array.isArray(data) ? data.length : 0);
     }).catch(console.error);
   }, [currentCommunity?.id, readOnly]);
+
+  React.useEffect(() => {
+    let mounted = true;
+    if (!currentCommunity?.id) {
+      setCatHubSummary(null);
+      return;
+    }
+    getCatHub()
+      .then((summary) => {
+        if (mounted) setCatHubSummary(summary);
+      })
+      .catch((error) => {
+        console.error('Failed to load CAT hub summary:', error);
+        if (mounted) setCatHubSummary(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [currentCommunity?.id, getCatHub]);
 
   // Init completed steps
   React.useEffect(() => {
@@ -380,10 +572,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     onSetupComplete?.();
   };
 
+  const featuredForStats = charities.find((c: any) => c.isFeatured);
+  const featuredRaisedTotal = Number(featuredForStats?.raisedAmount ?? 0);
+  const catGeneratedTotal = Number(catHubSummary?.totalCATGenerated ?? 0);
+
   const stats = [
     { label: 'Active Users', value: memberCount.toLocaleString(), icon: Users, color: PRIMARY },
-    { label: 'Total Charity', value: `R${totalCharityRaised.toLocaleString()}`, icon: HeartHandshake, color: SECONDARY },
-    { label: 'Active Alerts', value: activeAlertsCount.toString(), icon: Bell, color: ERROR, pulse: activeAlertsCount > 0 },
+    {
+      label: featuredForStats?.name?.trim() ? featuredForStats.name : 'CAT',
+      value: `R${Math.round(featuredForStats ? featuredRaisedTotal : catGeneratedTotal).toLocaleString()}`,
+      icon: HeartHandshake,
+      color: SECONDARY,
+    },
+    { label: 'Active', value: activeTotalCount.toLocaleString(), icon: Bell, color: ERROR },
   ];
 
   const activities = recentActivities.length > 0 ? recentActivities : [
@@ -440,11 +641,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <View style={styles.statsRow}>
         {stats.map((stat, idx) => (
           <View key={idx} style={styles.statCard}>
-            <Text style={styles.statLabel}>{stat.label}</Text>
+            <Text style={styles.statLabel} numberOfLines={1}>{stat.label}</Text>
             <View style={styles.statBottom}>
               <Text style={[styles.statValue, { color: stat.color }]}>{stat.value}</Text>
               <View style={{ position: 'relative' }}>
-                <stat.icon size={20} color={stat.color} style={{ opacity: 0.4 }} />
+                <stat.icon size={16} color={stat.color} style={{ opacity: 0.35 }} />
                 {(stat as any).pulse && (
                   <View style={styles.pulseDot} />
                 )}
@@ -484,55 +685,145 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         />
       </View>
 
-      {/* Moderation Center CTA */}
-      <View style={[styles.bentoCard, styles.bentoCardLarge]}>
-        {(() => {
-          const c = liveInsights?.counts;
-          const tiles: Array<{
-            id: string;
-            label: string;
-            tab: any;
-            Icon: any;
-            color: string;
-            bg: string;
-            count: number;
-          }> = [
-            { id: 'moderation-center', label: 'Moderation Center', tab: 'members', Icon: Gavel, color: PRIMARY, bg: '#f0fdf4', count: c?.respondersOnline ?? 0 },
-            { id: 'members', label: 'Members', tab: 'members', Icon: Users, color: PRIMARY, bg: '#f0fdf4', count: memberCount },
-            { id: 'alerts', label: 'Alerts', tab: 'logs', Icon: Bell, color: ERROR, bg: '#fef2f2', count: c?.alertsActive ?? activeAlertsCount },
-            { id: 'charity', label: 'Charity', tab: 'charity', Icon: HeartHandshake, color: SECONDARY, bg: '#f5f3ff', count: availableCharities.length },
-            { id: 'reports', label: 'Reports', tab: 'content', Icon: FileWarning, color: '#fc7127', bg: '#fff7ed', count: c?.activeReports ?? 0 },
-            { id: 'rules', label: 'Rules', tab: 'rules', Icon: ScrollText, color: PRIMARY, bg: '#f0fdf4', count: 0 },
-          ];
-          return (
-            <View style={styles.tileGrid}>
-              {tiles.map((t) => (
-                <TouchableOpacity
-                  key={t.id}
-                  style={[styles.tile, readOnly && styles.tileLocked]}
-                  onPress={() => {
-                    if (readOnly) return;
-                    setModerationTab(t.tab);
-                    setActiveView('moderation');
-                  }}
-                  activeOpacity={readOnly ? 1 : 0.8}
-                  disabled={readOnly}
-                >
-                  <View style={[styles.tileIcon, { backgroundColor: t.bg }]}>
-                    <t.Icon size={18} color={t.color} />
-                  </View>
-                  <Text style={styles.tileLabel}>{t.label}</Text>
-                  {readOnly && (
-                    <View style={styles.tileLockBadge}>
-                      <Lock size={10} color="#94a3b8" />
-                    </View>
-                  )}
-                </TouchableOpacity>
-              ))}
+      {/* Security Panel */}
+      <Animated.View
+        style={[
+          styles.bentoCard,
+          hasAnyIncidents && { backgroundColor: securityPulseBg },
+          hasEmergencies && { borderColor: '#fecaca' },
+          !hasEmergencies && hasWarnings && { borderColor: '#fde68a' },
+        ]}
+      >
+        <View style={styles.bentoHeader}>
+          <Shield
+            size={22}
+            color={hasEmergencies ? ERROR : hasWarnings ? '#d97706' : SECONDARY}
+          />
+          <Text
+            style={[
+              styles.bentoTitle,
+              hasEmergencies && { color: ERROR },
+              !hasEmergencies && hasWarnings && { color: '#d97706' },
+            ]}
+          >
+            Security Panel
+          </Text>
+          {hasEmergencies && (
+            <View style={styles.emergencyBadge}>
+              <View style={styles.emergencyDot} />
+              <Text style={styles.emergencyText}>Emergency</Text>
             </View>
-          );
-        })()}
-      </View>
+          )}
+          {!hasEmergencies && hasWarnings && (
+            <View style={styles.warningBadge}>
+              <View style={styles.warningDot} />
+              <Text style={styles.warningText}>Warning</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.securityStats}>
+          <View style={styles.securityStat}>
+            <Text style={styles.securityStatLabel}>EMERGENCIES</Text>
+            <Text style={[styles.securityStatValue, hasEmergencies && { color: ERROR }]}>
+              {emergencyCount}
+            </Text>
+          </View>
+          <View style={styles.securityStat}>
+            <Text style={styles.securityStatLabel}>WARNINGS</Text>
+            <Text style={[styles.securityStatValue, hasWarnings && { color: '#d97706' }]}>
+              {warningCount}
+            </Text>
+          </View>
+          <View style={styles.securityStat}>
+            <Text style={styles.securityStatLabel}>RESPONDERS</Text>
+            <Text style={styles.securityStatValue}>{responderTotal}</Text>
+          </View>
+        </View>
+
+        {hasAnyIncidents && (
+          <View style={styles.incidentListWrap}>
+            {hasEmergencies && (
+              <View style={styles.incidentSection}>
+                <Text style={[styles.incidentSectionLabel, { color: ERROR }]}>Active Emergencies</Text>
+                {activeEmergencyPosts.map((incident: any) => (
+                  <TouchableOpacity
+                    key={incident.id}
+                    style={[styles.incidentRow, styles.incidentRowEmergency]}
+                    activeOpacity={0.85}
+                    onPress={() => handleOpenIncident(incident.id)}
+                    accessibilityLabel={`Open emergency ${incident.title || 'incident'}`}
+                  >
+                    <View style={styles.incidentMain}>
+                      <Text style={styles.incidentTitle} numberOfLines={1}>
+                        {incident.title || 'Emergency alert'}
+                      </Text>
+                      <Text style={styles.incidentMeta} numberOfLines={1}>
+                        {incident.locationName || 'Unknown location'}
+                      </Text>
+                    </View>
+                    <Text style={[styles.incidentTime, { color: ERROR }]}>
+                      {formatIncidentTime(incident.createdAt)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {hasWarnings && (
+              <View style={styles.incidentSection}>
+                <Text style={[styles.incidentSectionLabel, { color: '#d97706' }]}>Active Warnings</Text>
+                {activeWarningPosts.map((incident: any) => (
+                  <TouchableOpacity
+                    key={incident.id}
+                    style={[styles.incidentRow, styles.incidentRowWarning]}
+                    activeOpacity={0.85}
+                    onPress={() => handleOpenIncident(incident.id)}
+                    accessibilityLabel={`Open warning ${incident.title || 'incident'}`}
+                  >
+                    <View style={styles.incidentMain}>
+                      <Text style={styles.incidentTitle} numberOfLines={1}>
+                        {incident.title || 'Warning notice'}
+                      </Text>
+                      <Text style={styles.incidentMeta} numberOfLines={1}>
+                        {incident.locationName || 'Unknown location'}
+                      </Text>
+                    </View>
+                    <Text style={[styles.incidentTime, { color: '#d97706' }]}>
+                      {formatIncidentTime(incident.createdAt)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+
+        {!hasAnyIncidents && (
+          <View style={styles.securityStats}>
+            <View style={styles.securityStat}>
+              <Text style={styles.securityStatLabel}>SECURITY MEMBERS</Text>
+              <View style={styles.securityValueRow}>
+                <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
+                {respondersOnline > 0 && (
+                  <View style={styles.onlinePulseDot} />
+                )}
+              </View>
+              {respondersOnline > 0 && (
+                <Text style={styles.onlineHint}>
+                  {respondersOnline} online now
+                </Text>
+              )}
+            </View>
+            <View style={styles.securityStat}>
+              <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
+              <Text style={[styles.securityStatValue, activeAlertsCount > 0 && { color: ERROR }]}> 
+                {openAlertsDisplay}
+              </Text>
+            </View>
+          </View>
+        )}
+      </Animated.View>
 
       {/* Charity Hub */}
       <View style={styles.bentoCard}>
@@ -643,153 +934,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )}
       </View>
 
-      {/* Community Insights (rotating mini-cards) */}
-      <CommunityInsightPanels insights={liveInsights?.insights ?? null} />
-
-      {/* Security Panel */}
-      <Animated.View
-        style={[
-          styles.bentoCard,
-          hasAnyIncidents && { backgroundColor: securityPulseBg },
-          hasEmergencies && { borderColor: '#fecaca' },
-          !hasEmergencies && hasWarnings && { borderColor: '#fde68a' },
-        ]}
-      >
-        <View style={styles.bentoHeader}>
-          <Shield
-            size={22}
-            color={hasEmergencies ? ERROR : hasWarnings ? '#d97706' : SECONDARY}
-          />
-          <Text
-            style={[
-              styles.bentoTitle,
-              hasEmergencies && { color: ERROR },
-              !hasEmergencies && hasWarnings && { color: '#d97706' },
-            ]}
-          >
-            Security Panel
-          </Text>
-          {hasEmergencies && (
-            <View style={styles.emergencyBadge}>
-              <View style={styles.emergencyDot} />
-              <Text style={styles.emergencyText}>
-                {hasWarnings ? 'Emergency + Warning Active' : 'Emergency Active'}
-              </Text>
-            </View>
-          )}
-          {!hasEmergencies && hasWarnings && (
-            <View style={styles.warningBadge}>
-              <View style={styles.warningDot} />
-              <Text style={styles.warningText}>Warning Active</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.securityStats}>
-          <View style={styles.securityStat}>
-            <Text style={styles.securityStatLabel}>EMERGENCIES</Text>
-            <Text style={[styles.securityStatValue, hasEmergencies && { color: ERROR }]}>
-              {emergencyCount}
-            </Text>
-          </View>
-          <View style={styles.securityStat}>
-            <Text style={styles.securityStatLabel}>WARNINGS</Text>
-            <Text style={[styles.securityStatValue, hasWarnings && { color: '#d97706' }]}>
-              {warningCount}
-            </Text>
-          </View>
-          <View style={styles.securityStat}>
-            <Text style={styles.securityStatLabel}>RESPONDERS</Text>
-            <View style={styles.securityValueRow}>
-              <Text style={styles.securityStatValue}>{respondersOnline}</Text>
-              {respondersOnline > 0 && <View style={styles.onlinePulseDot} />}
-            </View>
-          </View>
-        </View>
-
-        {hasAnyIncidents && (
-          <View style={styles.incidentListWrap}>
-            {hasEmergencies && (
-              <View style={styles.incidentSection}>
-                <Text style={[styles.incidentSectionLabel, { color: ERROR }]}>Active Emergencies</Text>
-                {activeEmergencyPosts.map((incident: any) => (
-                  <TouchableOpacity
-                    key={incident.id}
-                    style={[styles.incidentRow, styles.incidentRowEmergency]}
-                    activeOpacity={0.85}
-                    onPress={() => handleOpenIncident(incident.id)}
-                    accessibilityLabel={`Open emergency ${incident.title || 'incident'}`}
-                  >
-                    <View style={styles.incidentMain}>
-                      <Text style={styles.incidentTitle} numberOfLines={1}>
-                        {incident.title || 'Emergency alert'}
-                      </Text>
-                      <Text style={styles.incidentMeta} numberOfLines={1}>
-                        {incident.locationName || 'Unknown location'}
-                      </Text>
-                    </View>
-                    <Text style={[styles.incidentTime, { color: ERROR }]}>
-                      {formatIncidentTime(incident.createdAt)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-
-            {hasWarnings && (
-              <View style={styles.incidentSection}>
-                <Text style={[styles.incidentSectionLabel, { color: '#d97706' }]}>Active Warnings</Text>
-                {activeWarningPosts.map((incident: any) => (
-                  <TouchableOpacity
-                    key={incident.id}
-                    style={[styles.incidentRow, styles.incidentRowWarning]}
-                    activeOpacity={0.85}
-                    onPress={() => handleOpenIncident(incident.id)}
-                    accessibilityLabel={`Open warning ${incident.title || 'incident'}`}
-                  >
-                    <View style={styles.incidentMain}>
-                      <Text style={styles.incidentTitle} numberOfLines={1}>
-                        {incident.title || 'Warning notice'}
-                      </Text>
-                      <Text style={styles.incidentMeta} numberOfLines={1}>
-                        {incident.locationName || 'Unknown location'}
-                      </Text>
-                    </View>
-                    <Text style={[styles.incidentTime, { color: '#d97706' }]}>
-                      {formatIncidentTime(incident.createdAt)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
-        )}
-
-        {!hasAnyIncidents && (
-          <View style={styles.securityStats}>
-            <View style={styles.securityStat}>
-              <Text style={styles.securityStatLabel}>SECURITY MEMBERS</Text>
-              <View style={styles.securityValueRow}>
-                <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
-                {respondersOnline > 0 && (
-                  <View style={styles.onlinePulseDot} />
-                )}
-              </View>
-              {respondersOnline > 0 && (
-                <Text style={styles.onlineHint}>
-                  {respondersOnline} online now
-                </Text>
-              )}
-            </View>
-            <View style={styles.securityStat}>
-              <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
-              <Text style={[styles.securityStatValue, activeAlertsCount > 0 && { color: ERROR }]}> 
-                {openAlertsDisplay}
-              </Text>
-            </View>
-          </View>
-        )}
-      </Animated.View>
+      {/* Community Insights */}
+      <CommunityInsightPanels
+        responders={communityResponderInsights}
+        incidents={recentIncidentInsights}
+        listings={recentListingInsights}
+        businesses={recentMemberBusinessInsights}
+        onResponderPress={handleInsightResponderPress}
+        onIncidentPress={handleInsightIncidentPress}
+        onListingPress={handleInsightListingPress}
+        onBusinessPress={handleInsightBusinessPress}
+      />
 
       {/* System Health */}
       <View style={styles.bentoCard}>
@@ -853,28 +1008,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </View>
         <Text style={styles.topBarTitle}>Admin Dashboard</Text>
 
-        {/* View switcher */}
-        <View style={styles.viewSwitcher}>
-          {[
-            { id: 'dashboard', icon: LayoutDashboard },
-            ...(!readOnly ? [
-              { id: 'moderation', icon: Gavel },
-              { id: 'members', icon: Users },
-            ] : []),
-          ].map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[styles.viewSwitcherBtn, activeView === item.id && styles.viewSwitcherBtnActive]}
-              onPress={() => {
-                if (item.id === 'moderation') setModerationTab('members');
-                setActiveView(item.id as any);
-              }}
-              activeOpacity={0.7}
-            >
-              <item.icon size={18} color={activeView === item.id ? PRIMARY : '#94a3b8'} />
-            </TouchableOpacity>
-          ))}
-        </View>
+        {/* Admin-only moderation shortcut */}
+        {currentCommunity?.userRole === 'ADMIN' && activeView === 'dashboard' && !readOnly && (
+          <TouchableOpacity
+            style={[styles.viewSwitcherBtn, styles.viewSwitcherBtnActive]}
+            onPress={() => {
+              setModerationTab('members');
+              setActiveView('moderation');
+            }}
+            activeOpacity={0.7}
+            accessibilityLabel="Open moderation center"
+          >
+            <LayoutDashboard size={18} color={PRIMARY} />
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Content */}
@@ -983,14 +1130,29 @@ const styles = StyleSheet.create({
 
   statsRow: { flexDirection: 'row', gap: 10 },
   statCard: {
-    flex: 1, backgroundColor: '#fff', borderRadius: 16, padding: 14,
+    flex: 1, backgroundColor: '#fff', borderRadius: 15, paddingVertical: 10, paddingHorizontal: 12,
     borderWidth: 1, borderColor: '#f1f5f9',
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
-    gap: 4,
+    gap: 3,
+    alignItems: 'center',
   },
-  statLabel: { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1 },
-  statBottom: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 4 },
-  statValue: { fontSize: 22, fontWeight: '900' },
+  statLabel: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#94a3b8',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    textAlign: 'center',
+    width: '100%',
+  },
+  statBottom: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 0,
+    gap: 2,
+    width: '100%',
+  },
+  statValue: { fontSize: 22, fontWeight: '900', textAlign: 'center', lineHeight: 26 },
   pulseDot: {
     position: 'absolute', top: -2, right: -2, width: 7, height: 7,
     borderRadius: 4, backgroundColor: ERROR,
@@ -1001,7 +1163,6 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#f1f5f9',
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2,
   },
-  bentoCardLarge: {},
   bentoCardClickable: {},
   bentoHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   bentoIcon: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
@@ -1112,10 +1273,17 @@ const styles = StyleSheet.create({
   },
   warningDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#d97706' },
   warningText: { fontSize: 10, fontWeight: '900', color: '#d97706', textTransform: 'uppercase', letterSpacing: 0.8 },
-  securityStats: { flexDirection: 'row', gap: 24, marginTop: 8 },
-  securityStat: { gap: 4 },
-  securityStatLabel: { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1 },
-  securityStatValue: { fontSize: 28, fontWeight: '900', color: PRIMARY },
+  securityStats: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
+  securityStat: { flex: 1, gap: 4, alignItems: 'center' },
+  securityStatLabel: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#94a3b8',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+  securityStatValue: { fontSize: 28, fontWeight: '900', color: PRIMARY, textAlign: 'center' },
   incidentListWrap: {
     marginTop: 10,
     gap: 10,
@@ -1270,40 +1438,6 @@ const styles = StyleSheet.create({
     shadowColor: PRIMARY, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 4,
   },
   submitSuggestBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
-
-  // Moderation tile grid
-  tileGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8,
-  },
-  tile: {
-    width: '31.5%',
-    backgroundColor: '#f8fafc',
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    gap: 4,
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  tileLocked: { opacity: 0.5 },
-  tileIcon: {
-    width: 32, height: 32, borderRadius: 10,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  tileLabel: {
-    fontSize: 10, fontWeight: '900', color: '#64748b',
-    textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4,
-    textAlign: 'center',
-  },
-  tileCount: { fontSize: 18, fontWeight: '900', textAlign: 'center' },
-  tileLockBadge: {
-    position: 'absolute', top: 8, right: 8,
-    width: 18, height: 18, borderRadius: 9,
-    backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: '#f1f5f9',
-  },
 
   // Donor ticker chips
   donorTickerRow: { flexDirection: 'row', gap: 6, marginTop: 8, flexWrap: 'wrap' },

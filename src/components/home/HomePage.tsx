@@ -9,6 +9,7 @@ import {
   Modal,
   Alert,
   Animated,
+  Share as NativeShare,
 } from 'react-native';
 import {
   Siren,
@@ -25,6 +26,7 @@ import {
   MoreVertical,
   Share2,
   MapPin,
+  CheckCircle2,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
@@ -175,6 +177,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     communityBusinesses,
     charities,
     removePost,
+    markPostSold,
     startConversation,
     setActiveConversation,
   } = useCommunity();
@@ -241,6 +244,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [showIncidentMenu, setShowIncidentMenu] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
 
   // Progress bar animation value
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -302,7 +306,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const listings = useMemo(
     () =>
       [...posts]
-        .filter((p) => p.type === 'listing')
+        .filter((p) => p.type === 'listing' && String(p.status || '').toUpperCase() !== 'SOLD')
         .sort(
           (a, b) =>
             new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
@@ -461,6 +465,66 @@ export const HomePage: React.FC<HomePageProps> = ({
     removePost(postToDelete);
     setPostToDelete(null);
   };
+
+  const handleShareListing = useCallback(async (listing: CommunityNotice) => {
+    const route = `/market?listingId=${listing.id}`;
+    const communityName = currentCommunity?.name || 'your community';
+    const localPrice = typeof listing.price === 'number' ? `R${listing.price.toLocaleString()}` : 'Price on request';
+    const message = [
+      `${listing.title}`,
+      listing.description || 'Community listing on Lalela.',
+      `Local price: ${localPrice}`,
+      `Community: ${communityName}`,
+      `Open in Lalela: ${route}`,
+    ].join('\n');
+
+    try {
+      await NativeShare.share({
+        title: listing.title,
+        message,
+      });
+    } catch {
+      Alert.alert('Unable to share', 'Please try again.');
+    }
+  }, [currentCommunity?.name]);
+
+  const handleMarkListingSold = useCallback(
+    (listing: CommunityNotice) => {
+      const isOwner = listing.authorId && userProfile?.id && listing.authorId === userProfile.id;
+      const isSold = String(listing.status || '').toUpperCase() === 'SOLD';
+      if (!isOwner || isSold) return;
+
+      Alert.alert(
+        'Mark as sold',
+        listing.isPublic
+          ? 'This will mark the listing sold and trigger CAT accounting for this public listing.'
+          : 'This will mark the listing sold. Local listing sales do not trigger CAT.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Confirm',
+            onPress: async () => {
+              setMarkingSoldId(listing.id);
+              try {
+                const result = await markPostSold(listing.id);
+                Alert.alert(
+                  'Listing updated',
+                  result.catTriggered
+                    ? `Sold marked. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
+                    : 'Sold marked with no CAT trigger (local listing).'
+                );
+              } catch {
+                Alert.alert('Unable to mark sold', 'Please try again.');
+              } finally {
+                setMarkingSoldId(null);
+              }
+            },
+          },
+        ]
+      );
+    },
+    [markPostSold, userProfile?.id]
+  );
 
   // ─── Incident urgency menu items ──────────────────────────────────────────
   const urgencyMenuItems: {
@@ -894,6 +958,10 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   const renderListingCard = ({ item: listing }: { item: CommunityNotice }) => {
+    const isOwner = listing.authorId === userProfile?.id;
+    const isAdmin = currentCommunity?.userRole === 'ADMIN';
+    const isSold = String(listing.status || '').toUpperCase() === 'SOLD';
+    const isMarkingSold = markingSoldId === listing.id;
     const linkedCharity = listing.charityId
       ? charities.find((c) => c.id === listing.charityId)
       : null;
@@ -929,40 +997,39 @@ export const HomePage: React.FC<HomePageProps> = ({
             >
               {listing.title}
             </Text>
-            {(listing.authorId === userProfile?.id ||
-              currentCommunity?.userRole === 'ADMIN') && (
-              <View className="relative shrink-0">
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() =>
-                    setActiveMenuId(
-                      activeMenuId === listing.id ? null : listing.id
-                    )
-                  }
-                  className="w-7 h-7 rounded-full bg-gray-100 items-center justify-center"
+            <View className="relative shrink-0">
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() =>
+                  setActiveMenuId(
+                    activeMenuId === listing.id ? null : listing.id
+                  )
+                }
+                className="w-7 h-7 rounded-full bg-gray-100 items-center justify-center"
+              >
+                <MoreVertical size={14} color="#6b7280" />
+              </TouchableOpacity>
+              {activeMenuId === listing.id && (
+                <View
+                  className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
+                  style={{ top: 32 }}
                 >
-                  <MoreVertical size={14} color="#6b7280" />
-                </TouchableOpacity>
-                {activeMenuId === listing.id && (
-                  <View
-                    className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
-                    style={{ top: 32 }}
-                  >
-                    {listing.authorId === userProfile?.id && (
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => {
-                          setActiveMenuId(null);
-                          router.push(`/create-post?postId=${listing.id}` as any);
-                        }}
-                        className="flex-row items-center gap-2 px-4 py-2"
-                      >
-                        <Tag size={14} color="#0d3d47" />
-                        <Text className="text-sm font-bold text-primary">
-                          Edit Listing
-                        </Text>
-                      </TouchableOpacity>
-                    )}
+                  {isOwner && (
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setActiveMenuId(null);
+                        router.push(`/create-post?postId=${listing.id}` as any);
+                      }}
+                      className="flex-row items-center gap-2 px-4 py-2"
+                    >
+                      <Tag size={14} color="#0d3d47" />
+                      <Text className="text-sm font-bold text-primary">
+                        Edit Listing
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  {(isOwner || isAdmin) && (
                     <TouchableOpacity
                       activeOpacity={0.7}
                       onPress={() => {
@@ -976,9 +1043,30 @@ export const HomePage: React.FC<HomePageProps> = ({
                         Delete Listing
                       </Text>
                     </TouchableOpacity>
+                  )}
+                  {isOwner && !isSold && (
                     <TouchableOpacity
                       activeOpacity={0.7}
-                      onPress={() => setActiveMenuId(null)}
+                      disabled={isMarkingSold}
+                      onPress={() => {
+                        setActiveMenuId(null);
+                        handleMarkListingSold(listing);
+                      }}
+                      className="flex-row items-center gap-2 px-4 py-2"
+                    >
+                      <CheckCircle2 size={14} color="#059669" />
+                      <Text className="text-sm font-bold text-green-600">
+                        {isMarkingSold ? 'Marking...' : 'Mark as Sold'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  {!isOwner && (
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={async () => {
+                        setActiveMenuId(null);
+                        await handleShareListing(listing);
+                      }}
                       className="flex-row items-center gap-2 px-4 py-2"
                     >
                       <Share2 size={14} color="#6b7280" />
@@ -986,10 +1074,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                         Share
                       </Text>
                     </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            )}
+                  )}
+                </View>
+              )}
+            </View>
           </View>
 
           <Text
