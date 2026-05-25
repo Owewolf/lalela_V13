@@ -3,19 +3,33 @@ import { View, Text, TouchableOpacity, ScrollView, Platform, Linking } from 'rea
 import MapView, { Marker, Circle, Callout } from 'react-native-maps';
 import {
   Siren,
+  Flame,
+  Car,
   Shield,
   Users,
   Tag,
   AlertTriangle,
   Store,
-  Navigation,
   MapPin,
 } from 'lucide-react-native';
 import { cn } from '../../lib/utils';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
+import {
+  extractMapCoordinates,
+  regionForCoordinateCircles,
+} from '../../lib/mapBounds';
 import { useCommunity } from '../../context/CommunityContext';
 
 type MapFilter = 'members' | 'listings' | 'notices' | 'businesses';
+
+interface EmergencyIncident {
+  id: string;
+  title: string | undefined;
+  locationName: string | undefined;
+  emergencyType: 'fire' | 'accident' | 'security' | 'generic';
+  latitude: number;
+  longitude: number;
+}
 
 interface InteractiveCoverageMapProps {
   center: { 
@@ -33,7 +47,8 @@ interface InteractiveCoverageMapProps {
   height?: number;
   className?: string;
   onMarkerClick?: (type: string, data: any) => void;
-  onOpenEmergencyHub?: () => void;
+  onOpenEmergencyHub?: (incidentId: string) => void;
+  onOpenEmergencySelection?: () => void;
   resetTrigger?: number;
   initialFilter?: MapFilter;
   isLocked?: boolean;
@@ -44,6 +59,40 @@ interface InteractiveCoverageMapProps {
 
 const DELTA = 0.04;
 const FALLBACK_CENTER = { latitude: -26.2041, longitude: 28.0473 };
+const SINGLE_EMERGENCY_DELTA = 0.02;
+const EMERGENCY_RADIUS_METERS = 10000;
+
+const classifyEmergencyType = (
+  title?: string,
+  description?: string,
+  category?: string
+): EmergencyIncident['emergencyType'] => {
+  const haystack = `${title || ''} ${description || ''} ${category || ''}`.toLowerCase();
+
+  if (/(fire|smoke|burn|blaze)/.test(haystack)) return 'fire';
+  if (/(accident|crash|collision|vehicle|car|traffic|road)/.test(haystack)) {
+    return 'accident';
+  }
+  if (/(crime|security|robbery|theft|assault|break-in|violence|intruder)/.test(haystack)) {
+    return 'security';
+  }
+  return 'generic';
+};
+
+const emergencyVisualConfig = (
+  type: EmergencyIncident['emergencyType']
+): { icon: React.ComponentType<{ size?: number; color?: string }>; bgColor: string; label: string } => {
+  switch (type) {
+    case 'fire':
+      return { icon: Flame, bgColor: '#ef4444', label: 'Fire Emergency' };
+    case 'accident':
+      return { icon: Car, bgColor: '#f97316', label: 'Accident Emergency' };
+    case 'security':
+      return { icon: Shield, bgColor: '#dc2626', label: 'Security Emergency' };
+    default:
+      return { icon: Siren, bgColor: '#dc2626', label: 'Emergency' };
+  }
+};
 
 const toFiniteNumber = (value: unknown, fallback: number) => {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -66,6 +115,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
   className,
   onMarkerClick,
   onOpenEmergencyHub,
+  onOpenEmergencySelection,
   resetTrigger,
   initialFilter,
   isLocked = false,
@@ -125,57 +175,97 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
     safeCenter.longitudeDelta,
   ]);
 
-  const allResponders = useMemo(() => {
-    const calcDist = (lat: number, lng: number) => {
-      const R = 6371;
-      const dLat = ((lat - safeCenter.latitude) * Math.PI) / 180;
-      const dLng = ((lng - safeCenter.longitude) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos((safeCenter.latitude * Math.PI) / 180) *
-          Math.cos((lat * Math.PI) / 180) *
-          Math.sin(dLng / 2) ** 2;
-      return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
-    };
-
-    const responderIds = new Set(securityResponders.map((r) => r.userId));
-    const fromDedicated = securityResponders.map((r) => ({
-      ...r,
-      distance: calcDist(r.latitude, r.longitude),
-    }));
-    const fromMembers = members
-      .filter(
-        (m) =>
-          m.isSecurityMember && m.latitude && m.longitude && !responderIds.has(m.userId)
-      )
-      .map((m) => ({
-        userId: m.userId,
-        name: m.name || 'Security Member',
-        image:
-          m.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.userId}`,
-        latitude: m.latitude!,
-        longitude: m.longitude!,
-        timestamp: new Date().toISOString(),
-        distance: calcDist(m.latitude!, m.longitude!),
-      }));
-    return [...fromDedicated, ...fromMembers].sort(
-      (a, b) => parseFloat(a.distance) - parseFloat(b.distance)
-    );
-  }, [securityResponders, members, safeCenter.latitude, safeCenter.longitude]);
-
-  const emergencyPost = posts.find(
-    (p) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
+  const activeEmergencyPosts = useMemo(
+    () =>
+      [...posts]
+        .filter((p: any) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency')
+        .sort(
+          (a: any, b: any) =>
+            new Date((b?.timestamp || b?.createdAt || 0) as any).getTime() -
+            new Date((a?.timestamp || a?.createdAt || 0) as any).getTime()
+        ),
+    [posts]
   );
 
-  const coverageCenter =
-    isEmergencyActive && emergencyPost?.latitude && emergencyPost?.longitude
-      ? { latitude: emergencyPost.latitude, longitude: emergencyPost.longitude }
-      : currentCommunity?.coverageArea
-      ? {
-          latitude: currentCommunity.coverageArea.latitude,
-          longitude: currentCommunity.coverageArea.longitude,
-        }
-      : null;
+  const emergencyIncidents = useMemo<EmergencyIncident[]>(
+    () =>
+      activeEmergencyPosts
+        .map((post: any): EmergencyIncident | null => {
+          const latitude = toFiniteNumber(post?.latitude, NaN);
+          const longitude = toFiniteNumber(post?.longitude, NaN);
+          if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+          return {
+            id: String(post.id),
+            title: typeof post.title === 'string' ? post.title : undefined,
+            locationName:
+              typeof post.locationName === 'string' ? post.locationName : undefined,
+            emergencyType: classifyEmergencyType(
+              typeof post.title === 'string' ? post.title : undefined,
+              typeof post.description === 'string' ? post.description : undefined,
+              typeof post.category === 'string' ? post.category : undefined
+            ),
+            latitude,
+            longitude,
+          };
+        })
+        .filter((incident): incident is EmergencyIncident => incident !== null),
+    [activeEmergencyPosts]
+  );
+
+  const emergencyCoordinates = useMemo(
+    () => extractMapCoordinates(emergencyIncidents),
+    [emergencyIncidents]
+  );
+
+  const emergencyViewportTarget = useMemo(() => {
+    if (!isEmergencyActive || emergencyCoordinates.length === 0) return null;
+
+    if (emergencyCoordinates.length === 1) {
+      const [single] = emergencyCoordinates;
+      return {
+        latitude: single.latitude,
+        longitude: single.longitude,
+        latitudeDelta: SINGLE_EMERGENCY_DELTA,
+        longitudeDelta: SINGLE_EMERGENCY_DELTA,
+      };
+    }
+
+    return regionForCoordinateCircles(emergencyCoordinates, EMERGENCY_RADIUS_METERS, {
+      paddingFactor: 1.08,
+      minDelta: 0.008,
+    });
+  }, [isEmergencyActive, emergencyCoordinates]);
+
+  const emergencyPost = emergencyIncidents[0];
+  const emergencyAttentionLabel = useMemo(() => {
+    if (!isEmergencyActive || emergencyIncidents.length === 0) return null;
+    if (emergencyIncidents.length > 1) return 'Multiple emergencies';
+    return emergencyPost?.title || 'Emergency active';
+  }, [isEmergencyActive, emergencyIncidents.length, emergencyPost?.title]);
+
+  useEffect(() => {
+    if (!emergencyViewportTarget) return;
+    if (!mapRef.current?.animateToRegion) return;
+
+    try {
+      mapRef.current.animateToRegion(emergencyViewportTarget, 650);
+    } catch (error) {
+      console.warn('Emergency viewport animation error:', error);
+    }
+  }, [
+    emergencyViewportTarget?.latitude,
+    emergencyViewportTarget?.longitude,
+    emergencyViewportTarget?.latitudeDelta,
+    emergencyViewportTarget?.longitudeDelta,
+    resetTrigger,
+  ]);
+
+  const coverageCenter = currentCommunity?.coverageArea
+    ? {
+        latitude: currentCommunity.coverageArea.latitude,
+        longitude: currentCommunity.coverageArea.longitude,
+      }
+    : null;
 
   const initialRegion = {
     latitude: safeCenter.latitude,
@@ -217,7 +307,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
           showsScale={false}
         >
           {/* Coverage Area Circle */}
-          {coverageCenter && currentCommunity?.coverageArea && (
+          {!isEmergencyActive && coverageCenter && currentCommunity?.coverageArea && (
             <Circle
               center={coverageCenter}
               radius={currentCommunity.coverageArea.radius * 1000}
@@ -233,11 +323,15 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
 
           {/* Emergency Ripple Rings */}
           {isEmergencyActive &&
-            coverageCenter &&
+            emergencyIncidents.length === 1 &&
+            emergencyPost &&
             [120, 280, 500].map((radius, i) => (
               <Circle
                 key={`ripple-${i}`}
-                center={coverageCenter}
+                center={{
+                  latitude: emergencyPost.latitude,
+                  longitude: emergencyPost.longitude,
+                }}
                 radius={radius}
                 strokeColor="#B3261E"
                 strokeWidth={2}
@@ -245,31 +339,61 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
               />
             ))}
 
+          {/* Emergency 10km Radius Per Incident */}
+          {isEmergencyActive &&
+            emergencyIncidents.map((incident) => (
+              <Circle
+                key={`emergency-radius-${incident.id}`}
+                center={{
+                  latitude: incident.latitude,
+                  longitude: incident.longitude,
+                }}
+                radius={EMERGENCY_RADIUS_METERS}
+                strokeColor="rgba(179, 38, 30, 0.55)"
+                strokeWidth={2}
+                fillColor="rgba(179, 38, 30, 0.08)"
+              />
+            ))}
+
           {/* Emergency Marker */}
-          {isEmergencyActive && coverageCenter && (
+          {isEmergencyActive && emergencyIncidents.length > 0 && (
+            <>
+              {emergencyIncidents.map((incident) => {
+                const visual = emergencyVisualConfig(incident.emergencyType);
+                const EmergencyIcon = visual.icon;
+                return (
               <Marker
-                coordinate={coverageCenter}
+                key={`emergency-${incident.id}`}
+                coordinate={{ latitude: incident.latitude, longitude: incident.longitude }}
                 anchor={{ x: 0.5, y: 0.5 }}
-                onCalloutPress={() => onOpenEmergencyHub?.()}
-                onPress={(e) => {
+                onCalloutPress={() => {
+                  onOpenEmergencyHub?.(incident.id);
+                }}
+                onPress={() => {
                   if (isLocked) {
                     onUnlock?.();
-                  } else {
-                    // Optional: open hub without callout if tapped directly?
-                    // Currently relying on Callout press is standard MapView UX.
                   }
+                  onOpenEmergencyHub?.(incident.id);
                 }}
               >
-                <View className="bg-red-600 p-2 rounded-full border-2 border-white shadow-xl">
-                  <Siren size={18} color="#fff" />
+                <View
+                  className="p-2 rounded-full border-2 border-white shadow-xl"
+                  style={{ backgroundColor: visual.bgColor }}
+                >
+                  <EmergencyIcon size={18} color="#fff" />
                 </View>
-                <Callout tooltip onPress={() => onOpenEmergencyHub?.()}>
+                <Callout
+                  tooltip
+                  onPress={() => {
+                    onOpenEmergencyHub?.(incident.id);
+                  }}
+                >
                   <View className="bg-white rounded-lg p-3 min-w-[200px] shadow-sm border border-red-100">
                     <View className="flex-row items-center justify-between mb-1">
                       <View className="flex-row items-center gap-2">
-                        <Siren size={14} color="#B3261E" />
+                        <EmergencyIcon size={14} color="#B3261E" />
                         <Text className="text-[10px] font-black uppercase tracking-widest text-red-600">
-                          Active Emergency
+                          {visual.label}
                         </Text>
                       </View>
                       <Text className="text-[10px] text-gray-400 font-medium ml-2">
@@ -277,18 +401,19 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                         </Text>
                       </View>
                       <Text className="text-sm font-bold text-primary-container leading-tight">
-                    {emergencyPost
-                      ? emergencyPost.title
-                      : 'Emergency reported at this location.'}
+                    {incident.title || 'Emergency reported at this location.'}
                   </Text>
-                  {emergencyPost?.locationName && (
+                  {incident.locationName && (
                     <Text className="text-[10px] text-gray-500 font-bold mt-1">
-                      {emergencyPost.locationName}
+                      {incident.locationName}
                     </Text>
                   )}
                 </View>
               </Callout>
             </Marker>
+                );
+              })}
+            </>
           )}
 
           {/* Members Layer */}
@@ -484,7 +609,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
         </MapView>
 
         {/* Lock Overlay */}
-        {isLocked && (
+        {isLocked && !isEmergencyActive && (
           <TouchableOpacity
             activeOpacity={1}
             onPress={onUnlock}
@@ -517,56 +642,26 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
           </TouchableOpacity>
         )}
 
-        {/* Emergency Hub Overlay (bottom panel) */}
-        {showEmergencyOverlay && isEmergencyActive && (
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={onOpenEmergencyHub}
-            className="absolute bottom-4 left-4 right-4 z-10"
-          >
-            <View className="bg-red-600 px-4 py-3 rounded-2xl shadow-2xl">
-              <View className="flex-row items-center justify-between mb-2">
-                <View className="flex-row items-center gap-3">
-                  <Shield size={18} color="#fff" />
-                  <View>
-                    <Text className="text-white text-xs font-bold">
-                      {allResponders.length} Security Responder
-                      {allResponders.length !== 1 ? 's' : ''} Active
-                    </Text>
-                    <Text className="text-white/80 text-[10px]">
-                      Coordinating response...
-                    </Text>
-                  </View>
-                </View>
-                <Navigation size={18} color="#fff" />
-              </View>
-              {allResponders.length > 0 && (
-                <View className="border-t border-white/20 pt-2 gap-1.5">
-                  {allResponders.slice(0, 3).map((responder) => (
-                    <View
-                      key={responder.userId}
-                      className="flex-row items-center gap-2"
-                    >
-                      <View className="w-5 h-5 rounded-full bg-white/20 items-center justify-center">
-                        <Text className="text-white text-[8px] font-bold">
-                          {responder.name.charAt(0)}
-                        </Text>
-                      </View>
-                      <Text
-                        className="text-white text-[11px] font-bold flex-1"
-                        numberOfLines={1}
-                      >
-                        {responder.name}
-                      </Text>
-                      <Text className="text-white text-[10px] font-bold ml-auto">
-                        {responder.distance}km
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
+        {/* Emergency Attention Button */}
+        {isEmergencyActive && emergencyAttentionLabel && (
+          <View className="absolute bottom-3 left-0 right-0 z-10 items-center px-3">
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => {
+                if (emergencyIncidents.length > 1) {
+                  onOpenEmergencySelection?.();
+                  return;
+                }
+                const single = emergencyIncidents[0];
+                if (single?.id) onOpenEmergencyHub?.(single.id);
+              }}
+              className="bg-red-600 px-4 py-2 rounded-full shadow-md border border-red-500 max-w-[82%]"
+            >
+              <Text className="text-[11px] font-black text-white" numberOfLines={1}>
+                {emergencyAttentionLabel.toUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          </View>
         )}
 
         {children}

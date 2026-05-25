@@ -114,7 +114,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     mapUnlocked,
     setMapUnlocked,
     resetCommunityMapView,
-    findLatestEmergencyPost,
   } = useCommunityMap();
 
   const isEmergencyPost = React.useCallback(
@@ -469,9 +468,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           isLocked={!mapUnlocked}
           onUnlock={() => setMapUnlocked(true)}
           onResetMap={resetCommunityMapView}
-          onOpenEmergencyHub={() => {
-            const latest = findLatestEmergencyPost();
-            if (latest?.id) router.push(`/emergency/${latest.id}` as any);
+          onOpenEmergencyHub={(incidentId) => {
+            if (!incidentId) return;
+            router.push({
+              pathname: `/emergency/${incidentId}` as any,
+              params: { from: 'admin-map', source: 'coverage-overlay' },
+            } as any);
+          }}
+          onOpenEmergencySelection={() => {
+            router.push({
+              pathname: '/emergency' as any,
+              params: { from: 'admin-map', source: 'coverage-overlay' },
+            } as any);
           }}
         />
       </View>

@@ -269,6 +269,20 @@ export const HomePage: React.FC<HomePageProps> = ({
     [posts]
   );
 
+  const activeEmergencyPosts = useMemo(
+    () =>
+      [...posts]
+        .filter(
+          (p) => p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.timestamp || 0).getTime() -
+            new Date(a.timestamp || 0).getTime()
+        ),
+    [posts]
+  );
+
   // Emergency/warning/caution notices fill the row; info & general are 2-up.
   const isFullWidthNotice = (n: CommunityNotice) =>
     n.urgency === 'emergency' ||
@@ -1349,12 +1363,18 @@ export const HomePage: React.FC<HomePageProps> = ({
             isLocked={!mapUnlocked}
             onUnlock={() => setMapUnlocked(true)}
             onResetMap={resetCommunityMapView}
-            onOpenEmergencyHub={() => {
-              const latest = posts.find(
-                (p) =>
-                  p.urgency === 'emergency' || p.urgencyLevel === 'emergency'
-              );
-              if (latest) openEmergencyHub(latest);
+            onOpenEmergencyHub={(incidentId) => {
+              if (!incidentId) return;
+              router.push({
+                pathname: `/emergency/${incidentId}` as any,
+                params: { from: 'home-map', source: 'coverage-overlay' },
+              } as any);
+            }}
+            onOpenEmergencySelection={() => {
+              router.push({
+                pathname: '/emergency' as any,
+                params: { from: 'home-map', source: 'coverage-overlay' },
+              } as any);
             }}
           />
         </View>
