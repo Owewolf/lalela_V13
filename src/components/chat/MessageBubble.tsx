@@ -4,6 +4,7 @@ import { Check, CheckCheck } from 'lucide-react-native';
 import { Conversation, Message } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { resolveMediaUrl } from '../../lib/config';
+import { THEME_COLORS } from '../../theme/colors';
 
 interface MessageBubbleProps {
   message: Message;
@@ -16,8 +17,26 @@ interface MessageBubbleProps {
 
 const AVATAR_SIZE = 32;
 const AVATAR_GUTTER = 40;
+const TYPE_SCALE = {
+  sm: 12,
+};
 
-const SENDER_NAME_COLORS = ['#d81b60', '#00897b', '#5e35b1', '#ef6c00', '#1565c0', '#2e7d32'];
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xxs: 1,
+  xs: 2,
+  sm: 8,
+  lg: 10,
+  xl: 14,
+};
+
+const SENDER_NAME_COLORS = [THEME_COLORS.aliasHex_d81b60, THEME_COLORS.aliasHex_00897b, THEME_COLORS.aliasHex_5e35b1, THEME_COLORS.aliasHex_ef6c00, THEME_COLORS.aliasHex_1565c0, THEME_COLORS.aliasHex_2e7d32];
 
 const getSenderNameColor = (message: Message) => {
   const seed = message.userId || message.senderName || 'sender';
@@ -63,8 +82,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   if (message.messageType === 'system') {
     return (
       <View className="flex-row justify-center my-3">
-        <View className="bg-[#e9edef] px-4 py-1.5 rounded-full border border-[#d7dde0]">
-          <Text className="text-[10px] font-bold text-[#54656f] uppercase tracking-widest">
+        <View className="bg-slate-200 px-4 py-1.5 rounded-full border border-slate-300">
+          <Text className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
             {message.content}
           </Text>
         </View>
@@ -76,18 +95,18 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     'relative overflow-hidden',
     isMe ? 'rounded-[18px] rounded-br-md' : 'rounded-[18px] rounded-bl-md',
     message.messageType === 'image' ? '' : 'px-3 py-1.5',
-    isListingIntro ? 'border-l-4 border-[#fc7127]' : '',
+    isListingIntro ? 'border-l-4 border-secondary-container' : '',
   ].join(' ');
 
   const bubbleStyle = isMe
     ? {
-        backgroundColor: '#d9fdd3',
+        backgroundColor: THEME_COLORS.aliasHex_d9fdd3,
         maxWidth: isDirectConversation ? '92%' as const : '87%' as const,
       }
     : {
-        backgroundColor: '#ffffff',
+        backgroundColor: THEME_COLORS.white,
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: THEME_COLORS.neutralBorderSoft,
         maxWidth: isDirectConversation ? '90%' as const : '82%' as const,
       };
 
@@ -99,7 +118,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             message.senderImage ? (
               <Image
                 source={{ uri: message.senderImage }}
-                style={{ width: AVATAR_SIZE, height: AVATAR_SIZE, marginBottom: 1, marginRight: 8, borderRadius: AVATAR_SIZE / 2 }}
+                style={{ width: AVATAR_SIZE, height: AVATAR_SIZE, marginBottom: SPACE.xxs, marginRight: SPACE.sm, borderRadius: AVATAR_SIZE / 2 }}
                 resizeMode="cover"
               />
             ) : (
@@ -107,13 +126,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 style={{
                   width: AVATAR_SIZE,
                   height: AVATAR_SIZE,
-                  marginBottom: 1,
-                  marginRight: 8,
+                  marginBottom: SPACE.xxs,
+                  marginRight: SPACE.sm,
                   borderRadius: AVATAR_SIZE / 2,
                 }}
-                className="bg-[#dfe5e7] items-center justify-center"
+                className="bg-slate-200 items-center justify-center"
               >
-                <Text className="text-[11px] font-bold text-[#54656f]">{senderInitial}</Text>
+                <Text className="text-[11px] font-bold text-slate-600">{senderInitial}</Text>
               </View>
             )
           ) : (
@@ -147,7 +166,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                   />
                 </TouchableOpacity>
                 {showImageCaption ? (
-                  <Text className="text-[16px] leading-5 px-3 pt-1.5 text-[#111b21]">
+                  <Text className="text-[16px] leading-5 px-3 pt-1.5 text-neutralTextStrong">
                     {imageCaption}
                   </Text>
                 ) : null}
@@ -155,9 +174,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             ) : (
               <>
                 <Text
-                  className={isListingIntro ? 'text-[17px] leading-6 text-[#111b21] font-black' : 'text-[16px] leading-6 text-[#111b21]'}
+                  className={isListingIntro ? 'text-[17px] leading-6 text-neutralTextStrong font-black' : 'text-[16px] leading-6 text-neutralTextStrong'}
                   style={{
-                    paddingBottom: 1,
+                    paddingBottom: SPACE.xxs,
                   }}
                 >
                   {message.content}
@@ -165,16 +184,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 <View
                   className="flex-row items-center justify-end gap-0.5"
                   style={{
-                    marginTop: 2,
-                    paddingBottom: 1,
+                    marginTop: SPACE.xs,
+                    paddingBottom: SPACE.xxs,
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 12,
+                      fontSize: TYPE_SCALE.sm,
                       lineHeight: Platform.OS === 'ios' ? 14 : 15,
-                      color: '#667781',
-                      fontWeight: '500',
+                      color: THEME_COLORS.neutralTextWhatsapp,
+                      fontWeight: FONT_WEIGHT.medium,
                     }}
                   >
                     {formatTime(message.createdAt)}
@@ -182,9 +201,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                   {isMe && (
                     <View className="justify-center" style={{ minWidth: 16 }}>
                       {message.status === 'read' ? (
-                        <CheckCheck size={15} color="#53bdeb" />
+                        <CheckCheck size={15} color={THEME_COLORS.aliasHex_53bdeb} />
                       ) : (
-                        <Check size={15} color="#667781" />
+                        <Check size={15} color={THEME_COLORS.neutralTextWhatsapp} />
                       )}
                     </View>
                   )}
@@ -198,16 +217,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 style={{
                   minHeight: 16,
                   marginTop: showSenderName ? 2 : 4,
-                  paddingHorizontal: 14,
-                  paddingBottom: 10,
+                  paddingHorizontal: SPACE.xl,
+                  paddingBottom: SPACE.lg,
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 12,
+                    fontSize: TYPE_SCALE.sm,
                     lineHeight: Platform.OS === 'ios' ? 14 : 15,
-                    color: '#667781',
-                    fontWeight: '500',
+                    color: THEME_COLORS.neutralTextWhatsapp,
+                    fontWeight: FONT_WEIGHT.medium,
                   }}
                 >
                   {formatTime(message.createdAt)}
@@ -215,9 +234,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 {isMe && (
                   <View className="justify-center" style={{ minWidth: 16 }}>
                     {message.status === 'read' ? (
-                      <CheckCheck size={15} color="#53bdeb" />
+                      <CheckCheck size={15} color={THEME_COLORS.aliasHex_53bdeb} />
                     ) : (
-                      <Check size={15} color="#667781" />
+                      <Check size={15} color={THEME_COLORS.neutralTextWhatsapp} />
                     )}
                   </View>
                 )}

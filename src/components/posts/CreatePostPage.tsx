@@ -38,6 +38,7 @@ import CreateInfoNotice from './CreateInfoNotice';
 import CreateGeneralNotice from './CreateGeneralNotice';
 import LocationPickerSection from '../shared/LocationPickerSection';
 import type { CommunityNotice } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
 
 type PostType = 'listing' | 'notice';
 type Urgency = 'emergency' | 'warning' | 'info' | 'general';
@@ -56,10 +57,14 @@ const EMERGENCY_CATEGORIES: {
 ];
 
 const urgencyColors: Record<Urgency, { bg: string; text: string }> = {
-  emergency: { bg: '#DC2626', text: '#FFFFFF' },
-  warning: { bg: '#D97706', text: '#FFFFFF' },
-  info: { bg: '#2563EB', text: '#FFFFFF' },
-  general: { bg: '#059669', text: '#FFFFFF' },
+  emergency: { bg: THEME_COLORS.errorStrong, text: THEME_COLORS.white },
+  warning: { bg: THEME_COLORS.warning, text: THEME_COLORS.white },
+  info: { bg: THEME_COLORS.brandBlueText, text: THEME_COLORS.white },
+  general: { bg: THEME_COLORS.successStrongAlt, text: THEME_COLORS.white },
+};
+const SPACE = {
+  xxs: 2,
+  s120: 120,
 };
 
 const getCtaLabel = (postType: PostType, urgency: Urgency, isEditing: boolean): string => {
@@ -386,7 +391,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
           className="self-start flex-row items-center gap-2 rounded-full bg-slate-100 px-4 py-2"
           activeOpacity={0.8}
         >
-          <ArrowLeft size={18} color="#0d3d47" />
+          <ArrowLeft size={18} color={THEME_COLORS.primary} />
           <Text className="text-sm font-bold text-primary">Back</Text>
         </TouchableOpacity>
       </View>
@@ -396,7 +401,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
       >
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: SPACE.s120 }}
           keyboardShouldPersistTaps="handled"
         >
           <View className="px-5 pt-5 gap-5">
@@ -406,16 +411,16 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
               style={{
                 backgroundColor:
                   postType === 'listing'
-                    ? '#F0FDF4'
+                    ? THEME_COLORS.successSurface
                     : urgency === 'emergency'
-                    ? '#F8FAFC'
-                    : '#F0FDF4',
+                    ? THEME_COLORS.neutralBg
+                    : THEME_COLORS.successSurface,
                 borderColor:
                   postType === 'listing'
-                    ? '#0d3d4740'
+                    ? THEME_COLORS.aliasHex_0d3d4740
                     : urgency === 'emergency'
-                    ? '#CBD5E1'
-                    : '#0d3d4740',
+                    ? THEME_COLORS.neutralBorderStrong
+                    : THEME_COLORS.aliasHex_0d3d4740,
               }}
             >
               <View
@@ -423,10 +428,10 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                 style={{
                   backgroundColor:
                     postType === 'listing'
-                      ? '#0d3d47'
+                      ? THEME_COLORS.primary
                       : urgency === 'emergency'
-                      ? '#64748B'
-                      : '#0d3d47',
+                      ? THEME_COLORS.neutralTextSubtle
+                      : THEME_COLORS.primary,
                 }}
               >
                 {postType === 'listing' ? (
@@ -440,7 +445,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                   <Text
                     className="font-bold text-xl"
                     style={{
-                      color: urgency === 'emergency' ? '#475569' : '#0d3d47',
+                      color: urgency === 'emergency' ? THEME_COLORS.neutralTextDefault : THEME_COLORS.primary,
                     }}
                   >
                     {postType === 'listing'
@@ -474,7 +479,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                 <View>
                   <View className="flex-row items-center justify-between px-1 mb-2">
                     <View className="flex-row items-center gap-2">
-                      <MapPin size={16} color="#6B7280" />
+                      <MapPin size={16} color={THEME_COLORS.neutralTextSubtle} />
                       <Text className="text-sm font-semibold text-gray-600">Emergency Location</Text>
                     </View>
                     <View className="flex-row gap-2">
@@ -531,8 +536,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                           <Circle
                             center={{ latitude, longitude }}
                             radius={coverageRadius}
-                            strokeColor="#F59E0B"
-                            fillColor="#F59E0B10"
+                            strokeColor={THEME_COLORS.warningStrong}
+                            fillColor={THEME_COLORS.aliasHex_f59e0b10}
                             strokeWidth={1}
                           />
                         </>
@@ -566,9 +571,9 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         style={{
                           width: '48%',
                           backgroundColor:
-                            emergencyCategory === cat.id ? '#EFF6FF' : '#FFFFFF',
+                            emergencyCategory === cat.id ? THEME_COLORS.infoSurfaceSoft : THEME_COLORS.white,
                           borderColor:
-                            emergencyCategory === cat.id ? '#93C5FD' : '#E2E8F0',
+                            emergencyCategory === cat.id ? THEME_COLORS.infoBorderStrong : THEME_COLORS.neutralBorder,
                         }}
                         activeOpacity={0.8}
                       >
@@ -576,7 +581,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         <Text
                           className="text-base font-bold text-center"
                           style={{
-                            color: emergencyCategory === cat.id ? '#1D4ED8' : '#475569',
+                            color: emergencyCategory === cat.id ? THEME_COLORS.brandBlueText : THEME_COLORS.neutralTextDefault,
                           }}
                         >
                           {cat.label}
@@ -596,7 +601,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     value={description}
                     onChangeText={setDescription}
                     placeholder="Describe what's happening..."
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={THEME_COLORS.neutralTextSoft}
                     multiline
                     numberOfLines={3}
                     textAlignVertical="top"
@@ -617,7 +622,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     onPress={handlePickImage}
                     activeOpacity={0.8}
                     className="rounded-2xl overflow-hidden border-2 border-dashed border-gray-300 items-center justify-center"
-                    style={{ height: 180, backgroundColor: '#F9FAFB' }}
+                    style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg }}
                   >
                     {postsImage ? (
                       <>
@@ -635,12 +640,12 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       </>
                     ) : isUploading ? (
                       <View className="items-center gap-2">
-                        <ActivityIndicator color="#0d3d47" size="large" />
+                        <ActivityIndicator color={THEME_COLORS.primary} size="large" />
                         <Text className="text-sm text-gray-400">Uploading...</Text>
                       </View>
                     ) : (
                       <View className="items-center gap-2">
-                        <Camera color="#9CA3AF" size={36} />
+                        <Camera color={THEME_COLORS.neutralTextSoft} size={36} />
                         <Text className="text-sm text-gray-400">Add Photo</Text>
                       </View>
                     )}
@@ -657,7 +662,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       value={title}
                       onChangeText={setTitle}
                       placeholder="e.g. Handmade Pottery"
-                      placeholderTextColor="#9CA3AF"
+                      placeholderTextColor={THEME_COLORS.neutralTextSoft}
                       className="bg-gray-50 border-b-2 border-gray-200 px-4 py-3 rounded-t-xl text-gray-800"
                     />
                   </View>
@@ -669,7 +674,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       value={description}
                       onChangeText={setDescription}
                       placeholder="Tell the community about what you're listing..."
-                      placeholderTextColor="#9CA3AF"
+                      placeholderTextColor={THEME_COLORS.neutralTextSoft}
                       multiline
                       numberOfLines={4}
                       textAlignVertical="top"
@@ -686,7 +691,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         value={price}
                         onChangeText={setPrice}
                         placeholder="0.00"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={THEME_COLORS.neutralTextSoft}
                         keyboardType="decimal-pad"
                         editable={!isFree}
                         className="bg-gray-50 border-b-2 border-gray-200 px-4 py-3 rounded-t-xl text-gray-800"
@@ -704,9 +709,9 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         style={{
                           width: 48,
                           height: 24,
-                          backgroundColor: isFree ? '#0d3d47' : '#E5E7EB',
+                          backgroundColor: isFree ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft,
                           justifyContent: 'center',
-                          paddingHorizontal: 2,
+                          paddingHorizontal: SPACE.xxs,
                         }}
                         activeOpacity={0.8}
                       >
@@ -730,13 +735,13 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         onPress={() => setIsPublic(false)}
                         className="flex-1 py-2 rounded-full items-center"
                         style={{
-                          backgroundColor: !isPublic ? '#FFFFFF' : 'transparent',
+                          backgroundColor: !isPublic ? THEME_COLORS.white : 'transparent',
                         }}
                         activeOpacity={0.8}
                       >
                         <Text
                           className="text-xs font-semibold"
-                          style={{ color: !isPublic ? '#0d3d47' : '#6B7280' }}
+                          style={{ color: !isPublic ? THEME_COLORS.primary : THEME_COLORS.neutralTextSubtle }}
                         >
                           Local
                         </Text>
@@ -745,13 +750,13 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         onPress={() => setIsPublic(true)}
                         className="flex-1 py-2 rounded-full items-center"
                         style={{
-                          backgroundColor: isPublic ? '#FFFFFF' : 'transparent',
+                          backgroundColor: isPublic ? THEME_COLORS.white : 'transparent',
                         }}
                         activeOpacity={0.8}
                       >
                         <Text
                           className="text-xs font-semibold"
-                          style={{ color: isPublic ? '#0d3d47' : '#6B7280' }}
+                          style={{ color: isPublic ? THEME_COLORS.primary : THEME_COLORS.neutralTextSubtle }}
                         >
                           Public
                         </Text>
@@ -766,7 +771,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                   {isPublic && (
                     <View className="bg-surface-container-low border border-outline-variant rounded-3xl p-5 gap-4">
                       <View className="flex-row gap-3">
-                        <Info color="#0d3d47" size={18} />
+                        <Info color={THEME_COLORS.primary} size={18} />
                         <Text className="flex-1 text-xs text-gray-700 leading-5">
                           Public listings include a community contribution (CAT) added to your price.
                           The charity is locked to the active community cause.
@@ -794,7 +799,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                               value={customCharityPercentage}
                               onChangeText={setCustomCharityPercentage}
                               placeholder={basePercentage.toString()}
-                              placeholderTextColor="#9CA3AF"
+                              placeholderTextColor={THEME_COLORS.neutralTextSoft}
                               keyboardType="decimal-pad"
                               className="bg-white border-b-2 border-outline-variant px-4 py-3 rounded-t-xl text-gray-800 text-sm"
                               onBlur={() => {
@@ -877,7 +882,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
 
                 {/* Guidelines */}
                 <View className="bg-surface-container-low rounded-3xl p-5 flex-row items-start gap-4 border border-outline-variant">
-                  <Info color="#0d3d47" size={22} />
+                  <Info color={THEME_COLORS.primary} size={22} />
                   <View className="flex-1 gap-1">
                     <Text className="font-bold text-primary text-sm">Community Guidelines</Text>
                     <Text className="text-xs text-gray-500 leading-5">
@@ -900,22 +905,22 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
             style={{
               backgroundColor: canSubmit
                 ? urgency === 'emergency'
-                  ? '#DC2626'
+                  ? THEME_COLORS.errorStrong
                   : postType === 'listing'
-                  ? '#0d3d47'
+                  ? THEME_COLORS.primary
                   : urgencyColors[urgency].bg
-                : '#E5E7EB',
+                : THEME_COLORS.neutralBorderSoft,
               opacity: canSubmit ? 1 : 0.5,
             }}
             activeOpacity={0.85}
           >
             <Text
               className="font-bold text-lg"
-              style={{ color: canSubmit ? '#FFFFFF' : '#9CA3AF' }}
+              style={{ color: canSubmit ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft }}
             >
               {ctaLabel}
             </Text>
-            <Send color={canSubmit ? 'white' : '#9CA3AF'} size={20} />
+            <Send color={canSubmit ? 'white' : THEME_COLORS.neutralTextSoft} size={20} />
           </TouchableOpacity>
         </View>
 
@@ -945,9 +950,9 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                   style={{
                     backgroundColor:
                       urgency === 'emergency'
-                        ? '#DC2626'
+                        ? THEME_COLORS.errorStrong
                         : postType === 'listing'
-                        ? '#0d3d47'
+                        ? THEME_COLORS.primary
                         : urgencyColors[urgency].bg,
                   }}
                   activeOpacity={0.85}
@@ -993,7 +998,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                   >
                     <Text
                       className="text-base text-gray-800"
-                      style={{ color: category === cat ? '#0d3d47' : '#1F2937', fontWeight: category === cat ? '700' : '400' }}
+                      style={{ color: category === cat ? THEME_COLORS.primary : THEME_COLORS.aliasHex_1f2937, fontWeight: category === cat ? '700' : '400' }}
                     >
                       {cat}
                     </Text>

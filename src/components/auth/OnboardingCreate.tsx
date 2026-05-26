@@ -37,6 +37,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { GOOGLE_PLACES_API_KEY, BUSINESS_CATEGORIES } from '../../constants';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
+import { THEME_COLORS } from '../../theme/colors';
+import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
+import { createShadow } from '../../theme/shadows';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -50,6 +53,47 @@ const STEP_LABELS: Record<OnboardingStep, string> = {
   categories: 'Categories',
   businesses: 'Businesses',
   rules: 'Rules',
+};
+
+const TYPE_SCALE = {
+  xs: 10,
+  sm: 13,
+  md: 14,
+  lg: 18,
+  xl: 22,
+  icon: 26,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  xxxs: 3,
+  xxs: 4,
+  xs: 6,
+  sm: 8,
+  md: 12,
+  lg: 14,
+  xl: 16,
+  xxl: 18,
+  s22: 22,
+  s36: 36,
+  s40: 40,
+  s48: 48,
+  s52: 52,
+  s56: 56,
+  mapHeight: 240,
+};
+const RADIUS = {
+  md: 9,
+  lg: 11,
+  xl: 12,
+  xxl: 16,
 };
 
 // ─── Confirm Modal ────────────────────────────────────────────────────────────
@@ -70,10 +114,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   <Modal transparent visible={visible} animationType="fade" onRequestClose={() => {}}>
     <View className="flex-1 bg-black/50 items-center justify-center px-6">
       <View className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl">
-        <Text className="text-xl font-black text-[#0d3d47] mb-2">{title}</Text>
+        <Text className="text-xl font-black text-primary mb-2">{title}</Text>
         <Text className="text-sm text-gray-500 mb-6 leading-relaxed">{message}</Text>
         <View className="gap-3">
-          <TouchableOpacity onPress={onConfirm} className="py-4 rounded-2xl items-center" style={{ backgroundColor: '#0d3d47' }}>
+          <TouchableOpacity onPress={onConfirm} className="py-4 rounded-2xl items-center" style={{ backgroundColor: THEME_COLORS.primary }}>
             <Text className="text-white font-bold">{confirmLabel}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onCancel} className="py-4 rounded-2xl items-center bg-gray-100">
@@ -484,7 +528,7 @@ const OnboardingCreate: React.FC = () => {
   if (loading) {
     return (
       <SafeAreaView className="flex-1 bg-white items-center justify-center">
-        <ActivityIndicator size="large" color="#0d3d47" />
+        <ActivityIndicator size="large" color={THEME_COLORS.primary} />
       </SafeAreaView>
     );
   }
@@ -492,11 +536,11 @@ const OnboardingCreate: React.FC = () => {
   // Trial already exists — show a blocking gate instead of the wizard.
   if (trialBlocked) {
     return (
-      <SafeAreaView className="flex-1 bg-[#fff8f0] items-center justify-center px-8">
+      <SafeAreaView className="flex-1 bg-surface items-center justify-center px-8">
         <View className="w-16 h-16 rounded-3xl bg-orange-100 items-center justify-center mb-6">
-          <AlertCircle size={32} color="#fc7127" />
+          <AlertCircle size={32} color={THEME_COLORS.secondaryContainer} />
         </View>
-        <Text className="text-2xl font-black text-[#0d3d47] text-center mb-3">Trial Community Active</Text>
+        <Text className="text-2xl font-black text-primary text-center mb-3">Trial Community Active</Text>
         <Text className="text-sm text-gray-500 text-center leading-relaxed mb-8">
           You already have an active 30-day trial community. Each account is limited to one trial.{'\n\n'}
           Upgrade your licence to create additional communities, or manage your existing community from the dashboard.
@@ -504,7 +548,7 @@ const OnboardingCreate: React.FC = () => {
         <TouchableOpacity
           onPress={() => router.replace('/(tabs)')}
           className="w-full py-4 rounded-2xl items-center mb-3"
-          style={{ backgroundColor: '#0d3d47' }}
+          style={{ backgroundColor: THEME_COLORS.primary }}
         >
           <Text className="text-white font-bold text-base">Go to My Community</Text>
         </TouchableOpacity>
@@ -512,7 +556,7 @@ const OnboardingCreate: React.FC = () => {
           onPress={() => router.push('/pricing' as any)}
           className="w-full py-4 rounded-2xl items-center bg-orange-50 border border-orange-100"
         >
-          <Text className="text-[#fc7127] font-bold text-base">View Licence Options</Text>
+          <Text className="text-secondary-container font-bold text-base">View Licence Options</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -533,15 +577,15 @@ const OnboardingCreate: React.FC = () => {
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
-        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 48 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEnabled={!mapDragging}>
+        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: SPACE.s48 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEnabled={!mapDragging}>
 
           {/* Header */}
           <View className="px-6 pt-6 pb-4 flex-row items-center justify-between border-b border-gray-100">
             <View className="flex-row items-center gap-2">
-              <View className="w-9 h-9 bg-[#0d3d47] rounded-xl items-center justify-center overflow-hidden">
-                <Image source={require('../../../assets/lalela_logo.png')} style={{ width: 36, height: 36 }} resizeMode="cover" />
+              <View className="w-9 h-9 bg-primary rounded-xl items-center justify-center overflow-hidden">
+                <Image source={require('../../../assets/lalela_logo.png')} style={{ width: SPACE.s36, height: SPACE.s36 }} resizeMode="cover" />
               </View>
-              <Text className="text-xl font-black text-[#0d3d47] tracking-tight">lalela</Text>
+              <Text className="text-xl font-black text-primary tracking-tight">lalela</Text>
             </View>
             <Text className="text-xs font-black uppercase tracking-widest text-gray-400">New Community</Text>
           </View>
@@ -552,29 +596,29 @@ const OnboardingCreate: React.FC = () => {
             {!userProfile?.profileCompleted && (
               <React.Fragment>
                 <View className="items-center gap-1">
-                  <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: step === 'profile' ? '#0d3d47' : '#10b981' }}>
+                  <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: step === 'profile' ? THEME_COLORS.primary : THEME_COLORS.success }}>
                     {step !== 'profile' ? <CheckCircle2 size={16} color="white" /> : <Text className="text-xs font-bold text-white">1</Text>}
                   </View>
-                  <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: step === 'profile' ? '#0d3d47' : '#9ca3af' }}>Your Profile</Text>
+                  <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: step === 'profile' ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft }}>Your Profile</Text>
                 </View>
-                <View className="h-0.5 w-8 rounded-full mb-4" style={{ backgroundColor: step !== 'profile' ? '#10b981' : '#f3f4f6' }} />
+                <View className="h-0.5 w-8 rounded-full mb-4" style={{ backgroundColor: step !== 'profile' ? THEME_COLORS.success : THEME_COLORS.neutralBgSofter }} />
               </React.Fragment>
             )}
             {/* Community phase */}
             <View className="items-center gap-1">
-              <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: inCommunityPhase ? '#0d3d47' : '#f3f4f6' }}>
-                <Text className="text-xs font-bold" style={{ color: inCommunityPhase ? 'white' : '#9ca3af' }}>
+              <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: inCommunityPhase ? THEME_COLORS.primary : THEME_COLORS.neutralBgSofter }}>
+                <Text className="text-xs font-bold" style={{ color: inCommunityPhase ? 'white' : THEME_COLORS.neutralTextSoft }}>
                   {inCommunityPhase ? communitySubStep : '2'}
                 </Text>
               </View>
-              <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: inCommunityPhase ? '#0d3d47' : '#9ca3af' }}>
+              <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: inCommunityPhase ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft }}>
                 {inCommunityPhase ? STEP_LABELS[step] : 'Create Community'}
               </Text>
             </View>
             {inCommunityPhase && (
               <View className="flex-row items-center gap-1 mb-4">
                 {COMMUNITY_STEPS.map((s) => (
-                  <View key={s} className="w-2 h-2 rounded-full" style={{ backgroundColor: COMMUNITY_STEPS.indexOf(step) >= COMMUNITY_STEPS.indexOf(s) ? '#0d3d47' : '#e5e7eb' }} />
+                  <View key={s} className="w-2 h-2 rounded-full" style={{ backgroundColor: COMMUNITY_STEPS.indexOf(step) >= COMMUNITY_STEPS.indexOf(s) ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }} />
                 ))}
               </View>
             )}
@@ -586,10 +630,10 @@ const OnboardingCreate: React.FC = () => {
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
                   <View className="w-12 h-12 bg-orange-50 rounded-2xl items-center justify-center">
-                    <UserIcon size={24} color="#fc7127" />
+                    <UserIcon size={24} color={THEME_COLORS.secondaryContainer} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-2xl font-black text-[#0d3d47]">Your Profile</Text>
+                    <Text className="text-2xl font-black text-primary">Your Profile</Text>
                     <Text className="text-xs text-gray-500 font-medium">Set your account details first. Coverage comes in the next step.</Text>
                   </View>
                 </View>
@@ -601,7 +645,7 @@ const OnboardingCreate: React.FC = () => {
                       {profileImage ? (
                         <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" />
                       ) : (
-                        <UserIcon size={36} color="#d1d5db" />
+                        <UserIcon size={36} color={THEME_COLORS.neutralBorderMuted} />
                       )}
                       {isUploading && (
                         <View className="absolute inset-0 bg-black/40 items-center justify-center">
@@ -609,7 +653,7 @@ const OnboardingCreate: React.FC = () => {
                         </View>
                       )}
                     </View>
-                    <View className="absolute bottom-0 right-0 w-7 h-7 bg-[#0d3d47] rounded-full items-center justify-center border-2 border-white">
+                    <View className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full items-center justify-center border-2 border-white">
                       <Camera size={12} color="white" />
                     </View>
                   </TouchableOpacity>
@@ -619,24 +663,24 @@ const OnboardingCreate: React.FC = () => {
                 {/* Full Name */}
                 <View className="gap-1">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Full Name <Text className="text-red-500">*</Text></Text>
-                  <TextInput value={fullName} onChangeText={(t) => { setFullName(t); if (!communityName || communityName.endsWith("'s Community")) setCommunityName(t ? `${t}'s Community` : ''); }} placeholder="Your full name" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]" placeholderTextColor="#9ca3af" />
+                  <TextInput value={fullName} onChangeText={(t) => { setFullName(t); if (!communityName || communityName.endsWith("'s Community")) setCommunityName(t ? `${t}'s Community` : ''); }} placeholder="Your full name" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor={THEME_COLORS.neutralTextSoft} />
                 </View>
 
                 {/* Email */}
                 <View className="gap-1">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email</Text>
-                  <TextInput value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]" placeholderTextColor="#9ca3af" />
+                  <TextInput value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor={THEME_COLORS.neutralTextSoft} />
                 </View>
 
                 {/* Phone */}
                 <View className="gap-1">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Phone</Text>
-                  <TextInput value={phone} onChangeText={setPhone} placeholder="+27..." keyboardType="phone-pad" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]" placeholderTextColor="#9ca3af" />
+                  <TextInput value={phone} onChangeText={setPhone} placeholder="+27..." keyboardType="phone-pad" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor={THEME_COLORS.neutralTextSoft} />
                 </View>
 
                 <View className="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-4 flex-row items-start gap-3">
                   <View className="w-10 h-10 rounded-xl bg-white items-center justify-center">
-                    <MapPin size={18} color="#3b82f6" />
+                    <MapPin size={18} color={THEME_COLORS.brandBlue} />
                   </View>
                   <View className="flex-1">
                     <Text className="text-sm font-bold text-blue-900">Coverage sets your default location</Text>
@@ -657,7 +701,7 @@ const OnboardingCreate: React.FC = () => {
                   }}
                   disabled={!isProfileValid}
                   className="py-4 rounded-2xl flex-row items-center justify-center gap-2 shadow-lg"
-                  style={{ backgroundColor: isProfileValid ? '#0d3d47' : '#d1d5db' }}
+                  style={{ backgroundColor: isProfileValid ? THEME_COLORS.primary : THEME_COLORS.neutralBorderMuted }}
                 >
                   <Text className="text-white font-bold text-base">Continue</Text>
                   <ArrowRight size={20} color="white" />
@@ -670,10 +714,10 @@ const OnboardingCreate: React.FC = () => {
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
                   <View className="w-12 h-12 bg-orange-50 rounded-2xl items-center justify-center">
-                    <Sparkles size={24} color="#fc7127" />
+                    <Sparkles size={24} color={THEME_COLORS.secondaryContainer} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-2xl font-black text-[#0d3d47]">Start Your Community</Text>
+                    <Text className="text-2xl font-black text-primary">Start Your Community</Text>
                     <Text className="text-xs text-gray-500 font-medium">Step 1 of 5 — Name your community.</Text>
                   </View>
                 </View>
@@ -681,29 +725,29 @@ const OnboardingCreate: React.FC = () => {
                 {/* Profile preview */}
                 <View className="flex-row items-center gap-3 p-4 bg-gray-50 rounded-2xl">
                   <View className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 items-center justify-center">
-                    {profileImage ? <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" /> : <UserIcon size={20} color="#9ca3af" />}
+                    {profileImage ? <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" /> : <UserIcon size={20} color={THEME_COLORS.neutralTextSoft} />}
                   </View>
                   <View className="flex-1 min-w-0">
-                    <Text className="text-sm font-bold text-[#0d3d47]" numberOfLines={1}>{fullName}</Text>
+                    <Text className="text-sm font-bold text-primary" numberOfLines={1}>{fullName}</Text>
                     <View className="flex-row items-center gap-1">
-                      <MapPin size={10} color="#9ca3af" />
+                      <MapPin size={10} color={THEME_COLORS.neutralTextSoft} />
                       <Text className="text-[10px] text-gray-400" numberOfLines={1}>{coverageName || 'Coverage area set in next step'}</Text>
                     </View>
                   </View>
                   <TouchableOpacity onPress={() => setStep('profile')}>
-                    <Text className="text-[10px] font-bold text-[#0d3d47]">Edit</Text>
+                    <Text className="text-[10px] font-bold text-primary">Edit</Text>
                   </TouchableOpacity>
                 </View>
 
                 {/* Community Name */}
                 <View className="gap-1">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Community Name <Text className="text-red-500">*</Text></Text>
-                  <TextInput value={communityName} onChangeText={setCommunityName} placeholder="e.g. Parkwood Heights" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]" placeholderTextColor="#9ca3af" />
+                  <TextInput value={communityName} onChangeText={setCommunityName} placeholder="e.g. Parkwood Heights" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor={THEME_COLORS.neutralTextSoft} />
                 </View>
 
                 {draftCommunityId ? (
                   <View className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex-row items-center gap-3">
-                    <CheckCircle2 size={18} color="#10b981" />
+                    <CheckCircle2 size={18} color={THEME_COLORS.success} />
                     <View className="flex-1">
                       <Text className="text-sm font-bold text-emerald-800">Community name saved</Text>
                       <Text className="text-[11px] text-emerald-700 mt-1">Your community draft is created. Continue to add coverage, categories, and businesses.</Text>
@@ -727,7 +771,7 @@ const OnboardingCreate: React.FC = () => {
                 <View className="flex-row gap-3">
                   {!userProfile?.profileCompleted && (
                     <TouchableOpacity onPress={() => { setStep('profile'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
-                      <ArrowLeft size={20} color="#374151" />
+                      <ArrowLeft size={20} color={THEME_COLORS.neutralTextEmphasis} />
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity
@@ -745,7 +789,7 @@ const OnboardingCreate: React.FC = () => {
                     }}
                     disabled={!communityName.trim() || isSavingCommunity}
                     className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2 shadow-lg"
-                    style={{ backgroundColor: '#0d3d47', opacity: !communityName.trim() || isSavingCommunity ? 0.5 : 1 }}
+                    style={{ backgroundColor: THEME_COLORS.primary, opacity: !communityName.trim() || isSavingCommunity ? 0.5 : 1 }}
                   >
                     {isSavingCommunity ? <ActivityIndicator color="white" size="small" /> : <Text className="text-white font-bold text-base">Save & Continue</Text>}
                     {!isSavingCommunity ? <ArrowRight size={20} color="white" /> : null}
@@ -759,17 +803,20 @@ const OnboardingCreate: React.FC = () => {
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
                   <View className="w-12 h-12 bg-blue-50 rounded-2xl items-center justify-center">
-                    <MapPin size={24} color="#3b82f6" />
+                    <MapPin size={24} color={THEME_COLORS.brandBlue} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-2xl font-black text-[#0d3d47]">Coverage Area</Text>
+                    <Text className="text-2xl font-black text-primary">Coverage Area</Text>
                     <Text className="text-xs text-gray-500 font-medium">Step 2 of 5 — Where does your community operate?</Text>
                   </View>
                 </View>
 
-                <View className="gap-1" style={{ zIndex: 10, elevation: 10 }}>
+                <View
+                  className="gap-1"
+                  style={{ zIndex: LAYER_Z_INDEX.dropdown, elevation: LAYER_ELEVATION.dropdown }}
+                >
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Area or Address</Text>
-                  <View style={{ zIndex: 10, elevation: 10 }}>
+                  <View style={{ zIndex: LAYER_Z_INDEX.dropdown, elevation: LAYER_ELEVATION.dropdown }}>
                     <GooglePlacesAutocomplete
                       placeholder="e.g. Parkwood, Cape Town"
                       fetchDetails
@@ -784,13 +831,13 @@ const OnboardingCreate: React.FC = () => {
                       }}
                       query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
                       ref={coveragePlacesRef as any}
-                      textInputProps={{ placeholderTextColor: '#9ca3af' }}
+                      textInputProps={{ placeholderTextColor: THEME_COLORS.neutralTextSoft }}
                       styles={{
                         container: { flex: 0 },
-                        textInput: { backgroundColor: '#f3f4f6', borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14, fontWeight: 'bold', color: '#0d3d47', height: 52, margin: 0 },
-                        listView: { position: 'absolute', top: 56, left: 0, right: 0, zIndex: 9999, elevation: 9999, backgroundColor: '#fff', borderRadius: 12, marginTop: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8 },
-                        row: { paddingVertical: 12, paddingHorizontal: 16 },
-                        description: { fontSize: 13, color: '#374151' },
+                        textInput: { backgroundColor: THEME_COLORS.neutralBgSofter, borderRadius: RADIUS.xxl, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.md, fontWeight: 'bold', color: THEME_COLORS.primary, height: SPACE.s52, margin: SPACE.zero },
+                        listView: { position: 'absolute', top: SPACE.s56, left: SPACE.zero, right: SPACE.zero, zIndex: 9999, ...createShadow(THEME_COLORS.black, 0, 0, 0.1, SPACE.sm, 9999), backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xl, marginTop: SPACE.xxs },
+                        row: { paddingVertical: SPACE.md, paddingHorizontal: SPACE.xl },
+                        description: { fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextEmphasis },
                       }}
                       enablePoweredByContainer={false}
                       keyboardShouldPersistTaps="handled"
@@ -798,13 +845,13 @@ const OnboardingCreate: React.FC = () => {
                     />
                   </View>
                   <TouchableOpacity onPress={handleCoverageCurrentLocation} disabled={isFetchingCoverageLocation} className="flex-row items-center gap-2 py-3 px-4 bg-surface-container-low border border-outline-variant rounded-2xl mt-1">
-                    {isFetchingCoverageLocation ? <ActivityIndicator size="small" color="#0d3d47" /> : <MapPin size={16} color="#0d3d47" />}
-                    <Text className="text-xs font-bold text-[#0d3d47]">{isFetchingCoverageLocation ? 'Getting location...' : 'Use current location'}</Text>
+                    {isFetchingCoverageLocation ? <ActivityIndicator size="small" color={THEME_COLORS.primary} /> : <MapPin size={16} color={THEME_COLORS.primary} />}
+                    <Text className="text-xs font-bold text-primary">{isFetchingCoverageLocation ? 'Getting location...' : 'Use current location'}</Text>
                   </TouchableOpacity>
                   {coverageName ? (
-                    <View className="flex-row items-center gap-1 mt-1 ml-1"><CheckCircle2 size={12} color="#10b981" /><Text className="text-[10px] text-emerald-600 font-medium">Location set: {coverageName}</Text></View>
+                    <View className="flex-row items-center gap-1 mt-1 ml-1"><CheckCircle2 size={12} color={THEME_COLORS.success} /><Text className="text-[10px] text-emerald-600 font-medium">Location set: {coverageName}</Text></View>
                   ) : (
-                    <View className="flex-row items-center gap-1 mt-1 ml-1"><AlertCircle size={12} color="#f59e0b" /><Text className="text-[10px] text-amber-600 font-medium">Search, use current location, or tap the map to drop a pin.</Text></View>
+                    <View className="flex-row items-center gap-1 mt-1 ml-1"><AlertCircle size={12} color={THEME_COLORS.warningStrong} /><Text className="text-[10px] text-amber-600 font-medium">Search, use current location, or tap the map to drop a pin.</Text></View>
                   )}
                 </View>
 
@@ -812,7 +859,7 @@ const OnboardingCreate: React.FC = () => {
                 <View className="gap-2">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Fine-tune Position</Text>
                   <Text className="text-[10px] text-gray-400 ml-1">Tap anywhere on the map to set coverage, or drag the pin to fine-tune.</Text>
-                  <View style={{ height: 240, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb' }}>
+                  <View style={{ height: SPACE.mapHeight, borderRadius: RADIUS.xxl, overflow: 'hidden', borderWidth: 1, borderColor: THEME_COLORS.neutralBorderSoft }}>
                     <MapView
                       {...defaultMapViewProps}
                       provider={Platform.OS === 'ios' ? undefined : 'google'}
@@ -841,9 +888,9 @@ const OnboardingCreate: React.FC = () => {
                         <Circle
                           center={{ latitude: coverageLat, longitude: coverageLng }}
                           radius={coverageRadius * 1000}
-                          strokeColor="#0d3d47"
+                          strokeColor={THEME_COLORS.primary}
                           strokeWidth={2}
-                          fillColor="rgba(13,61,71,0.08)"
+                          fillColor={THEME_COLORS.primaryTintSoft}
                         />
                         <Marker
                           coordinate={{ latitude: coverageLat, longitude: coverageLng }}
@@ -854,7 +901,7 @@ const OnboardingCreate: React.FC = () => {
                             setCoverageLat(e.nativeEvent.coordinate.latitude);
                             setCoverageLng(e.nativeEvent.coordinate.longitude);
                           }}
-                          pinColor="#0d3d47"
+                          pinColor={THEME_COLORS.primary}
                         />
                         </>
                       ) : null}
@@ -866,20 +913,20 @@ const OnboardingCreate: React.FC = () => {
                 <View className="gap-3">
                   <View className="flex-row items-center justify-between">
                     <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400">Coverage Radius</Text>
-                    <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#0d3d47' }}>
+                    <View className="px-3 py-1 rounded-full" style={{ backgroundColor: THEME_COLORS.primary }}>
                       <Text className="text-white text-xs font-black">{coverageRadius} km</Text>
                     </View>
                   </View>
                   <Slider
-                    style={{ width: '100%', height: 40 }}
+                    style={{ width: '100%', height: SPACE.s40 }}
                     minimumValue={1}
                     maximumValue={200}
                     step={1}
                     value={coverageRadius}
                     onValueChange={(val) => setCoverageRadius(Math.round(val))}
-                    minimumTrackTintColor="#0d3d47"
-                    maximumTrackTintColor="#e5e7eb"
-                    thumbTintColor="#0d3d47"
+                    minimumTrackTintColor={THEME_COLORS.primary}
+                    maximumTrackTintColor={THEME_COLORS.neutralBorderSoft}
+                    thumbTintColor={THEME_COLORS.primary}
                   />
                   <View className="flex-row justify-between -mt-1">
                     <Text className="text-[9px] text-gray-400 font-medium">1 km</Text>
@@ -891,9 +938,9 @@ const OnboardingCreate: React.FC = () => {
 
                 <View className="flex-row gap-3">
                   <TouchableOpacity onPress={() => { setStep('name'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
-                    <ArrowLeft size={20} color="#374151" />
+                    <ArrowLeft size={20} color={THEME_COLORS.neutralTextEmphasis} />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { setError(null); setStep('categories'); }} className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2" style={{ backgroundColor: '#0d3d47' }}>
+                  <TouchableOpacity onPress={() => { setError(null); setStep('categories'); }} className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2" style={{ backgroundColor: THEME_COLORS.primary }}>
                     <Text className="text-white font-bold text-base">Next</Text>
                     <ArrowRight size={20} color="white" />
                   </TouchableOpacity>
@@ -914,7 +961,7 @@ const OnboardingCreate: React.FC = () => {
                         <View
                           key={s}
                           className="flex-1 h-1 rounded-full"
-                          style={{ backgroundColor: done ? '#fc7127' : '#e5e7eb' }}
+                          style={{ backgroundColor: done ? THEME_COLORS.secondaryContainer : THEME_COLORS.neutralBorderSoft }}
                         />
                       );
                     })}
@@ -924,7 +971,7 @@ const OnboardingCreate: React.FC = () => {
 
                 {/* Header */}
                 <View className="gap-2">
-                  <Text className="text-2xl font-black text-[#0d3d47]">What's in your neighbourhood?</Text>
+                  <Text className="text-2xl font-black text-primary">What's in your neighbourhood?</Text>
                   <Text className="text-sm text-gray-500 leading-relaxed">
                     Pick the types of businesses your community members can discover and list in the marketplace. Tap a category to toggle it.
                   </Text>
@@ -933,7 +980,7 @@ const OnboardingCreate: React.FC = () => {
                 {/* Counter + reset */}
                 <View className="flex-row items-center justify-between px-1">
                   <View className="flex-row items-center gap-2">
-                    <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#0d3d47' }}>
+                    <View className="px-3 py-1 rounded-full" style={{ backgroundColor: THEME_COLORS.primary }}>
                       <Text className="text-white text-xs font-black">
                         {selectedCategories.length} of {BUSINESS_CATEGORIES.length} selected
                       </Text>
@@ -947,7 +994,7 @@ const OnboardingCreate: React.FC = () => {
                     }
                     className="py-1 px-3"
                   >
-                    <Text className="text-xs font-bold" style={{ color: '#fc7127' }}>
+                    <Text className="text-xs font-bold" style={{ color: THEME_COLORS.secondaryContainer }}>
                       {selectedCategories.length === BUSINESS_CATEGORIES.length ? 'Deselect all' : 'Select all'}
                     </Text>
                   </TouchableOpacity>
@@ -965,14 +1012,14 @@ const OnboardingCreate: React.FC = () => {
                         )}
                         style={{
                           width: '31%',
-                          backgroundColor: enabled ? '#fff8f0' : '#f8fafc',
+                          backgroundColor: enabled ? THEME_COLORS.surface : THEME_COLORS.neutralBg,
                           borderWidth: 2,
-                          borderColor: enabled ? '#fc7127' : '#e5e7eb',
-                          borderRadius: 16,
-                          paddingVertical: 14,
-                          paddingHorizontal: 8,
+                          borderColor: enabled ? THEME_COLORS.secondaryContainer : THEME_COLORS.neutralBorderSoft,
+                          borderRadius: RADIUS.xxl,
+                          paddingVertical: SPACE.lg,
+                          paddingHorizontal: SPACE.sm,
                           alignItems: 'center',
-                          gap: 6,
+                          gap: SPACE.xs,
                           position: 'relative',
                         }}
                       >
@@ -981,23 +1028,23 @@ const OnboardingCreate: React.FC = () => {
                           <View
                             style={{
                               position: 'absolute',
-                              top: 8,
-                              right: 8,
-                              width: 18,
-                              height: 18,
-                              borderRadius: 9,
-                              backgroundColor: '#fc7127',
+                              top: SPACE.sm,
+                              right: SPACE.sm,
+                              width: SPACE.xxl,
+                              height: SPACE.xxl,
+                              borderRadius: RADIUS.md,
+                              backgroundColor: THEME_COLORS.secondaryContainer,
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}
                           >
-                            <CheckCircle2 size={11} color="#fff" />
+                            <CheckCircle2 size={11} color={THEME_COLORS.white} />
                           </View>
                         )}
-                        <Text style={{ fontSize: 26 }}>{cat.icon}</Text>
+                        <Text style={{ fontSize: TYPE_SCALE.icon }}>{cat.icon}</Text>
                         <Text
                           className="text-[10px] font-bold text-center"
-                          style={{ color: enabled ? '#0d3d47' : '#9ca3af' }}
+                          style={{ color: enabled ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft }}
                           numberOfLines={2}
                         >
                           {cat.label}
@@ -1011,19 +1058,19 @@ const OnboardingCreate: React.FC = () => {
                     onPress={() => { setError(null); setStep('businesses'); }}
                     style={{
                       width: '31%',
-                      backgroundColor: '#0d3d47',
+                      backgroundColor: THEME_COLORS.primary,
                       borderWidth: 2,
-                      borderColor: '#0d3d47',
-                      borderRadius: 16,
-                      paddingVertical: 14,
-                      paddingHorizontal: 8,
+                      borderColor: THEME_COLORS.primary,
+                      borderRadius: RADIUS.xxl,
+                      paddingVertical: SPACE.lg,
+                      paddingHorizontal: SPACE.sm,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: 6,
+                      gap: SPACE.xs,
                     }}
                   >
-                    <ArrowRight size={22} color="#fff" />
-                    <Text style={{ color: '#fff', fontSize: 10, fontWeight: '800' }}>Next</Text>
+                    <ArrowRight size={22} color={THEME_COLORS.white} />
+                    <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold }}>Next</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -1033,7 +1080,7 @@ const OnboardingCreate: React.FC = () => {
                     onPress={() => { setStep('coverage'); setError(null); }}
                     className="flex-row items-center gap-1 py-1"
                   >
-                    <ArrowLeft size={13} color="#9ca3af" />
+                    <ArrowLeft size={13} color={THEME_COLORS.neutralTextSoft} />
                     <Text className="text-[11px] text-gray-400 font-medium">Back</Text>
                   </TouchableOpacity>
                   <Text className="text-[10px] text-gray-400">Update anytime in Settings.</Text>
@@ -1046,7 +1093,7 @@ const OnboardingCreate: React.FC = () => {
               <View className="gap-5">
                 {/* Header */}
                 <View className="gap-1">
-                  <Text className="text-2xl font-black text-[#0d3d47]">Discover Local Businesses</Text>
+                  <Text className="text-2xl font-black text-primary">Discover Local Businesses</Text>
                   <Text className="text-sm text-gray-500 leading-relaxed">
                     We'll search Google Maps for businesses near{coverageName ? ` ${coverageName}` : ' your coverage area'} using the categories you selected.
                   </Text>
@@ -1058,11 +1105,11 @@ const OnboardingCreate: React.FC = () => {
                     onPress={handleDiscover}
                     disabled={isDiscovering || coverageLat === 0}
                     className="py-4 rounded-2xl flex-row items-center justify-center gap-2"
-                    style={{ backgroundColor: coverageLat === 0 ? '#e5e7eb' : '#fc7127', opacity: isDiscovering ? 0.7 : 1 }}
+                    style={{ backgroundColor: coverageLat === 0 ? THEME_COLORS.neutralBorderSoft : THEME_COLORS.secondaryContainer, opacity: isDiscovering ? 0.7 : 1 }}
                   >
                     {isDiscovering
-                      ? <><ActivityIndicator color="#fff" size="small" /><Text className="text-white font-bold text-sm">Searching Google Maps…</Text></>
-                      : <><Text style={{ fontSize: 18 }}>🔍</Text><Text className="text-white font-bold text-sm">Search businesses near me</Text></>}
+                      ? <><ActivityIndicator color={THEME_COLORS.white} size="small" /><Text className="text-white font-bold text-sm">Searching Google Maps…</Text></>
+                      : <><Text style={{ fontSize: TYPE_SCALE.lg }}>🔍</Text><Text className="text-white font-bold text-sm">Search businesses near me</Text></>}
                   </TouchableOpacity>
                 )}
 
@@ -1080,7 +1127,7 @@ const OnboardingCreate: React.FC = () => {
                 {discoveredBusinesses.length > 0 && (
                   <View className="gap-3">
                     <View className="flex-row items-center justify-between">
-                      <Text className="text-xs font-black text-[#0d3d47] uppercase tracking-widest">
+                      <Text className="text-xs font-black text-primary uppercase tracking-widest">
                         {discoveredBusinesses.length} businesses found
                       </Text>
                       <TouchableOpacity onPress={() => {
@@ -1090,7 +1137,7 @@ const OnboardingCreate: React.FC = () => {
                           setSelectedDiscovered(new Set(discoveredBusinesses.map((_, i) => i)));
                         }
                       }}>
-                        <Text className="text-[11px] font-bold" style={{ color: '#fc7127' }}>
+                        <Text className="text-[11px] font-bold" style={{ color: THEME_COLORS.secondaryContainer }}>
                           {selectedDiscovered.size === discoveredBusinesses.length ? 'Deselect all' : 'Select all'}
                         </Text>
                       </TouchableOpacity>
@@ -1110,25 +1157,25 @@ const OnboardingCreate: React.FC = () => {
                             style={{
                               flexDirection: 'row',
                               alignItems: 'center',
-                              gap: 12,
-                              padding: 12,
-                              borderRadius: 16,
+                              gap: SPACE.md,
+                              padding: SPACE.md,
+                              borderRadius: RADIUS.xxl,
                               borderWidth: 2,
-                              backgroundColor: selected ? '#fff8f0' : '#f8fafc',
-                              borderColor: selected ? '#fc7127' : '#e5e7eb',
+                              backgroundColor: selected ? THEME_COLORS.surface : THEME_COLORS.neutralBg,
+                              borderColor: selected ? THEME_COLORS.secondaryContainer : THEME_COLORS.neutralBorderSoft,
                             }}
                           >
                             <View
                               style={{
-                                width: 22, height: 22, borderRadius: 11,
-                                backgroundColor: selected ? '#fc7127' : '#e5e7eb',
+                                width: SPACE.s22, height: SPACE.s22, borderRadius: RADIUS.lg,
+                                backgroundColor: selected ? THEME_COLORS.secondaryContainer : THEME_COLORS.neutralBorderSoft,
                                 alignItems: 'center', justifyContent: 'center',
                               }}
                             >
-                              {selected && <CheckCircle2 size={13} color="#fff" />}
+                              {selected && <CheckCircle2 size={13} color={THEME_COLORS.white} />}
                             </View>
                             <View style={{ flex: 1 }}>
-                              <Text className="text-sm font-bold text-[#0d3d47]" numberOfLines={1}>{biz.name}</Text>
+                              <Text className="text-sm font-bold text-primary" numberOfLines={1}>{biz.name}</Text>
                               <Text className="text-[10px] text-gray-400" numberOfLines={1}>{biz.address}</Text>
                             </View>
                             {biz.rating != null && (
@@ -1150,9 +1197,9 @@ const OnboardingCreate: React.FC = () => {
                         onPress={handleAddDiscovered}
                         disabled={selectedDiscovered.size === 0}
                         className="flex-1 py-3 rounded-2xl items-center justify-center"
-                        style={{ backgroundColor: selectedDiscovered.size > 0 ? '#0d3d47' : '#e5e7eb' }}
+                        style={{ backgroundColor: selectedDiscovered.size > 0 ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }}
                       >
-                        <Text style={{ color: selectedDiscovered.size > 0 ? '#fff' : '#9ca3af', fontWeight: 'bold', fontSize: 13 }}>
+                        <Text style={{ color: selectedDiscovered.size > 0 ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft, fontWeight: 'bold', fontSize: TYPE_SCALE.sm }}>
                           Add {selectedDiscovered.size} business{selectedDiscovered.size !== 1 ? 'es' : ''}
                         </Text>
                       </TouchableOpacity>
@@ -1166,7 +1213,7 @@ const OnboardingCreate: React.FC = () => {
                     <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Added</Text>
                     {pendingBusinesses.map((biz, i) => (
                       <View key={i} className="flex-row items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                        <Text className="flex-1 text-sm font-bold text-[#0d3d47]">{biz.name}</Text>
+                        <Text className="flex-1 text-sm font-bold text-primary">{biz.name}</Text>
                         <Text className="text-[10px] text-gray-400">{BUSINESS_CATEGORIES.find(c => c.id === biz.category)?.label ?? biz.category}</Text>
                         <TouchableOpacity onPress={() => setPendingBusinesses(prev => prev.filter((_, idx) => idx !== i))}>
                           <Text className="text-red-400 font-bold text-xs">✕</Text>
@@ -1184,8 +1231,8 @@ const OnboardingCreate: React.FC = () => {
                       value={newBizName}
                       onChangeText={setNewBizName}
                       placeholder="Business name (e.g. Cape Coffee)"
-                      className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl font-bold text-[#0d3d47] text-sm"
-                      placeholderTextColor="#9ca3af"
+                      className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl font-bold text-primary text-sm"
+                      placeholderTextColor={THEME_COLORS.neutralTextSoft}
                     />
                     <TouchableOpacity
                       onPress={() => {
@@ -1196,18 +1243,18 @@ const OnboardingCreate: React.FC = () => {
                       }}
                       disabled={!newBizName.trim()}
                       className="px-4 py-3 rounded-2xl items-center justify-center"
-                      style={{ backgroundColor: newBizName.trim() ? '#0d3d47' : '#e5e7eb' }}
+                      style={{ backgroundColor: newBizName.trim() ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }}
                     >
-                      <Text style={{ color: newBizName.trim() ? '#fff' : '#9ca3af', fontWeight: 'bold', fontSize: 13 }}>+</Text>
+                      <Text style={{ color: newBizName.trim() ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft, fontWeight: 'bold', fontSize: TYPE_SCALE.sm }}>+</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
 
                 <View className="flex-row gap-3">
                   <TouchableOpacity onPress={() => { setStep('categories'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
-                    <ArrowLeft size={20} color="#374151" />
+                    <ArrowLeft size={20} color={THEME_COLORS.neutralTextEmphasis} />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { setError(null); setStep('rules'); }} className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2" style={{ backgroundColor: '#0d3d47' }}>
+                  <TouchableOpacity onPress={() => { setError(null); setStep('rules'); }} className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2" style={{ backgroundColor: THEME_COLORS.primary }}>
                     <Text className="text-white font-bold text-base">{pendingBusinesses.length > 0 ? `Next (${pendingBusinesses.length} added)` : 'Skip'}</Text>
                     <ArrowRight size={20} color="white" />
                   </TouchableOpacity>
@@ -1220,10 +1267,10 @@ const OnboardingCreate: React.FC = () => {
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
                   <View className="w-12 h-12 bg-red-50 rounded-2xl items-center justify-center">
-                    <Text style={{ fontSize: 22 }}>📋</Text>
+                    <Text style={{ fontSize: TYPE_SCALE.xl }}>📋</Text>
                   </View>
                   <View className="flex-1">
-                    <Text className="text-2xl font-black text-[#0d3d47]">Community Rules</Text>
+                    <Text className="text-2xl font-black text-primary">Community Rules</Text>
                     <Text className="text-xs text-gray-500 font-medium">Step 5 of 5 — Set posting limits and access controls.</Text>
                   </View>
                 </View>
@@ -1231,19 +1278,19 @@ const OnboardingCreate: React.FC = () => {
                 <View className="gap-4 p-4 bg-gray-50 rounded-2xl">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400">POSTING LIMITS</Text>
                   <View className="flex-row items-center justify-between">
-                    <Text className="text-sm font-medium text-[#0d3d47]">Max posts per user / day</Text>
+                    <Text className="text-sm font-medium text-primary">Max posts per user / day</Text>
                     <View className="flex-row items-center gap-2">
-                      <TouchableOpacity onPress={() => setMaxPostsPerDay(v => String(Math.max(1, Number(v) - 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-[#0d3d47]">−</Text></TouchableOpacity>
-                      <Text className="text-base font-black text-[#0d3d47] w-6 text-center">{maxPostsPerDay}</Text>
-                      <TouchableOpacity onPress={() => setMaxPostsPerDay(v => String(Math.min(20, Number(v) + 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-[#0d3d47]">+</Text></TouchableOpacity>
+                      <TouchableOpacity onPress={() => setMaxPostsPerDay(v => String(Math.max(1, Number(v) - 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-primary">−</Text></TouchableOpacity>
+                      <Text className="text-base font-black text-primary w-6 text-center">{maxPostsPerDay}</Text>
+                      <TouchableOpacity onPress={() => setMaxPostsPerDay(v => String(Math.min(20, Number(v) + 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-primary">+</Text></TouchableOpacity>
                     </View>
                   </View>
                   <View className="flex-row items-center justify-between">
-                    <Text className="text-sm font-medium text-[#0d3d47]">Max listings per week</Text>
+                    <Text className="text-sm font-medium text-primary">Max listings per week</Text>
                     <View className="flex-row items-center gap-2">
-                      <TouchableOpacity onPress={() => setMaxListingsPerWeek(v => String(Math.max(1, Number(v) - 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-[#0d3d47]">−</Text></TouchableOpacity>
-                      <Text className="text-base font-black text-[#0d3d47] w-6 text-center">{maxListingsPerWeek}</Text>
-                      <TouchableOpacity onPress={() => setMaxListingsPerWeek(v => String(Math.min(20, Number(v) + 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-[#0d3d47]">+</Text></TouchableOpacity>
+                      <TouchableOpacity onPress={() => setMaxListingsPerWeek(v => String(Math.max(1, Number(v) - 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-primary">−</Text></TouchableOpacity>
+                      <Text className="text-base font-black text-primary w-6 text-center">{maxListingsPerWeek}</Text>
+                      <TouchableOpacity onPress={() => setMaxListingsPerWeek(v => String(Math.min(20, Number(v) + 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-primary">+</Text></TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -1251,19 +1298,19 @@ const OnboardingCreate: React.FC = () => {
                 <View className="gap-3 p-4 bg-gray-50 rounded-2xl">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400">ACCESS CONTROL</Text>
                   <View className="flex-row items-center justify-between">
-                    <Text className="text-sm font-medium text-[#0d3d47] flex-1 pr-4">Require business verification</Text>
+                    <Text className="text-sm font-medium text-primary flex-1 pr-4">Require business verification</Text>
                     <TouchableOpacity
                       onPress={() => setRequireVerification(v => !v)}
                       className="w-12 h-7 rounded-full items-center justify-center"
-                      style={{ backgroundColor: requireVerification ? '#0d3d47' : '#e5e7eb' }}
+                      style={{ backgroundColor: requireVerification ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }}
                     >
-                      <View className="w-5 h-5 rounded-full bg-white" style={{ alignSelf: requireVerification ? 'flex-end' : 'flex-start', margin: 3 }} />
+                      <View className="w-5 h-5 rounded-full bg-white" style={{ alignSelf: requireVerification ? 'flex-end' : 'flex-start', margin: SPACE.xxxs }} />
                     </TouchableOpacity>
                   </View>
                 </View>
 
                 {/* Summary of all steps */}
-                <View className="bg-[#f0fdf4] border border-emerald-100 rounded-2xl p-4 gap-2">
+                <View className="bg-successSurface border border-emerald-100 rounded-2xl p-4 gap-2">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-emerald-700">Ready to Launch</Text>
                   <Text className="text-xs text-gray-600">📍 <Text className="font-bold">{communityName}</Text></Text>
                   {coverageName ? <Text className="text-xs text-gray-600">🗺️ {coverageName} · {coverageRadius}km radius</Text> : null}
@@ -1275,13 +1322,13 @@ const OnboardingCreate: React.FC = () => {
 
                 <View className="flex-row gap-3">
                   <TouchableOpacity onPress={() => { setStep('businesses'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
-                    <ArrowLeft size={20} color="#374151" />
+                    <ArrowLeft size={20} color={THEME_COLORS.neutralTextEmphasis} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setShowConfirmation(true)}
                     disabled={isSubmitting}
                     className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2 shadow-lg"
-                    style={{ backgroundColor: '#0d3d47', opacity: isSubmitting ? 0.6 : 1 }}
+                    style={{ backgroundColor: THEME_COLORS.primary, opacity: isSubmitting ? 0.6 : 1 }}
                   >
                     {isSubmitting
                       ? <ActivityIndicator color="white" size="small" />
@@ -1290,7 +1337,7 @@ const OnboardingCreate: React.FC = () => {
                 </View>
                 <Text className="text-[10px] text-gray-400 text-center leading-relaxed">
                   By creating a community you agree to our{' '}
-                  <Text className="text-[#0d3d47]">Terms & Conditions</Text>.
+                  <Text className="text-primary">Terms & Conditions</Text>.
                 </Text>
               </View>
             )}

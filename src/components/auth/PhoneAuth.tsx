@@ -12,6 +12,24 @@ import {
 import PhoneInput from 'react-native-phone-number-input';
 import { KeyRound, ArrowLeft } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
+import { THEME_COLORS } from '../../theme/colors';
+
+const SPACE = {
+  zero: 0,
+  xs: 4,
+  lg: 16,
+};
+const RADIUS = {
+  lg: 16,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
 
 interface PhoneAuthProps {
   onSuccess?: (user: any) => Promise<void> | void;
@@ -52,7 +70,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <TouchableOpacity
             onPress={onConfirm}
             disabled={confirmDisabled}
-            className="flex-1 py-3 rounded-2xl bg-[#0d3d47] items-center opacity-100 disabled:opacity-50"
+            className="flex-1 py-3 rounded-2xl bg-primary items-center opacity-100 disabled:opacity-50"
             style={{ opacity: confirmDisabled ? 0.5 : 1 }}
           >
             <Text className="font-bold text-white">{confirmLabel}</Text>
@@ -154,18 +172,18 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
                 withDarkTheme={false}
                 withShadow={false}
                 autoFocus={false}
-                containerStyle={{ width: '100%', backgroundColor: '#f3f4f6', borderRadius: 16, paddingVertical: 4 }}
-                textContainerStyle={{ backgroundColor: '#f3f4f6', borderRadius: 16, paddingVertical: 0 }}
-                textInputStyle={{ color: '#0d3d47', fontWeight: '700' }}
-                codeTextStyle={{ color: '#0d3d47', fontWeight: '700' }}
-                textInputProps={{ placeholderTextColor: '#9ca3af', accessibilityLabel: 'Phone number' }}
+                containerStyle={{ width: '100%', backgroundColor: THEME_COLORS.neutralBgSofter, borderRadius: RADIUS.lg, paddingVertical: SPACE.xs }}
+                textContainerStyle={{ backgroundColor: THEME_COLORS.neutralBgSofter, borderRadius: RADIUS.lg, paddingVertical: SPACE.zero }}
+                textInputStyle={{ color: THEME_COLORS.primary, fontWeight: FONT_WEIGHT.bold }}
+                codeTextStyle={{ color: THEME_COLORS.primary, fontWeight: FONT_WEIGHT.bold }}
+                textInputProps={{ placeholderTextColor: THEME_COLORS.neutralTextSoft, accessibilityLabel: 'Phone number' }}
               />
             </View>
             <TouchableOpacity
               onPress={handlePrepareSendCode}
               disabled={isLoading || !isPhoneValid}
               className="w-full py-5 rounded-2xl items-center justify-center flex-row gap-2"
-              style={{ backgroundColor: isLoading || !isPhoneValid ? '#ffddb9' : '#0d3d47', opacity: isLoading || !isPhoneValid ? 0.6 : 1 }}
+              style={{ backgroundColor: isLoading || !isPhoneValid ? THEME_COLORS.tertiaryFixed : THEME_COLORS.primary, opacity: isLoading || !isPhoneValid ? 0.6 : 1 }}
             >
               {isLoading ? (
                 <ActivityIndicator color="white" size="small" />
@@ -184,7 +202,7 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
               </Text>
               <View className="relative">
                 <View className="absolute left-4 top-0 bottom-0 justify-center z-10">
-                  <KeyRound size={20} color="#0d3d47" />
+                  <KeyRound size={20} color={THEME_COLORS.primary} />
                 </View>
                 <TextInput
                   value={otpCode}
@@ -195,8 +213,8 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
                   autoComplete="sms-otp"
                   importantForAutofill="yes"
                   maxLength={6}
-                  className="w-full pl-12 pr-6 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47] text-center text-xl tracking-widest"
-                  placeholderTextColor="#9ca3af"
+                  className="w-full pl-12 pr-6 py-4 bg-gray-100 rounded-2xl font-bold text-primary text-center text-xl tracking-widest"
+                  placeholderTextColor={THEME_COLORS.neutralTextSoft}
                 />
               </View>
               <Text className="text-xs text-gray-500 text-center mt-2 px-2 leading-relaxed">
@@ -209,7 +227,7 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
               onPress={handlePrepareVerifyCode}
               disabled={isLoading || otpCode.length !== 6}
               className="w-full py-5 rounded-2xl items-center justify-center"
-              style={{ backgroundColor: '#0d3d47', opacity: isLoading || otpCode.length !== 6 ? 0.5 : 1 }}
+              style={{ backgroundColor: THEME_COLORS.primary, opacity: isLoading || otpCode.length !== 6 ? 0.5 : 1 }}
             >
               {isLoading ? (
                 <ActivityIndicator color="white" size="small" />
@@ -228,7 +246,7 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
               disabled={isLoading}
               className="w-full py-3 items-center justify-center flex-row gap-2"
             >
-              <ArrowLeft size={16} color="#9ca3af" />
+              <ArrowLeft size={16} color={THEME_COLORS.neutralTextSoft} />
               <Text className="text-gray-400 text-sm font-bold">Change Mobile Number</Text>
             </TouchableOpacity>
           </View>

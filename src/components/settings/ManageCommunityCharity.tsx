@@ -23,6 +23,7 @@ import {
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import type { Charity, CharitySuggestion, CatHubSummary } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
 
 type CharityEntryMode = 'manage' | 'suggest' | null;
 type CharityAdminView = 'list' | 'form' | 'suggestions';
@@ -74,6 +75,56 @@ const EMPTY_SUGGESTION_FORM: SuggestionFormState = {
   reason: '',
   amount: '',
   website: '',
+};
+const TYPE_SCALE = {
+  sm: 10,
+  md: 11,
+  base: 12,
+  body: 13,
+  lg: 14,
+  xl: 16,
+  title: 20,
+};
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xxs: 2,
+  s3: 3,
+  xs: 4,
+  sm: 6,
+  md: 8,
+  lg: 10,
+  xl: 12,
+  xxl: 14,
+  s16: 16,
+  s18: 18,
+  s20: 20,
+  s28: 28,
+  s34: 34,
+  s40: 40,
+  s11: 11,
+  s7: 7,
+};
+const RADIUS = {
+  s17: 17,
+  md: 12,
+  lg: 14,
+  xl: 16,
+  pill: 20,
+  full: 999,
+};
+const LETTER_SPACING = {
+  md: 1,
+  lg: 2,
+};
+const LINE_HEIGHT = {
+  md: 16,
+  lg: 18,
 };
 
 const toCharityForm = (
@@ -439,9 +490,9 @@ export default function ManageCommunityCharity({
           }}
         >
           <View style={styles.cardIconWrap}>
-            <HeartHandshake size={20} color="#0d3d47" />
+            <HeartHandshake size={20} color={THEME_COLORS.primary} />
           </View>
-          <View style={{ flex: 1, gap: 3 }}>
+          <View style={{ flex: 1, gap: SPACE.s3 }}>
             <Text style={styles.cardTitle}>
               {featuredCharity?.name || 'Support a local cause'}
             </Text>
@@ -455,7 +506,7 @@ export default function ManageCommunityCharity({
             <Text style={styles.cardActionText}>
               {canManageCharity ? 'Manage' : 'Suggest'}
             </Text>
-            <ChevronRight size={16} color="#94a3b8" />
+            <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} />
           </View>
         </TouchableOpacity>
       </View>
@@ -502,11 +553,11 @@ export default function ManageCommunityCharity({
               </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: 20 }}>
+            <ScrollView contentContainerStyle={{ gap: SPACE.xl, paddingBottom: SPACE.s20 }}>
               {adminView === 'list' && (
                 <>
                   <View style={styles.catCycleCard}>
-                    <View style={{ flex: 1, gap: 4 }}>
+                    <View style={{ flex: 1, gap: SPACE.xs }}>
                       <Text style={styles.listItemTitle}>CAT Charity Cycle</Text>
                       <Text style={styles.listItemMeta}>
                         {currentCommunity?.catCycleActive
@@ -518,15 +569,15 @@ export default function ManageCommunityCharity({
                       value={Boolean(currentCommunity?.catCycleActive)}
                       disabled={updatingCatCycle}
                       onValueChange={handleToggleCatCycle}
-                      trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
-                      thumbColor="#ffffff"
+                      trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
+                      thumbColor={THEME_COLORS.white}
                     />
                   </View>
 
                   <View style={styles.catHubCard}>
                     <Text style={styles.catHubTitle}>Charity Hub</Text>
                     {catHubLoading ? (
-                      <ActivityIndicator color="#0d3d47" />
+                      <ActivityIndicator color={THEME_COLORS.primary} />
                     ) : (
                       <>
                         <Text style={styles.catHubMetric}>
@@ -547,13 +598,13 @@ export default function ManageCommunityCharity({
                     onPress={() => openAdminForm(null, null)}
                     activeOpacity={0.85}
                   >
-                    <Plus size={16} color="#fff" />
+                    <Plus size={16} color={THEME_COLORS.white} />
                     <Text style={styles.primaryButtonText}>Add Charity</Text>
                   </TouchableOpacity>
 
                   {availableCharities.length === 0 ? (
                     <View style={styles.emptyState}>
-                      <Sparkles size={18} color="#94a3b8" />
+                      <Sparkles size={18} color={THEME_COLORS.neutralTextMuted} />
                       <Text style={styles.emptyStateTitle}>No charities yet</Text>
                       <Text style={styles.emptyStateBody}>
                         Create the first charity for this community or approve a member suggestion.
@@ -562,18 +613,18 @@ export default function ManageCommunityCharity({
                   ) : (
                     availableCharities.map((charity) => (
                       <View key={charity.id} style={styles.listItem}>
-                        <View style={{ flex: 1, gap: 4 }}>
+                        <View style={{ flex: 1, gap: SPACE.xs }}>
                           <View style={styles.inlineRow}>
                             <Text style={styles.listItemTitle}>{charity.name}</Text>
                             {charity.isCATCharity && (
                               <View style={styles.badge}>
-                                <CheckCircle2 size={11} color="#0d3d47" />
+                                <CheckCircle2 size={11} color={THEME_COLORS.primary} />
                                 <Text style={styles.badgeText}>CAT</Text>
                               </View>
                             )}
                             {charity.isFeatured && (
                               <View style={styles.badge}>
-                                <ShieldCheck size={11} color="#0d3d47" />
+                                <ShieldCheck size={11} color={THEME_COLORS.primary} />
                                 <Text style={styles.badgeText}>Featured</Text>
                               </View>
                             )}
@@ -595,7 +646,7 @@ export default function ManageCommunityCharity({
                           onPress={() => handleArchiveCharity(charity)}
                           style={styles.iconButton}
                         >
-                          <Trash2 size={15} color="#dc2626" />
+                          <Trash2 size={15} color={THEME_COLORS.errorStrong} />
                         </TouchableOpacity>
                       </View>
                     ))
@@ -607,7 +658,7 @@ export default function ManageCommunityCharity({
                 <>
                   {pendingSuggestions.length === 0 ? (
                     <View style={styles.emptyState}>
-                      <Sparkles size={18} color="#94a3b8" />
+                      <Sparkles size={18} color={THEME_COLORS.neutralTextMuted} />
                       <Text style={styles.emptyStateTitle}>No pending suggestions</Text>
                       <Text style={styles.emptyStateBody}>
                         Member charity suggestions will appear here for moderator or admin review.
@@ -633,7 +684,7 @@ export default function ManageCommunityCharity({
                             }))
                           }
                           placeholder="Optional feedback for the member"
-                          placeholderTextColor="#94a3b8"
+                          placeholderTextColor={THEME_COLORS.neutralTextMuted}
                           multiline
                         />
                         <View style={styles.inlineRow}>
@@ -657,7 +708,7 @@ export default function ManageCommunityCharity({
               )}
 
               {adminView === 'form' && (
-                <View style={{ gap: 12 }}>
+                <View style={{ gap: SPACE.xl }}>
                   <Text style={styles.formTitle}>
                     {selectedSuggestion
                       ? `Approve ${selectedSuggestion.name}`
@@ -672,7 +723,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, name: value }))
                     }
                     placeholder="Charity name"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     editable={!selectedCharity?.isCATCharity}
                   />
                   {selectedCharity?.isCATCharity ? (
@@ -685,7 +736,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, description: value }))
                     }
                     placeholder="Charity description"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     multiline
                   />
                   <TextInput
@@ -695,7 +746,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, percentage: value }))
                     }
                     placeholder="Donation percentage"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     keyboardType="numeric"
                   />
                   <TextInput
@@ -705,7 +756,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, fundraisingGoal: value }))
                     }
                     placeholder="Fundraising goal (optional)"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     keyboardType="numeric"
                   />
                   <TextInput
@@ -715,7 +766,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, website: value }))
                     }
                     placeholder="Website"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                   />
                   <TextInput
                     style={styles.input}
@@ -724,7 +775,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, contactEmail: value }))
                     }
                     placeholder="Contact email"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     autoCapitalize="none"
                   />
                   <TextInput
@@ -734,7 +785,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, contactPhone: value }))
                     }
                     placeholder="Contact phone"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                   />
                   <TextInput
                     style={styles.input}
@@ -743,7 +794,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, logo: value }))
                     }
                     placeholder="Logo URL"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     autoCapitalize="none"
                   />
                   <TextInput
@@ -753,7 +804,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, coverImage: value }))
                     }
                     placeholder="Cover image URL"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     autoCapitalize="none"
                   />
                   <TextInput
@@ -763,7 +814,7 @@ export default function ManageCommunityCharity({
                       setCharityForm((current) => ({ ...current, tags: value }))
                     }
                     placeholder="Tags separated by commas"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={THEME_COLORS.neutralTextMuted}
                   />
                   <View style={styles.switchRow}>
                     <Text style={styles.switchLabel}>Featured charity</Text>
@@ -772,8 +823,8 @@ export default function ManageCommunityCharity({
                       onValueChange={(value) =>
                         setCharityForm((current) => ({ ...current, isFeatured: value }))
                       }
-                      trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
-                      thumbColor="#ffffff"
+                      trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
+                      thumbColor={THEME_COLORS.white}
                     />
                   </View>
                   {selectedSuggestion && (
@@ -782,7 +833,7 @@ export default function ManageCommunityCharity({
                       value={reviewFeedback}
                       onChangeText={setReviewFeedback}
                       placeholder="Optional approval feedback"
-                      placeholderTextColor="#94a3b8"
+                      placeholderTextColor={THEME_COLORS.neutralTextMuted}
                       multiline
                     />
                   )}
@@ -805,7 +856,7 @@ export default function ManageCommunityCharity({
                       disabled={savingCharity}
                     >
                       {savingCharity ? (
-                        <ActivityIndicator color="#fff" />
+                        <ActivityIndicator color={THEME_COLORS.white} />
                       ) : (
                         <Text style={styles.primaryButtonText}>
                           {selectedSuggestion
@@ -839,7 +890,7 @@ export default function ManageCommunityCharity({
               </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: 20 }}>
+            <ScrollView contentContainerStyle={{ gap: SPACE.xl, paddingBottom: SPACE.s20 }}>
               <TextInput
                 style={styles.input}
                 value={suggestionForm.name}
@@ -847,7 +898,7 @@ export default function ManageCommunityCharity({
                   setSuggestionForm((current) => ({ ...current, name: value }))
                 }
                 placeholder="Charity name"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={THEME_COLORS.neutralTextMuted}
               />
               <TextInput
                 style={[styles.input, styles.textarea]}
@@ -856,7 +907,7 @@ export default function ManageCommunityCharity({
                   setSuggestionForm((current) => ({ ...current, description: value }))
                 }
                 placeholder="What is their mission?"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={THEME_COLORS.neutralTextMuted}
                 multiline
               />
               <TextInput
@@ -866,7 +917,7 @@ export default function ManageCommunityCharity({
                   setSuggestionForm((current) => ({ ...current, amount: value }))
                 }
                 placeholder="Suggested percentage"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={THEME_COLORS.neutralTextMuted}
                 keyboardType="numeric"
               />
               <TextInput
@@ -876,7 +927,7 @@ export default function ManageCommunityCharity({
                   setSuggestionForm((current) => ({ ...current, website: value }))
                 }
                 placeholder="Website"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={THEME_COLORS.neutralTextMuted}
                 autoCapitalize="none"
               />
               <TextInput
@@ -886,7 +937,7 @@ export default function ManageCommunityCharity({
                   setSuggestionForm((current) => ({ ...current, reason: value }))
                 }
                 placeholder="Why should the community support them?"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={THEME_COLORS.neutralTextMuted}
                 multiline
               />
 
@@ -900,7 +951,7 @@ export default function ManageCommunityCharity({
                   disabled={savingSuggestion}
                 >
                   {savingSuggestion ? (
-                    <ActivityIndicator color="#fff" />
+                    <ActivityIndicator color={THEME_COLORS.white} />
                   ) : (
                     <Text style={styles.primaryButtonText}>Submit Suggestion</Text>
                   )}
@@ -915,224 +966,224 @@ export default function ManageCommunityCharity({
 }
 
 const styles = StyleSheet.create({
-  section: { gap: 6 },
+  section: { gap: SPACE.sm },
   sectionLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#888',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextSoft,
     textTransform: 'uppercase',
-    letterSpacing: 2,
-    paddingHorizontal: 4,
-    paddingBottom: 6,
+    letterSpacing: LETTER_SPACING.lg,
+    paddingHorizontal: SPACE.xs,
+    paddingBottom: SPACE.sm,
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    backgroundColor: '#fff',
-    borderRadius: 16,
+    gap: SPACE.xxl,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    padding: 16,
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    padding: SPACE.s16,
   },
   cardIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: SPACE.s40,
+    height: SPACE.s40,
+    borderRadius: RADIUS.pill,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f0fdf4',
+    backgroundColor: THEME_COLORS.successSurface,
   },
-  cardTitle: { fontSize: 14, fontWeight: '700', color: '#1a1a1a' },
-  cardDescription: { fontSize: 11, color: '#6b7280', lineHeight: 16 },
-  cardAction: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  cardTitle: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface },
+  cardDescription: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, lineHeight: LINE_HEIGHT.md },
+  cardAction: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
   cardActionText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#0d3d47',
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.extrabold,
+    color: THEME_COLORS.primary,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.md,
   },
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(15,23,42,0.45)',
+    backgroundColor: THEME_COLORS.alias_rgba_15_23_42_0_45,
     justifyContent: 'flex-end',
   },
   modalCard: {
-    backgroundColor: '#fff',
+    backgroundColor: THEME_COLORS.white,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    paddingHorizontal: 18,
-    paddingTop: 18,
-    paddingBottom: 28,
+    paddingHorizontal: SPACE.s18,
+    paddingTop: SPACE.s18,
+    paddingBottom: SPACE.s28,
     maxHeight: '88%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    gap: 12,
-    marginBottom: 14,
+    gap: SPACE.xl,
+    marginBottom: SPACE.xxl,
   },
-  modalTitle: { fontSize: 20, fontWeight: '800', color: '#0d3d47' },
-  modalSubtitle: { fontSize: 12, color: '#6b7280', marginTop: 4 },
+  modalTitle: { fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary },
+  modalSubtitle: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs },
   closeButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: '#f3f4f6',
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.md,
+    borderRadius: RADIUS.full,
+    backgroundColor: THEME_COLORS.neutralBgSofter,
   },
-  closeButtonText: { fontSize: 12, fontWeight: '700', color: '#374151' },
+  closeButtonText: { fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextEmphasis },
   tabRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 14,
+    gap: SPACE.md,
+    marginBottom: SPACE.xxl,
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: '#f3f4f6',
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.md,
+    backgroundColor: THEME_COLORS.neutralBgSofter,
     alignItems: 'center',
   },
-  tabButtonActive: { backgroundColor: '#0d3d47' },
-  tabButtonText: { fontSize: 12, fontWeight: '700', color: '#4b5563' },
-  tabButtonTextActive: { color: '#fff' },
+  tabButtonActive: { backgroundColor: THEME_COLORS.primary },
+  tabButtonText: { fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextDefault },
+  tabButtonTextActive: { color: THEME_COLORS.white },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#0d3d47',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 14,
+    gap: SPACE.md,
+    backgroundColor: THEME_COLORS.primary,
+    paddingVertical: SPACE.xl,
+    paddingHorizontal: SPACE.s16,
+    borderRadius: RADIUS.lg,
     flex: 1,
   },
-  primaryButtonText: { color: '#fff', fontSize: 13, fontWeight: '800' },
+  primaryButtonText: { color: THEME_COLORS.white, fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.extrabold },
   secondaryButton: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    paddingVertical: 11,
-    backgroundColor: '#e0f2fe',
+    borderRadius: RADIUS.lg,
+    paddingVertical: SPACE.s11,
+    backgroundColor: THEME_COLORS.infoSurface,
   },
-  secondaryButtonText: { color: '#0369a1', fontSize: 12, fontWeight: '800' },
+  secondaryButtonText: { color: THEME_COLORS.infoText, fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.extrabold },
   destructiveButton: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    paddingVertical: 11,
-    backgroundColor: '#fee2e2',
+    borderRadius: RADIUS.lg,
+    paddingVertical: SPACE.s11,
+    backgroundColor: THEME_COLORS.errorBorder,
   },
-  destructiveButtonText: { color: '#dc2626', fontSize: 12, fontWeight: '800' },
+  destructiveButtonText: { color: THEME_COLORS.error, fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.extrabold },
   cancelButton: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    paddingVertical: 11,
-    backgroundColor: '#f3f4f6',
+    borderRadius: RADIUS.lg,
+    paddingVertical: SPACE.s11,
+    backgroundColor: THEME_COLORS.neutralBgSofter,
   },
-  cancelButtonText: { color: '#374151', fontSize: 12, fontWeight: '800' },
+  cancelButtonText: { color: THEME_COLORS.neutralTextEmphasis, fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.extrabold },
   emptyState: {
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    padding: 18,
-    gap: 6,
-    backgroundColor: '#f9fafb',
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    padding: SPACE.s18,
+    gap: SPACE.sm,
+    backgroundColor: THEME_COLORS.neutralBg,
   },
-  emptyStateTitle: { fontSize: 14, fontWeight: '700', color: '#1f2937' },
-  emptyStateBody: { fontSize: 12, color: '#6b7280', lineHeight: 18 },
+  emptyStateTitle: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.aliasHex_1f2937 },
+  emptyStateBody: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.neutralTextSubtle, lineHeight: LINE_HEIGHT.lg },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    borderRadius: 16,
+    gap: SPACE.lg,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    padding: 14,
-    backgroundColor: '#fff',
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    padding: SPACE.xxl,
+    backgroundColor: THEME_COLORS.white,
   },
   catCycleCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    borderRadius: 16,
+    gap: SPACE.xl,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    padding: 14,
-    backgroundColor: '#f8fafc',
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    padding: SPACE.xxl,
+    backgroundColor: THEME_COLORS.neutralBg,
   },
   catHubCard: {
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    padding: 14,
-    gap: 6,
-    backgroundColor: '#ffffff',
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    padding: SPACE.xxl,
+    gap: SPACE.sm,
+    backgroundColor: THEME_COLORS.white,
   },
   catHubTitle: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#0d3d47',
+    fontSize: TYPE_SCALE.body,
+    fontWeight: FONT_WEIGHT.extrabold,
+    color: THEME_COLORS.primary,
   },
   catHubMetric: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#111827',
+    fontSize: TYPE_SCALE.base,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextStrong,
   },
-  listItemTitle: { fontSize: 14, fontWeight: '700', color: '#111827' },
-  listItemMeta: { fontSize: 11, color: '#6b7280' },
-  inlineRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  listItemTitle: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  listItemMeta: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle },
+  inlineRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
   inlineButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: '#eff6ff',
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.s7,
+    borderRadius: RADIUS.full,
+    backgroundColor: THEME_COLORS.infoSurfaceSoft,
   },
-  inlineButtonText: { color: '#2563eb', fontSize: 11, fontWeight: '800' },
+  inlineButtonText: { color: THEME_COLORS.brandBlueText, fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold },
   iconButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: SPACE.s34,
+    height: SPACE.s34,
+    borderRadius: RADIUS.s17,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fee2e2',
+    backgroundColor: THEME_COLORS.errorBorder,
   },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    backgroundColor: '#ecfdf5',
+    gap: SPACE.xs,
+    borderRadius: RADIUS.full,
+    paddingHorizontal: SPACE.md,
+    paddingVertical: SPACE.xs,
+    backgroundColor: THEME_COLORS.successSurface,
   },
-  badgeText: { fontSize: 10, fontWeight: '800', color: '#0d3d47' },
+  badgeText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary },
   suggestionItem: {
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    padding: 14,
-    gap: 8,
-    backgroundColor: '#fff',
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    padding: SPACE.xxl,
+    gap: SPACE.md,
+    backgroundColor: THEME_COLORS.white,
   },
-  suggestionBody: { fontSize: 12, color: '#4b5563', lineHeight: 18 },
-  suggestionReason: { fontSize: 12, color: '#0d3d47', fontWeight: '600' },
-  formTitle: { fontSize: 16, fontWeight: '800', color: '#111827' },
+  suggestionBody: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.neutralTextDefault, lineHeight: LINE_HEIGHT.lg },
+  suggestionReason: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.primary, fontWeight: FONT_WEIGHT.semibold },
+  formTitle: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextStrong },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 13,
-    color: '#111827',
-    backgroundColor: '#fff',
+    borderColor: THEME_COLORS.neutralBorderMuted,
+    borderRadius: RADIUS.lg,
+    paddingHorizontal: SPACE.xxl,
+    paddingVertical: SPACE.xl,
+    fontSize: TYPE_SCALE.body,
+    color: THEME_COLORS.neutralTextStrong,
+    backgroundColor: THEME_COLORS.white,
   },
   textarea: {
     minHeight: 96,
@@ -1142,7 +1193,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 2,
+    paddingVertical: SPACE.xxs,
   },
-  switchLabel: { fontSize: 13, fontWeight: '700', color: '#374151' },
+  switchLabel: { fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextEmphasis },
 });

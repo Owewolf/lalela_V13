@@ -62,6 +62,7 @@ import {
 } from 'lucide-react-native';
 import MapView, { Circle, Marker } from 'react-native-maps';
 import { useCommunity } from '../../context/CommunityContext';
+import { useTheme } from '../../context/ThemeContext';
 import { BUSINESS_CATEGORIES, GOOGLE_PLACES_API_KEY, POST_SUBTYPE_CONFIG } from '../../constants';
 import { PostConfirmationModal } from '../shared/PostConfirmationModal';
 import { useAuth } from '../../context/AuthContext';
@@ -73,11 +74,80 @@ import ManageCommunityCharity from '../settings/ManageCommunityCharity';
 import { GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from 'react-native-google-places-autocomplete';
 import Slider from '@react-native-community/slider';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
+import { THEME_COLORS } from '../../theme/colors';
+import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
-const SECONDARY = '#7c3aed';
-const ERROR = '#dc2626';
+const PRIMARY = THEME_COLORS.primary;
+const SECONDARY = THEME_COLORS.secondary;
+const ERROR = THEME_COLORS.error;
 const INVITE_WEB_BASE_URL = 'https://lalela.net';
+
+const TYPE_SCALE = {
+  xs: 9,
+  sm: 10,
+  md: 11,
+  lg: 12,
+  xl: 13,
+  xxl: 14,
+  h3: 15,
+  h2: 16,
+  h1: 18,
+  title: 20,
+  display: 24,
+} as const;
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+
+const LINE_HEIGHT = {
+  compact: 18,
+} as const;
+
+const LETTER_SPACING = {
+  tight: 0.4,
+  normal: 0.5,
+  wide: 0.8,
+  widest: 1,
+  hero: 1.5,
+} as const;
+
+const SPACE = {
+  zero: 0,
+  xxxs: 1,
+  xxs: 2,
+  xs: 3,
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 10,
+  xxl: 12,
+  xxxl: 14,
+  s16: 16,
+  s20: 20,
+  s60: 60,
+  s40: 40,
+} as const;
+
+const RADIUS = {
+  sm: 3,
+  dot: 7,
+  chip: 6,
+  md: 8,
+  lg: 10,
+  xl: 12,
+  xxl: 14,
+  card: 16,
+  round: 20,
+  circle: 40,
+  tab: 22,
+  pill: 99,
+} as const;
 
 export interface ModerationCenterHandle {
   saveCurrentTab: () => Promise<void>;
@@ -85,6 +155,19 @@ export interface ModerationCenterHandle {
 
 type ModTab = 'members' | 'content' | 'businesses' | 'rules' | 'logs' | 'categories' | 'coverage' | 'charity';
 type MemberSubView = 'list' | 'invite' | 'details';
+
+type ThemeDraft = {
+  name: string;
+  primaryColor: string;
+  secondaryColor: string;
+  backgroundColor: string;
+  surfaceColor: string;
+  textPrimary: string;
+  textSecondary: string;
+  borderRadius: string;
+  fontFamily: string;
+  iconUrl: string;
+};
 
 type MemberInsightsSnapshot = {
   totalListings?: number;
@@ -138,6 +221,13 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       generateInviteLink,
     } = useCommunity();
     const { userProfile: currentUserProfile, sendSmsInvite } = useAuth();
+    const {
+      theme,
+      source: themeSource,
+      updateTheme,
+      refreshTheme,
+      loading: isThemeLoading,
+    } = useTheme();
 
     const [activeTab, setActiveTab] = useState<ModTab>(initialTab || 'members');
     const coveragePlacesRef = useRef<GooglePlacesAutocompleteRef | null>(null);
@@ -173,6 +263,20 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       'all' | 'notices' | 'listings' | 'businesses' | 'public_queue'
     >('all');
     const [logs, setLogs] = useState<any[]>([]);
+    const [themeDraft, setThemeDraft] = useState<ThemeDraft>({
+      name: '',
+      primaryColor: '',
+      secondaryColor: '',
+      backgroundColor: '',
+      surfaceColor: '',
+      textPrimary: '',
+      textSecondary: '',
+      borderRadius: '',
+      fontFamily: '',
+      iconUrl: '',
+    });
+    const [isSavingTheme, setIsSavingTheme] = useState(false);
+    const [themeSaveStatus, setThemeSaveStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [urgencyChangePost, setUrgencyChangePost] = useState<any>(null);
     const [pendingRemoveMember, setPendingRemoveMember] = useState<{ id: string; name: string } | null>(null);
     const [pendingDeleteMember, setPendingDeleteMember] = useState<{ id: string; name: string } | null>(null);
@@ -196,6 +300,21 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     useEffect(() => {
       if (initialTab) setActiveTab(initialTab);
     }, [initialTab]);
+
+    useEffect(() => {
+      setThemeDraft({
+        name: theme.name ?? '',
+        primaryColor: theme.primaryColor ?? '',
+        secondaryColor: theme.secondaryColor ?? '',
+        backgroundColor: theme.backgroundColor ?? '',
+        surfaceColor: theme.surfaceColor ?? '',
+        textPrimary: theme.textPrimary ?? '',
+        textSecondary: theme.textSecondary ?? '',
+        borderRadius: theme.borderRadius ?? '',
+        fontFamily: theme.fontFamily ?? '',
+        iconUrl: theme.iconUrl ?? '',
+      });
+    }, [theme]);
 
     const handleSendInviteEmail = async (email: string, link: string) => {
       try {
@@ -497,15 +616,78 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       finally { setIsProcessingDestructiveAction(false); }
     };
 
+    const handleThemeDraftChange = (field: keyof ThemeDraft, value: string) => {
+      setThemeSaveStatus(null);
+      setThemeDraft((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleSaveTheme = async () => {
+      const colorFields: Array<keyof ThemeDraft> = [
+        'primaryColor',
+        'secondaryColor',
+        'backgroundColor',
+        'surfaceColor',
+        'textPrimary',
+        'textSecondary',
+      ];
+      const colorRegex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+
+      for (const field of colorFields) {
+        if (!colorRegex.test((themeDraft[field] || '').trim())) {
+          setThemeSaveStatus({ type: 'error', message: `Invalid color value for ${field}` });
+          return;
+        }
+      }
+
+      if (!themeDraft.name.trim()) {
+        setThemeSaveStatus({ type: 'error', message: 'Theme name is required' });
+        return;
+      }
+
+      if (!themeDraft.borderRadius.trim()) {
+        setThemeSaveStatus({ type: 'error', message: 'Border radius is required' });
+        return;
+      }
+
+      if (!themeDraft.fontFamily.trim()) {
+        setThemeSaveStatus({ type: 'error', message: 'Font family is required' });
+        return;
+      }
+
+      setIsSavingTheme(true);
+      try {
+        await updateTheme({
+          name: themeDraft.name.trim(),
+          primaryColor: themeDraft.primaryColor.trim(),
+          secondaryColor: themeDraft.secondaryColor.trim(),
+          backgroundColor: themeDraft.backgroundColor.trim(),
+          surfaceColor: themeDraft.surfaceColor.trim(),
+          textPrimary: themeDraft.textPrimary.trim(),
+          textSecondary: themeDraft.textSecondary.trim(),
+          borderRadius: themeDraft.borderRadius.trim(),
+          fontFamily: themeDraft.fontFamily.trim(),
+          iconUrl: themeDraft.iconUrl.trim() || null,
+        });
+        setThemeSaveStatus({ type: 'success', message: 'Theme updated successfully' });
+      } catch (error: any) {
+        setThemeSaveStatus({
+          type: 'error',
+          message: error?.response?.data?.error || error?.message || 'Failed to save theme',
+        });
+      } finally {
+        setIsSavingTheme(false);
+      }
+    };
+
     const tabs: { id: ModTab; label: string; icon: React.ReactNode }[] = [
-      { id: 'members', label: 'Members', icon: <Users size={20} color={activeTab === 'members' ? '#fff' : '#64748b'} /> },
-      { id: 'content', label: 'Content', icon: <FileText size={20} color={activeTab === 'content' ? '#fff' : '#64748b'} /> },
-      { id: 'businesses', label: 'Businesses', icon: <Store size={20} color={activeTab === 'businesses' ? '#fff' : '#64748b'} /> },
-      { id: 'categories', label: 'Categories', icon: <Tag size={20} color={activeTab === 'categories' ? '#fff' : '#64748b'} /> },
-      { id: 'rules', label: 'Rules', icon: <Shield size={20} color={activeTab === 'rules' ? '#fff' : '#64748b'} /> },
-      { id: 'coverage', label: 'Coverage', icon: <Map size={20} color={activeTab === 'coverage' ? '#fff' : '#64748b'} /> },
-      { id: 'charity', label: 'Charity', icon: <Heart size={20} color={activeTab === 'charity' ? '#fff' : '#64748b'} /> },
-      { id: 'logs', label: 'Audit', icon: <History size={20} color={activeTab === 'logs' ? '#fff' : '#64748b'} /> },
+      { id: 'members', label: 'Members', icon: <Users size={20} color={activeTab === 'members' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'content', label: 'Content', icon: <FileText size={20} color={activeTab === 'content' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'businesses', label: 'Businesses', icon: <Store size={20} color={activeTab === 'businesses' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'categories', label: 'Categories', icon: <Tag size={20} color={activeTab === 'categories' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'rules', label: 'Rules', icon: <Shield size={20} color={activeTab === 'rules' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'coverage', label: 'Coverage', icon: <Map size={20} color={activeTab === 'coverage' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'charity', label: 'Charity', icon: <Heart size={20} color={activeTab === 'charity' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'logs', label: 'Manage', icon: <Sparkles size={20} color={activeTab === 'logs' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
     ];
 
     const renderTabBar = () => (
@@ -531,7 +713,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     const renderCharityModeration = () => (
       <ScrollView
         style={styles.tabContent}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: SPACE.s40 }}
         keyboardShouldPersistTaps="handled"
       >
         <ManageCommunityCharity initialMode="manage" clearInitialMode={() => {}} />
@@ -539,16 +721,25 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     );
 
     const renderCoverage = () => (
-      <ScrollView 
-        style={styles.tabContent} 
-        contentContainerStyle={{ gap: 20, paddingBottom: 40 }}
+        <ScrollView
+          style={styles.tabContent}
+          contentContainerStyle={{ gap: SPACE.xl, paddingBottom: SPACE.s40 }}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Coverage Area</Text>
         </View>
 
-        <View style={[styles.fieldGroup, { zIndex: 9999, elevation: 999, position: 'relative' }]}>
+        <View
+          style={[
+            styles.fieldGroup,
+            {
+              zIndex: LAYER_Z_INDEX.placesOverlay,
+              elevation: LAYER_ELEVATION.placesOverlay,
+              position: 'relative',
+            },
+          ]}
+        >
           <Text style={styles.fieldLabel}>Location Name</Text>
           <GooglePlacesAutocomplete
             ref={coveragePlacesRef as any}
@@ -564,25 +755,22 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             }}
             query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
             textInputProps={{
-              placeholderTextColor: '#94a3b8',
+              placeholderTextColor: THEME_COLORS.neutralTextMuted,
             }}
             styles={{
-              textInput: { ...styles.input, marginBottom: 0 },
+              textInput: { ...styles.input, marginBottom: SPACE.zero },
               listView: { 
                 position: 'absolute', 
                 width: '100%', 
-                top: 60,
-                backgroundColor: '#fff', 
-                borderRadius: 8, 
-                marginTop: 2, 
-                elevation: 4, 
-                shadowColor: '#000', 
-                shadowOpacity: 0.1, 
-                shadowRadius: 6,
+                top: SPACE.s60,
+                backgroundColor: THEME_COLORS.white, 
+                borderRadius: RADIUS.md, 
+                marginTop: SPACE.xxs,
+                ...createShadow(THEME_COLORS.black, 0, 0, 0.1, 6, 4),
                 zIndex: 9999
               },
-              row: { paddingVertical: 10, paddingHorizontal: 12 },
-              description: { fontSize: 13, color: '#374151' },
+              row: { paddingVertical: SPACE.xl, paddingHorizontal: SPACE.xxl },
+              description: { fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextEmphasis },
             }}
             enablePoweredByContainer={false}
             keyboardShouldPersistTaps="handled"
@@ -602,14 +790,14 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             value={tempCoverage.radius || 10}
             onValueChange={(val) => setTempCoverage({ ...tempCoverage, radius: val })}
             minimumTrackTintColor={PRIMARY}
-            maximumTrackTintColor="#CBD5E1"
+            maximumTrackTintColor={THEME_COLORS.neutralBorderStrong}
             thumbTintColor={PRIMARY}
           />
         </View>
 
         <View style={styles.fieldGroup}>
           <Text style={styles.fieldLabel}>Set Center on Map</Text>
-          <Text style={{ fontSize: 12, color: '#94a3b8', marginBottom: 10 }}>
+          <Text style={{ fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextMuted, marginBottom: SPACE.xl }}>
             Tap the map to move the center point, or drag the pin to fine-tune.
           </Text>
           <View style={styles.mapContainer}>
@@ -638,8 +826,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   longitude: isNaN(tempCoverage.longitude) ? 28.0473 : tempCoverage.longitude,
                 }}
                 radius={(tempCoverage.radius || 10) * 1000}
-                fillColor="rgba(13,61,71,0.08)"
-                strokeColor="#0d3d47"
+                fillColor={THEME_COLORS.primaryTintSoft}
+                strokeColor={THEME_COLORS.primary}
                 strokeWidth={2}
               />
               <Marker
@@ -656,23 +844,23 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               />
             </MapView>
           </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-            <Text style={{ fontSize: 11, color: '#64748b' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: SPACE.lg }}>
+            <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle }}>
               Lat: {isNaN(tempCoverage.latitude) ? '-' : tempCoverage.latitude.toFixed(5)}
             </Text>
-            <Text style={{ fontSize: 11, color: '#64748b' }}>
+            <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle }}>
               Lng: {isNaN(tempCoverage.longitude) ? '-' : tempCoverage.longitude.toFixed(5)}
             </Text>
           </View>
         </View>
 
         <View style={styles.infoBanner}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg }}>
             <ShieldCheck size={24} color={PRIMARY} />
             <Text style={styles.infoBannerTitle}>Active Monitoring Zone</Text>
           </View>
           <TouchableOpacity style={styles.saveBtn} onPress={handleSaveCoverage} activeOpacity={0.8}>
-            <Save size={16} color="#fff" />
+            <Save size={16} color={THEME_COLORS.white} />
             <Text style={styles.saveBtnText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -688,7 +876,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         : [];
 
       return (
-        <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 16, paddingBottom: 40 }}>
+        <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: SPACE.s16, paddingBottom: SPACE.s40 }}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Member Management</Text>
             <TouchableOpacity
@@ -696,7 +884,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               onPress={() => setMemberSubView('invite')}
               activeOpacity={0.8}
             >
-              <UserPlus size={16} color="#fff" />
+              <UserPlus size={16} color={THEME_COLORS.white} />
               <Text style={styles.actionBtnText}>Add Members</Text>
             </TouchableOpacity>
           </View>
@@ -708,14 +896,14 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               {pendingInvites.map((inv: any) => (
                 <View key={inv.id} style={styles.memberRow}>
                   <View style={styles.memberAvatar}>
-                    <Mail size={20} color="#94a3b8" />
+                    <Mail size={20} color={THEME_COLORS.neutralTextMuted} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.memberName}>Invited User</Text>
                     <Text style={styles.memberSub}>{inv.invited_user_id?.slice(0, 20)}...</Text>
                   </View>
-                  <View style={[styles.roleBadge, { backgroundColor: '#f8fafc' }]}>
-                    <Text style={[styles.roleBadgeText, { color: '#64748b' }]}>{inv.role}</Text>
+                  <View style={[styles.roleBadge, { backgroundColor: THEME_COLORS.neutralBg }]}>
+                    <Text style={[styles.roleBadgeText, { color: THEME_COLORS.neutralTextSubtle }]}>{inv.role}</Text>
                   </View>
                   <TouchableOpacity
                     onPress={() => setPendingCancelInvitation({ id: inv.id, label: inv.invited_user_id || 'Pending invite' })}
@@ -747,25 +935,25 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                     <Text style={styles.memberName}>{member.name || 'Unknown'}</Text>
                     <View style={styles.memberStatusRow}>
                       <View style={[styles.statusDot, {
-                        backgroundColor: member.status === 'ACTIVE' ? '#fc7127' : member.status === 'READ-ONLY' ? '#f59e0b' : '#94a3b8'
+                        backgroundColor: member.status === 'ACTIVE' ? THEME_COLORS.secondaryContainer : member.status === 'READ-ONLY' ? THEME_COLORS.warningStrong : THEME_COLORS.neutralTextMuted
                       }]} />
                       <Text style={styles.memberSub}>{member.status}</Text>
                     </View>
                   </View>
                   <View style={[
                     styles.roleBadge,
-                    { backgroundColor: member.role === 'ADMIN' ? PRIMARY : member.role === 'MODERATOR' ? SECONDARY : '#f1f5f9' }
+                    { backgroundColor: member.role === 'ADMIN' ? PRIMARY : member.role === 'MODERATOR' ? SECONDARY : THEME_COLORS.neutralBgSoft }
                   ]}>
-                    <Text style={[styles.roleBadgeText, { color: (member.role === 'ADMIN' || member.role === 'MODERATOR') ? '#fff' : '#64748b' }]}>
+                    <Text style={[styles.roleBadgeText, { color: (member.role === 'ADMIN' || member.role === 'MODERATOR') ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle }]}>
                       {member.role}
                     </Text>
                   </View>
-                  <ChevronRight size={16} color="#94a3b8" />
+                  <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} />
                 </TouchableOpacity>
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Users size={32} color="#cbd5e1" />
+                <Users size={32} color={THEME_COLORS.neutralBorderStrong} />
                 <Text style={styles.emptyStateText}>No members yet</Text>
               </View>
             )}
@@ -775,7 +963,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     };
 
     const renderInviteMembers = () => (
-      <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 16, paddingBottom: 40 }}>
+      <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: SPACE.s16, paddingBottom: SPACE.s40 }}>
         <View style={styles.sectionHeader}>
           <TouchableOpacity onPress={() => setMemberSubView('list')} style={styles.backBtn}>
             <ArrowLeft size={20} color={PRIMARY} />
@@ -805,24 +993,24 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   }}
                 >
                   {linkCopied ? (
-                    <CheckCircle2 size={18} color="#fc7127" />
+                    <CheckCircle2 size={18} color={THEME_COLORS.secondaryContainer} />
                   ) : (
                     <Copy size={18} color={PRIMARY} />
                   )}
                 </TouchableOpacity>
               </View>
-              <View style={[styles.buttonRow, { marginTop: 12 }]}>
+              <View style={[styles.buttonRow, { marginTop: SPACE.xxl }]}>
                 <TextInput
-                  style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                  style={[styles.input, { flex: 1, marginBottom: SPACE.zero }]}
                   value={inviteEmailRecipient}
                   onChangeText={setInviteEmailRecipient}
                   placeholder="Recipient email..."
-                  placeholderTextColor="#94a3b8"
+                  placeholderTextColor={THEME_COLORS.neutralTextMuted}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
                 <TouchableOpacity
-                  style={[styles.actionBtn, { marginLeft: 8, paddingHorizontal: 16 }]}
+                  style={[styles.actionBtn, { marginLeft: SPACE.lg, paddingHorizontal: SPACE.s16 }]}
                   onPress={async () => {
                     if (!inviteEmailRecipient || !activeCommunityLink) return;
                     setIsSendingInviteEmail(true);
@@ -839,34 +1027,34 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   disabled={isSendingInviteEmail || !inviteEmailRecipient}
                 >
                   {isSendingInviteEmail ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color={THEME_COLORS.white} />
                   ) : (
-                    <Mail size={16} color="#fff" />
+                    <Mail size={16} color={THEME_COLORS.white} />
                   )}
                 </TouchableOpacity>
               </View>
               {inviteEmailStatus && (
                 <View style={[styles.statusBanner, {
-                  backgroundColor: inviteEmailStatus.type === 'success' ? '#f0fdf4' : '#fef2f2',
-                  marginTop: 12
+                  backgroundColor: inviteEmailStatus.type === 'success' ? THEME_COLORS.successSurface : THEME_COLORS.errorSurface,
+                  marginTop: SPACE.xxl,
                 }]}>
-                  <Text style={{ color: inviteEmailStatus.type === 'success' ? '#1e5667' : ERROR, fontSize: 12, fontWeight: '700' }}>
+                  <Text style={{ color: inviteEmailStatus.type === 'success' ? THEME_COLORS.primaryContainer : ERROR, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold }}>
                     {inviteEmailStatus.message}
                   </Text>
                 </View>
               )}
-              <View style={[styles.buttonRow, { marginTop: 12 }]}>
+              <View style={[styles.buttonRow, { marginTop: SPACE.xxl }]}>
                 <TextInput
-                  style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                  style={[styles.input, { flex: 1, marginBottom: SPACE.zero }]}
                   value={inviteSmsRecipient}
                   onChangeText={setInviteSmsRecipient}
                   placeholder="+27 phone in E.164…"
-                  placeholderTextColor="#94a3b8"
+                  placeholderTextColor={THEME_COLORS.neutralTextMuted}
                   keyboardType="phone-pad"
                   autoCapitalize="none"
                 />
                 <TouchableOpacity
-                  style={[styles.actionBtn, { marginLeft: 8, paddingHorizontal: 16 }]}
+                  style={[styles.actionBtn, { marginLeft: SPACE.lg, paddingHorizontal: SPACE.s16 }]}
                   onPress={async () => {
                     if (!inviteSmsRecipient || !currentCommunity?.id || currentCommunity.id === 'loading') return;
                     const phone = inviteSmsRecipient.trim();
@@ -890,18 +1078,18 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   disabled={isSendingInviteSms || !inviteSmsRecipient}
                 >
                   {isSendingInviteSms ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color={THEME_COLORS.white} />
                   ) : (
-                    <MessageSquare size={16} color="#fff" />
+                    <MessageSquare size={16} color={THEME_COLORS.white} />
                   )}
                 </TouchableOpacity>
               </View>
               {inviteSmsStatus && (
                 <View style={[styles.statusBanner, {
-                  backgroundColor: inviteSmsStatus.type === 'success' ? '#f0fdf4' : '#fef2f2',
-                  marginTop: 12
+                  backgroundColor: inviteSmsStatus.type === 'success' ? THEME_COLORS.successSurface : THEME_COLORS.errorSurface,
+                  marginTop: SPACE.xxl,
                 }]}>
-                  <Text style={{ color: inviteSmsStatus.type === 'success' ? '#1e5667' : ERROR, fontSize: 12, fontWeight: '700' }}>
+                  <Text style={{ color: inviteSmsStatus.type === 'success' ? THEME_COLORS.primaryContainer : ERROR, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold }}>
                     {inviteSmsStatus.message}
                   </Text>
                 </View>
@@ -922,9 +1110,9 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               disabled={generatingLink}
             >
               {generatingLink ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={THEME_COLORS.white} />
               ) : (
-                <RefreshCw size={16} color="#fff" />
+                <RefreshCw size={16} color={THEME_COLORS.white} />
               )}
               <Text style={styles.actionBtnText}>
                 {activeCommunityLink ? 'Regenerate' : 'Generate Link'}
@@ -936,17 +1124,17 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         {/* Pending invitations sidebar */}
         {Array.isArray(communityInvitations) && communityInvitations.filter((inv: any) => inv.status === 'pending').length > 0 && (
           <View style={[styles.card, { backgroundColor: SECONDARY }]}>
-            <Text style={[styles.cardLabel, { color: 'rgba(255,255,255,0.7)' }]}>
+            <Text style={[styles.cardLabel, { color: THEME_COLORS.whiteOverlay70 }]}>
               PENDING INVITATIONS ({communityInvitations.filter((inv: any) => inv.status === 'pending').length})
             </Text>
             {communityInvitations.filter((inv: any) => inv.status === 'pending').map((inv: any) => (
-              <View key={inv.id} style={[styles.memberRow, { borderBottomColor: 'rgba(255,255,255,0.1)' }]}>
-                <Mail size={16} color="rgba(255,255,255,0.8)" />
-                <Text style={[styles.memberName, { color: '#fff', flex: 1, marginLeft: 8 }]} numberOfLines={1}>
+              <View key={inv.id} style={[styles.memberRow, { borderBottomColor: THEME_COLORS.alias_rgba_255_255_255_0_1 }]}>
+                <Mail size={16} color={THEME_COLORS.whiteOverlay80} />
+                <Text style={[styles.memberName, { color: THEME_COLORS.white, flex: 1, marginLeft: SPACE.lg }]} numberOfLines={1}>
                   {inv.invited_user_id?.slice(0, 20)}...
                 </Text>
-                <View style={[styles.roleBadge, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                  <Text style={[styles.roleBadgeText, { color: '#fff' }]}>{inv.role}</Text>
+                <View style={[styles.roleBadge, { backgroundColor: THEME_COLORS.whiteOverlay20 }]}>
+                  <Text style={[styles.roleBadgeText, { color: THEME_COLORS.white }]}>{inv.role}</Text>
                 </View>
               </View>
             ))}
@@ -989,7 +1177,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       };
 
       return (
-      <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 16, paddingBottom: 40 }}>
+      <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: SPACE.s16, paddingBottom: SPACE.s40 }}>
         <View style={styles.sectionHeader}>
           <TouchableOpacity onPress={() => setMemberSubView('list')} style={styles.backBtn}>
             <ArrowLeft size={20} color={PRIMARY} />
@@ -1002,14 +1190,14 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             source={{ uri: selectedMember.image || `https://picsum.photos/seed/${selectedMember.userId}/200/200` }}
             style={styles.profileImg}
           />
-          <Text style={[styles.sectionTitle, { marginTop: 12 }]}>{selectedMember.name}</Text>
+          <Text style={[styles.sectionTitle, { marginTop: SPACE.xxl }]}>{selectedMember.name}</Text>
           <Text style={styles.memberSub}>{selectedMember.email}</Text>
           <View style={styles.badgeRow}>
             <View style={[styles.roleBadge, { backgroundColor: PRIMARY }]}>
-              <Text style={[styles.roleBadgeText, { color: '#fff' }]}>{selectedMember.role}</Text>
+              <Text style={[styles.roleBadgeText, { color: THEME_COLORS.white }]}>{selectedMember.role}</Text>
             </View>
-            <View style={[styles.roleBadge, { backgroundColor: '#f1f5f9' }]}>
-              <Text style={[styles.roleBadgeText, { color: '#64748b' }]}>{selectedMember.status}</Text>
+            <View style={[styles.roleBadge, { backgroundColor: THEME_COLORS.neutralBgSoft }]}>
+              <Text style={[styles.roleBadgeText, { color: THEME_COLORS.neutralTextSubtle }]}>{selectedMember.status}</Text>
             </View>
           </View>
         </View>
@@ -1020,7 +1208,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             selectedMember.userId !== currentUserProfile?.id &&
             selectedMember.role !== 'ADMIN' && (
               <TouchableOpacity
-                style={[styles.controlBtn, { backgroundColor: selectedMember.role === 'MODERATOR' ? '#f5f3ff' : '#f8fafc' }]}
+                style={[styles.controlBtn, { backgroundColor: selectedMember.role === 'MODERATOR' ? THEME_COLORS.brandPurpleSurface : THEME_COLORS.neutralBg }]}
                 onPress={() =>
                   setPendingRoleChange({
                     userId: selectedMember.userId,
@@ -1030,8 +1218,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   })
                 }
               >
-                <ShieldAlert size={16} color={selectedMember.role === 'MODERATOR' ? SECONDARY : '#64748b'} />
-                <Text style={[styles.controlBtnText, { color: selectedMember.role === 'MODERATOR' ? SECONDARY : '#64748b' }]}>
+                <ShieldAlert size={16} color={selectedMember.role === 'MODERATOR' ? SECONDARY : THEME_COLORS.neutralTextSubtle} />
+                <Text style={[styles.controlBtnText, { color: selectedMember.role === 'MODERATOR' ? SECONDARY : THEME_COLORS.neutralTextSubtle }]}>
                   {selectedMember.role === 'MODERATOR' ? 'Remove Moderator Privileges' : 'Promote to Moderator'}
                 </Text>
               </TouchableOpacity>
@@ -1042,11 +1230,11 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           <Text style={styles.cardLabel}>PROFILE INFORMATION</Text>
           {isLoadingMemberInsights ? (
             <View style={styles.inlineLoader}>
-              <Loader2 size={16} color="#64748b" />
+              <Loader2 size={16} color={THEME_COLORS.neutralTextSubtle} />
               <Text style={styles.memberSub}>Loading profile insights...</Text>
             </View>
           ) : (
-            <View style={{ gap: 8 }}>
+            <View style={{ gap: SPACE.lg }}>
               <View style={styles.infoRow}><Text style={styles.infoLabel}>Email</Text><Text style={styles.infoValue}>{selectedMemberProfile?.email || selectedMember.email || 'Not provided'}</Text></View>
               <View style={styles.infoRow}><Text style={styles.infoLabel}>Phone</Text><Text style={styles.infoValue}>{selectedMemberProfile?.phone || selectedMemberProfile?.mobileNumber || 'Not provided'}</Text></View>
               <View style={styles.infoRow}><Text style={styles.infoLabel}>Address</Text><Text style={styles.infoValue}>{selectedMemberProfile?.address || 'Not provided'}</Text></View>
@@ -1065,8 +1253,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           ) : (
             memberListings.map((item: any) => (
               <View key={item.id} style={styles.activityRow}>
-                <View style={[styles.activityBadge, { backgroundColor: item.type === 'listing' ? '#fef3c7' : '#e0f2fe' }]}>
-                  <Text style={[styles.activityBadgeText, { color: item.type === 'listing' ? '#b45309' : '#075985' }]}>{item.type === 'listing' ? 'LISTING' : 'NOTICE'}</Text>
+                <View style={[styles.activityBadge, { backgroundColor: item.type === 'listing' ? THEME_COLORS.warningSurfaceAlt : THEME_COLORS.infoSurface }]}>
+                  <Text style={[styles.activityBadgeText, { color: item.type === 'listing' ? THEME_COLORS.warningText : THEME_COLORS.info }]}>{item.type === 'listing' ? 'LISTING' : 'NOTICE'}</Text>
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.memberName} numberOfLines={1}>{item.title}</Text>
@@ -1087,8 +1275,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           ) : (
             memberSuggestions.map((item: any) => (
               <View key={item.id} style={styles.activityRow}>
-                <View style={[styles.activityBadge, { backgroundColor: '#f3e8ff' }]}>
-                  <Text style={[styles.activityBadgeText, { color: '#6d28d9' }]}>{item.status?.toUpperCase() || 'PENDING'}</Text>
+                <View style={[styles.activityBadge, { backgroundColor: THEME_COLORS.brandPurpleLight }]}>
+                  <Text style={[styles.activityBadgeText, { color: THEME_COLORS.brandPurpleText }]}>{item.status?.toUpperCase() || 'PENDING'}</Text>
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.memberName} numberOfLines={1}>{item.name}</Text>
@@ -1119,8 +1307,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           ) : (
             selectedMemberRoleHistory.map((log) => (
               <View key={log.id} style={styles.activityRow}>
-                <View style={[styles.activityBadge, { backgroundColor: '#ecfeff' }]}>
-                  <Text style={[styles.activityBadgeText, { color: '#155e75' }]}>{log.action.toUpperCase()}</Text>
+                <View style={[styles.activityBadge, { backgroundColor: THEME_COLORS.infoSurfaceAlt }]}>
+                  <Text style={[styles.activityBadgeText, { color: THEME_COLORS.infoText }]}>{log.action.toUpperCase()}</Text>
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.memberSub}>{log.reason || 'Role update recorded'}</Text>
@@ -1132,15 +1320,15 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         </View>
 
         {selectedMember.userId !== currentUserProfile?.id && selectedMember.role !== 'ADMIN' && (
-          <View style={[styles.card, { borderColor: '#fef2f2', backgroundColor: '#fff5f5' }]}>
+          <View style={[styles.card, { borderColor: THEME_COLORS.errorSurface, backgroundColor: THEME_COLORS.errorSurfaceStrong }]}>
             <View style={styles.dangerHeader}>
               <UserMinus size={20} color={ERROR} />
-              <Text style={[styles.cardLabel, { color: ERROR, marginBottom: 0 }]}>REMOVE MEMBER</Text>
+              <Text style={[styles.cardLabel, { color: ERROR, marginBottom: SPACE.zero }]}>REMOVE MEMBER</Text>
             </View>
             <Text style={styles.memberSub}>Revoke access to this community or permanently delete the member.</Text>
             <View style={styles.buttonRow}>
               <TouchableOpacity
-                style={[styles.dangerBtn, { backgroundColor: '#fef2f2' }]}
+                style={[styles.dangerBtn, { backgroundColor: THEME_COLORS.errorSurface }]}
                 onPress={() => setPendingRemoveMember({ id: selectedMember.userId, name: selectedMember.name || 'Member' })}
               >
                 <Text style={[styles.dangerBtnText, { color: ERROR }]}>Deactivate</Text>
@@ -1149,7 +1337,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 style={[styles.dangerBtn, { backgroundColor: ERROR }]}
                 onPress={() => setPendingDeleteMember({ id: selectedMember.userId, name: selectedMember.name || 'Member' })}
               >
-                <Text style={[styles.dangerBtnText, { color: '#fff' }]}>Delete</Text>
+                <Text style={[styles.dangerBtnText, { color: THEME_COLORS.white }]}>Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1182,12 +1370,12 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       ];
 
       return (
-        <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 12, paddingBottom: 40 }}>
+        <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: SPACE.xxl, paddingBottom: SPACE.s40 }}>
           <Text style={styles.sectionTitle}>Content & Notice Control</Text>
 
           {/* Filter tabs */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 4 }}>
-            <View style={{ flexDirection: 'row', gap: 8, paddingVertical: 4 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: SPACE.sm }}>
+            <View style={{ flexDirection: 'row', gap: SPACE.lg, paddingVertical: SPACE.sm }}>
               {filterTabs.map((tab) => (
                 <TouchableOpacity
                   key={tab.key}
@@ -1206,15 +1394,15 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           {contentFilter === 'businesses' ? (
             businesses.map((biz: any) => (
               <View key={biz.id} style={styles.contentItem}>
-                <View style={[styles.contentIcon, { backgroundColor: '#f5f3ff' }]}>
+                <View style={[styles.contentIcon, { backgroundColor: THEME_COLORS.brandPurpleSurface }]}>
                   <Store size={18} color={SECONDARY} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.contentTitle}>{biz.name}</Text>
                   <Text style={styles.contentSub}>{biz.category} • Live in Marketplace</Text>
                 </View>
-                <View style={[styles.statusChip, { backgroundColor: '#f0fdf4' }]}>
-                  <Text style={[styles.statusChipText, { color: '#1e5667' }] }>
+                <View style={[styles.statusChip, { backgroundColor: THEME_COLORS.successSurface }]}>
+                  <Text style={[styles.statusChipText, { color: THEME_COLORS.primaryContainer }] }>
                     Live
                   </Text>
                 </View>
@@ -1224,11 +1412,11 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             filteredItems.map((notice: any) => (
               <View key={notice.id} style={styles.contentItem}>
                 <View style={[styles.contentIcon, {
-                  backgroundColor: notice.status === 'PendingPublic' ? '#fffbeb'
-                    : notice.type === 'listing' ? '#f5f3ff' : '#f0fdf4'
+                  backgroundColor: notice.status === 'PendingPublic' ? THEME_COLORS.warningSurface
+                    : notice.type === 'listing' ? THEME_COLORS.brandPurpleSurface : THEME_COLORS.successSurface
                 }]}>
                   {notice.status === 'PendingPublic' ? (
-                    <Globe size={18} color="#b45309" />
+                    <Globe size={18} color={THEME_COLORS.warningText} />
                   ) : notice.type === 'listing' ? (
                     <Tag size={18} color={SECONDARY} />
                   ) : (
@@ -1245,7 +1433,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   {notice.status === 'PendingPublic' ? (
                     <>
                       <TouchableOpacity style={styles.iconBtn} onPress={() => handleApprovePublicListing(notice)}>
-                        <CheckCircle2 size={18} color="#fc7127" />
+                        <CheckCircle2 size={18} color={THEME_COLORS.secondaryContainer} />
                       </TouchableOpacity>
                       <TouchableOpacity style={styles.iconBtn} onPress={() => handleRejectPublicListing(notice)}>
                         <XCircle size={18} color={ERROR} />
@@ -1257,7 +1445,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                         style={styles.iconBtn}
                         onPress={() => handleTogglePin(notice)}
                       >
-                        <Pin size={16} color={notice.status === 'Pinned' ? PRIMARY : '#94a3b8'} />
+                        <Pin size={16} color={notice.status === 'Pinned' ? PRIMARY : THEME_COLORS.neutralTextMuted} />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconBtn}
@@ -1274,7 +1462,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
           {filteredItems.length === 0 && contentFilter !== 'businesses' && (
             <View style={styles.emptyState}>
-              <FileText size={32} color="#cbd5e1" />
+              <FileText size={32} color={THEME_COLORS.neutralBorderStrong} />
               <Text style={styles.emptyStateText}>No content to display</Text>
             </View>
           )}
@@ -1300,12 +1488,12 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           <View style={{ flex: 1 }}>
             <Text style={styles.bizName}>{biz.name}</Text>
             <Text style={styles.bizCategory}>{biz.category}</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
-              <View style={{ backgroundColor: '#dcfce7', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
-                <Text style={{ fontSize: 10, color: '#16a34a', fontWeight: '700' }}>Live in Marketplace</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm, marginTop: SPACE.sm }}>
+              <View style={{ backgroundColor: THEME_COLORS.successSurfaceStrong, paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, borderRadius: RADIUS.chip }}>
+                <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.successStrong, fontWeight: FONT_WEIGHT.bold }}>Live in Marketplace</Text>
               </View>
-              <View style={{ backgroundColor: biz.source === 'IMPORT' ? '#f5f3ff' : '#eff6ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
-                <Text style={{ fontSize: 10, color: biz.source === 'IMPORT' ? '#7c3aed' : '#1d4ed8', fontWeight: '700' }}>
+              <View style={{ backgroundColor: biz.source === 'IMPORT' ? THEME_COLORS.brandPurpleSurface : THEME_COLORS.infoSurfaceSoft, paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, borderRadius: RADIUS.chip }}>
+                <Text style={{ fontSize: TYPE_SCALE.sm, color: biz.source === 'IMPORT' ? THEME_COLORS.brandPurple : THEME_COLORS.brandBlueText, fontWeight: FONT_WEIGHT.bold }}>
                   {biz.source === 'IMPORT' ? 'AI Imported' : 'User Business'}
                 </Text>
               </View>
@@ -1326,20 +1514,20 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       );
 
       return (
-        <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 16, paddingBottom: 40 }}>
+        <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: SPACE.s16, paddingBottom: SPACE.s40 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={styles.sectionTitle}>Business Management</Text>
             <TouchableOpacity
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#0d3d47', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, backgroundColor: THEME_COLORS.primary, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.lg, borderRadius: RADIUS.round }}
               onPress={() => setShowImportTool(true)}
               activeOpacity={0.8}
             >
-              <Sparkles size={14} color="#fff" />
-              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>AI Import</Text>
+              <Sparkles size={14} color={THEME_COLORS.white} />
+              <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold }}>AI Import</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={{ flexDirection: 'row', gap: 8 }}>
+          <View style={{ flexDirection: 'row', gap: SPACE.lg }}>
             <TouchableOpacity
               style={[styles.filterTab, bizFilter === 'user' && styles.filterTabActive]}
               onPress={() => setBizFilter('user')}
@@ -1362,7 +1550,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             ? activeBizs.map((biz, idx) => renderBizCard(biz, idx))
             : (
               <View style={styles.emptyState}>
-                <Store size={32} color="#cbd5e1" />
+                <Store size={32} color={THEME_COLORS.neutralBorderStrong} />
                 <Text style={styles.emptyStateText}>
                   {bizFilter === 'user' ? 'No user businesses yet' : 'No imported businesses yet'}
                 </Text>
@@ -1384,11 +1572,11 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       };
 
       return (
-        <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 12, paddingBottom: 40 }}>
+        <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: SPACE.xxl, paddingBottom: SPACE.s40 }}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Category Management</Text>
           </View>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
+          <View style={{ flexDirection: 'row', gap: SPACE.lg }}>
             <TouchableOpacity
               style={[styles.filterTab, styles.filterTabActive]}
               onPress={() => currentCommunity?.id && updateCommunityCategories(currentCommunity.id, BUSINESS_CATEGORIES.map((c) => c.id))}
@@ -1411,15 +1599,15 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 onPress={() => toggleCategory(cat.id)}
                 activeOpacity={0.8}
               >
-                <View style={[styles.categoryIcon, { backgroundColor: enabled ? '#fff' : '#f8fafc' }]}>
-                  <Text style={{ fontSize: 24 }}>{cat.icon}</Text>
+                <View style={[styles.categoryIcon, { backgroundColor: enabled ? THEME_COLORS.white : THEME_COLORS.neutralBg }]}>
+                  <Text style={{ fontSize: TYPE_SCALE.display }}>{cat.icon}</Text>
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.categoryName, enabled && { color: PRIMARY }]}>{cat.label}</Text>
                   <Text style={styles.categoryTypes}>{cat.types.length} types</Text>
                 </View>
                 <View style={[styles.checkCircle, enabled && styles.checkCircleActive]}>
-                  {enabled && <CheckCircle2 size={16} color="#fff" />}
+                  {enabled && <CheckCircle2 size={16} color={THEME_COLORS.white} />}
                 </View>
               </TouchableOpacity>
             );
@@ -1429,7 +1617,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     };
 
     const renderRules = () => (
-      <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 16, paddingBottom: 40 }}>
+      <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: SPACE.s16, paddingBottom: SPACE.s40 }}>
         <Text style={styles.sectionTitle}>Governance & Rules</Text>
 
         <View style={styles.card}>
@@ -1448,29 +1636,29 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           <Text style={styles.cardLabel}>ACCESS CONTROL</Text>
           <View style={styles.ruleRow}>
             <Text style={styles.ruleText}>Allow unverified users to post</Text>
-            <View style={[styles.toggle, { backgroundColor: '#e2e8f0' }]}>
-              <View style={[styles.toggleThumb, { left: 2 }]} />
+            <View style={[styles.toggle, { backgroundColor: THEME_COLORS.neutralBorder }]}>
+              <View style={[styles.toggleThumb, { left: SPACE.xxs }]} />
             </View>
           </View>
           <View style={styles.ruleRow}>
             <Text style={styles.ruleText}>Require business verification</Text>
-            <View style={[styles.toggle, { backgroundColor: '#fc7127' }]}>
-              <View style={[styles.toggleThumb, { right: 2 }]} />
+            <View style={[styles.toggle, { backgroundColor: THEME_COLORS.secondaryContainer }]}>
+              <View style={[styles.toggleThumb, { right: SPACE.xxs }]} />
             </View>
           </View>
         </View>
 
-        <View style={[styles.card, { backgroundColor: '#f0fdf4', borderColor: '#ffddb9' }]}>
-          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
+        <View style={[styles.card, { backgroundColor: THEME_COLORS.successSurface, borderColor: THEME_COLORS.tertiaryFixed }]}>
+          <View style={{ flexDirection: 'row', gap: SPACE.xxl, alignItems: 'flex-start' }}>
             <View style={[styles.categoryIcon, { backgroundColor: PRIMARY }]}>
-              <AlertTriangle size={20} color="#fff" />
+              <AlertTriangle size={20} color={THEME_COLORS.white} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.cardLabel, { color: PRIMARY }]}>AUTO-MODERATION (AI LAYER)</Text>
               <Text style={styles.memberSub}>
                 Configure automated filters for spam, hate speech, and misinformation.
               </Text>
-              <TouchableOpacity style={[styles.actionBtn, { marginTop: 12, alignSelf: 'flex-start' }]}>
+              <TouchableOpacity style={[styles.actionBtn, { marginTop: SPACE.xxl, alignSelf: 'flex-start' }]}>
                 <Text style={styles.actionBtnText}>Configure AI Filters</Text>
               </TouchableOpacity>
             </View>
@@ -1480,13 +1668,123 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     );
 
     const renderLogs = () => (
-      <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: 12, paddingBottom: 40 }}>
-        <Text style={styles.sectionTitle}>Audit & Logs</Text>
+      <ScrollView style={styles.tabContent} contentContainerStyle={{ gap: SPACE.xxl, paddingBottom: SPACE.s40 }}>
+        <Text style={styles.sectionTitle}>Management</Text>
+
+        <View style={styles.logItem}>
+          <View style={[styles.logIcon, { backgroundColor: THEME_COLORS.primaryTintSoft }]}> 
+            <Sparkles size={16} color={PRIMARY} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.logAction}>Community Theme Management</Text>
+            <Text style={styles.logMeta}>
+              Source: {themeSource === 'community' ? 'Community theme' : 'Fallback default'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.actionBtn, { paddingVertical: SPACE.lg, paddingHorizontal: SPACE.xxl }]}
+            onPress={refreshTheme}
+            activeOpacity={0.8}
+            disabled={isThemeLoading}
+          >
+            {isThemeLoading ? <Loader2 size={14} color={THEME_COLORS.white} /> : <RefreshCw size={14} color={THEME_COLORS.white} />}
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.fieldLabel}>Theme Name</Text>
+          <TextInput
+            style={styles.input}
+            value={themeDraft.name}
+            onChangeText={(v) => handleThemeDraftChange('name', v)}
+            placeholder="Community Theme"
+            placeholderTextColor={THEME_COLORS.neutralTextMuted}
+          />
+
+          <View style={styles.fieldRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Primary</Text>
+              <TextInput style={styles.input} value={themeDraft.primaryColor} onChangeText={(v) => handleThemeDraftChange('primaryColor', v)} autoCapitalize="none" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Secondary</Text>
+              <TextInput style={styles.input} value={themeDraft.secondaryColor} onChangeText={(v) => handleThemeDraftChange('secondaryColor', v)} autoCapitalize="none" />
+            </View>
+          </View>
+
+          <View style={styles.fieldRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Background</Text>
+              <TextInput style={styles.input} value={themeDraft.backgroundColor} onChangeText={(v) => handleThemeDraftChange('backgroundColor', v)} autoCapitalize="none" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Surface</Text>
+              <TextInput style={styles.input} value={themeDraft.surfaceColor} onChangeText={(v) => handleThemeDraftChange('surfaceColor', v)} autoCapitalize="none" />
+            </View>
+          </View>
+
+          <View style={styles.fieldRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Text Primary</Text>
+              <TextInput style={styles.input} value={themeDraft.textPrimary} onChangeText={(v) => handleThemeDraftChange('textPrimary', v)} autoCapitalize="none" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Text Secondary</Text>
+              <TextInput style={styles.input} value={themeDraft.textSecondary} onChangeText={(v) => handleThemeDraftChange('textSecondary', v)} autoCapitalize="none" />
+            </View>
+          </View>
+
+          <View style={{ gap: SPACE.xl, marginTop: SPACE.sm }}>
+            <Text style={styles.fieldLabel}>Preview</Text>
+            <View style={{ flexDirection: 'row', gap: SPACE.lg, flexWrap: 'wrap' }}>
+              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.primaryColor || THEME_COLORS.primary }]} />
+              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.secondaryColor || THEME_COLORS.secondary }]} />
+              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.backgroundColor || THEME_COLORS.surface }]} />
+              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.surfaceColor || THEME_COLORS.surfaceContainer }]} />
+              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.textPrimary || THEME_COLORS.neutralTextStrong }]} />
+              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.textSecondary || THEME_COLORS.neutralTextSubtle }]} />
+            </View>
+          </View>
+
+          <View style={styles.fieldRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Border Radius</Text>
+              <TextInput style={styles.input} value={themeDraft.borderRadius} onChangeText={(v) => handleThemeDraftChange('borderRadius', v)} placeholder="16px" placeholderTextColor={THEME_COLORS.neutralTextMuted} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Font Family</Text>
+              <TextInput style={styles.input} value={themeDraft.fontFamily} onChangeText={(v) => handleThemeDraftChange('fontFamily', v)} placeholder="System" placeholderTextColor={THEME_COLORS.neutralTextMuted} />
+            </View>
+          </View>
+
+          <Text style={styles.fieldLabel}>Icon URL (optional)</Text>
+          <TextInput
+            style={styles.input}
+            value={themeDraft.iconUrl}
+            onChangeText={(v) => handleThemeDraftChange('iconUrl', v)}
+            autoCapitalize="none"
+            placeholder="https://..."
+            placeholderTextColor={THEME_COLORS.neutralTextMuted}
+          />
+
+          {themeSaveStatus && (
+            <Text style={{ color: themeSaveStatus.type === 'success' ? THEME_COLORS.successText : ERROR, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.semibold }}>
+              {themeSaveStatus.message}
+            </Text>
+          )}
+
+          <TouchableOpacity style={[styles.actionBtn, { marginTop: SPACE.lg }]} onPress={handleSaveTheme} disabled={isSavingTheme}>
+            {isSavingTheme ? <Loader2 size={16} color={THEME_COLORS.white} /> : <Save size={16} color={THEME_COLORS.white} />}
+            <Text style={styles.actionBtnText}>{isSavingTheme ? 'Saving...' : 'Save Theme'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={[styles.sectionTitle, { fontSize: TYPE_SCALE.h1, marginTop: SPACE.lg }]}>Moderation Activity</Text>
         {logs.length > 0 ? logs.map((log) => {
           const actionColors: Record<string, string> = {
-            approve: '#fc7127', reject: ERROR, delete: ERROR, warn: '#f59e0b', ban: ERROR,
+            approve: THEME_COLORS.secondaryContainer, reject: ERROR, delete: ERROR, warn: THEME_COLORS.warningStrong, ban: ERROR,
           };
-          const color = actionColors[log.action] || '#94a3b8';
+          const color = actionColors[log.action] || THEME_COLORS.neutralTextMuted;
           return (
             <View key={log.id} style={styles.logItem}>
               <View style={[styles.logIcon, { backgroundColor: color + '20' }]}>
@@ -1501,7 +1799,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 </Text>
               </View>
               <View style={styles.timeRow}>
-                <Clock size={10} color="#94a3b8" />
+                <Clock size={10} color={THEME_COLORS.neutralTextMuted} />
                 <Text style={styles.timeText}>
                   {log.timestamp ? new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent'}
                 </Text>
@@ -1510,8 +1808,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           );
         }) : (
           <View style={styles.emptyState}>
-            <History size={32} color="#cbd5e1" />
-            <Text style={styles.emptyStateText}>No audit logs yet</Text>
+            <History size={32} color={THEME_COLORS.neutralBorderStrong} />
+            <Text style={styles.emptyStateText}>No moderation activity yet</Text>
           </View>
         )}
       </ScrollView>
@@ -1646,259 +1944,260 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 export default ModerationCenter;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: THEME_COLORS.white },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    gap: SPACE.xxl,
+    paddingHorizontal: SPACE.s16,
+    paddingVertical: SPACE.xxxl,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: THEME_COLORS.neutralBgSoft,
   },
-  headerTitle: { fontSize: 18, fontWeight: '900', color: PRIMARY },
-  backBtn: { padding: 6 },
-  tabBar: { borderBottomWidth: 1, borderBottomColor: '#f1f5f9', flexGrow: 0, minHeight: 50 },
-  tabBarContent: { paddingHorizontal: 12, paddingVertical: 8, gap: 8, flexDirection: 'row', alignItems: 'center' },
+  headerTitle: { fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
+  backBtn: { padding: SPACE.md },
+  tabBar: { borderBottomWidth: 1, borderBottomColor: THEME_COLORS.neutralBgSoft, flexGrow: 0, minHeight: 50 },
+  tabBarContent: { paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.lg, gap: SPACE.lg, flexDirection: 'row', alignItems: 'center' },
   tabBtn: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: '#f8fafc',
+    borderRadius: RADIUS.tab,
+    backgroundColor: THEME_COLORS.neutralBg,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
   },
   tabBtnActive: { backgroundColor: PRIMARY },
-  tabBtnText: { fontSize: 12, fontWeight: '700', color: '#64748b' },
-  tabBtnTextActive: { color: '#fff' },
-  tabContent: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
+  tabBtnText: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSubtle },
+  tabBtnTextActive: { color: THEME_COLORS.white },
+  tabContent: { flex: 1, paddingHorizontal: SPACE.s16, paddingTop: SPACE.s16 },
 
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  sectionTitle: { fontSize: 20, fontWeight: '900', color: PRIMARY, flex: 1 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.xxl },
+  sectionTitle: { fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.black, color: PRIMARY, flex: 1 },
 
   saveBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: SPACE.md,
     backgroundColor: PRIMARY,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 99,
+    paddingHorizontal: SPACE.xxxl,
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.pill,
   },
-  saveBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  saveBtnText: { color: THEME_COLORS.white, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold },
 
   actionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: SPACE.md,
     backgroundColor: PRIMARY,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 99,
+    paddingHorizontal: SPACE.xxxl,
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.pill,
   },
-  actionBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  actionBtnText: { color: THEME_COLORS.white, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold },
 
-  fieldGroup: { gap: 6 },
+  fieldGroup: { gap: SPACE.md },
   fieldLabel: {
-    fontSize: 10, fontWeight: '900', color: '#94a3b8',
-    textTransform: 'uppercase', letterSpacing: 1,
+    fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted,
+    textTransform: 'uppercase', letterSpacing: LETTER_SPACING.widest,
   },
-  fieldRow: { flexDirection: 'row', gap: 12 },
+  fieldRow: { flexDirection: 'row', gap: SPACE.xxl },
   input: {
-    backgroundColor: '#f8fafc',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: '#0f172a',
+    backgroundColor: THEME_COLORS.neutralBg,
+    borderRadius: RADIUS.xl,
+    paddingHorizontal: SPACE.xxxl,
+    paddingVertical: SPACE.xl,
+    fontSize: TYPE_SCALE.xxl,
+    color: THEME_COLORS.neutralTextStrong,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: THEME_COLORS.neutralBgSoft,
   },
   radiusRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  radiusValue: { fontSize: 14, fontWeight: '700', color: PRIMARY },
-  radiusButtons: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  radiusValue: { fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
+  radiusButtons: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.lg },
   radiusBtn: {
-    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 99,
-    backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#f1f5f9',
+    paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.md, borderRadius: RADIUS.pill,
+    backgroundColor: THEME_COLORS.neutralBg, borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
   },
   radiusBtnActive: { backgroundColor: PRIMARY, borderColor: PRIMARY },
-  radiusBtnText: { fontSize: 12, fontWeight: '700', color: '#64748b' },
-  radiusBtnTextActive: { color: '#fff' },
-  mapContainer: { borderRadius: 20, overflow: 'hidden', height: 280, borderWidth: 1, borderColor: '#e2e8f0' },
+  radiusBtnText: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSubtle },
+  radiusBtnTextActive: { color: THEME_COLORS.white },
+  mapContainer: { borderRadius: RADIUS.round, overflow: 'hidden', height: 280, borderWidth: 1, borderColor: THEME_COLORS.neutralBorder },
   map: { width: '100%', height: '100%' },
   infoBanner: {
-    flexDirection: 'row', backgroundColor: '#f0fdf4',
-    borderRadius: 20, padding: 16, borderWidth: 1, borderColor: '#ffddb9', alignItems: 'center', justifyContent: 'space-between',
+    flexDirection: 'row', backgroundColor: THEME_COLORS.successSurface,
+    borderRadius: RADIUS.round, padding: SPACE.s16, borderWidth: 1, borderColor: THEME_COLORS.tertiaryFixed, alignItems: 'center', justifyContent: 'space-between',
   },
-  infoBannerTitle: { fontSize: 14, fontWeight: '700', color: PRIMARY },
-  infoBannerDesc: { fontSize: 12, color: '#475569', lineHeight: 18, flex: 1 },
+  infoBannerTitle: { fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
+  infoBannerDesc: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextDefault, lineHeight: LINE_HEIGHT.compact, flex: 1 },
 
   card: {
-    backgroundColor: '#fff', borderRadius: 16, padding: 16, gap: 12,
-    borderWidth: 1, borderColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, padding: SPACE.s16, gap: SPACE.xxl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, 1, 0.04, 4, 1),
   },
   cardLabel: {
-    fontSize: 9, fontWeight: '900', color: '#94a3b8',
-    textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4,
+    fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted,
+    textTransform: 'uppercase', letterSpacing: LETTER_SPACING.hero, marginBottom: SPACE.sm,
   },
   memberRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f8fafc',
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.xl,
+    paddingVertical: SPACE.lg, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.neutralBg,
   },
   memberAvatar: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: '#f1f5f9',
+    width: 40, height: 40, borderRadius: RADIUS.round, backgroundColor: THEME_COLORS.neutralBgSoft,
     alignItems: 'center', justifyContent: 'center',
   },
-  memberImg: { width: 40, height: 40, borderRadius: 20 },
-  memberName: { fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  memberSub: { fontSize: 11, color: '#64748b', marginTop: 1 },
-  memberStatusRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 },
-  statusDot: { width: 6, height: 6, borderRadius: 3 },
+  memberImg: { width: 40, height: 40, borderRadius: RADIUS.round },
+  memberName: { fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  memberSub: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxxs },
+  memberStatusRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, marginTop: SPACE.xxs },
+  statusDot: { width: 6, height: 6, borderRadius: RADIUS.sm },
   roleBadge: {
-    paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99,
+    paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill,
   },
-  roleBadgeText: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 },
-  iconBtn: { padding: 6 },
+  roleBadgeText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },
+  iconBtn: { padding: SPACE.md },
 
-  searchRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  searchRow: { flexDirection: 'row', gap: SPACE.lg, alignItems: 'center' },
   searchBtn: {
-    backgroundColor: PRIMARY, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10,
+    backgroundColor: PRIMARY, borderRadius: RADIUS.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.xl,
   },
-  searchBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+  searchBtnText: { color: THEME_COLORS.white, fontWeight: FONT_WEIGHT.bold, fontSize: TYPE_SCALE.xl },
   linkRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#f8fafc', borderRadius: 10, padding: 10,
-    borderWidth: 1, borderColor: '#f1f5f9',
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.lg,
+    backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.lg, padding: SPACE.xl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
   },
-  linkText: { flex: 1, fontSize: 11, fontFamily: 'monospace', color: '#334155' },
-  statusBanner: { padding: 10, borderRadius: 10 },
-  buttonRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
+  linkText: { flex: 1, fontSize: TYPE_SCALE.md, fontFamily: 'monospace', color: THEME_COLORS.neutralTextHeading },
+  statusBanner: { padding: SPACE.xl, borderRadius: RADIUS.lg },
+  buttonRow: { flexDirection: 'row', gap: SPACE.xl, marginTop: SPACE.sm },
 
-  profileImg: { width: 80, height: 80, borderRadius: 40, marginTop: 8 },
-  badgeRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  profileImg: { width: 80, height: 80, borderRadius: RADIUS.circle, marginTop: SPACE.lg },
+  badgeRow: { flexDirection: 'row', gap: SPACE.lg, marginTop: SPACE.lg },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  inlineLoader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  infoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
-  infoLabel: { fontSize: 11, color: '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-  infoValue: { flex: 1, textAlign: 'right', fontSize: 13, color: '#0f172a', fontWeight: '600' },
+  inlineLoader: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
+  infoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.xl },
+  previewSwatch: { width: 28, height: 28, borderRadius: RADIUS.md, borderWidth: 1, borderColor: THEME_COLORS.neutralBorderStrong },
+  infoLabel: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, fontWeight: FONT_WEIGHT.bold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },
+  infoValue: { flex: 1, textAlign: 'right', fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextStrong, fontWeight: FONT_WEIGHT.semibold },
   activityRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f8fafc',
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.xl,
+    paddingVertical: SPACE.lg, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.neutralBg,
   },
-  activityBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99 },
-  activityBadgeText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.4 },
-  insightGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  activityBadge: { paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill },
+  activityBadgeText: { fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, letterSpacing: LETTER_SPACING.tight },
+  insightGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.xl },
   insightItem: {
-    width: '48%', backgroundColor: '#f8fafc', borderRadius: 12,
-    paddingVertical: 10, paddingHorizontal: 12, borderWidth: 1, borderColor: '#f1f5f9',
+    width: '48%', backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.xl,
+    paddingVertical: SPACE.xl, paddingHorizontal: SPACE.xxl, borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
   },
-  insightValue: { fontSize: 18, fontWeight: '900', color: PRIMARY },
-  insightLabel: { fontSize: 10, fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginTop: 2 },
+  insightValue: { fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
+  insightLabel: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', marginTop: SPACE.xxs },
 
   controlBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    padding: 12, borderRadius: 12,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.lg,
+    padding: SPACE.xxl, borderRadius: RADIUS.xl,
   },
-  controlBtnText: { fontSize: 13, fontWeight: '700', flex: 1 },
-  dangerHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  controlBtnText: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, flex: 1 },
+  dangerHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
   dangerBtn: {
-    flex: 1, paddingVertical: 10, borderRadius: 99,
+    flex: 1, paddingVertical: SPACE.xl, borderRadius: RADIUS.pill,
     alignItems: 'center', justifyContent: 'center',
   },
-  dangerBtnText: { fontSize: 13, fontWeight: '700' },
+  dangerBtnText: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold },
 
   filterTab: {
-    paddingHorizontal: 14, paddingVertical: 6, borderRadius: 99,
-    backgroundColor: '#f8fafc',
+    paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: RADIUS.pill,
+    backgroundColor: THEME_COLORS.neutralBg,
   },
   filterTabActive: { backgroundColor: PRIMARY },
-  filterTabText: { fontSize: 12, fontWeight: '700', color: '#64748b' },
-  filterTabTextActive: { color: '#fff' },
+  filterTabText: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSubtle },
+  filterTabTextActive: { color: THEME_COLORS.white },
 
   contentItem: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: '#fff', borderRadius: 14, padding: 12,
-    borderWidth: 1, borderColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 4, elevation: 1,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.xl,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xxl, padding: SPACE.xxl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, 1, 0.03, 4, 1),
   },
-  contentIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  contentTitle: { fontSize: 13, fontWeight: '700', color: '#0f172a' },
-  contentSub: { fontSize: 11, color: '#64748b', marginTop: 2 },
-  contentActions: { flexDirection: 'row', gap: 2 },
-  statusChip: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99 },
-  statusChipText: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 },
+  contentIcon: { width: 40, height: 40, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
+  contentTitle: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  contentSub: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs },
+  contentActions: { flexDirection: 'row', gap: SPACE.xxs },
+  statusChip: { paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill },
+  statusChipText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },
 
   bizCard: {
-    flexDirection: 'row', gap: 12, backgroundColor: '#fff', borderRadius: 20, padding: 14,
-    borderWidth: 1, borderColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2,
+    flexDirection: 'row', gap: SPACE.xxl, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.round, padding: SPACE.xxxl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, 2, 0.04, 8, 2),
   },
-  bizImg: { width: 64, height: 64, borderRadius: 14 },
-  bizName: { fontSize: 16, fontWeight: '700', color: PRIMARY },
-  bizCategory: { fontSize: 11, color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 },
-  bizStatus: { fontSize: 12, fontWeight: '600', marginTop: 2 },
-  bizActions: { gap: 6, justifyContent: 'center' },
+  bizImg: { width: 64, height: 64, borderRadius: RADIUS.xxl },
+  bizName: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
+  bizCategory: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextMuted, fontWeight: FONT_WEIGHT.bold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal, marginTop: SPACE.xxs },
+  bizStatus: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.semibold, marginTop: SPACE.xxs },
+  bizActions: { gap: SPACE.md, justifyContent: 'center' },
   approveBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#fc7127', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    backgroundColor: THEME_COLORS.secondaryContainer, borderRadius: RADIUS.lg, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.md,
   },
-  approveBtnText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  approveBtnText: { color: THEME_COLORS.white, fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold },
   featureBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#f1f5f9', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    backgroundColor: THEME_COLORS.neutralBgSoft, borderRadius: RADIUS.lg, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.md,
   },
-  featureBtnActive: { backgroundColor: '#f59e0b' },
-  featureBtnText: { color: '#94a3b8', fontSize: 11, fontWeight: '700' },
+  featureBtnActive: { backgroundColor: THEME_COLORS.warningStrong },
+  featureBtnText: { color: THEME_COLORS.neutralTextMuted, fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold },
   removeBtn: {
-    backgroundColor: '#fef2f2', borderRadius: 10, padding: 7,
+    backgroundColor: THEME_COLORS.errorSurface, borderRadius: RADIUS.lg, padding: SPACE.sm,
     alignItems: 'center', justifyContent: 'center',
   },
 
   categoryItem: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
-    backgroundColor: '#fff', borderRadius: 20, padding: 14,
-    borderWidth: 2, borderColor: '#f1f5f9', opacity: 0.7,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.xxxl,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.round, padding: SPACE.xxxl,
+    borderWidth: 2, borderColor: THEME_COLORS.neutralBgSoft, opacity: 0.7,
   },
-  categoryItemActive: { backgroundColor: '#f0fdf4', borderColor: PRIMARY, opacity: 1 },
-  categoryIcon: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  categoryName: { fontSize: 15, fontWeight: '700', color: '#0f172a' },
-  categoryTypes: { fontSize: 10, color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 },
+  categoryItemActive: { backgroundColor: THEME_COLORS.successSurface, borderColor: PRIMARY, opacity: 1 },
+  categoryIcon: { width: 48, height: 48, borderRadius: RADIUS.card, alignItems: 'center', justifyContent: 'center' },
+  categoryName: { fontSize: TYPE_SCALE.h3, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  categoryTypes: { fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextMuted, fontWeight: FONT_WEIGHT.bold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide, marginTop: SPACE.xxs },
   checkCircle: {
-    width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#e2e8f0',
+    width: 24, height: 24, borderRadius: RADIUS.xl, borderWidth: 2, borderColor: THEME_COLORS.neutralBorder,
     alignItems: 'center', justifyContent: 'center',
   },
   checkCircleActive: { backgroundColor: PRIMARY, borderColor: PRIMARY },
 
   ruleRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f8fafc',
+    paddingVertical: SPACE.xl, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.neutralBg,
   },
-  ruleText: { fontSize: 14, color: '#334155', fontWeight: '500', flex: 1 },
+  ruleText: { fontSize: TYPE_SCALE.xxl, color: THEME_COLORS.neutralTextHeading, fontWeight: FONT_WEIGHT.medium, flex: 1 },
   ruleInput: {
-    width: 56, backgroundColor: '#fff', borderRadius: 8, textAlign: 'center',
-    fontSize: 14, fontWeight: '700', color: PRIMARY,
-    borderWidth: 1, borderColor: '#f1f5f9', paddingVertical: 6,
+    width: 56, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.md, textAlign: 'center',
+    fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft, paddingVertical: SPACE.md,
   },
-  toggle: { width: 40, height: 20, borderRadius: 10, position: 'relative', justifyContent: 'center' },
+  toggle: { width: 40, height: 20, borderRadius: RADIUS.lg, position: 'relative', justifyContent: 'center' },
   toggleThumb: {
-    position: 'absolute', width: 14, height: 14, borderRadius: 7, backgroundColor: '#fff',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 2, elevation: 2,
+    position: 'absolute', width: SPACE.xxxl, height: SPACE.xxxl, borderRadius: RADIUS.dot, backgroundColor: THEME_COLORS.white,
+    ...createShadow(THEME_COLORS.black, 0, 1, 0.15, 2, 2),
   },
 
   logItem: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#fff', borderRadius: 14, padding: 12,
-    borderWidth: 1, borderColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 4, elevation: 1,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xxl, padding: SPACE.xxl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, 1, 0.03, 4, 1),
   },
-  logIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  logAction: { fontSize: 13, fontWeight: '700', color: '#0f172a' },
-  logMeta: { fontSize: 10, color: '#64748b', marginTop: 2 },
-  timeRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  timeText: { fontSize: 9, fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.8 },
+  logIcon: { width: 40, height: 40, borderRadius: RADIUS.round, alignItems: 'center', justifyContent: 'center' },
+  logAction: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  logMeta: { fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs },
+  timeRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
+  timeText: { fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextMuted, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide },
 
-  emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 40, gap: 10 },
-  emptyStateText: { fontSize: 14, color: '#94a3b8', fontStyle: 'italic' },
+  emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: SPACE.s40, gap: SPACE.xl },
+  emptyStateText: { fontSize: TYPE_SCALE.xxl, color: THEME_COLORS.neutralTextMuted, fontStyle: 'italic' },
 });

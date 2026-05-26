@@ -253,6 +253,24 @@ exports.Prisma.CommunityScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ThemeScalarFieldEnum = {
+  id: 'id',
+  communityId: 'communityId',
+  name: 'name',
+  primaryColor: 'primaryColor',
+  secondaryColor: 'secondaryColor',
+  backgroundColor: 'backgroundColor',
+  surfaceColor: 'surfaceColor',
+  textPrimary: 'textPrimary',
+  textSecondary: 'textSecondary',
+  borderRadius: 'borderRadius',
+  fontFamily: 'fontFamily',
+  iconUrl: 'iconUrl',
+  isDefault: 'isDefault',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.CommunityMemberScalarFieldEnum = {
   communityId: 'communityId',
   userId: 'userId',
@@ -583,6 +601,7 @@ exports.Prisma.ModelName = {
   UserSession: 'UserSession',
   AuditLog: 'AuditLog',
   Community: 'Community',
+  Theme: 'Theme',
   CommunityMember: 'CommunityMember',
   MemberLocation: 'MemberLocation',
   SecurityLocation: 'SecurityLocation',

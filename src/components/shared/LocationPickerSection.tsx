@@ -6,6 +6,42 @@ import MapView, { MapPressEvent, Marker, Region } from 'react-native-maps';
 import { MapPin } from 'lucide-react-native';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
 import { GOOGLE_PLACES_API_KEY } from '../../constants';
+import { THEME_COLORS } from '../../theme/colors';
+import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
+import { createShadow } from '../../theme/shadows';
+
+const TYPE_SCALE = {
+  xs: 11,
+  sm: 12,
+  md: 14,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  xs: 6,
+  sm: 8,
+  md: 10,
+  lg: 12,
+  xl: 14,
+  xxl: 16,
+  sectionGap: 16,
+  mapHeight: 240,
+  placesTop: 50,
+};
+const RADIUS = {
+  md: 12,
+  lg: 14,
+};
+const LETTER_SPACING = {
+  wide: 1,
+};
 
 export type LocationSource = 'places' | 'current_location' | 'map' | 'manual';
 
@@ -24,22 +60,22 @@ interface LocationPickerSectionProps {
 
 const inputStyle = {
   borderWidth: 1,
-  borderColor: 'rgba(0,0,0,0.08)',
-  borderRadius: 14,
-  paddingHorizontal: 14,
-  paddingVertical: 12,
-  backgroundColor: '#ffffff',
-  fontSize: 14,
-  color: '#1a1a1a',
+  borderColor: THEME_COLORS.overlayBorder,
+  borderRadius: RADIUS.lg,
+  paddingHorizontal: SPACE.xl,
+  paddingVertical: SPACE.lg,
+  backgroundColor: THEME_COLORS.white,
+  fontSize: TYPE_SCALE.md,
+  color: THEME_COLORS.onSurface,
 } as const;
 
 const labelStyle = {
-  fontSize: 11,
-  fontWeight: '700' as const,
-  color: '#4b5563',
+  fontSize: TYPE_SCALE.xs,
+  fontWeight: FONT_WEIGHT.bold,
+  color: THEME_COLORS.neutralTextDefault,
   textTransform: 'uppercase' as const,
-  letterSpacing: 1,
-  marginBottom: 8,
+  letterSpacing: LETTER_SPACING.wide,
+  marginBottom: SPACE.sm,
 } as const;
 
 const reverseGeocodeName = async (lat: number, lng: number): Promise<string> => {
@@ -140,20 +176,26 @@ const LocationPickerSection: React.FC<LocationPickerSectionProps> = ({
     value.longitude !== undefined && Number.isFinite(value.longitude) && value.longitude !== 0;
 
   return (
-    <View style={{ gap: 16 }}>
+    <View style={{ gap: SPACE.sectionGap }}>
       <View>
         <Text style={labelStyle}>Address</Text>
         <TextInput
           value={value.address}
           onChangeText={(text) => onChange({ ...value, address: text }, 'manual')}
           placeholder="Street address or area name"
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={THEME_COLORS.neutralTextSoft}
           style={inputStyle}
         />
       </View>
 
       {showSearch && (
-        <View style={{ gap: 10, zIndex: 9999, elevation: 999 }}>
+        <View
+          style={{
+            gap: SPACE.md,
+            zIndex: LAYER_Z_INDEX.placesOverlay,
+            elevation: LAYER_ELEVATION.placesOverlay,
+          }}
+        >
           <Text style={labelStyle}>Search Address</Text>
           <GooglePlacesAutocomplete
             placeholder="Search with Google"
@@ -168,36 +210,33 @@ const LocationPickerSection: React.FC<LocationPickerSectionProps> = ({
             }}
             query={{ key: GOOGLE_PLACES_API_KEY, language: 'en' }}
             textInputProps={{
-              placeholderTextColor: '#9ca3af',
+              placeholderTextColor: THEME_COLORS.neutralTextSoft,
               returnKeyType: 'search',
             }}
             styles={{
               container: { flex: 1 },
               textInput: {
-                backgroundColor: '#ffffff',
-                borderRadius: 14,
+                backgroundColor: THEME_COLORS.white,
+                borderRadius: RADIUS.lg,
                 borderWidth: 1,
-                borderColor: 'rgba(0,0,0,0.08)',
-                paddingHorizontal: 14,
-                paddingVertical: 12,
-                fontSize: 14,
-                color: '#1a1a1a',
-                marginBottom: 0,
+                borderColor: THEME_COLORS.overlayBorder,
+                paddingHorizontal: SPACE.xl,
+                paddingVertical: SPACE.lg,
+                fontSize: TYPE_SCALE.md,
+                color: THEME_COLORS.onSurface,
+                marginBottom: SPACE.zero,
               },
               listView: {
                 position: 'absolute',
-                top: 50,
+                top: SPACE.placesTop,
                 width: '100%',
-                backgroundColor: '#fff',
-                borderRadius: 12,
-                elevation: 5,
-                shadowColor: '#000',
-                shadowOpacity: 0.1,
-                shadowRadius: 5,
+                backgroundColor: THEME_COLORS.white,
+                borderRadius: RADIUS.md,
+                ...createShadow(THEME_COLORS.black, 0, 0, 0.1, 5, 5),
                 zIndex: 9999,
               },
-              row: { paddingVertical: 12, paddingHorizontal: 16 },
-              description: { fontSize: 14, color: '#374151' },
+              row: { paddingVertical: SPACE.lg, paddingHorizontal: SPACE.xxl },
+              description: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextEmphasis },
             }}
             enablePoweredByContainer={false}
             keyboardShouldPersistTaps="handled"
@@ -205,24 +244,24 @@ const LocationPickerSection: React.FC<LocationPickerSectionProps> = ({
         </View>
       )}
 
-      <View style={{ gap: 10 }}>
+      <View style={{ gap: SPACE.md }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text style={labelStyle}>Location Coordinates</Text>
           <TouchableOpacity
             onPress={handleUseCurrentLocation}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xs }}
           >
-            <MapPin size={14} color="#0d3d47" />
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#0d3d47' }}>Use current location</Text>
+            <MapPin size={14} color={THEME_COLORS.primary} />
+            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary }}>Use current location</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flexDirection: 'row', gap: SPACE.md }}>
           <TextInput
             value={latText}
             onChangeText={handleLatitudeChange}
             keyboardType="numeric"
             placeholder="Latitude"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={THEME_COLORS.neutralTextSoft}
             style={[inputStyle, { flex: 1 }]}
           />
           <TextInput
@@ -230,15 +269,15 @@ const LocationPickerSection: React.FC<LocationPickerSectionProps> = ({
             onChangeText={handleLongitudeChange}
             keyboardType="numeric"
             placeholder="Longitude"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={THEME_COLORS.neutralTextSoft}
             style={[inputStyle, { flex: 1 }]}
           />
         </View>
       </View>
 
-      <View style={{ gap: 8 }}>
+      <View style={{ gap: SPACE.sm }}>
         <Text style={labelStyle}>Refine With Pin</Text>
-        <View style={{ height: 240, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
+        <View style={{ height: SPACE.mapHeight, borderRadius: RADIUS.lg, overflow: 'hidden', borderWidth: 1, borderColor: THEME_COLORS.overlayBorder }}>
           <MapView
             {...defaultMapViewProps}
             style={{ flex: 1 }}
@@ -257,7 +296,7 @@ const LocationPickerSection: React.FC<LocationPickerSectionProps> = ({
             )}
           </MapView>
         </View>
-        <Text style={{ fontSize: 11, color: '#6b7280' }}>{hint}</Text>
+        <Text style={{ fontSize: TYPE_SCALE.xs, color: THEME_COLORS.neutralTextSubtle }}>{hint}</Text>
       </View>
     </View>
   );

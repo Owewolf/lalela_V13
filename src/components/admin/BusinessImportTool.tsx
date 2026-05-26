@@ -27,11 +27,59 @@ import { BUSINESS_CATEGORIES as CATEGORIES } from '../../constants';
 import { Business } from '../../types';
 import { cn } from '../../lib/utils';
 import api from '../../lib/api';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
-const SECONDARY = '#fc7127';
-const SURFACE = '#fff8f0';
-const SURFACE_LOW = '#f4f3f1';
+const PRIMARY = THEME_COLORS.primary;
+const SECONDARY = THEME_COLORS.secondaryContainer;
+const SURFACE = THEME_COLORS.surface;
+const SURFACE_LOW = THEME_COLORS.surfaceContainerLow;
+const TYPE_SCALE = {
+  sm: 9,
+  md: 10,
+  base: 11,
+  body: 12,
+  lg: 13,
+  xl: 14,
+  xxl: 15,
+  title: 16,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  xxs: 2,
+  xs: 4,
+  s5: 5,
+  sm: 6,
+  md: 8,
+  lg: 10,
+  xl: 12,
+  xxl: 14,
+  s11: 11,
+  s16: 16,
+  s24: 24,
+  s40: 40,
+  s46: 46,
+  s72: 72,
+  s140: 140,
+  s100: 100,
+};
+const RADIUS = {
+  sm: 6,
+  md: 12,
+  lg: 14,
+  xl: 16,
+  pill: 20,
+  capsule: 24,
+  full: 100,
+};
 
 interface BusinessImportToolProps {
   onBack: () => void;
@@ -177,21 +225,21 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
         )}
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 100 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: SPACE.s16, gap: SPACE.s16, paddingBottom: SPACE.s100 }}>
 
         {/* Category search */}
         <View style={styles.searchRow}>
-          <Search size={16} color="#737971" />
+          <Search size={16} color={THEME_COLORS.outline} />
           <TextInput
             style={styles.searchInput}
             placeholder="Filter categories..."
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={THEME_COLORS.neutralTextSoft}
             value={categorySearch}
             onChangeText={setCategorySearch}
           />
           {categorySearch ? (
             <TouchableOpacity onPress={() => setCategorySearch('')}>
-              <X size={16} color="#737971" />
+              <X size={16} color={THEME_COLORS.outline} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -209,7 +257,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
                   activeOpacity={0.7}
                 >
                   <Text style={styles.chipText}>{cat ? `${cat.icon} ${cat.label}` : id}</Text>
-                  <X size={10} color="#fff" />
+                  <X size={10} color={THEME_COLORS.white} />
                 </TouchableOpacity>
               );
             })}
@@ -242,7 +290,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
           <TextInput
             style={styles.customInput}
             placeholder="Add custom place type (e.g. 'park')..."
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={THEME_COLORS.neutralTextSoft}
             value={customCategory}
             onChangeText={setCustomCategory}
             onSubmitEditing={addCustomCategory}
@@ -254,7 +302,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
             disabled={!customCategory.trim()}
             activeOpacity={0.8}
           >
-            <Plus size={18} color="#fff" />
+            <Plus size={18} color={THEME_COLORS.white} />
           </TouchableOpacity>
         </View>
 
@@ -266,9 +314,9 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
           activeOpacity={0.85}
         >
           {isSearching ? (
-            <ActivityIndicator color="#fff" size="small" />
+            <ActivityIndicator color={THEME_COLORS.white} size="small" />
           ) : (
-            <Sparkles size={20} color="#fff" />
+            <Sparkles size={20} color={THEME_COLORS.white} />
           )}
           <Text style={styles.scanBtnText}>
             {isSearching ? 'Scanning...' : 'Scan & Discover Businesses'}
@@ -277,14 +325,14 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
 
         {error && (
           <View style={styles.errorBox}>
-            <AlertCircle size={14} color="#ba1a1a" />
+            <AlertCircle size={14} color={THEME_COLORS.error} />
             <Text style={styles.errorText}>{error}</Text>
           </View>
         )}
 
         {/* Results */}
         {results.length > 0 && (
-          <View style={{ gap: 12 }}>
+          <View style={{ gap: SPACE.xl }}>
             <Text style={styles.sectionTitle}>
               Select Businesses to Import ({selectedIds.size} selected)
             </Text>
@@ -305,16 +353,16 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
                     />
                     {selected && (
                       <View style={styles.bizImgOverlay}>
-                        <CheckCircle2 size={28} color="#fff" />
+                        <CheckCircle2 size={28} color={THEME_COLORS.white} />
                       </View>
                     )}
                   </View>
-                  <View style={{ flex: 1, gap: 2 }}>
+                  <View style={{ flex: 1, gap: SPACE.xxs }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <Text style={styles.bizName} numberOfLines={1}>{biz.name}</Text>
                       {biz.rating ? (
                         <View style={styles.ratingBadge}>
-                          <Star size={10} color="#b45309" fill="#b45309" />
+                          <Star size={10} color={THEME_COLORS.warningText} fill={THEME_COLORS.warningText} />
                           <Text style={styles.ratingText}>{biz.rating}</Text>
                         </View>
                       ) : null}
@@ -330,7 +378,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
 
         {results.length === 0 && !isSearching && (
           <View style={styles.emptyState}>
-            <Globe size={40} color="#c2c8bf" />
+            <Globe size={40} color={THEME_COLORS.outlineVariant} />
             <Text style={styles.emptyTitle}>No scan results</Text>
             <Text style={styles.emptyBody}>Select categories and scan your coverage area.</Text>
           </View>
@@ -347,9 +395,9 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
             activeOpacity={0.85}
           >
             {isImporting ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={THEME_COLORS.white} size="small" />
             ) : (
-              <Plus size={20} color="#fff" />
+              <Plus size={20} color={THEME_COLORS.white} />
             )}
             <Text style={styles.fabText}>
               Import {selectedIds.size} into "{currentCommunity?.name}"
@@ -365,84 +413,84 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 12,
-    backgroundColor: '#fff',
+    padding: SPACE.s16,
+    gap: SPACE.xl,
+    backgroundColor: THEME_COLORS.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: THEME_COLORS.neutralBorderSoft,
   },
-  backBtn: { padding: 8, borderRadius: 20, backgroundColor: '#f4f3f1' },
-  headerTitle: { fontSize: 16, fontWeight: '700', color: PRIMARY },
-  headerSub: { fontSize: 11, color: '#737971' },
+  backBtn: { padding: SPACE.md, borderRadius: RADIUS.pill, backgroundColor: THEME_COLORS.surfaceContainerLow },
+  headerTitle: { fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
+  headerSub: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.outline },
   coveragePill: {
-    backgroundColor: '#fff8f0',
+    backgroundColor: THEME_COLORS.surface,
     borderWidth: 1,
-    borderColor: '#ffddb9',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    maxWidth: 140,
+    borderColor: THEME_COLORS.tertiaryFixed,
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.xs,
+    borderRadius: RADIUS.pill,
+    maxWidth: SPACE.s140,
   },
-  coverageText: { fontSize: 10, fontWeight: '700', color: PRIMARY },
+  coverageText: { fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 8,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.lg,
+    gap: SPACE.md,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: THEME_COLORS.neutralBorderSoft,
   },
-  searchInput: { flex: 1, fontSize: 13, color: '#1a1c1a', padding: 0 },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' },
+  searchInput: { flex: 1, fontSize: TYPE_SCALE.lg, color: THEME_COLORS.onSurface, padding: SPACE.zero },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.md, alignItems: 'center' },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: SPACE.xs,
     backgroundColor: PRIMARY,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.s5,
+    borderRadius: RADIUS.pill,
   },
-  chipText: { color: '#fff', fontSize: 11, fontWeight: '700' },
-  clearAll: { color: '#737971', fontSize: 11, fontWeight: '700', marginLeft: 4 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chipText: { color: THEME_COLORS.white, fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.bold },
+  clearAll: { color: THEME_COLORS.outline, fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.bold, marginLeft: SPACE.xs },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.md },
   catBtn: {
     width: '30%',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 16,
+    paddingVertical: SPACE.xl,
+    paddingHorizontal: SPACE.md,
+    borderRadius: RADIUS.xl,
     backgroundColor: SURFACE_LOW,
     alignItems: 'center',
-    gap: 4,
+    gap: SPACE.xs,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: THEME_COLORS.neutralBorderSoft,
   },
   catBtnActive: {
     backgroundColor: PRIMARY,
     borderColor: PRIMARY,
   },
-  catIcon: { fontSize: 20 },
-  catLabel: { fontSize: 9, fontWeight: '700', color: '#737971', textAlign: 'center', textTransform: 'uppercase' },
-  catLabelActive: { color: '#fff' },
-  customRow: { flexDirection: 'row', gap: 8 },
+  catIcon: { fontSize: RADIUS.pill },
+  catLabel: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.outline, textAlign: 'center', textTransform: 'uppercase' },
+  catLabelActive: { color: THEME_COLORS.white },
+  customRow: { flexDirection: 'row', gap: SPACE.md },
   customInput: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    fontSize: 13,
-    color: '#1a1c1a',
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACE.xxl,
+    paddingVertical: SPACE.s11,
+    fontSize: TYPE_SCALE.lg,
+    color: THEME_COLORS.onSurface,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: THEME_COLORS.neutralBorderSoft,
   },
   addBtn: {
-    width: 46,
-    height: 46,
-    borderRadius: 12,
+    width: SPACE.s46,
+    height: SPACE.s46,
+    borderRadius: RADIUS.md,
     backgroundColor: SECONDARY,
     alignItems: 'center',
     justifyContent: 'center',
@@ -451,78 +499,74 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: SPACE.lg,
     backgroundColor: PRIMARY,
-    paddingVertical: 16,
-    borderRadius: 24,
-    marginTop: 4,
+    paddingVertical: SPACE.s16,
+    borderRadius: RADIUS.capsule,
+    marginTop: SPACE.xs,
   },
-  scanBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  scanBtnText: { color: THEME_COLORS.white, fontWeight: FONT_WEIGHT.bold, fontSize: TYPE_SCALE.xxl },
   errorBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#fff5f5',
+    gap: SPACE.md,
+    backgroundColor: THEME_COLORS.errorSurfaceStrong,
     borderWidth: 1,
-    borderColor: '#fecaca',
-    borderRadius: 12,
-    padding: 12,
+    borderColor: THEME_COLORS.errorBorder,
+    borderRadius: RADIUS.md,
+    padding: SPACE.xl,
   },
-  errorText: { color: '#ba1a1a', fontSize: 12, fontWeight: '600', flex: 1 },
-  sectionTitle: { fontSize: 15, fontWeight: '700', color: PRIMARY },
+  errorText: { color: THEME_COLORS.error, fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.semibold, flex: 1 },
+  sectionTitle: { fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
   bizCard: {
     flexDirection: 'row',
-    gap: 12,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 12,
+    gap: SPACE.xl,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.pill,
+    padding: SPACE.xl,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: THEME_COLORS.neutralBorderSoft,
   },
   bizCardActive: { borderColor: PRIMARY, borderWidth: 2 },
-  bizImgWrap: { width: 72, height: 72, borderRadius: 14, overflow: 'hidden', backgroundColor: SURFACE_LOW },
+  bizImgWrap: { width: SPACE.s72, height: SPACE.s72, borderRadius: RADIUS.lg, overflow: 'hidden', backgroundColor: SURFACE_LOW },
   bizImg: { width: '100%', height: '100%' },
   bizImgOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(13,61,71,0.5)',
+    backgroundColor: THEME_COLORS.alias_rgba_13_61_71_0_5,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bizName: { fontSize: 13, fontWeight: '700', color: PRIMARY, flex: 1 },
-  bizCat: { fontSize: 10, fontWeight: '700', color: '#737971', textTransform: 'uppercase' },
-  bizAddr: { fontSize: 11, color: '#9ca3af' },
+  bizName: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: PRIMARY, flex: 1 },
+  bizCat: { fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.outline, textTransform: 'uppercase' },
+  bizAddr: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.neutralTextSoft },
   ratingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
-    backgroundColor: '#fef3c7',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
+    gap: SPACE.xxs,
+    backgroundColor: THEME_COLORS.warningSurfaceAlt,
+    paddingHorizontal: SPACE.sm,
+    paddingVertical: SPACE.xxs,
+    borderRadius: RADIUS.sm,
   },
-  ratingText: { fontSize: 10, fontWeight: '900', color: '#b45309' },
-  emptyState: { alignItems: 'center', paddingVertical: 40, gap: 8 },
-  emptyTitle: { fontSize: 16, fontWeight: '700', color: PRIMARY, opacity: 0.5 },
-  emptyBody: { fontSize: 12, color: '#9ca3af', textAlign: 'center' },
+  ratingText: { fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.warningText },
+  emptyState: { alignItems: 'center', paddingVertical: SPACE.s40, gap: SPACE.md },
+  emptyTitle: { fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.bold, color: PRIMARY, opacity: 0.5 },
+  emptyBody: { fontSize: TYPE_SCALE.body, color: THEME_COLORS.neutralTextSoft, textAlign: 'center' },
   fabWrap: {
     position: 'absolute',
-    bottom: 24,
-    left: 16,
-    right: 16,
+    bottom: SPACE.s24,
+    left: SPACE.s16,
+    right: SPACE.s16,
   },
   fab: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: SPACE.lg,
     backgroundColor: SECONDARY,
-    paddingVertical: 16,
-    borderRadius: 100,
-    shadowColor: SECONDARY,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    paddingVertical: SPACE.s16,
+    borderRadius: RADIUS.full,
+    ...createShadow(SECONDARY, SPACE.zero, SPACE.xs, 0.4, 12, 8),
   },
-  fabText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  fabText: { color: THEME_COLORS.white, fontWeight: FONT_WEIGHT.bold, fontSize: TYPE_SCALE.xl },
 });

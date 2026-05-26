@@ -6,6 +6,11 @@ import { useCommunity } from '../../src/context/CommunityContext';
 import { Header } from '../../src/components/shared/Header';
 import { MobileSidebar } from '../../src/components/shared/MobileSidebar';
 import { NotificationCenter } from '../../src/components/shared/NotificationCenter';
+import { THEME_COLORS } from '../../src/theme/colors';
+
+const SPACE = {
+  sm: 8,
+};
 
 function ChatTabIcon({ color, focused }: { color: string; focused: boolean }) {
   const { chatUnreadTotals } = useCommunity();
@@ -54,13 +59,13 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: '#0d3d47',
-          tabBarInactiveTintColor: '#9ca3af',
+          tabBarActiveTintColor: THEME_COLORS.primary,
+          tabBarInactiveTintColor: THEME_COLORS.neutralTextSoft,
           tabBarStyle: {
-            backgroundColor: '#ffffff',
-            borderTopColor: '#e5e7eb',
+            backgroundColor: THEME_COLORS.white,
+            borderTopColor: THEME_COLORS.neutralBorderSoft,
             height: 60,
-            paddingBottom: 8,
+            paddingBottom: SPACE.sm,
           },
         }}
       >

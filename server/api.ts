@@ -11,6 +11,7 @@ import usersRouter from './routes/users.js';
 import communitiesRouter from './routes/communities.js';
 import conversationsRouter from './routes/conversations.js';
 import businessesRouter from './routes/businesses.js';
+import themesRouter from './routes/themes.js';
 import billingRouter from './billing/routes.js';
 
 const router = Router();
@@ -22,6 +23,7 @@ router.use('/users', usersRouter);
 router.use('/communities', communitiesRouter);
 router.use('/conversations', conversationsRouter);
 router.use('/businesses', businessesRouter);
+router.use('/themes', themesRouter);
 router.use('/billing', billingRouter);
 
 // ─── Health ───────────────────────────────────────────────────────────────────

@@ -18,6 +18,36 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '../../lib/api';
 import { Users } from 'lucide-react-native';
+import { THEME_COLORS } from '../../theme/colors';
+
+const TYPE_SCALE = {
+  h2Web: 36,
+  h2Mobile: 48,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const LINE_HEIGHT = {
+  h2Web: 42,
+  h2Mobile: 54,
+};
+const SPACE = {
+  md: 16,
+  xl: 40,
+};
+const RADIUS = {
+  sm: 8,
+  md: 12,
+};
+const ICON_SIZE = {
+  sm: 32,
+  md: 40,
+};
 
 
 // Simple checkbox component
@@ -25,7 +55,7 @@ const Checkbox: React.FC<{ checked: boolean; onChange: (val: boolean) => void }>
   <TouchableOpacity
     onPress={() => onChange(!checked)}
     className="w-5 h-5 rounded-md border-2 items-center justify-center mr-1"
-    style={{ borderColor: checked ? '#0d3d47' : '#d1d5db', backgroundColor: checked ? '#0d3d47' : 'transparent' }}
+    style={{ borderColor: checked ? THEME_COLORS.primary : THEME_COLORS.neutralBorderMuted, backgroundColor: checked ? THEME_COLORS.primary : 'transparent' }}
   >
     {checked && <Text className="text-white text-[10px] font-black">✓</Text>}
   </TouchableOpacity>
@@ -203,7 +233,7 @@ const LandingPage: React.FC = () => {
       <ScrollView
         ref={scrollRef}
         className="flex-1"
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: SPACE.xl }}
         keyboardShouldPersistTaps="handled"
           keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
           nestedScrollEnabled
@@ -214,21 +244,21 @@ const LandingPage: React.FC = () => {
           <View className="flex-row items-center gap-2">
             <Image 
               source={require('../../../assets/lalela_logo.png')} 
-              style={{ width: 40, height: 40, borderRadius: 12 }}
+              style={{ width: ICON_SIZE.md, height: ICON_SIZE.md, borderRadius: RADIUS.md }}
               resizeMode="contain"
             />
-            <Text className="text-2xl font-black text-[#0d3d47] tracking-tight">lalela</Text>
+            <Text className="text-2xl font-black text-primary tracking-tight">lalela</Text>
           </View>
           <View className="flex-row gap-2">
             <TouchableOpacity
               onPress={() => switchTab('login')}
-              className="px-4 py-2 rounded-full border border-[#0d3d47]"
+              className="px-4 py-2 rounded-full border border-primary"
             >
-              <Text className="text-[#0d3d47] font-black text-xs uppercase tracking-widest">Login</Text>
+              <Text className="text-primary font-black text-xs uppercase tracking-widest">Login</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => switchTab('start')}
-              className="px-4 py-2 rounded-full bg-[#0d3d47]"
+              className="px-4 py-2 rounded-full bg-primary"
             >
               <Text className="text-white font-black text-xs uppercase tracking-widest">Sign Up</Text>
             </TouchableOpacity>
@@ -237,9 +267,9 @@ const LandingPage: React.FC = () => {
 
         {/* ── Hero ── */}
         <View className="px-6 pt-10 pb-8">
-          <Text style={{ fontSize: Platform.OS === 'web' ? 36 : 48, fontWeight: '900', color: '#0d3d47', lineHeight: Platform.OS === 'web' ? 42 : 54, marginBottom: 16 }}>
+          <Text style={{ fontSize: Platform.OS === 'web' ? TYPE_SCALE.h2Web : TYPE_SCALE.h2Mobile, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.primary, lineHeight: Platform.OS === 'web' ? LINE_HEIGHT.h2Web : LINE_HEIGHT.h2Mobile, marginBottom: SPACE.md }}>
             no more talk talk —{'\n'}
-            <Text style={{ color: '#f97316' }}>it's listen, listen, do.</Text>
+            <Text style={{ color: THEME_COLORS.aliasHex_f97316 }}>it's listen, listen, do.</Text>
           </Text>
           <Text className="text-base text-gray-500 font-medium leading-relaxed mb-8">
             join your community. trade safely.{'\n'}give back with every deal.
@@ -248,13 +278,13 @@ const LandingPage: React.FC = () => {
             <TouchableOpacity
               onPress={() => switchTab('start')}
               className="px-6 py-4 rounded-2xl flex-row items-center gap-2"
-              style={{ backgroundColor: '#fc7127' }}
+              style={{ backgroundColor: THEME_COLORS.secondaryContainer }}
             >
               <Text className="text-white font-black uppercase tracking-widest text-sm">Get Started</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => switchTab('login')}
-              className="px-6 py-4 bg-[#0d3d47] rounded-2xl"
+              className="px-6 py-4 bg-primary rounded-2xl"
             >
               <Text className="text-white font-black uppercase tracking-widest text-sm">Login</Text>
             </TouchableOpacity>
@@ -270,33 +300,33 @@ const LandingPage: React.FC = () => {
           <View className="bg-white rounded-[2.5rem] p-6 shadow-2xl border border-gray-100">
             {/* CTA */}
             <View className="mb-6 gap-4">
-              <Text className="text-3xl font-black text-[#0d3d47] leading-tight">
+              <Text className="text-3xl font-black text-primary leading-tight">
                 Start your community today
               </Text>
               <View className="flex-row items-center gap-3">
                 <View className="w-10 h-10 rounded-2xl bg-surface-container-low items-center justify-center">
-                  <Text className="text-[#0d3d47] text-base font-black">✓</Text>
+                  <Text className="text-primary text-base font-black">✓</Text>
                 </View>
-                <Text className="font-bold text-[#0d3d47] text-sm">30 days free for admins</Text>
+                <Text className="font-bold text-primary text-sm">30 days free for admins</Text>
               </View>
               <View className="flex-row items-center gap-3">
                 <View className="w-10 h-10 rounded-2xl bg-orange-50 items-center justify-center">
-                  <Text className="text-[#fc7127] text-base font-black">+ +</Text>
+                  <Text className="text-secondary-container text-base font-black">+ +</Text>
                 </View>
-                <Text className="font-bold text-[#0d3d47] text-sm">Unlimited member invites</Text>
+                <Text className="font-bold text-primary text-sm">Unlimited member invites</Text>
               </View>
             </View>
 
             {/* Verification email sent — replaces form */}
             {verificationEmailSent ? (
               <View className="gap-6 items-center py-4">
-                <View className="w-20 h-20 rounded-full bg-[#f0fdf4] items-center justify-center">
-                  <Text className="text-[#0d3d47] text-3xl font-black">@</Text>
+                <View className="w-20 h-20 rounded-full bg-successSurface items-center justify-center">
+                  <Text className="text-primary text-3xl font-black">@</Text>
                 </View>
-                <Text className="text-2xl font-black text-[#0d3d47] text-center">Verify Your Email</Text>
+                <Text className="text-2xl font-black text-primary text-center">Verify Your Email</Text>
                 <Text className="text-sm text-gray-500 text-center leading-relaxed">
                   We've sent a verification link to{'\n'}
-                  <Text className="font-bold text-[#0d3d47]">{email}</Text>
+                  <Text className="font-bold text-primary">{email}</Text>
                 </Text>
                 <View className="bg-orange-50 border border-orange-100 rounded-2xl p-4 w-full">
                   <Text className="text-xs text-gray-600 text-center leading-relaxed">
@@ -306,7 +336,7 @@ const LandingPage: React.FC = () => {
                 </View>
                 <TouchableOpacity
                   onPress={() => { setVerificationEmailSent(false); switchTab('login'); }}
-                  className="w-full py-4 bg-[#0d3d47] rounded-2xl items-center"
+                  className="w-full py-4 bg-primary rounded-2xl items-center"
                 >
                   <Text className="text-white font-black uppercase tracking-widest">Go to Sign In</Text>
                 </TouchableOpacity>
@@ -316,7 +346,7 @@ const LandingPage: React.FC = () => {
                   className="items-center py-2"
                   style={{ opacity: isSubmitting ? 0.5 : 1 }}
                 >
-                  <Text className="text-sm font-bold text-[#0d3d47]">
+                  <Text className="text-sm font-bold text-primary">
                     {isSubmitting ? 'Sending…' : 'Resend verification email'}
                   </Text>
                 </TouchableOpacity>
@@ -339,7 +369,7 @@ const LandingPage: React.FC = () => {
                     >
                       <Text
                         className="font-black uppercase tracking-widest text-xs"
-                        style={{ color: joinMode === m ? '#0d3d47' : '#9ca3af' }}
+                        style={{ color: joinMode === m ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft }}
                       >
                         {m === 'start' ? 'Sign Up' : 'Login'}
                       </Text>
@@ -350,9 +380,9 @@ const LandingPage: React.FC = () => {
                 {/* Invite banner */}
                 {invitedCommunityName && (
                   <View className="bg-teal-50 border border-teal-100 rounded-2xl p-4 mb-4 flex-row items-center gap-3">
-                    <Users size={18} color="#0d3d47" />
+                    <Users size={18} color={THEME_COLORS.primary} />
                     <View className="flex-1">
-                      <Text className="text-sm font-black text-[#0d3d47]">
+                      <Text className="text-sm font-black text-primary">
                         You've been invited to join {invitedCommunityName}
                       </Text>
                       <Text className="text-xs text-gray-500 mt-0.5">
@@ -372,7 +402,7 @@ const LandingPage: React.FC = () => {
                 )}
 
                 <View className="mb-4 gap-1">
-                  <Text className="text-2xl font-black text-[#0d3d47] text-center leading-tight">
+                  <Text className="text-2xl font-black text-primary text-center leading-tight">
                     {invitedCommunityName && joinMode === 'login'
                       ? `Join ${invitedCommunityName}`
                       : joinMode === 'start' ? 'Create Your Account' : 'Welcome Back'}
@@ -390,7 +420,7 @@ const LandingPage: React.FC = () => {
                 {isOtpSent ? (
                   <View className="gap-4">
                     <View className="gap-1 items-center">
-                      <Text className="text-lg font-black text-[#0d3d47]">Verify Your Number</Text>
+                      <Text className="text-lg font-black text-primary">Verify Your Number</Text>
                       <Text className="text-sm text-gray-500">
                         We've sent a code to {getFormattedPhoneNumber()}
                       </Text>
@@ -408,15 +438,15 @@ const LandingPage: React.FC = () => {
                         textContentType="oneTimeCode"
                         autoComplete="sms-otp"
                         importantForAutofill="yes"
-                        className="w-full px-6 py-4 bg-gray-100 rounded-2xl font-bold text-center tracking-widest text-2xl text-[#0d3d47]"
-                        placeholderTextColor="#9ca3af"
+                        className="w-full px-6 py-4 bg-gray-100 rounded-2xl font-bold text-center tracking-widest text-2xl text-primary"
+                        placeholderTextColor={THEME_COLORS.neutralTextSoft}
                       />
                     </View>
                     <TouchableOpacity
                       onPress={handleVerifyOtp}
                       disabled={isSubmitting || otpCode.length !== 6}
                       className="py-4 rounded-2xl items-center"
-                      style={{ backgroundColor: '#fc7127', opacity: isSubmitting || otpCode.length !== 6 ? 0.5 : 1 }}
+                      style={{ backgroundColor: THEME_COLORS.secondaryContainer, opacity: isSubmitting || otpCode.length !== 6 ? 0.5 : 1 }}
                     >
                       {isSubmitting
                         ? <ActivityIndicator color="white" size="small" />
@@ -443,8 +473,8 @@ const LandingPage: React.FC = () => {
                             value={name}
                             onChangeText={setName}
                             placeholder="e.g. Sipho"
-                            className="px-4 py-3 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                            placeholderTextColor="#9ca3af"
+                            className="px-4 py-3 bg-gray-100 rounded-2xl font-bold text-primary"
+                            placeholderTextColor={THEME_COLORS.neutralTextSoft}
                           />
                         </View>
                         <View className="flex-1 gap-1">
@@ -453,8 +483,8 @@ const LandingPage: React.FC = () => {
                             value={lastName}
                             onChangeText={setLastName}
                             placeholder="e.g. Ndlovu"
-                            className="px-4 py-3 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                            placeholderTextColor="#9ca3af"
+                            className="px-4 py-3 bg-gray-100 rounded-2xl font-bold text-primary"
+                            placeholderTextColor={THEME_COLORS.neutralTextSoft}
                           />
                         </View>
                       </View>
@@ -472,8 +502,8 @@ const LandingPage: React.FC = () => {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         editable={mobileNumber.length === 0}
-                        className="px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                        placeholderTextColor="#9ca3af"
+                        className="px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                        placeholderTextColor={THEME_COLORS.neutralTextSoft}
                         style={{ opacity: mobileNumber.length > 0 ? 0.4 : 1 }}
                       />
                     </View>
@@ -495,7 +525,7 @@ const LandingPage: React.FC = () => {
                           onPress={() => email.length === 0 && setShowCountryPicker(true)}
                           className="px-3 py-4 bg-gray-100 rounded-2xl items-center justify-center min-w-[72px]"
                         >
-                          <Text className="font-bold text-[#0d3d47]">{countryCode}</Text>
+                          <Text className="font-bold text-primary">{countryCode}</Text>
                         </TouchableOpacity>
                         <TextInput
                           value={mobileNumber}
@@ -503,8 +533,8 @@ const LandingPage: React.FC = () => {
                           placeholder="082 123 4567"
                           keyboardType="phone-pad"
                           editable={email.length === 0}
-                          className="flex-1 px-4 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                          placeholderTextColor="#9ca3af"
+                          className="flex-1 px-4 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                          placeholderTextColor={THEME_COLORS.neutralTextSoft}
                         />
                       </View>
                     </View>
@@ -521,11 +551,11 @@ const LandingPage: React.FC = () => {
                             onChangeText={setPassword}
                             placeholder="Enter your password"
                             secureTextEntry={!showPassword}
-                            className="flex-1 px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47] pr-12"
-                            placeholderTextColor="#9ca3af"
+                            className="flex-1 px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary pr-12"
+                            placeholderTextColor={THEME_COLORS.neutralTextSoft}
                           />
                           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="absolute right-4">
-                            <Text className="text-xs font-bold text-[#9ca3af]">{showPassword ? 'Hide' : 'Show'}</Text>
+                            <Text className="text-xs font-bold text-neutralTextSoft">{showPassword ? 'Hide' : 'Show'}</Text>
                           </TouchableOpacity>
                         </View>
                         {joinMode === 'login' && (
@@ -533,7 +563,7 @@ const LandingPage: React.FC = () => {
                             onPress={() => { setShowForgotPassword(true); setForgotEmail(email); setForgotSent(false); setForgotError(null); }}
                             className="mt-1 ml-1"
                           >
-                            <Text className="text-xs font-bold text-[#0d3d47]">Forgot password?</Text>
+                            <Text className="text-xs font-bold text-primary">Forgot password?</Text>
                           </TouchableOpacity>
                         )}
                       </View>
@@ -551,11 +581,11 @@ const LandingPage: React.FC = () => {
                             onChangeText={setConfirmPassword}
                             placeholder="Re-enter your password"
                             secureTextEntry={!showConfirmPassword}
-                            className="flex-1 px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47] pr-12"
-                            placeholderTextColor="#9ca3af"
+                            className="flex-1 px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary pr-12"
+                            placeholderTextColor={THEME_COLORS.neutralTextSoft}
                           />
                           <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4">
-                            <Text className="text-xs font-bold text-[#9ca3af]">{showConfirmPassword ? 'Hide' : 'Show'}</Text>
+                            <Text className="text-xs font-bold text-neutralTextSoft">{showConfirmPassword ? 'Hide' : 'Show'}</Text>
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -565,9 +595,9 @@ const LandingPage: React.FC = () => {
                     {joinMode === 'start' && (
                       <Text className="text-[10px] text-gray-400 text-center leading-relaxed">
                         By creating an account you agree to our{' '}
-                        <Text className="text-[#0d3d47]">Terms & Conditions</Text>
+                        <Text className="text-primary">Terms & Conditions</Text>
                         {' '}and{' '}
-                        <Text className="text-[#0d3d47]">Privacy Policy</Text>.
+                        <Text className="text-primary">Privacy Policy</Text>.
                       </Text>
                     )}
 
@@ -576,7 +606,7 @@ const LandingPage: React.FC = () => {
                       onPress={handleAuthSubmit}
                       disabled={isSubmitting}
                       className="py-4 rounded-2xl items-center"
-                      style={{ backgroundColor: '#fc7127', opacity: isSubmitting ? 0.5 : 1 }}
+                      style={{ backgroundColor: THEME_COLORS.secondaryContainer, opacity: isSubmitting ? 0.5 : 1 }}
                     >
                       {isSubmitting
                         ? <ActivityIndicator color="white" size="small" />
@@ -599,11 +629,11 @@ const LandingPage: React.FC = () => {
         </KeyboardAvoidingView>
 
         {Platform.OS === 'web' && (
-          <View className="bg-[#0d3d47] px-6 py-12">
+          <View className="bg-primary px-6 py-12">
             <View className="flex-row items-center gap-2 mb-4">
               <Image 
                 source={require('../../../assets/lalela_logo.png')} 
-                style={{ width: 32, height: 32, borderRadius: 8 }}
+                style={{ width: ICON_SIZE.sm, height: ICON_SIZE.sm, borderRadius: RADIUS.sm }}
                 resizeMode="contain"
               />
               <Text className="text-2xl font-black text-white tracking-tight">lalela</Text>
@@ -628,14 +658,14 @@ const LandingPage: React.FC = () => {
           onPress={() => setShowCountryPicker(false)}
         >
           <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 pb-10">
-            <Text className="text-lg font-black text-[#0d3d47] mb-4 text-center">Select Country Code</Text>
+            <Text className="text-lg font-black text-primary mb-4 text-center">Select Country Code</Text>
             {countryCodes.map((code) => (
               <TouchableOpacity
                 key={code}
                 onPress={() => { setCountryCode(code); setShowCountryPicker(false); }}
                 className="py-3 border-b border-gray-100 items-center"
               >
-                <Text className="font-bold text-base" style={{ color: countryCode === code ? '#0d3d47' : '#374151' }}>
+                <Text className="font-bold text-base" style={{ color: countryCode === code ? THEME_COLORS.primary : THEME_COLORS.neutralTextEmphasis }}>
                   {code}
                 </Text>
               </TouchableOpacity>
@@ -655,24 +685,24 @@ const LandingPage: React.FC = () => {
             activeOpacity={1}
             onPress={(e) => e.stopPropagation()}
             className="w-full bg-white rounded-t-3xl p-8"
-            style={{ paddingBottom: 40 }}
+            style={{ paddingBottom: SPACE.xl }}
           >
             {forgotSent ? (
               <View className="gap-4 items-center">
                 <View className="w-16 h-16 rounded-full bg-surface items-center justify-center">
-                  <Text className="text-[#0d3d47] text-2xl font-black">@</Text>
+                  <Text className="text-primary text-2xl font-black">@</Text>
                 </View>
-                <Text className="text-2xl font-black text-[#0d3d47] text-center">Check Your Email</Text>
+                <Text className="text-2xl font-black text-primary text-center">Check Your Email</Text>
                 <Text className="text-gray-500 text-center font-medium">
                   We sent a password reset link to{' '}
-                  <Text className="font-bold text-[#0d3d47]">{forgotEmail}</Text>
+                  <Text className="font-bold text-primary">{forgotEmail}</Text>
                 </Text>
                 <Text className="text-sm text-gray-400 text-center leading-relaxed">
                   Click the link in the email to set a new password. Check your spam folder if you don't see it.
                 </Text>
                 <TouchableOpacity
                   onPress={() => setShowForgotPassword(false)}
-                  className="w-full py-4 bg-[#0d3d47] rounded-2xl items-center"
+                  className="w-full py-4 bg-primary rounded-2xl items-center"
                 >
                   <Text className="text-white font-black uppercase tracking-widest">Back to Login</Text>
                 </TouchableOpacity>
@@ -680,7 +710,7 @@ const LandingPage: React.FC = () => {
             ) : (
               <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <View className="gap-4">
-                  <Text className="text-2xl font-black text-[#0d3d47] text-center">Reset Password</Text>
+                  <Text className="text-2xl font-black text-primary text-center">Reset Password</Text>
                   <Text className="text-sm text-gray-500 text-center">
                     Enter your email and we'll send you a link to reset your password.
                   </Text>
@@ -694,8 +724,8 @@ const LandingPage: React.FC = () => {
                       placeholder="your@email.com"
                       keyboardType="email-address"
                       autoCapitalize="none"
-                      className="px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                      placeholderTextColor="#9ca3af"
+                      className="px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                      placeholderTextColor={THEME_COLORS.neutralTextSoft}
                     />
                   </View>
                   {forgotError && (
@@ -707,7 +737,7 @@ const LandingPage: React.FC = () => {
                     onPress={handleForgotPassword}
                     disabled={forgotSubmitting || !forgotEmail}
                     className="py-4 rounded-2xl items-center"
-                    style={{ backgroundColor: '#fc7127', opacity: forgotSubmitting || !forgotEmail ? 0.5 : 1 }}
+                    style={{ backgroundColor: THEME_COLORS.secondaryContainer, opacity: forgotSubmitting || !forgotEmail ? 0.5 : 1 }}
                   >
                     {forgotSubmitting
                       ? <ActivityIndicator color="white" size="small" />
@@ -718,7 +748,7 @@ const LandingPage: React.FC = () => {
                     onPress={() => { setShowForgotPassword(false); router.push('/phone-reset'); }}
                     className="items-center py-2"
                   >
-                    <Text className="text-sm font-bold text-[#0d3d47] underline">Reset via SMS instead</Text>
+                    <Text className="text-sm font-bold text-primary underline">Reset via SMS instead</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => setShowForgotPassword(false)} className="items-center py-2">
                     <Text className="text-sm font-bold text-gray-400">Back to Login</Text>

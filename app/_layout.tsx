@@ -12,9 +12,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { CommunityProvider, useCommunity } from '../src/context/CommunityContext';
+import { ThemeProvider } from '../src/context/ThemeContext';
 import { GoogleMapsProvider } from '../src/context/GoogleMapsContext';
 import { CallProvider } from '../src/context/CallContext';
 import { IncomingCallOverlay } from '../src/components/call/IncomingCallOverlay';
+import { THEME_COLORS } from '../src/theme/colors';
 
 
 // ─── Parse lalela://join?join=<code> ────────────────────────────────────────
@@ -62,7 +64,7 @@ async function registerForPushNotifications(): Promise<string | null> {
         name: 'LaLela',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#fc7127',
+        lightColor: THEME_COLORS.secondaryContainer,
       });
     }
 
@@ -295,7 +297,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#17341D',
+    backgroundColor: THEME_COLORS.aliasHex_17341d,
     zIndex: 999,
   },
 });
@@ -308,29 +310,31 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <AuthProvider>
           <CommunityProvider>
-            <GoogleMapsProvider>
-              <CallProvider>
-                <AppGuard />
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="(tabs)" />
-                  <Stack.Screen name="landing" />
-                  <Stack.Screen name="onboarding" />
-                  <Stack.Screen name="onboarding-create" />
-                  <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
-                  <Stack.Screen name="security" options={{ presentation: 'modal' }} />
-                  <Stack.Screen name="notifications-settings" options={{ presentation: 'modal' }} />
-                  <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
-                  <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
-                  <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
-                  <Stack.Screen name="join" options={{ headerShown: false }} />
-                  <Stack.Screen name="chat/[id]" />
-                  <Stack.Screen name="emergency/[id]" />
-                  <Stack.Screen name="call/[id]" options={{ animation: 'fade' }} />
-                </Stack>
-                <IncomingCallOverlay />
-                <LoadingOverlay />
-              </CallProvider>
-            </GoogleMapsProvider>
+            <ThemeProvider>
+              <GoogleMapsProvider>
+                <CallProvider>
+                  <AppGuard />
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="landing" />
+                    <Stack.Screen name="onboarding" />
+                    <Stack.Screen name="onboarding-create" />
+                    <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="security" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="notifications-settings" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="join" options={{ headerShown: false }} />
+                    <Stack.Screen name="chat/[id]" />
+                    <Stack.Screen name="emergency/[id]" />
+                    <Stack.Screen name="call/[id]" options={{ animation: 'fade' }} />
+                  </Stack>
+                  <IncomingCallOverlay />
+                  <LoadingOverlay />
+                </CallProvider>
+              </GoogleMapsProvider>
+            </ThemeProvider>
           </CommunityProvider>
         </AuthProvider>
       </SafeAreaProvider>

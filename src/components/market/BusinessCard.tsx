@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { ArrowRight, Phone, Star, Clock, MessageSquare, Globe, MapPin } from 'lucide-react-native';
 import { showMapOptions } from '../../lib/maps';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
 interface BusinessCardProps {
   name: string;
@@ -104,14 +106,14 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
       ].join(' ')}
       style={
         isMemberBusiness
-          ? { shadowColor: '#a855f7', shadowOpacity: 0.12, shadowRadius: 8, elevation: 3 }
-          : { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 }
+          ? createShadow(THEME_COLORS.aliasHex_a855f7, 0, 0, 0.12, 8, 3)
+          : createShadow(THEME_COLORS.black, 0, 0, 0.06, 6, 2)
       }
     >
       {/* Image / Icon area */}
       <View
         className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 items-center justify-center"
-        style={{ backgroundColor: iconBg || '#f3f4f6' }}
+        style={{ backgroundColor: iconBg || THEME_COLORS.neutralBgSofter }}
       >
         {image && !imgError ? (
           <Image
@@ -125,14 +127,14 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         ) : (
           <Text
             className="text-3xl font-bold"
-            style={{ color: iconColor || '#0d3d47' }}
+            style={{ color: iconColor || THEME_COLORS.primary }}
           >
             {name.charAt(0).toUpperCase()}
           </Text>
         )}
         {labelType === 'top-rated' && (
           <View className="absolute top-1 left-1 bg-amber-400 rounded-full px-1.5 py-0.5 flex-row items-center gap-0.5">
-            <Star size={8} color="#fff" fill="#fff" />
+            <Star size={8} color={THEME_COLORS.white} fill={THEME_COLORS.white} />
           </View>
         )}
       </View>
@@ -180,14 +182,14 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
                 className="flex-row items-center gap-1 mt-1" 
                 onPress={() => showMapOptions(latitude, longitude, name)}
               >
-                <MapPin size={10} color="#3b82f6" />
+                <MapPin size={10} color={THEME_COLORS.brandBlue} />
                 <Text className="text-blue-500 text-[10px] flex-1 font-medium" numberOfLines={1}>
                   {address}
                 </Text>
               </TouchableOpacity>
             ) : (
               <View className="flex-row items-center gap-1 mt-1">
-                <MapPin size={10} color="#9ca3af" />
+                <MapPin size={10} color={THEME_COLORS.neutralTextSoft} />
                 <Text className="text-gray-300 text-[10px] flex-1" numberOfLines={1}>
                   {address}
                 </Text>
@@ -239,7 +241,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
               </View>
             ) : closingTime ? (
               <View className="flex-row items-center gap-1">
-                <Clock size={12} color="#9ca3af" />
+                <Clock size={12} color={THEME_COLORS.neutralTextSoft} />
                 <Text className="text-[10px] text-gray-400">Closes {closingTime}</Text>
               </View>
             ) : visibleLabel ? (
@@ -267,10 +269,10 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
               <TouchableOpacity
                 onPress={handleCall}
                 className="w-8 h-8 rounded-full bg-primary items-center justify-center"
-                style={{ shadowColor: '#0d3d47', shadowOpacity: 0.3, shadowRadius: 4, elevation: 2 }}
+                style={createShadow(THEME_COLORS.primary, 0, 0, 0.3, 4, 2)}
                 activeOpacity={0.8}
               >
-                <Phone size={16} color="#fff" />
+                <Phone size={16} color={THEME_COLORS.white} />
               </TouchableOpacity>
             ) : null}
 
@@ -280,7 +282,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
                 className="w-8 h-8 rounded-full bg-blue-50 items-center justify-center"
                 activeOpacity={0.8}
               >
-                <Globe size={16} color="#2563eb" />
+                <Globe size={16} color={THEME_COLORS.brandBlueText} />
               </TouchableOpacity>
             ) : null}
 
@@ -290,7 +292,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
                 className="w-8 h-8 rounded-full bg-surface-container-low items-center justify-center"
                 activeOpacity={0.8}
               >
-                <MessageSquare size={16} color="#0d3d47" />
+                <MessageSquare size={16} color={THEME_COLORS.primary} />
               </TouchableOpacity>
             ) : null}
 
@@ -300,11 +302,11 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
                   className="w-8 h-8 rounded-full bg-primary items-center justify-center"
                   activeOpacity={0.8}
                 >
-                  <Phone size={16} color="#fff" />
+                  <Phone size={16} color={THEME_COLORS.white} />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity activeOpacity={0.8}>
-                  <ArrowRight size={20} color="#0d3d47" />
+                  <ArrowRight size={20} color={THEME_COLORS.primary} />
                 </TouchableOpacity>
               )
             ) : null}

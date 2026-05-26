@@ -19,6 +19,7 @@ import {
   regionForCoordinateCircles,
 } from '../../lib/mapBounds';
 import { useCommunity } from '../../context/CommunityContext';
+import { THEME_COLORS } from '../../theme/colors';
 
 type MapFilter = 'members' | 'listings' | 'notices' | 'businesses';
 
@@ -84,13 +85,13 @@ const emergencyVisualConfig = (
 ): { icon: React.ComponentType<{ size?: number; color?: string }>; bgColor: string; label: string } => {
   switch (type) {
     case 'fire':
-      return { icon: Flame, bgColor: '#ef4444', label: 'Fire Emergency' };
+      return { icon: Flame, bgColor: THEME_COLORS.errorStrong, label: 'Fire Emergency' };
     case 'accident':
-      return { icon: Car, bgColor: '#f97316', label: 'Accident Emergency' };
+      return { icon: Car, bgColor: THEME_COLORS.aliasHex_f97316, label: 'Accident Emergency' };
     case 'security':
-      return { icon: Shield, bgColor: '#dc2626', label: 'Security Emergency' };
+      return { icon: Shield, bgColor: THEME_COLORS.errorStrong, label: 'Security Emergency' };
     default:
-      return { icon: Siren, bgColor: '#dc2626', label: 'Emergency' };
+      return { icon: Siren, bgColor: THEME_COLORS.errorStrong, label: 'Emergency' };
   }
 };
 
@@ -275,10 +276,10 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
   };
 
   const filterItems: { id: MapFilter; color: string; label: string }[] = [
-    { id: 'members', color: '#10b981', label: 'Members' },
-    { id: 'listings', color: '#3b82f6', label: 'Listings' },
-    { id: 'notices', color: '#f59e0b', label: 'Notices' },
-    { id: 'businesses', color: '#a855f7', label: 'Businesses' },
+    { id: 'members', color: THEME_COLORS.success, label: 'Members' },
+    { id: 'listings', color: THEME_COLORS.brandBlue, label: 'Listings' },
+    { id: 'notices', color: THEME_COLORS.warningStrong, label: 'Notices' },
+    { id: 'businesses', color: THEME_COLORS.aliasHex_a855f7, label: 'Businesses' },
   ];
 
   return (
@@ -311,12 +312,12 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
             <Circle
               center={coverageCenter}
               radius={currentCommunity.coverageArea.radius * 1000}
-              strokeColor={isEmergencyActive ? '#B3261E' : '#134E42'}
+              strokeColor={isEmergencyActive ? THEME_COLORS.md3Error : THEME_COLORS.aliasHex_134e42}
               strokeWidth={2}
               fillColor={
                 isEmergencyActive
-                  ? 'rgba(179,38,30,0.08)'
-                  : 'rgba(19,78,66,0.08)'
+                  ? THEME_COLORS.alias_rgba_179_38_30_0_08
+                  : THEME_COLORS.alias_rgba_19_78_66_0_08
               }
             />
           )}
@@ -333,9 +334,9 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                   longitude: emergencyPost.longitude,
                 }}
                 radius={radius}
-                strokeColor="#B3261E"
+                strokeColor={THEME_COLORS.md3Error}
                 strokeWidth={2}
-                fillColor="rgba(179,38,30,0.04)"
+                fillColor={THEME_COLORS.alias_rgba_179_38_30_0_04}
               />
             ))}
 
@@ -349,9 +350,9 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                   longitude: incident.longitude,
                 }}
                 radius={EMERGENCY_RADIUS_METERS}
-                strokeColor="rgba(179, 38, 30, 0.55)"
+                strokeColor={THEME_COLORS.md3ErrorOverlay55}
                 strokeWidth={2}
-                fillColor="rgba(179, 38, 30, 0.08)"
+                fillColor={THEME_COLORS.md3ErrorOverlay08}
               />
             ))}
 
@@ -380,7 +381,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                   className="p-2 rounded-full border-2 border-white shadow-xl"
                   style={{ backgroundColor: visual.bgColor }}
                 >
-                  <EmergencyIcon size={18} color="#fff" />
+                  <EmergencyIcon size={18} color={THEME_COLORS.white} />
                 </View>
                 <Callout
                   tooltip
@@ -391,7 +392,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                   <View className="bg-white rounded-lg p-3 min-w-[200px] shadow-sm border border-red-100">
                     <View className="flex-row items-center justify-between mb-1">
                       <View className="flex-row items-center gap-2">
-                        <EmergencyIcon size={14} color="#B3261E" />
+                        <EmergencyIcon size={14} color={THEME_COLORS.md3Error} />
                         <Text className="text-[10px] font-black uppercase tracking-widest text-red-600">
                           {visual.label}
                         </Text>
@@ -439,14 +440,14 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                       className="p-1.5 rounded-full border-2 border-white"
                       style={{
                         backgroundColor: isSecurityActive
-                          ? '#6366f1'
-                          : '#10b981',
+                          ? THEME_COLORS.aliasHex_6366f1
+                          : THEME_COLORS.success,
                       }}
                     >
                       {isSecurityActive ? (
-                        <Shield size={14} color="#fff" />
+                        <Shield size={14} color={THEME_COLORS.white} />
                       ) : (
-                        <Users size={14} color="#fff" />
+                        <Users size={14} color={THEME_COLORS.white} />
                       )}
                     </View>
                     <Callout>
@@ -480,7 +481,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                   }}
                 >
                   <View className="bg-blue-500 p-1.5 rounded-full border-2 border-white">
-                    <Store size={14} color="#fff" />
+                    <Store size={14} color={THEME_COLORS.white} />
                   </View>
                   <Callout>
                     <View className="p-2 min-w-[200px]">
@@ -528,11 +529,11 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                       className="p-1.5 rounded-full border-2 border-white"
                       style={{
                         backgroundColor: isEmergencyNotice
-                          ? '#ef4444'
-                          : '#f59e0b',
+                          ? THEME_COLORS.errorStrong
+                          : THEME_COLORS.warningStrong,
                       }}
                     >
-                      <AlertTriangle size={14} color="#fff" />
+                      <AlertTriangle size={14} color={THEME_COLORS.white} />
                     </View>
                     <Callout>
                       <View className="p-2 min-w-[200px]">
@@ -566,7 +567,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 }}
               >
                 <View className="bg-purple-500 p-1.5 rounded-full border-2 border-white">
-                  <Store size={14} color="#fff" />
+                  <Store size={14} color={THEME_COLORS.white} />
                 </View>
                 <Callout>
                   <View className="p-2 min-w-[200px]">
@@ -594,7 +595,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 zIndex={800}
               >
                 <View className="bg-indigo-600 p-1.5 rounded-full border-2 border-white">
-                  <Shield size={14} color="#fff" />
+                  <Shield size={14} color={THEME_COLORS.white} />
                 </View>
                 <Callout>
                   <View className="p-2 min-w-[150px]">
@@ -614,7 +615,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
             activeOpacity={1}
             onPress={onUnlock}
             className="absolute inset-0"
-            style={{ backgroundColor: 'rgba(0,0,0,0.01)' }}
+            style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_01 }}
           />
         )}
 
@@ -628,12 +629,12 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
             <View
               className="w-2 h-2 rounded-full"
               style={{
-                backgroundColor: isEmergencyActive ? '#ef4444' : '#10b981',
+                backgroundColor: isEmergencyActive ? THEME_COLORS.errorStrong : THEME_COLORS.success,
               }}
             />
             <Text
               className="text-[11px] font-bold"
-              style={{ color: isEmergencyActive ? '#ef4444' : '#0d3d47' }}
+              style={{ color: isEmergencyActive ? THEME_COLORS.errorStrong : THEME_COLORS.primary }}
             >
               {isEmergencyActive
                 ? 'EMERGENCY MODE ACTIVE'
@@ -686,7 +687,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 className="w-2 h-2 rounded-full"
                 style={{
                   backgroundColor:
-                    mapFilter === item.id ? '#fff' : item.color,
+                    mapFilter === item.id ? THEME_COLORS.white : item.color,
                 }}
               />
               <Text

@@ -20,10 +20,68 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
-const SECONDARY = '#7c3aed';
-const ERROR = '#dc2626';
+const PRIMARY = THEME_COLORS.primary;
+const SECONDARY = THEME_COLORS.brandPurple;
+const ERROR = THEME_COLORS.error;
+const TYPE_SCALE = {
+  sm: 9,
+  md: 10,
+  base: 12,
+  body: 13,
+  lg: 14,
+  xl: 15,
+  xxl: 16,
+  title: 18,
+  h2: 22,
+  h1: 24,
+  jumbo: 28,
+  hero: 32,
+};
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  xxs: 2,
+  s1: 1,
+  xs: 4,
+  sm: 6,
+  md: 8,
+  lg: 10,
+  xl: 12,
+  s16: 16,
+  s17: 17,
+  s20: 20,
+  s24: 24,
+  s28: 28,
+  s32: 32,
+  s40: 40,
+  s48: 48,
+};
+const RADIUS = {
+  dot: 2,
+  sm: 10,
+  md: 16,
+  lg: 24,
+  xl: 32,
+};
+const LINE_HEIGHT = {
+  body: 20,
+  compact: 17,
+  dense: 18,
+  subtitle: 22,
+  hero: 40,
+};
+const LETTER_SPACING = {
+  normal: 1,
+};
 
 interface BenefitsPricingPageProps {
   onBack?: () => void;
@@ -119,13 +177,13 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
   const renderCheckOrX = (val: boolean | string, isLicensed: boolean) => {
     if (typeof val === 'boolean') {
       return val ? (
-        <Check size={16} color="#fc7127" />
+        <Check size={16} color={THEME_COLORS.secondaryContainer} />
       ) : (
         <X size={16} color={ERROR} />
       );
     }
     return (
-      <Text style={[styles.tableValue, isLicensed && { color: '#fc7127' }]}>
+      <Text style={[styles.tableValue, isLicensed && { color: THEME_COLORS.secondaryContainer }]}>
         {val}
       </Text>
     );
@@ -171,7 +229,7 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
           {/* Membership tier */}
           <View style={styles.pricingRow}>
             <View style={styles.pricingIconWrap}>
-              <Crown size={28} color="#fc7127" />
+              <Crown size={28} color={THEME_COLORS.secondaryContainer} />
             </View>
             <View style={styles.pricingInfo}>
               <Text style={styles.pricingTierTitle}>Platform Membership</Text>
@@ -183,7 +241,7 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
           {membershipFeatures.map((item, i) => (
             <View key={i} style={styles.featureRow}>
               <View style={styles.featureCheck}>
-                <Check size={14} color="#fc7127" />
+                <Check size={14} color={THEME_COLORS.secondaryContainer} />
               </View>
               <Text style={styles.featureText}>{item}</Text>
             </View>
@@ -202,7 +260,7 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
           {communityFeatures.map((item, i) => (
             <View key={i} style={styles.featureRow}>
               <View style={styles.featureCheck}>
-                <Check size={14} color="#fc7127" />
+                <Check size={14} color={THEME_COLORS.secondaryContainer} />
               </View>
               <Text style={styles.featureText}>{item}</Text>
             </View>
@@ -311,245 +369,229 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
 export default BenefitsPricingPage;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: THEME_COLORS.white },
   stickyHeader: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: THEME_COLORS.whiteOverlay90,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    borderBottomColor: THEME_COLORS.overlayBorderSoft,
+    paddingHorizontal: SPACE.s16,
+    paddingVertical: SPACE.lg,
   },
   backBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: SPACE.sm,
   },
   backBtnText: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.semibold,
     color: PRIMARY,
   },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: 20, paddingTop: 8, gap: 32 },
+  content: { paddingHorizontal: SPACE.s20, paddingTop: SPACE.md, gap: SPACE.s32 },
 
   // Hero
-  heroSection: { alignItems: 'center', gap: 16, paddingTop: 16 },
+  heroSection: { alignItems: 'center', gap: SPACE.s16, paddingTop: SPACE.s16 },
   heroTitle: {
-    fontSize: 32,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.hero,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
     textAlign: 'center',
-    lineHeight: 40,
+    lineHeight: LINE_HEIGHT.hero,
   },
   heroSubtitle: {
-    fontSize: 15,
-    color: '#64748b',
-    fontWeight: '500',
+    fontSize: TYPE_SCALE.xl,
+    color: THEME_COLORS.neutralTextSubtle,
+    fontWeight: FONT_WEIGHT.medium,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: LINE_HEIGHT.subtitle,
   },
-  heroButtons: { alignSelf: 'stretch', gap: 12, marginTop: 8 },
+  heroButtons: { alignSelf: 'stretch', gap: SPACE.xl, marginTop: SPACE.md },
   primaryCta: {
     backgroundColor: PRIMARY,
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACE.s16,
     alignItems: 'center',
-    shadowColor: PRIMARY,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+    ...createShadow(PRIMARY, SPACE.zero, SPACE.xs, 0.3, 12, 6),
   },
   primaryCtaText: {
-    color: '#fff',
-    fontWeight: '900',
-    fontSize: 15,
+    color: THEME_COLORS.white,
+    fontWeight: FONT_WEIGHT.black,
+    fontSize: TYPE_SCALE.xl,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
   secondaryCta: {
-    backgroundColor: '#f0fdf4',
-    borderRadius: 16,
-    paddingVertical: 16,
+    backgroundColor: THEME_COLORS.successSurface,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACE.s16,
     alignItems: 'center',
   },
   secondaryCtaText: {
     color: PRIMARY,
-    fontWeight: '900',
-    fontSize: 15,
+    fontWeight: FONT_WEIGHT.black,
+    fontSize: TYPE_SCALE.xl,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
 
   // Pricing card
   pricingCard: {
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     borderWidth: 1.5,
-    borderColor: 'rgba(34,197,94,0.3)',
-    padding: 24,
-    backgroundColor: '#f8fafc',
-    gap: 12,
-    shadowColor: '#fc7127',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 4,
+    borderColor: THEME_COLORS.alias_rgba_34_197_94_0_3,
+    padding: SPACE.s24,
+    backgroundColor: THEME_COLORS.neutralBg,
+    gap: SPACE.xl,
+    ...createShadow(THEME_COLORS.secondaryContainer, SPACE.zero, SPACE.xs, 0.1, 16, 4),
   },
-  pricingRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  pricingRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xl },
   pricingIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: 'rgba(34,197,94,0.1)',
+    width: SPACE.s48,
+    height: SPACE.s48,
+    borderRadius: RADIUS.md,
+    backgroundColor: THEME_COLORS.alias_rgba_34_197_94_0_1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   pricingInfo: { flex: 1 },
-  pricingTierTitle: { fontSize: 16, fontWeight: '700', color: PRIMARY },
+  pricingTierTitle: { fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
   pricingTierSub: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#fc7127',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.secondaryContainer,
     textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginTop: 2,
+    letterSpacing: LETTER_SPACING.normal,
+    marginTop: SPACE.xxs,
   },
-  pricingAmount: { fontSize: 28, fontWeight: '900', color: PRIMARY },
-  featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  pricingAmount: { fontSize: TYPE_SCALE.jumbo, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
+  featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.lg },
   featureCheck: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: 'rgba(34,197,94,0.1)',
+    width: SPACE.s20,
+    height: SPACE.s20,
+    borderRadius: RADIUS.sm,
+    backgroundColor: THEME_COLORS.alias_rgba_34_197_94_0_1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 1,
+    marginTop: SPACE.s1,
     flexShrink: 0,
   },
-  featureText: { flex: 1, fontSize: 13, color: '#475569', fontWeight: '500', lineHeight: 20 },
-  divider: { height: 1, backgroundColor: 'rgba(0,0,0,0.06)', marginVertical: 8 },
+  featureText: { flex: 1, fontSize: TYPE_SCALE.body, color: THEME_COLORS.neutralTextDefault, fontWeight: FONT_WEIGHT.medium, lineHeight: LINE_HEIGHT.body },
+  divider: { height: 1, backgroundColor: THEME_COLORS.overlayBorderSoft, marginVertical: SPACE.md },
 
   // Rules
   rulesSection: {
-    backgroundColor: '#f8fafc',
-    borderRadius: 24,
-    padding: 24,
-    gap: 16,
+    backgroundColor: THEME_COLORS.neutralBg,
+    borderRadius: RADIUS.lg,
+    padding: SPACE.s24,
+    gap: SPACE.s16,
   },
-  rulesSectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  rulesSectionTitle: { fontSize: 18, fontWeight: '700', color: PRIMARY },
+  rulesSectionHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xl },
+  rulesSectionTitle: { fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
   ruleCard: {
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 16,
-    padding: 16,
-    gap: 6,
+    backgroundColor: THEME_COLORS.whiteOverlay80,
+    borderRadius: RADIUS.md,
+    padding: SPACE.s16,
+    gap: SPACE.sm,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: THEME_COLORS.neutralBgSoft,
   },
-  ruleCardTitle: { fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  ruleCardBullet: { fontSize: 12, color: '#475569', fontWeight: '500', lineHeight: 18 },
-  ruleCardDesc: { fontSize: 12, color: '#475569', fontWeight: '500', lineHeight: 18 },
-  ruleGridRow: { flexDirection: 'row', gap: 12 },
+  ruleCardTitle: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  ruleCardBullet: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.neutralTextDefault, fontWeight: FONT_WEIGHT.medium, lineHeight: LINE_HEIGHT.dense },
+  ruleCardDesc: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.neutralTextDefault, fontWeight: FONT_WEIGHT.medium, lineHeight: LINE_HEIGHT.dense },
+  ruleGridRow: { flexDirection: 'row', gap: SPACE.xl },
   ruleGridCard: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 16,
-    padding: 16,
-    gap: 6,
+    backgroundColor: THEME_COLORS.whiteOverlay80,
+    borderRadius: RADIUS.md,
+    padding: SPACE.s16,
+    gap: SPACE.sm,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: THEME_COLORS.neutralBgSoft,
   },
   ruleGridLabel: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
-  ruleGridValue: { fontSize: 12, fontWeight: '700', color: '#0f172a', lineHeight: 17 },
+  ruleGridValue: { fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong, lineHeight: LINE_HEIGHT.compact },
 
   // Benefits
-  benefitsSection: { gap: 16 },
+  benefitsSection: { gap: SPACE.s16 },
   benefitsSectionTitle: {
-    fontSize: 22,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.h2,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
     textAlign: 'center',
   },
   benefitCard: {
     flexDirection: 'row',
-    gap: 20,
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 20,
+    gap: SPACE.s20,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.lg,
+    padding: SPACE.s20,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    ...createShadow(THEME_COLORS.black, SPACE.zero, SPACE.xxs, 0.04, 8, 2),
   },
   benefitIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: 'rgba(22,163,74,0.05)',
+    width: SPACE.s48,
+    height: SPACE.s48,
+    borderRadius: RADIUS.md,
+    backgroundColor: THEME_COLORS.successTintSofter,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
-  benefitContent: { flex: 1, gap: 8 },
-  benefitTitle: { fontSize: 15, fontWeight: '700', color: PRIMARY },
-  benefitBullet: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  benefitDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(22,163,74,0.3)' },
-  benefitBulletText: { fontSize: 12, color: '#475569', fontWeight: '500', flex: 1, lineHeight: 18 },
+  benefitContent: { flex: 1, gap: SPACE.md },
+  benefitTitle: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
+  benefitBullet: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
+  benefitDot: { width: SPACE.xs, height: SPACE.xs, borderRadius: RADIUS.dot, backgroundColor: THEME_COLORS.alias_rgba_22_163_74_0_3 },
+  benefitBulletText: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.neutralTextDefault, fontWeight: FONT_WEIGHT.medium, flex: 1, lineHeight: LINE_HEIGHT.dense },
 
   // Table
-  tableSection: { gap: 16 },
-  tableSectionTitle: { fontSize: 22, fontWeight: '900', color: PRIMARY, textAlign: 'center' },
+  tableSection: { gap: SPACE.s16 },
+  tableSectionTitle: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.black, color: PRIMARY, textAlign: 'center' },
   table: {
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
+    borderColor: THEME_COLORS.overlayBorderSoft,
     overflow: 'hidden',
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: THEME_COLORS.white,
+    ...createShadow(THEME_COLORS.black, SPACE.zero, SPACE.xxs, 0.04, 8, 2),
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f8fafc',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: THEME_COLORS.neutralBg,
+    paddingHorizontal: SPACE.s16,
+    paddingVertical: SPACE.xl,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
+    borderBottomColor: THEME_COLORS.overlayBorderSoft,
   },
   tableHeaderCell: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
   tableRow: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: SPACE.s16,
+    paddingVertical: SPACE.xl,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#f8fafc',
+    borderBottomColor: THEME_COLORS.neutralBg,
   },
-  tableRowAlt: { backgroundColor: '#fafafa' },
-  tableCell: { fontSize: 12, fontWeight: '700', color: '#0f172a' },
+  tableRowAlt: { backgroundColor: THEME_COLORS.aliasHex_fafafa },
+  tableCell: { fontSize: TYPE_SCALE.base, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
   tableCellCenter: { alignItems: 'center', justifyContent: 'center' },
   tableValue: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
     textAlign: 'center',
   },
@@ -557,40 +599,32 @@ const styles = StyleSheet.create({
   // Final CTA
   finalCta: {
     backgroundColor: PRIMARY,
-    borderRadius: 32,
-    padding: 32,
+    borderRadius: RADIUS.xl,
+    padding: SPACE.s32,
     alignItems: 'center',
-    gap: 16,
-    shadowColor: PRIMARY,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 24,
-    elevation: 8,
+    gap: SPACE.s16,
+    ...createShadow(PRIMARY, SPACE.zero, SPACE.md, 0.3, 24, 8),
   },
-  finalCtaTitle: { fontSize: 24, fontWeight: '900', color: '#fff', textAlign: 'center' },
+  finalCtaTitle: { fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.white, textAlign: 'center' },
   finalCtaSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
-    fontWeight: '500',
+    fontSize: TYPE_SCALE.body,
+    color: THEME_COLORS.whiteOverlay80,
+    fontWeight: FONT_WEIGHT.medium,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: LINE_HEIGHT.body,
   },
   finalCtaBtn: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 28,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACE.s16,
+    paddingHorizontal: SPACE.s28,
+    ...createShadow(THEME_COLORS.black, SPACE.zero, SPACE.xs, 0.1, 12, 4),
   },
   finalCtaBtnText: {
     color: PRIMARY,
-    fontWeight: '900',
-    fontSize: 14,
+    fontWeight: FONT_WEIGHT.black,
+    fontSize: TYPE_SCALE.lg,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
 });

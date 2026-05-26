@@ -19,6 +19,15 @@ import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { calculateDistance } from '../../lib/utils';
 import { CommunityMember, Conversation } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
+
+const RADIUS = {
+  pill: 999,
+};
+const SPACE = {
+  xxs: 1,
+  s100: 100,
+};
 
 // The REST API returns conversation.participants as an array of
 // ConversationParticipant objects ({ userId, user, ... }), but legacy code paths
@@ -246,9 +255,9 @@ export const ChatPage: React.FC = () => {
 
   const roleBadgeBg = (role: string) => {
     switch (role) {
-      case 'ADMIN': return '#0d3d47';
-      case 'MODERATOR': return '#8b5cf6';
-      default: return '#9ca3af';
+      case 'ADMIN': return THEME_COLORS.primary;
+      case 'MODERATOR': return THEME_COLORS.aliasHex_8b5cf6;
+      default: return THEME_COLORS.neutralTextSoft;
     }
   };
 
@@ -277,7 +286,7 @@ export const ChatPage: React.FC = () => {
             ].join(' ')}
             style={
               hasActivePost
-                ? { borderWidth: 2, borderColor: '#fc7127', borderRadius: 999 }
+                ? { borderWidth: 2, borderColor: THEME_COLORS.secondaryContainer, borderRadius: RADIUS.pill }
                 : undefined
             }
           >
@@ -341,7 +350,7 @@ export const ChatPage: React.FC = () => {
                   </View>
                   {hasBusiness && (
                     <View className="flex-row items-center gap-0.5 bg-amber-100 px-1.5 py-0.5 rounded">
-                      <Store size={9} color="#d97706" />
+                      <Store size={9} color={THEME_COLORS.warning} />
                       <Text className="text-[10px] font-bold uppercase tracking-wider text-amber-600">
                         Biz
                       </Text>
@@ -355,7 +364,7 @@ export const ChatPage: React.FC = () => {
             {normalizedLastMessage ? (
               isPhotoPreview ? (
                 <View className="flex-row items-center gap-1">
-                  <Camera size={12} color="#6b7280" />
+                  <Camera size={12} color={THEME_COLORS.neutralTextSubtle} />
                   <Text
                     numberOfLines={1}
                     className="text-xs text-gray-500 leading-tight"
@@ -410,7 +419,7 @@ export const ChatPage: React.FC = () => {
 
             {isEmergency && isSecurity && emergencyDistance != null ? (
               <View className="flex-row items-center gap-1">
-                <Navigation size={11} color="#ef4444" />
+                <Navigation size={11} color={THEME_COLORS.errorStrong} />
                 <Text className="text-[10px] font-bold text-red-500">
                   {emergencyDistance.toFixed(1)}km
                 </Text>
@@ -437,11 +446,11 @@ export const ChatPage: React.FC = () => {
 
       {/* Search bar */}
       <View className="flex-row items-center bg-gray-100 rounded-2xl px-4 py-3 border border-gray-200">
-        <Search size={18} color="#9ca3af" />
+        <Search size={18} color={THEME_COLORS.neutralTextSoft} />
         <TextInput
           className="flex-1 ml-3 text-sm text-gray-900"
           placeholder="Search members..."
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={THEME_COLORS.neutralTextSoft}
           value={searchQuery}
           onChangeText={setSearchQuery}
           returnKeyType="search"
@@ -500,7 +509,7 @@ export const ChatPage: React.FC = () => {
   const ListEmptyComponent = () => (
     <View className="items-center justify-center py-20 px-4">
       <View className="w-16 h-16 bg-gray-100 rounded-full items-center justify-center mb-4">
-        <Search size={28} color="#9ca3af" />
+        <Search size={28} color={THEME_COLORS.neutralTextSoft} />
       </View>
       <Text className="text-lg font-bold text-gray-900 mb-1 text-center">
         {(searchQuery || activeFilter !== 'all') ? 'No members found' : 'No community members'}
@@ -524,8 +533,8 @@ export const ChatPage: React.FC = () => {
         ListHeaderComponent={ListHeaderComponent}
         ListEmptyComponent={ListEmptyComponent}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
-        scrollIndicatorInsets={{ right: 1 }}
+        contentContainerStyle={{ paddingBottom: SPACE.s100 }}
+        scrollIndicatorInsets={{ right: SPACE.xxs }}
       />
     </View>
   );

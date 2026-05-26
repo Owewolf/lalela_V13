@@ -31,6 +31,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LocationPickerSection from '../shared/LocationPickerSection';
 
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { THEME_COLORS } from '../../theme/colors';
+import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
+
+const SPACE = {
+  s48: 48,
+};
 
 interface InviteCoverageArea {
   latitude: number;
@@ -57,13 +63,13 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   <Modal transparent visible={visible} animationType="fade" onRequestClose={() => {}}>
     <View className="flex-1 bg-black/50 items-center justify-center px-6">
       <View className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl">
-        <Text className="text-xl font-black text-[#0d3d47] mb-2">{title}</Text>
+        <Text className="text-xl font-black text-primary mb-2">{title}</Text>
         <Text className="text-sm text-gray-500 mb-6 leading-relaxed">{message}</Text>
         <View className="gap-3">
           <TouchableOpacity
             onPress={onConfirm}
             className="py-4 rounded-2xl items-center"
-            style={{ backgroundColor: '#0d3d47' }}
+            style={{ backgroundColor: THEME_COLORS.primary }}
           >
             <Text className="text-white font-bold">{confirmLabel}</Text>
           </TouchableOpacity>
@@ -292,7 +298,7 @@ const OnboardingInvite: React.FC = () => {
   if (loading) {
     return (
       <SafeAreaView className="flex-1 bg-white items-center justify-center">
-        <ActivityIndicator size="large" color="#0d3d47" />
+        <ActivityIndicator size="large" color={THEME_COLORS.primary} />
       </SafeAreaView>
     );
   }
@@ -301,15 +307,15 @@ const OnboardingInvite: React.FC = () => {
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
-        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 48 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: SPACE.s48 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
           {/* Header */}
           <View className="px-6 pt-6 pb-4 flex-row items-center justify-between border-b border-gray-100">
             <View className="flex-row items-center gap-2">
-              <View className="w-9 h-9 bg-[#0d3d47] rounded-xl items-center justify-center">
+              <View className="w-9 h-9 bg-primary rounded-xl items-center justify-center">
                 <Text className="text-white font-black text-base">L</Text>
               </View>
-              <Text className="text-xl font-black text-[#0d3d47] tracking-tight">lalela</Text>
+              <Text className="text-xl font-black text-primary tracking-tight">lalela</Text>
             </View>
             <Text className="text-xs font-black uppercase tracking-widest text-gray-400">
               {invitedCommunityName ? `Joining ${invitedCommunityName}` : 'New Member'}
@@ -319,7 +325,7 @@ const OnboardingInvite: React.FC = () => {
           {/* Community invite banner */}
           {invitedCommunityName && (
             <View className="mx-6 mt-4 bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 flex-row items-center gap-3">
-              <Users size={18} color="#3b82f6" />
+              <Users size={18} color={THEME_COLORS.brandBlue} />
               <Text className="text-sm font-semibold text-blue-800 flex-1">
                 You've been invited to join <Text className="font-black">{invitedCommunityName}</Text>
               </Text>
@@ -330,10 +336,10 @@ const OnboardingInvite: React.FC = () => {
             {/* Title */}
             <View className="flex-row items-center gap-3">
               <View className="w-12 h-12 bg-orange-50 rounded-2xl items-center justify-center">
-                <UserIcon size={24} color="#fc7127" />
+                <UserIcon size={24} color={THEME_COLORS.secondaryContainer} />
               </View>
               <View className="flex-1">
-                <Text className="text-2xl font-black text-[#0d3d47]">Complete Your Profile</Text>
+                <Text className="text-2xl font-black text-primary">Complete Your Profile</Text>
                 <Text className="text-xs text-gray-500 font-medium">Set your details to activate your membership</Text>
               </View>
             </View>
@@ -345,7 +351,7 @@ const OnboardingInvite: React.FC = () => {
                   {profileImage ? (
                     <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" />
                   ) : (
-                    <UserIcon size={36} color="#d1d5db" />
+                    <UserIcon size={36} color={THEME_COLORS.neutralBorderMuted} />
                   )}
                   {isUploading && (
                     <View className="absolute inset-0 bg-black/40 items-center justify-center">
@@ -353,7 +359,7 @@ const OnboardingInvite: React.FC = () => {
                     </View>
                   )}
                 </View>
-                <View className="absolute bottom-0 right-0 w-7 h-7 bg-[#0d3d47] rounded-full items-center justify-center border-2 border-white">
+                <View className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full items-center justify-center border-2 border-white">
                   <Camera size={12} color="white" />
                 </View>
               </TouchableOpacity>
@@ -369,8 +375,8 @@ const OnboardingInvite: React.FC = () => {
                 value={fullName}
                 onChangeText={setFullName}
                 placeholder="Your full name"
-                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                placeholderTextColor="#9ca3af"
+                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                placeholderTextColor={THEME_COLORS.neutralTextSoft}
               />
             </View>
 
@@ -383,8 +389,8 @@ const OnboardingInvite: React.FC = () => {
                 placeholder="you@example.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                placeholderTextColor="#9ca3af"
+                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                placeholderTextColor={THEME_COLORS.neutralTextSoft}
               />
             </View>
 
@@ -396,20 +402,23 @@ const OnboardingInvite: React.FC = () => {
                 onChangeText={setPhone}
                 placeholder="+27..."
                 keyboardType="phone-pad"
-                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
-                placeholderTextColor="#9ca3af"
+                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                placeholderTextColor={THEME_COLORS.neutralTextSoft}
               />
             </View>
 
             {/* Default Location */}
-            <View className="gap-2" style={{ zIndex: 10, elevation: 10 }}>
+            <View
+              className="gap-2"
+              style={{ zIndex: LAYER_Z_INDEX.dropdown, elevation: LAYER_ELEVATION.dropdown }}
+            >
               <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
                 Default Location <Text className="text-red-500">*</Text>
               </Text>
               <View className="bg-gray-100 rounded-2xl px-4 py-4">
                 <View className="flex-row items-start gap-3">
                   <View className="w-9 h-9 rounded-xl bg-white items-center justify-center">
-                    <MapPin size={16} color="#0d3d47" />
+                    <MapPin size={16} color={THEME_COLORS.primary} />
                   </View>
                   <View className="flex-1">
                     <Text className="text-[11px] text-gray-500 leading-relaxed">
@@ -437,12 +446,12 @@ const OnboardingInvite: React.FC = () => {
 
               {locationName && locationLat !== 0 ? (
                 <View className="flex-row items-center gap-1 mt-1 ml-1">
-                  <CheckCircle2 size={12} color="#10b981" />
+                  <CheckCircle2 size={12} color={THEME_COLORS.success} />
                   <Text className="text-[10px] text-emerald-600 font-medium">Default location ready</Text>
                 </View>
               ) : (
                 <View className="flex-row items-center gap-1 mt-1 ml-1">
-                  <AlertCircle size={12} color="#f59e0b" />
+                  <AlertCircle size={12} color={THEME_COLORS.warningStrong} />
                   <Text className="text-[10px] text-amber-600 font-medium">Waiting for a community coverage default or your current location</Text>
                 </View>
               )}
@@ -459,7 +468,7 @@ const OnboardingInvite: React.FC = () => {
               onPress={() => { if (isProfileValid) setShowConfirmation(true); }}
               disabled={!isProfileValid || isSubmitting}
               className="py-4 rounded-2xl flex-row items-center justify-center gap-2 shadow-lg"
-              style={{ backgroundColor: isProfileValid ? '#0d3d47' : '#d1d5db' }}
+              style={{ backgroundColor: isProfileValid ? THEME_COLORS.primary : THEME_COLORS.neutralBorderMuted }}
             >
               <Text className="text-white font-bold text-base">
                 {invitedCommunityName ? 'Complete & Join Community' : 'Complete Profile'}

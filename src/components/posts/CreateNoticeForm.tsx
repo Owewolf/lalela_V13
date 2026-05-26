@@ -36,6 +36,7 @@ import { uploadImage } from '../../lib/uploadImage';
 import { resolveCreatePostLocationDefaults } from '../../lib/postLocationDefaults';
 import LocationPickerSection from '../shared/LocationPickerSection';
 import type { CommunityNotice } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
 
 type NoticeSubtype = 'warning' | 'normal' | 'information';
 
@@ -66,6 +67,9 @@ const NOTICE_CTA: Record<NoticeSubtype, { ctaLabel: string; buttonBg: string }> 
   normal: { ctaLabel: 'Publish Notice', buttonBg: 'bg-emerald-600' },
   information: { ctaLabel: 'Share Information', buttonBg: 'bg-blue-600' },
 };
+const SPACE = {
+  s120: 120,
+};
 
 const SUBTYPE_THEME: Record<NoticeSubtype, {
   label: string;
@@ -81,35 +85,35 @@ const SUBTYPE_THEME: Record<NoticeSubtype, {
   warning: {
     label: 'Warning Notice',
     subtitle: 'Immediate attention needed',
-    iconColor: '#FFFFFF',
-    iconBgColor: '#D97706',
-    accentColor: '#D97706',
-    bannerBgColor: '#FFFBEB',
-    badgeBgColor: '#FEF3C7',
-    badgeTextColor: '#92400E',
-    circleStrokeColor: '#F59E0B',
+    iconColor: THEME_COLORS.white,
+    iconBgColor: THEME_COLORS.warning,
+    accentColor: THEME_COLORS.warning,
+    bannerBgColor: THEME_COLORS.warningSurface,
+    badgeBgColor: THEME_COLORS.warningSurfaceAlt,
+    badgeTextColor: THEME_COLORS.aliasHex_92400e,
+    circleStrokeColor: THEME_COLORS.warningStrong,
   },
   normal: {
     label: 'General Notice',
     subtitle: 'General community information',
-    iconColor: '#FFFFFF',
-    iconBgColor: '#059669',
-    accentColor: '#059669',
-    bannerBgColor: '#ECFDF5',
-    badgeBgColor: '#D1FAE5',
-    badgeTextColor: '#065F46',
-    circleStrokeColor: '#10B981',
+    iconColor: THEME_COLORS.white,
+    iconBgColor: THEME_COLORS.successStrongAlt,
+    accentColor: THEME_COLORS.successStrongAlt,
+    bannerBgColor: THEME_COLORS.successSurfaceSoft,
+    badgeBgColor: THEME_COLORS.aliasHex_d1fae5,
+    badgeTextColor: THEME_COLORS.aliasHex_065f46,
+    circleStrokeColor: THEME_COLORS.success,
   },
   information: {
     label: 'Info Notice',
     subtitle: 'Standard community notice',
-    iconColor: '#FFFFFF',
-    iconBgColor: '#2563EB',
-    accentColor: '#2563EB',
-    bannerBgColor: '#EFF6FF',
-    badgeBgColor: '#DBEAFE',
-    badgeTextColor: '#1E40AF',
-    circleStrokeColor: '#3B82F6',
+    iconColor: THEME_COLORS.white,
+    iconBgColor: THEME_COLORS.brandBlueText,
+    accentColor: THEME_COLORS.brandBlueText,
+    bannerBgColor: THEME_COLORS.infoSurfaceSoft,
+    badgeBgColor: THEME_COLORS.aliasHex_dbeafe,
+    badgeTextColor: THEME_COLORS.aliasHex_1e40af,
+    circleStrokeColor: THEME_COLORS.brandBlue,
   },
 };
 
@@ -278,7 +282,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
     >
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{ paddingBottom: SPACE.s120 }}
         keyboardShouldPersistTaps="handled"
       >
         <View className="px-5 pt-6 space-y-6">
@@ -287,7 +291,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
             className="self-start flex-row items-center gap-2 rounded-full bg-slate-100 px-4 py-2"
             activeOpacity={0.8}
           >
-            <ArrowLeft size={18} color="#0d3d47" />
+            <ArrowLeft size={18} color={THEME_COLORS.primary} />
             <Text className="text-sm font-bold text-primary">Back</Text>
           </TouchableOpacity>
 
@@ -331,7 +335,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
             <View className="space-y-3">
               <View className="flex-row items-center justify-between px-1 mb-2">
                 <View className="flex-row items-center gap-2">
-                  <MapPin size={16} color="#6B7280" />
+                  <MapPin size={16} color={THEME_COLORS.neutralTextSubtle} />
                   <Text className="text-sm font-semibold text-gray-600">Warning Location</Text>
                 </View>
                 <View className="flex-row gap-2">
@@ -414,7 +418,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               <TouchableOpacity
                 onPress={handlePickImage}
                 className="w-full rounded-3xl overflow-hidden border-2 border-dashed border-gray-300 items-center justify-center"
-                style={{ height: 180, backgroundColor: '#F9FAFB' }}
+                style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg }}
                 activeOpacity={0.8}
               >
                 {postsImage ? (
@@ -429,12 +433,12 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
                   </>
                 ) : isUploading ? (
                   <View className="items-center gap-2">
-                    <ActivityIndicator color="#0d3d47" size="large" />
+                    <ActivityIndicator color={THEME_COLORS.primary} size="large" />
                     <Text className="text-sm text-gray-400">Uploading...</Text>
                   </View>
                 ) : (
                   <View className="items-center gap-2">
-                    <Camera color="#9CA3AF" size={40} />
+                    <Camera color={THEME_COLORS.neutralTextSoft} size={40} />
                     <Text className="text-sm text-gray-500">Upload image or take photo</Text>
                   </View>
                 )}
@@ -449,7 +453,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               value={title}
               onChangeText={setTitle}
               placeholder="What is this notice about?"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={THEME_COLORS.neutralTextSoft}
               className="bg-gray-50 border-b-2 border-gray-200 px-4 py-4 rounded-t-2xl text-lg text-gray-800"
             />
           </View>
@@ -461,7 +465,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               value={description}
               onChangeText={setDescription}
               placeholder="Provide details for your community..."
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={THEME_COLORS.neutralTextSoft}
               multiline
               numberOfLines={4}
               textAlignVertical="top"
@@ -476,12 +480,12 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               <Text className="text-sm font-semibold ml-1 text-gray-500">Location</Text>
               <View className="relative">
                 <View className="flex-row items-center bg-gray-50 border-b-2 border-gray-200 rounded-t-2xl px-4">
-                  <MapPin size={16} color="#6B7280" />
+                  <MapPin size={16} color={THEME_COLORS.neutralTextSubtle} />
                   <TextInput
                     value={locationName}
                     onChangeText={setLocationName}
                     placeholder="Location set via map above"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={THEME_COLORS.neutralTextSoft}
                     className="flex-1 py-4 px-2 text-sm text-gray-800"
                   />
                 </View>
@@ -509,12 +513,12 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
             <View className="space-y-2">
               <Text className="text-sm font-semibold ml-1 text-gray-500">Expiration Date</Text>
               <View className="flex-row items-center bg-gray-50 border-b-2 border-gray-200 rounded-t-2xl px-4">
-                <Calendar size={16} color="#6B7280" />
+                <Calendar size={16} color={THEME_COLORS.neutralTextSubtle} />
                 <TextInput
                   value={expiresAt}
                   onChangeText={setExpiresAt}
                   placeholder="YYYY-MM-DD"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={THEME_COLORS.neutralTextSoft}
                   className="flex-1 py-4 px-2 text-sm text-gray-800"
                   keyboardType="numbers-and-punctuation"
                 />
@@ -533,13 +537,13 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
           className={`py-4 rounded-full items-center justify-center flex-row gap-2 ${
             canSubmit ? '' : 'opacity-40'
           }`}
-          style={{ backgroundColor: canSubmit ? theme.iconBgColor : '#E5E7EB' }}
+          style={{ backgroundColor: canSubmit ? theme.iconBgColor : THEME_COLORS.neutralBorderSoft }}
           activeOpacity={0.8}
         >
           <Text className={`font-bold text-lg ${canSubmit ? 'text-white' : 'text-gray-400'}`}>
             {postToEdit ? 'Update Notice' : NOTICE_CTA[postSubtype].ctaLabel}
           </Text>
-          <Send color={canSubmit ? 'white' : '#9CA3AF'} size={20} />
+          <Send color={canSubmit ? 'white' : THEME_COLORS.neutralTextSoft} size={20} />
         </TouchableOpacity>
       </View>
 

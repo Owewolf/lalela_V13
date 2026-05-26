@@ -21,6 +21,46 @@ import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/uploadImage';
 import LocationPickerSection from '../shared/LocationPickerSection';
 import { Community, UserBusiness } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
+
+const TYPE_SCALE = {
+  base: 11,
+  body: 12,
+  lg: 13,
+  xl: 14,
+  xxl: 16,
+  title: 18,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xs: 4,
+  sm: 8,
+  md: 10,
+  lg: 12,
+  xl: 14,
+  s15: 15,
+  s16: 16,
+  s18: 18,
+  s20: 20,
+  s36: 36,
+  s72: 72,
+};
+const RADIUS = {
+  lg: 14,
+  xl: 16,
+  xxl: 18,
+  pill: 20,
+};
+const LETTER_SPACING = {
+  normal: 1,
+};
 
 interface CreateBusinessFormProps {
   visible: boolean;
@@ -32,22 +72,22 @@ interface CreateBusinessFormProps {
 
 const inputStyle = {
   borderWidth: 1,
-  borderColor: 'rgba(0,0,0,0.08)',
-  borderRadius: 14,
-  paddingHorizontal: 14,
-  paddingVertical: 12,
-  backgroundColor: '#ffffff',
-  fontSize: 14,
-  color: '#1a1a1a',
+  borderColor: THEME_COLORS.overlayBorder,
+  borderRadius: RADIUS.lg,
+  paddingHorizontal: SPACE.xl,
+  paddingVertical: SPACE.lg,
+  backgroundColor: THEME_COLORS.white,
+  fontSize: TYPE_SCALE.xl,
+  color: THEME_COLORS.onSurface,
 } as const;
 
 const labelStyle = {
-  fontSize: 11,
-  fontWeight: '700' as const,
-  color: '#4b5563',
+  fontSize: TYPE_SCALE.base,
+  fontWeight: FONT_WEIGHT.bold,
+  color: THEME_COLORS.neutralTextDefault,
   textTransform: 'uppercase' as const,
-  letterSpacing: 1,
-  marginBottom: 8,
+  letterSpacing: LETTER_SPACING.normal,
+  marginBottom: SPACE.sm,
 } as const;
 
 const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
@@ -226,54 +266,54 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.38)', justifyContent: 'flex-end' }}>
+      <View style={{ flex: 1, backgroundColor: THEME_COLORS.alias_rgba_15_23_42_0_38, justifyContent: 'flex-end' }}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <View style={{ maxHeight: '92%', backgroundColor: '#f9fafb', borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-            <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ maxHeight: '92%', backgroundColor: THEME_COLORS.neutralBg, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+            <View style={{ paddingHorizontal: SPACE.s20, paddingTop: SPACE.s16, paddingBottom: SPACE.lg, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View>
-                <Text style={{ fontSize: 18, fontWeight: '800', color: '#0d3d47' }}>
+                <Text style={{ fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary }}>
                   {business ? 'Edit Business' : 'Create Business'}
                 </Text>
-                <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
+                <Text style={{ fontSize: TYPE_SCALE.body, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs }}>
                   Add a business profile to your communities.
                 </Text>
               </View>
-              <TouchableOpacity onPress={onClose} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' }}>
-                <X size={18} color="#6b7280" />
+              <TouchableOpacity onPress={onClose} style={{ width: SPACE.s36, height: SPACE.s36, borderRadius: RADIUS.xxl, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+                <X size={18} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 36 }} keyboardShouldPersistTaps="handled">
-              <View style={{ gap: 10 }}>
+            <ScrollView contentContainerStyle={{ padding: SPACE.s20, gap: SPACE.s18, paddingBottom: SPACE.s36 }} keyboardShouldPersistTaps="handled">
+              <View style={{ gap: SPACE.lg }}>
                 <Text style={labelStyle}>Business Image</Text>
-                <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8} style={{ borderRadius: 20, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)', backgroundColor: '#ffffff', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                  <View style={{ width: 72, height: 72, borderRadius: 18, backgroundColor: '#ecfeff', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8} style={{ borderRadius: RADIUS.pill, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, padding: SPACE.xl, flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
+                  <View style={{ width: SPACE.s72, height: SPACE.s72, borderRadius: RADIUS.xxl, backgroundColor: THEME_COLORS.infoSurfaceAlt, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
                     {image ? (
                       <Image source={{ uri: image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
                     ) : (
-                      <ImagePlus size={24} color="#0d3d47" />
+                      <ImagePlus size={24} color={THEME_COLORS.primary} />
                     )}
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>
+                    <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>
                       {image ? 'Replace image' : 'Upload business image'}
                     </Text>
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
+                    <Text style={{ fontSize: TYPE_SCALE.body, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs }}>
                       Photos help neighbors recognize your business faster.
                     </Text>
                   </View>
-                  {isUploadingImage ? <ActivityIndicator color="#0d3d47" /> : <Camera size={18} color="#0d3d47" />}
+                  {isUploadingImage ? <ActivityIndicator color={THEME_COLORS.primary} /> : <Camera size={18} color={THEME_COLORS.primary} />}
                 </TouchableOpacity>
               </View>
 
               <View>
                 <Text style={labelStyle}>Business Name</Text>
-                <TextInput value={name} onChangeText={setName} placeholder="Example: Sipho's Bakery" placeholderTextColor="#9ca3af" style={inputStyle} />
+                <TextInput value={name} onChangeText={setName} placeholder="Example: Sipho's Bakery" placeholderTextColor={THEME_COLORS.neutralTextSoft} style={inputStyle} />
               </View>
 
-              <View style={{ gap: 10 }}>
+              <View style={{ gap: SPACE.lg }}>
                 <Text style={labelStyle}>Category</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.lg }}>
                   {BUSINESS_CATEGORIES.map((item) => {
                     const selected = item.label === category;
                     return (
@@ -281,19 +321,19 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                         key={item.id}
                         onPress={() => setCategory(item.label)}
                         style={{
-                          paddingHorizontal: 14,
-                          paddingVertical: 10,
-                          borderRadius: 14,
+                          paddingHorizontal: SPACE.xl,
+                          paddingVertical: SPACE.lg,
+                          borderRadius: RADIUS.lg,
                           borderWidth: 1,
-                          borderColor: selected ? '#0d3d47' : 'rgba(0,0,0,0.08)',
-                          backgroundColor: selected ? 'rgba(13,61,71,0.08)' : '#ffffff',
+                          borderColor: selected ? THEME_COLORS.primary : THEME_COLORS.overlayBorder,
+                          backgroundColor: selected ? THEME_COLORS.primaryTintSoft : THEME_COLORS.white,
                           flexDirection: 'row',
                           alignItems: 'center',
-                          gap: 8,
+                          gap: SPACE.sm,
                         }}
                       >
-                        <Text style={{ fontSize: 16 }}>{item.icon}</Text>
-                        <Text style={{ fontSize: 12, fontWeight: '700', color: selected ? '#0d3d47' : '#374151' }}>
+                        <Text style={{ fontSize: TYPE_SCALE.xxl }}>{item.icon}</Text>
+                        <Text style={{ fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.bold, color: selected ? THEME_COLORS.primary : THEME_COLORS.neutralTextEmphasis }}>
                           {item.label}
                         </Text>
                       </TouchableOpacity>
@@ -308,7 +348,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                   value={description}
                   onChangeText={setDescription}
                   placeholder="Tell neighbors what you offer."
-                  placeholderTextColor="#9ca3af"
+                  placeholderTextColor={THEME_COLORS.neutralTextSoft}
                   style={[inputStyle, { minHeight: 112, textAlignVertical: 'top' }]}
                   multiline
                 />
@@ -328,23 +368,23 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                 hint="Search first, then tap or drag the pin to set the exact business location."
               />
 
-              <View style={{ gap: 10 }}>
+              <View style={{ gap: SPACE.lg }}>
                 <Text style={labelStyle}>Contact Details</Text>
-                <View style={{ gap: 10 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)', backgroundColor: '#ffffff', paddingHorizontal: 14 }}>
-                    <Phone size={16} color="#6b7280" />
-                    <TextInput value={contactPhone} onChangeText={setContactPhone} placeholder="Phone number" placeholderTextColor="#9ca3af" style={{ flex: 1, paddingVertical: 12, fontSize: 14, color: '#1a1a1a' }} keyboardType="phone-pad" />
+                <View style={{ gap: SPACE.lg }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, paddingHorizontal: SPACE.xl }}>
+                    <Phone size={16} color={THEME_COLORS.neutralTextSubtle} />
+                    <TextInput value={contactPhone} onChangeText={setContactPhone} placeholder="Phone number" placeholderTextColor={THEME_COLORS.neutralTextSoft} style={{ flex: 1, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }} keyboardType="phone-pad" />
                   </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)', backgroundColor: '#ffffff', paddingHorizontal: 14 }}>
-                    <Mail size={16} color="#6b7280" />
-                    <TextInput value={contactEmail} onChangeText={setContactEmail} placeholder="Email address" placeholderTextColor="#9ca3af" style={{ flex: 1, paddingVertical: 12, fontSize: 14, color: '#1a1a1a' }} keyboardType="email-address" autoCapitalize="none" />
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, paddingHorizontal: SPACE.xl }}>
+                    <Mail size={16} color={THEME_COLORS.neutralTextSubtle} />
+                    <TextInput value={contactEmail} onChangeText={setContactEmail} placeholder="Email address" placeholderTextColor={THEME_COLORS.neutralTextSoft} style={{ flex: 1, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }} keyboardType="email-address" autoCapitalize="none" />
                   </View>
                 </View>
               </View>
 
-              <View style={{ gap: 10 }}>
+              <View style={{ gap: SPACE.lg }}>
                 <Text style={labelStyle}>Visible In Communities</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.lg }}>
                   {communities.map((community) => {
                     const selected = communityIds.includes(community.id);
                     return (
@@ -352,15 +392,15 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                         key={community.id}
                         onPress={() => toggleCommunity(community.id)}
                         style={{
-                          paddingHorizontal: 14,
-                          paddingVertical: 10,
-                          borderRadius: 14,
+                          paddingHorizontal: SPACE.xl,
+                          paddingVertical: SPACE.lg,
+                          borderRadius: RADIUS.lg,
                           borderWidth: 1,
-                          borderColor: selected ? '#10b981' : 'rgba(0,0,0,0.08)',
-                          backgroundColor: selected ? 'rgba(16,185,129,0.08)' : '#ffffff',
+                          borderColor: selected ? THEME_COLORS.success : THEME_COLORS.overlayBorder,
+                          backgroundColor: selected ? THEME_COLORS.alias_rgba_16_185_129_0_08 : THEME_COLORS.white,
                         }}
                       >
-                        <Text style={{ fontSize: 12, fontWeight: '700', color: selected ? '#047857' : '#374151' }}>
+                        <Text style={{ fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.bold, color: selected ? THEME_COLORS.aliasHex_047857 : THEME_COLORS.neutralTextEmphasis }}>
                           {community.name}
                         </Text>
                       </TouchableOpacity>
@@ -369,31 +409,31 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                 </View>
               </View>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderRadius: 16, backgroundColor: '#ffffff', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: SPACE.s16, borderRadius: RADIUS.xl, backgroundColor: THEME_COLORS.white, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
                 <View>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Business is active</Text>
-                  <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
+                  <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Business is active</Text>
+                  <Text style={{ fontSize: TYPE_SCALE.body, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs }}>
                     Inactive businesses stay saved but won’t appear publicly.
                   </Text>
                 </View>
-                <Switch value={isActive} onValueChange={setIsActive} trackColor={{ false: '#d1d5db', true: '#0d3d47' }} thumbColor="#ffffff" />
+                <Switch value={isActive} onValueChange={setIsActive} trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }} thumbColor={THEME_COLORS.white} />
               </View>
 
               <TouchableOpacity
                 onPress={handleSubmit}
                 disabled={isSubmitting || isUploadingImage}
                 style={{
-                  backgroundColor: isSubmitting || isUploadingImage ? '#9ca3af' : '#0d3d47',
-                  paddingVertical: 15,
-                  borderRadius: 16,
+                  backgroundColor: isSubmitting || isUploadingImage ? THEME_COLORS.neutralTextSoft : THEME_COLORS.primary,
+                  paddingVertical: SPACE.s15,
+                  borderRadius: RADIUS.xl,
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexDirection: 'row',
-                  gap: 10,
+                  gap: SPACE.lg,
                 }}
               >
-                {isSubmitting ? <ActivityIndicator color="#ffffff" /> : null}
-                <Text style={{ fontSize: 13, fontWeight: '800', color: '#ffffff', textTransform: 'uppercase', letterSpacing: 1 }}>
+                {isSubmitting ? <ActivityIndicator color={THEME_COLORS.white} /> : null}
+                <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                   {business ? 'Save Changes' : 'Create Business'}
                 </Text>
               </TouchableOpacity>

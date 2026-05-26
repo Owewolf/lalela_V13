@@ -4,10 +4,53 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { useRouter } from 'expo-router';
 import { AlertTriangle, ArrowLeft, TriangleAlert } from 'lucide-react-native';
 import { useCommunity } from '../../src/context/CommunityContext';
+import { THEME_COLORS } from '../../src/theme/colors';
 
-const PRIMARY = '#0d3d47';
-const ERROR = '#dc2626';
-const WARNING = '#d97706';
+const PRIMARY = THEME_COLORS.primary;
+const ERROR = THEME_COLORS.error;
+const WARNING = THEME_COLORS.warning;
+const TYPE_SCALE = {
+  xs: 9,
+  sm: 10,
+  md: 11,
+  lg: 13,
+  xl: 14,
+  h1: 16,
+  h2: 18,
+  hero: 24,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xxs: 2,
+  xs: 3,
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 10,
+  xxl: 12,
+  xxxl: 16,
+  s24: 24,
+  s32: 32,
+  s36: 36,
+  s40: 40,
+};
+const RADIUS = {
+  sm: 10,
+  md: 12,
+  lg: 14,
+  xl: 16,
+  pill: 99,
+};
+const LETTER_SPACING = {
+  compact: 0.8,
+};
 
 type IncidentType = 'emergency' | 'warning';
 
@@ -91,7 +134,7 @@ export default function EmergencyIndexScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {activeIncidents.length === 0 ? (
           <View style={styles.emptyState}>
-            <TriangleAlert size={24} color="#94a3b8" />
+            <TriangleAlert size={24} color={THEME_COLORS.neutralTextMuted} />
             <Text style={styles.emptyTitle}>No active incidents</Text>
             <Text style={styles.emptyCopy}>Warnings and emergencies will appear here.</Text>
           </View>
@@ -107,7 +150,7 @@ export default function EmergencyIndexScreen() {
                   onPress={() => router.push(`/emergency/${incident.id}` as any)}
                   activeOpacity={0.85}
                 >
-                  <View style={[styles.iconWrap, { backgroundColor: isEmergency ? '#fef2f2' : '#fffbeb' }]}>
+                  <View style={[styles.iconWrap, { backgroundColor: isEmergency ? THEME_COLORS.errorSurface : THEME_COLORS.warningSurface }]}>
                     <AlertTriangle size={16} color={accent} />
                   </View>
                   <View style={styles.rowMain}>
@@ -115,7 +158,7 @@ export default function EmergencyIndexScreen() {
                     <Text numberOfLines={1} style={styles.rowMeta}>{incident.locationName || 'Unknown location'}</Text>
                   </View>
                   <View style={styles.rowRight}>
-                    <View style={[styles.badge, { backgroundColor: isEmergency ? '#fef2f2' : '#fffbeb' }]}>
+                    <View style={[styles.badge, { backgroundColor: isEmergency ? THEME_COLORS.errorSurface : THEME_COLORS.warningSurface }]}>
                       <Text style={[styles.badgeText, { color: accent }]}>{isEmergency ? 'EMERGENCY' : 'WARNING'}</Text>
                     </View>
                     <Text style={[styles.rowTime, { color: accent }]}>{formatIncidentTime(incident.createdAt)}</Text>
@@ -131,103 +174,103 @@ export default function EmergencyIndexScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: THEME_COLORS.neutralBg },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 8,
-    backgroundColor: '#fff',
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xxxl,
+    paddingTop: SPACE.xl,
+    paddingBottom: SPACE.lg,
+    backgroundColor: THEME_COLORS.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: THEME_COLORS.neutralBorder,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: '#f1f5f9',
+    width: SPACE.s36,
+    height: SPACE.s36,
+    borderRadius: RADIUS.md,
+    backgroundColor: THEME_COLORS.neutralBgSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 18, fontWeight: '900', color: PRIMARY },
+  title: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
   summaryRow: {
     flexDirection: 'row',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xxxl,
+    paddingTop: SPACE.xxl,
   },
   summaryCard: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.xl,
+    paddingVertical: SPACE.xl,
+    paddingHorizontal: SPACE.xxl,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: THEME_COLORS.neutralBorder,
   },
-  summaryEmergency: { borderColor: '#fecaca' },
-  summaryWarning: { borderColor: '#fde68a' },
+  summaryEmergency: { borderColor: THEME_COLORS.errorBorder },
+  summaryWarning: { borderColor: THEME_COLORS.warningBorder },
   summaryLabel: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: LETTER_SPACING.compact,
   },
   summaryValue: {
-    marginTop: 2,
-    fontSize: 24,
-    fontWeight: '900',
+    marginTop: SPACE.xxs,
+    fontSize: TYPE_SCALE.hero,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
   },
   content: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: SPACE.xxxl,
+    paddingBottom: SPACE.s40,
   },
-  listWrap: { gap: 10 },
+  listWrap: { gap: SPACE.xl },
   row: {
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    padding: 10,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.lg,
+    padding: SPACE.xl,
     borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: SPACE.xl,
   },
-  rowEmergency: { borderColor: '#fecaca' },
-  rowWarning: { borderColor: '#fde68a' },
+  rowEmergency: { borderColor: THEME_COLORS.errorBorder },
+  rowWarning: { borderColor: THEME_COLORS.warningBorder },
   iconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: SPACE.s32,
+    height: SPACE.s32,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   rowMain: { flex: 1, minWidth: 0 },
-  rowTitle: { fontSize: 14, fontWeight: '700', color: '#0f172a' },
-  rowMeta: { fontSize: 11, color: '#64748b', marginTop: 2 },
-  rowRight: { alignItems: 'flex-end', gap: 4 },
-  badge: { borderRadius: 99, paddingHorizontal: 8, paddingVertical: 3 },
+  rowTitle: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  rowMeta: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs },
+  rowRight: { alignItems: 'flex-end', gap: SPACE.sm },
+  badge: { borderRadius: RADIUS.pill, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.xs },
   badgeText: {
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 0.8,
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.black,
+    letterSpacing: LETTER_SPACING.compact,
     textTransform: 'uppercase',
   },
-  rowTime: { fontSize: 10, fontWeight: '700' },
+  rowTime: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold },
   emptyState: {
-    marginTop: 24,
+    marginTop: SPACE.s24,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 36,
-    borderRadius: 16,
-    backgroundColor: '#fff',
+    paddingVertical: SPACE.s36,
+    borderRadius: RADIUS.xl,
+    backgroundColor: THEME_COLORS.white,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    gap: 6,
+    borderColor: THEME_COLORS.neutralBorder,
+    gap: SPACE.md,
   },
-  emptyTitle: { fontSize: 16, fontWeight: '700', color: '#334155' },
-  emptyCopy: { fontSize: 13, color: '#64748b' },
+  emptyTitle: { fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextHeading },
+  emptyCopy: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextSubtle },
 });

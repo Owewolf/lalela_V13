@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../src/context/AuthContext';
 import { useCommunity } from '../src/context/CommunityContext';
+import { THEME_COLORS } from '../src/theme/colors';
 
 // Handles "lalela://join?join=<code>" deep links routed by Expo Router.
 // - Existing fully-onboarded users: join immediately and go back to tabs.
@@ -59,5 +60,5 @@ export default function JoinRoute() {
     process();
   }, [loading, user, userProfile, inviteCode]);
 
-  return <View style={{ flex: 1, backgroundColor: '#0d3d47' }} />;
+  return <View style={{ flex: 1, backgroundColor: THEME_COLORS.primary }} />;
 }

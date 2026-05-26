@@ -1,0 +1,186 @@
+app/emergency/index.tsx:95:            <TriangleAlert size={24} color="#94a3b8" />
+app/emergency/index.tsx:232:  emptyTitle: { fontSize: 16, fontWeight: '700', color: '#334155' },
+src/components/admin/AdminDashboard.tsx:309:        : ['#ffffff', '#ffffff'],
+src/components/admin/AdminDashboard.tsx:837:              <Settings size={14} color="#fff" />
+src/components/admin/AdminDashboard.tsx:859:                <CheckCircle2 size={12} color="#fc7127" />
+src/components/admin/AdminDashboard.tsx:906:            <Droplets size={28} color="#cbd5e1" />
+src/components/admin/AdminDashboard.tsx:953:          <Activity size={20} color="#fc7127" />
+src/components/admin/AdminDashboard.tsx:1067:              <CheckCircle2 size={14} color="#fff" />
+src/components/admin/AdminDashboard.tsx:1079:              <CheckCircle2 size={40} color="#fc7127" />
+src/components/admin/AdminDashboard.tsx:1088:              <ArrowUpRight size={18} color="#fff" />
+src/components/admin/AdminDashboard.tsx:1101:  container: { flex: 1, backgroundColor: '#fff' },
+src/components/admin/AdminDashboard.tsx:1134:    flex: 1, backgroundColor: '#fff', borderRadius: 15, paddingVertical: 10, paddingHorizontal: 12,
+src/components/admin/AdminDashboard.tsx:1136:    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+src/components/admin/AdminDashboard.tsx:1163:    backgroundColor: '#fff', borderRadius: 20, padding: 18, gap: 8,
+src/components/admin/AdminDashboard.tsx:1165:    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2,
+src/components/admin/AdminDashboard.tsx:1193:  manageFundsBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+src/components/admin/AdminDashboard.tsx:1199:    fontSize: 9, fontWeight: '900', color: 'rgba(255,255,255,0.6)',
+src/components/admin/AdminDashboard.tsx:1202:  featuredCharityName: { fontSize: 16, fontWeight: '700', color: '#fff' },
+src/components/admin/AdminDashboard.tsx:1205:    alignSelf: 'flex-start', backgroundColor: 'rgba(74,222,128,0.15)',
+src/components/admin/AdminDashboard.tsx:1210:  progressText: { fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.9)' },
+src/components/admin/AdminDashboard.tsx:1211:  goalText: { fontSize: 12, color: 'rgba(255,255,255,0.6)' },
+src/components/admin/AdminDashboard.tsx:1212:  progressTrack: { height: 6, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 3, overflow: 'hidden', marginTop: 6 },
+src/components/admin/AdminDashboard.tsx:1216:    backgroundColor: '#fff', borderRadius: 12, paddingVertical: 10, marginTop: 8,
+src/components/admin/AdminDashboard.tsx:1231:    backgroundColor: 'rgba(30, 86, 103, 0.06)',
+src/components/admin/AdminDashboard.tsx:1241:    color: 'rgba(30, 86, 103, 0.7)',
+src/components/admin/AdminDashboard.tsx:1246:    color: '#1e5667',
+src/components/admin/AdminDashboard.tsx:1251:    color: 'rgba(30, 86, 103, 0.7)',
+src/components/admin/AdminDashboard.tsx:1312:    backgroundColor: 'rgba(254,242,242,0.8)',
+src/components/admin/AdminDashboard.tsx:1316:    backgroundColor: 'rgba(255,251,235,0.8)',
+src/components/admin/AdminDashboard.tsx:1350:    backgroundColor: '#fff', borderRadius: 14, padding: 12,
+src/components/admin/AdminDashboard.tsx:1352:    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 4, elevation: 1,
+src/components/admin/AdminDashboard.tsx:1362:    backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: THEME_COLORS.neutralBgSoft,
+src/components/admin/AdminDashboard.tsx:1363:    shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 8,
+src/components/admin/AdminDashboard.tsx:1382:  doneBtnText: { fontSize: 10, fontWeight: '900', color: '#fff', textTransform: 'uppercase', letterSpacing: 0.8 },
+src/components/admin/AdminDashboard.tsx:1386:    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)',
+src/components/admin/AdminDashboard.tsx:1390:    backgroundColor: '#fff', borderRadius: 32, padding: 32,
+src/components/admin/AdminDashboard.tsx:1393:    shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.15, shadowRadius: 32, elevation: 10,
+src/components/admin/AdminDashboard.tsx:1407:  setupCompleteBtnText: { color: '#fff', fontWeight: '900', fontSize: 15 },
+src/components/admin/AdminDashboard.tsx:1410:    backgroundColor: '#fff', borderRadius: 32, padding: 24,
+src/components/admin/AdminDashboard.tsx:1412:    shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.15, shadowRadius: 32, elevation: 10,
+src/components/admin/AdminDashboard.tsx:1441:  submitSuggestBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+src/components/admin/AdminDashboard.tsx:1446:    backgroundColor: 'rgba(252,113,39,0.15)',
+src/components/admin/AdminDashboard.tsx:1448:    borderWidth: 1, borderColor: 'rgba(252,113,39,0.35)',
+src/components/auth/OnboardingCreate.tsx:496:      <SafeAreaView className="flex-1 bg-[#fff8f0] items-center justify-center px-8">
+src/components/auth/OnboardingCreate.tsx:498:          <AlertCircle size={32} color="#fc7127" />
+src/components/auth/OnboardingCreate.tsx:516:          <Text className="text-[#fc7127] font-bold text-base">View Licence Options</Text>
+src/components/auth/OnboardingCreate.tsx:559:                  <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: step === 'profile' ? THEME_COLORS.primary : '#9ca3af' }}>Your Profile</Text>
+src/components/auth/OnboardingCreate.tsx:561:                <View className="h-0.5 w-8 rounded-full mb-4" style={{ backgroundColor: step !== 'profile' ? '#10b981' : '#f3f4f6' }} />
+src/components/auth/OnboardingCreate.tsx:566:              <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: inCommunityPhase ? THEME_COLORS.primary : '#f3f4f6' }}>
+src/components/auth/OnboardingCreate.tsx:567:                <Text className="text-xs font-bold" style={{ color: inCommunityPhase ? 'white' : '#9ca3af' }}>
+src/components/auth/OnboardingCreate.tsx:571:              <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: inCommunityPhase ? THEME_COLORS.primary : '#9ca3af' }}>
+src/components/auth/OnboardingCreate.tsx:578:                  <View key={s} className="w-2 h-2 rounded-full" style={{ backgroundColor: COMMUNITY_STEPS.indexOf(step) >= COMMUNITY_STEPS.indexOf(s) ? THEME_COLORS.primary : '#e5e7eb' }} />
+src/components/auth/OnboardingCreate.tsx:590:                    <UserIcon size={24} color="#fc7127" />
+src/components/auth/OnboardingCreate.tsx:605:                        <UserIcon size={36} color="#d1d5db" />
+src/components/auth/OnboardingCreate.tsx:623:                  <TextInput value={fullName} onChangeText={(t) => { setFullName(t); if (!communityName || communityName.endsWith("'s Community")) setCommunityName(t ? `${t}'s Community` : ''); }} placeholder="Your full name" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor="#9ca3af" />
+src/components/auth/OnboardingCreate.tsx:629:                  <TextInput value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor="#9ca3af" />
+src/components/auth/OnboardingCreate.tsx:635:                  <TextInput value={phone} onChangeText={setPhone} placeholder="+27..." keyboardType="phone-pad" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor="#9ca3af" />
+src/components/auth/OnboardingCreate.tsx:640:                    <MapPin size={18} color="#3b82f6" />
+src/components/auth/OnboardingCreate.tsx:661:                  style={{ backgroundColor: isProfileValid ? THEME_COLORS.primary : '#d1d5db' }}
+src/components/auth/OnboardingCreate.tsx:674:                    <Sparkles size={24} color="#fc7127" />
+src/components/auth/OnboardingCreate.tsx:685:                    {profileImage ? <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" /> : <UserIcon size={20} color="#9ca3af" />}
+src/components/auth/OnboardingCreate.tsx:690:                      <MapPin size={10} color="#9ca3af" />
+src/components/auth/OnboardingCreate.tsx:702:                  <TextInput value={communityName} onChangeText={setCommunityName} placeholder="e.g. Parkwood Heights" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor="#9ca3af" />
+src/components/auth/OnboardingCreate.tsx:707:                    <CheckCircle2 size={18} color="#10b981" />
+src/components/auth/OnboardingCreate.tsx:731:                      <ArrowLeft size={20} color="#374151" />
+src/components/auth/OnboardingCreate.tsx:763:                    <MapPin size={24} color="#3b82f6" />
+src/components/auth/OnboardingCreate.tsx:788:                      textInputProps={{ placeholderTextColor: '#9ca3af' }}
+src/components/auth/OnboardingCreate.tsx:791:                        textInput: { backgroundColor: '#f3f4f6', borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14, fontWeight: 'bold', color: THEME_COLORS.primary, height: 52, margin: 0 },
+src/components/auth/OnboardingCreate.tsx:792:                        listView: { position: 'absolute', top: 56, left: 0, right: 0, zIndex: 9999, elevation: 9999, backgroundColor: THEME_COLORS.white, borderRadius: 12, marginTop: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8 },
+src/components/auth/OnboardingCreate.tsx:794:                        description: { fontSize: 13, color: '#374151' },
+src/components/auth/OnboardingCreate.tsx:806:                    <View className="flex-row items-center gap-1 mt-1 ml-1"><CheckCircle2 size={12} color="#10b981" /><Text className="text-[10px] text-emerald-600 font-medium">Location set: {coverageName}</Text></View>
+src/components/auth/OnboardingCreate.tsx:808:                    <View className="flex-row items-center gap-1 mt-1 ml-1"><AlertCircle size={12} color="#f59e0b" /><Text className="text-[10px] text-amber-600 font-medium">Search, use current location, or tap the map to drop a pin.</Text></View>
+src/components/auth/OnboardingCreate.tsx:816:                  <View style={{ height: 240, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb' }}>
+src/components/auth/OnboardingCreate.tsx:847:                          fillColor="rgba(13,61,71,0.08)"
+src/components/auth/OnboardingCreate.tsx:882:                    maximumTrackTintColor="#e5e7eb"
+src/components/auth/OnboardingCreate.tsx:895:                    <ArrowLeft size={20} color="#374151" />
+src/components/auth/OnboardingCreate.tsx:918:                          style={{ backgroundColor: done ? THEME_COLORS.secondaryContainer : '#e5e7eb' }}
+src/components/auth/OnboardingCreate.tsx:969:                          backgroundColor: enabled ? '#fff8f0' : THEME_COLORS.neutralBg,
+src/components/auth/OnboardingCreate.tsx:971:                          borderColor: enabled ? THEME_COLORS.secondaryContainer : '#e5e7eb',
+src/components/auth/OnboardingCreate.tsx:1001:                          style={{ color: enabled ? THEME_COLORS.primary : '#9ca3af' }}
+src/components/auth/OnboardingCreate.tsx:1037:                    <ArrowLeft size={13} color="#9ca3af" />
+src/components/auth/OnboardingCreate.tsx:1062:                    style={{ backgroundColor: coverageLat === 0 ? '#e5e7eb' : THEME_COLORS.secondaryContainer, opacity: isDiscovering ? 0.7 : 1 }}
+src/components/auth/OnboardingCreate.tsx:1118:                              backgroundColor: selected ? '#fff8f0' : THEME_COLORS.neutralBg,
+src/components/auth/OnboardingCreate.tsx:1119:                              borderColor: selected ? THEME_COLORS.secondaryContainer : '#e5e7eb',
+src/components/auth/OnboardingCreate.tsx:1125:                                backgroundColor: selected ? THEME_COLORS.secondaryContainer : '#e5e7eb',
+src/components/auth/OnboardingCreate.tsx:1154:                        style={{ backgroundColor: selectedDiscovered.size > 0 ? THEME_COLORS.primary : '#e5e7eb' }}
+src/components/auth/OnboardingCreate.tsx:1156:                        <Text style={{ color: selectedDiscovered.size > 0 ? THEME_COLORS.white : '#9ca3af', fontWeight: 'bold', fontSize: 13 }}>
+src/components/auth/OnboardingCreate.tsx:1189:                      placeholderTextColor="#9ca3af"
+src/components/auth/OnboardingCreate.tsx:1200:                      style={{ backgroundColor: newBizName.trim() ? THEME_COLORS.primary : '#e5e7eb' }}
+src/components/auth/OnboardingCreate.tsx:1202:                      <Text style={{ color: newBizName.trim() ? THEME_COLORS.white : '#9ca3af', fontWeight: 'bold', fontSize: 13 }}>+</Text>
+src/components/auth/OnboardingCreate.tsx:1209:                    <ArrowLeft size={20} color="#374151" />
+src/components/auth/OnboardingCreate.tsx:1259:                      style={{ backgroundColor: requireVerification ? THEME_COLORS.primary : '#e5e7eb' }}
+src/components/auth/OnboardingCreate.tsx:1267:                <View className="bg-[#f0fdf4] border border-emerald-100 rounded-2xl p-4 gap-2">
+src/components/auth/OnboardingCreate.tsx:1279:                    <ArrowLeft size={20} color="#374151" />
+src/components/admin/ModerationCenter.tsx:502:      { id: 'members', label: 'Members', icon: <Users size={20} color={activeTab === 'members' ? '#fff' : THEME_COLORS.neutralTextSubtle} /> },
+src/components/admin/ModerationCenter.tsx:503:      { id: 'content', label: 'Content', icon: <FileText size={20} color={activeTab === 'content' ? '#fff' : THEME_COLORS.neutralTextSubtle} /> },
+src/components/admin/ModerationCenter.tsx:504:      { id: 'businesses', label: 'Businesses', icon: <Store size={20} color={activeTab === 'businesses' ? '#fff' : THEME_COLORS.neutralTextSubtle} /> },
+src/components/admin/ModerationCenter.tsx:505:      { id: 'categories', label: 'Categories', icon: <Tag size={20} color={activeTab === 'categories' ? '#fff' : THEME_COLORS.neutralTextSubtle} /> },
+src/components/admin/ModerationCenter.tsx:506:      { id: 'rules', label: 'Rules', icon: <Shield size={20} color={activeTab === 'rules' ? '#fff' : THEME_COLORS.neutralTextSubtle} /> },
+src/components/admin/ModerationCenter.tsx:507:      { id: 'coverage', label: 'Coverage', icon: <Map size={20} color={activeTab === 'coverage' ? '#fff' : THEME_COLORS.neutralTextSubtle} /> },
+src/components/admin/ModerationCenter.tsx:508:      { id: 'charity', label: 'Charity', icon: <Heart size={20} color={activeTab === 'charity' ? '#fff' : THEME_COLORS.neutralTextSubtle} /> },
+src/components/admin/ModerationCenter.tsx:509:      { id: 'logs', label: 'Audit', icon: <History size={20} color={activeTab === 'logs' ? '#fff' : THEME_COLORS.neutralTextSubtle} /> },
+src/components/admin/ModerationCenter.tsx:576:                backgroundColor: '#fff', 
+src/components/admin/ModerationCenter.tsx:580:                shadowColor: '#000', 
+src/components/admin/ModerationCenter.tsx:586:              description: { fontSize: 13, color: '#374151' },
+src/components/admin/ModerationCenter.tsx:606:            maximumTrackTintColor="#CBD5E1"
+src/components/admin/ModerationCenter.tsx:642:                fillColor="rgba(13,61,71,0.08)"
+src/components/admin/ModerationCenter.tsx:643:                strokeColor="#0d3d47"
+src/components/admin/ModerationCenter.tsx:676:            <Save size={16} color="#fff" />
+src/components/admin/ModerationCenter.tsx:700:              <UserPlus size={16} color="#fff" />
+src/components/admin/ModerationCenter.tsx:712:                    <Mail size={20} color="#94a3b8" />
+src/components/admin/ModerationCenter.tsx:760:                    <Text style={[styles.roleBadgeText, { color: (member.role === 'ADMIN' || member.role === 'MODERATOR') ? '#fff' : THEME_COLORS.neutralTextSubtle }]}>
+src/components/admin/ModerationCenter.tsx:764:                  <ChevronRight size={16} color="#94a3b8" />
+src/components/admin/ModerationCenter.tsx:769:                <Users size={32} color="#cbd5e1" />
+src/components/admin/ModerationCenter.tsx:809:                    <CheckCircle2 size={18} color="#fc7127" />
+src/components/admin/ModerationCenter.tsx:821:                  placeholderTextColor="#94a3b8"
+src/components/admin/ModerationCenter.tsx:843:                    <ActivityIndicator size="small" color="#fff" />
+src/components/admin/ModerationCenter.tsx:845:                    <Mail size={16} color="#fff" />
+src/components/admin/ModerationCenter.tsx:854:                  <Text style={{ color: inviteEmailStatus.type === 'success' ? '#1e5667' : ERROR, fontSize: 12, fontWeight: '700' }}>
+src/components/admin/ModerationCenter.tsx:865:                  placeholderTextColor="#94a3b8"
+src/components/admin/ModerationCenter.tsx:894:                    <ActivityIndicator size="small" color="#fff" />
+src/components/admin/ModerationCenter.tsx:896:                    <MessageSquare size={16} color="#fff" />
+src/components/admin/ModerationCenter.tsx:905:                  <Text style={{ color: inviteSmsStatus.type === 'success' ? '#1e5667' : ERROR, fontSize: 12, fontWeight: '700' }}>
+src/components/admin/ModerationCenter.tsx:926:                <ActivityIndicator size="small" color="#fff" />
+src/components/admin/ModerationCenter.tsx:928:                <RefreshCw size={16} color="#fff" />
+src/components/admin/ModerationCenter.tsx:940:            <Text style={[styles.cardLabel, { color: 'rgba(255,255,255,0.7)' }]}>
+src/components/admin/ModerationCenter.tsx:944:              <View key={inv.id} style={[styles.memberRow, { borderBottomColor: 'rgba(255,255,255,0.1)' }]}>
+src/components/admin/ModerationCenter.tsx:945:                <Mail size={16} color="rgba(255,255,255,0.8)" />
+src/components/admin/ModerationCenter.tsx:946:                <Text style={[styles.memberName, { color: '#fff', flex: 1, marginLeft: 8 }]} numberOfLines={1}>
+src/components/admin/ModerationCenter.tsx:949:                <View style={[styles.roleBadge, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+src/components/admin/ModerationCenter.tsx:950:                  <Text style={[styles.roleBadgeText, { color: '#fff' }]}>{inv.role}</Text>
+src/components/admin/ModerationCenter.tsx:1010:              <Text style={[styles.roleBadgeText, { color: '#fff' }]}>{selectedMember.role}</Text>
+src/components/admin/ModerationCenter.tsx:1024:                style={[styles.controlBtn, { backgroundColor: selectedMember.role === 'MODERATOR' ? '#f5f3ff' : THEME_COLORS.neutralBg }]}
+src/components/admin/ModerationCenter.tsx:1046:              <Loader2 size={16} color="#64748b" />
+src/components/admin/ModerationCenter.tsx:1069:                <View style={[styles.activityBadge, { backgroundColor: item.type === 'listing' ? '#fef3c7' : '#e0f2fe' }]}>
+src/components/admin/ModerationCenter.tsx:1070:                  <Text style={[styles.activityBadgeText, { color: item.type === 'listing' ? '#b45309' : '#075985' }]}>{item.type === 'listing' ? 'LISTING' : 'NOTICE'}</Text>
+src/components/admin/ModerationCenter.tsx:1091:                <View style={[styles.activityBadge, { backgroundColor: '#f3e8ff' }]}>
+src/components/admin/ModerationCenter.tsx:1092:                  <Text style={[styles.activityBadgeText, { color: '#6d28d9' }]}>{item.status?.toUpperCase() || 'PENDING'}</Text>
+src/components/admin/ModerationCenter.tsx:1123:                <View style={[styles.activityBadge, { backgroundColor: '#ecfeff' }]}>
+src/components/admin/ModerationCenter.tsx:1124:                  <Text style={[styles.activityBadgeText, { color: '#155e75' }]}>{log.action.toUpperCase()}</Text>
+src/components/admin/ModerationCenter.tsx:1136:          <View style={[styles.card, { borderColor: THEME_COLORS.errorSurface, backgroundColor: '#fff5f5' }]}>
+src/components/admin/ModerationCenter.tsx:1153:                <Text style={[styles.dangerBtnText, { color: '#fff' }]}>Delete</Text>
+src/components/admin/ModerationCenter.tsx:1210:                <View style={[styles.contentIcon, { backgroundColor: '#f5f3ff' }]}>
+src/components/admin/ModerationCenter.tsx:1218:                  <Text style={[styles.statusChipText, { color: '#1e5667' }] }>
+src/components/admin/ModerationCenter.tsx:1229:                    : notice.type === 'listing' ? '#f5f3ff' : THEME_COLORS.successSurface
+src/components/admin/ModerationCenter.tsx:1232:                    <Globe size={18} color="#b45309" />
+src/components/admin/ModerationCenter.tsx:1249:                        <CheckCircle2 size={18} color="#fc7127" />
+src/components/admin/ModerationCenter.tsx:1278:              <FileText size={32} color="#cbd5e1" />
+src/components/admin/ModerationCenter.tsx:1305:              <View style={{ backgroundColor: '#dcfce7', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+src/components/admin/ModerationCenter.tsx:1306:                <Text style={{ fontSize: 10, color: '#16a34a', fontWeight: '700' }}>Live in Marketplace</Text>
+src/components/admin/ModerationCenter.tsx:1308:              <View style={{ backgroundColor: biz.source === 'IMPORT' ? '#f5f3ff' : '#eff6ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+src/components/admin/ModerationCenter.tsx:1309:                <Text style={{ fontSize: 10, color: biz.source === 'IMPORT' ? '#7c3aed' : '#1d4ed8', fontWeight: '700' }}>
+src/components/admin/ModerationCenter.tsx:1334:              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#0d3d47', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 }}
+src/components/admin/ModerationCenter.tsx:1338:              <Sparkles size={14} color="#fff" />
+src/components/admin/ModerationCenter.tsx:1339:              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>AI Import</Text>
+src/components/admin/ModerationCenter.tsx:1366:                <Store size={32} color="#cbd5e1" />
+src/components/admin/ModerationCenter.tsx:1415:                <View style={[styles.categoryIcon, { backgroundColor: enabled ? '#fff' : THEME_COLORS.neutralBg }]}>
+src/components/admin/ModerationCenter.tsx:1423:                  {enabled && <CheckCircle2 size={16} color="#fff" />}
+src/components/admin/ModerationCenter.tsx:1464:        <View style={[styles.card, { backgroundColor: THEME_COLORS.successSurface, borderColor: '#ffddb9' }]}>
+src/components/admin/ModerationCenter.tsx:1467:              <AlertTriangle size={20} color="#fff" />
+src/components/admin/ModerationCenter.tsx:1505:                <Clock size={10} color="#94a3b8" />
+src/components/admin/ModerationCenter.tsx:1514:            <History size={32} color="#cbd5e1" />
+src/components/admin/ModerationCenter.tsx:1650:  container: { flex: 1, backgroundColor: '#fff' },
+src/components/admin/ModerationCenter.tsx:1675:  tabBtnTextActive: { color: '#fff' },
+src/components/admin/ModerationCenter.tsx:1690:  saveBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+src/components/admin/ModerationCenter.tsx:1701:  actionBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+src/components/admin/ModerationCenter.tsx:1728:  radiusBtnTextActive: { color: '#fff' },
+src/components/admin/ModerationCenter.tsx:1733:    borderRadius: 20, padding: 16, borderWidth: 1, borderColor: '#ffddb9', alignItems: 'center', justifyContent: 'space-between',
+src/components/admin/ModerationCenter.tsx:1736:  infoBannerDesc: { fontSize: 12, color: '#475569', lineHeight: 18, flex: 1 },
+src/components/admin/ModerationCenter.tsx:1739:    backgroundColor: '#fff', borderRadius: 16, padding: 16, gap: 12,
+src/components/admin/ModerationCenter.tsx:1741:    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+src/components/admin/ModerationCenter.tsx:1770:  searchBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+src/components/admin/ModerationCenter.tsx:1776:  linkText: { flex: 1, fontSize: 11, fontFamily: 'monospace', color: '#334155' },
+src/components/admin/ModerationCenter.tsx:1819:  filterTabTextActive: { color: '#fff' },
+src/components/admin/ModerationCenter.tsx:1823:    backgroundColor: '#fff', borderRadius: 14, padding: 12,
+src/components/admin/ModerationCenter.tsx:1825:    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 4, elevation: 1,
+src/components/admin/ModerationCenter.tsx:1835:    flexDirection: 'row', gap: 12, backgroundColor: '#fff', borderRadius: 20, padding: 14,
+src/components/admin/ModerationCenter.tsx:1837:    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2,
+src/components/admin/ModerationCenter.tsx:1848:  approveBtnText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+src/components/admin/ModerationCenter.tsx:1862:    backgroundColor: '#fff', borderRadius: 20, padding: 14,
+src/components/admin/ModerationCenter.tsx:1879:  ruleText: { fontSize: 14, color: '#334155', fontWeight: '500', flex: 1 },
+src/components/admin/ModerationCenter.tsx:1881:    width: 56, backgroundColor: '#fff', borderRadius: 8, textAlign: 'center',
+src/components/admin/ModerationCenter.tsx:1887:    position: 'absolute', width: 14, height: 14, borderRadius: 7, backgroundColor: '#fff',
+src/components/admin/ModerationCenter.tsx:1888:    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 2, elevation: 2,
+src/components/admin/ModerationCenter.tsx:1893:    backgroundColor: '#fff', borderRadius: 14, padding: 12,
+src/components/admin/ModerationCenter.tsx:1895:    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 4, elevation: 1,

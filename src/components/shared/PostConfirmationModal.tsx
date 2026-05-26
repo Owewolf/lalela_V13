@@ -1,6 +1,8 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { AlertCircle, Send } from 'lucide-react-native';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
 interface PostConfirmationModalProps {
   isOpen: boolean;
@@ -18,13 +20,50 @@ interface PostConfirmationModalProps {
   confirmDisabled?: boolean;
 }
 
-const THEME_COLORS: Record<string, string> = {
-  'bg-primary': '#0d3d47',
-  'bg-error': '#dc2626',
-  'bg-blue-600': '#2563eb',
-  'bg-amber-600': '#d97706',
-  'bg-emerald-600': '#059669',
-  'bg-secondary': '#6750a4',
+const THEME_COLOR_CLASS_MAP: Record<string, string> = {
+  'bg-primary': THEME_COLORS.primary,
+  'bg-error': THEME_COLORS.errorStrong,
+  'bg-blue-600': THEME_COLORS.brandBlueText,
+  'bg-amber-600': THEME_COLORS.warning,
+  'bg-emerald-600': THEME_COLORS.successStrongAlt,
+  'bg-secondary': THEME_COLORS.md3Primary,
+};
+const TYPE_SCALE = {
+  sm: 9,
+  body: 13,
+  lg: 14,
+  title: 20,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xs: 4,
+  sm: 6,
+  md: 8,
+  s10: 10,
+  lg: 12,
+  xl: 16,
+  xxl: 20,
+  s24: 24,
+  s32: 32,
+  s64: 64,
+};
+const RADIUS = {
+  md: 16,
+  lg: 24,
+  full: 32,
+};
+const LINE_HEIGHT = {
+  body: 20,
+};
+const LETTER_SPACING = {
+  wide: 1.5,
 };
 
 export const PostConfirmationModal: React.FC<PostConfirmationModalProps> = ({
@@ -42,7 +81,7 @@ export const PostConfirmationModal: React.FC<PostConfirmationModalProps> = ({
   confirmLabel,
   confirmDisabled = false,
 }) => {
-  const resolvedColor = THEME_COLORS[themeColor] || '#0d3d47';
+  const resolvedColor = THEME_COLOR_CLASS_MAP[themeColor] || THEME_COLORS.primary;
 
   return (
     <Modal
@@ -97,7 +136,7 @@ export const PostConfirmationModal: React.FC<PostConfirmationModalProps> = ({
               disabled={confirmDisabled}
             >
               <Text style={styles.confirmBtnText}>{confirmLabel ?? ctaLabel}</Text>
-              <Send size={16} color="#fff" style={{ marginLeft: 6 }} />
+              <Send size={SPACE.xl} color={THEME_COLORS.white} style={{ marginLeft: SPACE.sm }} />
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -109,112 +148,108 @@ export const PostConfirmationModal: React.FC<PostConfirmationModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_4,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: SPACE.s24,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 32,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.lg,
+    padding: SPACE.s32,
     width: '100%',
     maxWidth: 380,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
-    elevation: 8,
+    ...createShadow(THEME_COLORS.black, 0, 8, 0.18, 24, 8),
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    gap: 20,
+    borderColor: THEME_COLORS.neutralBorder,
+    gap: SPACE.xxl,
   },
   iconContainer: {
     alignItems: 'center',
-    gap: 8,
+    gap: SPACE.md,
   },
   iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: SPACE.s64,
+    height: SPACE.s64,
+    borderRadius: RADIUS.full,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: SPACE.md,
   },
   modalTitle: {
-    fontWeight: '900',
-    fontSize: 20,
-    color: '#1e293b',
+    fontWeight: FONT_WEIGHT.black,
+    fontSize: TYPE_SCALE.title,
+    color: THEME_COLORS.aliasHex_1e293b,
     textAlign: 'center',
   },
   modalMessage: {
-    fontSize: 13,
-    color: '#64748b',
+    fontSize: TYPE_SCALE.body,
+    color: THEME_COLORS.neutralTextSubtle,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: LINE_HEIGHT.body,
   },
   bold: {
-    fontWeight: '700',
-    color: '#334155',
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextHeading,
   },
   boldItalic: {
-    fontWeight: '700',
+    fontWeight: FONT_WEIGHT.bold,
     fontStyle: 'italic',
-    color: '#334155',
+    color: THEME_COLORS.neutralTextHeading,
   },
   titleBox: {
-    marginTop: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#f8fafc',
-    borderRadius: 16,
+    marginTop: SPACE.lg,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.s10,
+    backgroundColor: THEME_COLORS.neutralBg,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: THEME_COLORS.neutralBgSoft,
     width: '100%',
   },
   postTypeLabel: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginBottom: 4,
+    letterSpacing: LETTER_SPACING.wide,
+    marginBottom: SPACE.xs,
   },
   postTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#334155',
+    fontSize: TYPE_SCALE.body,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextHeading,
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: SPACE.lg,
   },
   cancelBtn: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 16,
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.md,
     borderWidth: 2,
-    borderColor: '#e2e8f0',
+    borderColor: THEME_COLORS.neutralBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelBtnText: {
-    color: '#475569',
-    fontWeight: '700',
-    fontSize: 14,
+    color: THEME_COLORS.neutralTextDefault,
+    fontWeight: FONT_WEIGHT.bold,
+    fontSize: TYPE_SCALE.lg,
   },
   confirmBtn: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 16,
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
   },
   confirmBtnText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 14,
+    color: THEME_COLORS.white,
+    fontWeight: FONT_WEIGHT.bold,
+    fontSize: TYPE_SCALE.lg,
   },
   disabledBtn: {
     opacity: 0.6,

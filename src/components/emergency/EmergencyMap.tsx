@@ -10,6 +10,8 @@ import { defaultMapViewProps } from '../../lib/mapViewProps';
 import { useCommunity } from '../../context/CommunityContext';
 import { CommunityNotice } from '../../types';
 import { deriveEmergencyResponders } from './responderUtils';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
 interface EmergencyMapProps {
   emergencyPost: CommunityNotice;
@@ -134,20 +136,20 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
         <Circle
           center={{ latitude: emergencyLat, longitude: emergencyLng }}
           radius={EMERGENCY_RADIUS}
-          strokeColor="rgba(220, 38, 38, 0.45)"
-          fillColor="rgba(220, 38, 38, 0.08)"
+          strokeColor={THEME_COLORS.errorOverlay45}
+          fillColor={THEME_COLORS.errorOverlay08}
           strokeWidth={2}
         />
 
         {/* Emergency source marker */}
         <Marker
           coordinate={{ latitude: emergencyLat, longitude: emergencyLng }}
-          pinColor="#B3261E"
+          pinColor={THEME_COLORS.md3Error}
         >
           <Callout tooltip>
             <View className="bg-white rounded-2xl p-3 min-w-[180px] max-w-[260px] shadow-lg">
               <View className="flex-row items-center gap-2 mb-2">
-                <Siren color="#B3261E" size={14} />
+                <Siren color={THEME_COLORS.md3Error} size={14} />
                 <Text className="text-xs font-black text-red-600 uppercase tracking-widest">Active Emergency</Text>
               </View>
               <Text className="text-sm font-bold text-primary">{emergencyPost.title}</Text>
@@ -199,14 +201,14 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
             >
               <View
                 className="bg-teal-700 p-1.5 rounded-full border-2 border-white"
-                style={{ shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 4 }}
+                    style={createShadow(THEME_COLORS.black, 0, 0, 0.3, 4, 0)}
               >
                 <Shield color="white" size={14} />
               </View>
               <Callout tooltip>
                 <View className="bg-white rounded-2xl p-3 min-w-[180px] shadow-lg">
                   <View className="flex-row items-center gap-2 mb-2">
-                    <Shield color="#0D9488" size={14} />
+                    <Shield color={THEME_COLORS.aliasHex_0d9488} size={14} />
                     <Text className="text-xs font-black text-teal-700 uppercase tracking-widest">Responder</Text>
                   </View>
                   <Text className="text-sm font-bold text-primary">{responder.name}</Text>
@@ -255,12 +257,12 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
             >
               <View
                 className="bg-emerald-500 rounded-full border-2 border-white"
-                style={{ width: 14, height: 14, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 3 }}
+                    style={{ width: 14, height: 14, ...createShadow(THEME_COLORS.black, 0, 0, 0.2, 3, 0) }}
               />
               <Callout tooltip>
                 <View className="bg-white rounded-2xl p-3 min-w-[180px] shadow-lg">
                   <View className="flex-row items-center gap-2 mb-2">
-                    <Users color="#10B981" size={14} />
+                    <Users color={THEME_COLORS.success} size={14} />
                     <Text className="text-xs font-black text-emerald-600 uppercase tracking-widest">Community Member</Text>
                   </View>
                   <Text className="text-sm font-bold text-primary">{member.name || 'Community Member'}</Text>

@@ -47,10 +47,83 @@ import { CommunityInsightPanels } from './CommunityInsightPanels';
 import { InteractiveCoverageMap } from '../home/InteractiveCoverageMap';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
 import type { CatHubSummary } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
-const ERROR = '#dc2626';
-const SECONDARY = '#7c3aed';
+const PRIMARY = THEME_COLORS.primary;
+const ERROR = THEME_COLORS.error;
+const SECONDARY = THEME_COLORS.secondary;
+
+const TYPE_SCALE = {
+  xs: 9,
+  sm: 10,
+  md: 11,
+  lg: 12,
+  xl: 13,
+  xxl: 14,
+  h3: 15,
+  h2: 16,
+  h1: 18,
+  display: 22,
+  hero: 26,
+  metric: 28,
+} as const;
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+
+const LINE_HEIGHT = {
+  compact: 18,
+  base: 20,
+  display: 26,
+} as const;
+
+const LETTER_SPACING = {
+  tight: 0.4,
+  normal: 0.5,
+  wide: 0.8,
+  wider: 0.9,
+  widest: 1,
+  ultra: 1.2,
+  hero: 1.5,
+} as const;
+
+const SPACE = {
+  zero: 0,
+  xxxs: 1,
+  xxs: 2,
+  xs: 3,
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 10,
+  xxl: 12,
+  xxxl: 14,
+  s16: 16,
+  s18: 18,
+  s20: 20,
+  s24: 24,
+  s32: 32,
+} as const;
+
+const RADIUS = {
+  sm: 3,
+  md: 4,
+  lg: 8,
+  xl: 10,
+  xxl: 12,
+  card: 14,
+  cardLg: 16,
+  panel: 20,
+  modal: 32,
+  circle: 40,
+  pill: 99,
+} as const;
 
 const APP_LOGO = require('../../../assets/lalela_logo.png');
 
@@ -58,6 +131,7 @@ interface AdminDashboardProps {
   onBack?: () => void;
   onManageCharity?: () => void;
   initialView?: 'dashboard' | 'moderation' | 'members';
+  initialModerationTab?: 'members' | 'content' | 'businesses' | 'rules' | 'logs' | 'categories' | 'coverage' | 'charity';
   readOnly?: boolean;
   guidedSetup?: boolean;
   onSetupComplete?: () => void;
@@ -78,6 +152,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onBack,
   onManageCharity,
   initialView = 'dashboard',
+  initialModerationTab = 'members',
   readOnly = false,
   guidedSetup = false,
   onSetupComplete,
@@ -105,7 +180,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [activeView, setActiveView] = React.useState<'dashboard' | 'moderation' | 'members'>(
     readOnly ? 'dashboard' : initialView
   );
-  const [moderationTab, setModerationTab] = React.useState<any>('members');
+  const [moderationTab, setModerationTab] = React.useState<any>(initialModerationTab);
   const [memberCount, setMemberCount] = React.useState(0);
   const [activeAlertsCount, setActiveAlertsCount] = React.useState(0);
   const [recentActivities, setRecentActivities] = React.useState<any[]>([]);
@@ -302,10 +377,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const securityPulseBg = securityPulse.interpolate({
     inputRange: [0, 1],
     outputRange: hasEmergencies
-      ? ['#fef2f2', '#fecaca']
+      ? [THEME_COLORS.errorSurface, THEME_COLORS.errorBorder]
       : hasWarnings
-        ? ['#fffbeb', '#fde68a']
-        : ['#ffffff', '#ffffff'],
+        ? [THEME_COLORS.warningSurface, THEME_COLORS.warningBorder]
+        : [THEME_COLORS.white, THEME_COLORS.white],
   });
 
   const formatIncidentTime = React.useCallback((value?: string) => {
@@ -414,6 +489,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   }, [readOnly, activeView]);
 
+  React.useEffect(() => {
+    if (initialModerationTab) {
+      setModerationTab(initialModerationTab);
+    }
+  }, [initialModerationTab]);
+
   // Derive member/volunteer counts from CommunityContext state
   React.useEffect(() => {
     setMemberCount(members.length);
@@ -467,7 +548,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           subtitle: `${d.target_type} • ${d.reason || 'No reason provided'}`,
           time: d.timestamp ? new Date(d.timestamp).toLocaleString() : 'Just now',
           icon: d.action === 'approve' ? UserPlus : Flag,
-          iconBg: d.action === 'approve' ? '#f0fdf4' : '#fef2f2',
+          iconBg: d.action === 'approve' ? THEME_COLORS.successSurface : THEME_COLORS.errorSurface,
           iconColor: d.action === 'approve' ? PRIMARY : ERROR,
         }))
       );
@@ -590,7 +671,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const activities = recentActivities.length > 0 ? recentActivities : [
     {
       id: 'no-activity', title: 'No recent activity', subtitle: 'System is quiet',
-      time: 'NOW', icon: History, iconBg: '#f8fafc', iconColor: '#94a3b8',
+      time: 'NOW', icon: History, iconBg: THEME_COLORS.neutralBg, iconColor: THEME_COLORS.neutralTextMuted,
     },
   ];
 
@@ -656,7 +737,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </View>
 
       {/* Interactive Community Map */}
-      <View style={[styles.bentoCard, { padding: 12 }]}>
+      <View style={[styles.bentoCard, { padding: SPACE.xxl }]}>
         <InteractiveCoverageMap
           center={mapCenter}
           resetTrigger={resetTrigger}
@@ -690,20 +771,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         style={[
           styles.bentoCard,
           hasAnyIncidents && { backgroundColor: securityPulseBg },
-          hasEmergencies && { borderColor: '#fecaca' },
-          !hasEmergencies && hasWarnings && { borderColor: '#fde68a' },
+          hasEmergencies && { borderColor: THEME_COLORS.errorBorder },
+          !hasEmergencies && hasWarnings && { borderColor: THEME_COLORS.warningBorder },
         ]}
       >
         <View style={styles.bentoHeader}>
           <Shield
             size={22}
-            color={hasEmergencies ? ERROR : hasWarnings ? '#d97706' : SECONDARY}
+            color={hasEmergencies ? ERROR : hasWarnings ? THEME_COLORS.warning : SECONDARY}
           />
           <Text
             style={[
               styles.bentoTitle,
               hasEmergencies && { color: ERROR },
-              !hasEmergencies && hasWarnings && { color: '#d97706' },
+              !hasEmergencies && hasWarnings && { color: THEME_COLORS.warning },
             ]}
           >
             Security Panel
@@ -731,7 +812,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </View>
           <View style={styles.securityStat}>
             <Text style={styles.securityStatLabel}>WARNINGS</Text>
-            <Text style={[styles.securityStatValue, hasWarnings && { color: '#d97706' }]}>
+            <Text style={[styles.securityStatValue, hasWarnings && { color: THEME_COLORS.warning }]}>
               {warningCount}
             </Text>
           </View>
@@ -772,7 +853,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             {hasWarnings && (
               <View style={styles.incidentSection}>
-                <Text style={[styles.incidentSectionLabel, { color: '#d97706' }]}>Active Warnings</Text>
+                <Text style={[styles.incidentSectionLabel, { color: THEME_COLORS.warning }]}>Active Warnings</Text>
                 {activeWarningPosts.map((incident: any) => (
                   <TouchableOpacity
                     key={incident.id}
@@ -789,7 +870,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         {incident.locationName || 'Unknown location'}
                       </Text>
                     </View>
-                    <Text style={[styles.incidentTime, { color: '#d97706' }]}>
+                    <Text style={[styles.incidentTime, { color: THEME_COLORS.warning }]}>
                       {formatIncidentTime(incident.createdAt)}
                     </Text>
                   </TouchableOpacity>
@@ -828,12 +909,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Charity Hub */}
       <View style={styles.bentoCard}>
         <View style={styles.bentoHeader}>
-          <View style={[styles.bentoIcon, { backgroundColor: '#f0fdf4' }]}>
+          <View style={[styles.bentoIcon, { backgroundColor: THEME_COLORS.successSurface }]}>
             <HeartHandshake size={24} color={PRIMARY} />
           </View>
           {canManageCharity ? (
             <TouchableOpacity style={styles.manageFundsBtn} onPress={handleOpenManageCharity} activeOpacity={0.8}>
-              <Settings size={14} color="#fff" />
+              <Settings size={14} color={THEME_COLORS.white} />
               <Text style={styles.manageFundsBtnText}>Manage Charity</Text>
             </TouchableOpacity>
           ) : (
@@ -855,7 +936,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <Text style={styles.featuredCharityName}>{featuredCharity.name || 'Unnamed Charity'}</Text>
             {featuredCharity.campaignCompleted && (
               <View style={styles.completedBadge}>
-                <CheckCircle2 size={12} color="#fc7127" />
+                <CheckCircle2 size={12} color={THEME_COLORS.secondaryContainer} />
                 <Text style={styles.completedBadgeText}>Completed</Text>
               </View>
             )}
@@ -902,7 +983,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </View>
         ) : (
           <View style={styles.noCharity}>
-            <Droplets size={28} color="#cbd5e1" />
+            <Droplets size={28} color={THEME_COLORS.neutralBorderStrong} />
             <Text style={styles.noCharityText}>CAT is in effect</Text>
             <Text style={styles.noCharitySubtext}>
               No featured charity is selected yet.
@@ -949,24 +1030,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* System Health */}
       <View style={styles.bentoCard}>
         <View style={styles.bentoHeader}>
-          <Activity size={20} color="#fc7127" />
+          <Activity size={20} color={THEME_COLORS.secondaryContainer} />
           <Text style={styles.bentoTitle}>System Health</Text>
         </View>
         <View style={styles.healthRow}>
           <Text style={styles.healthLabel}>UPTIME</Text>
-          <Text style={[styles.healthValue, { color: '#fc7127' }]}>{systemUptime}%</Text>
+          <Text style={[styles.healthValue, { color: THEME_COLORS.secondaryContainer }]}>{systemUptime}%</Text>
         </View>
         <View style={styles.uptimeBar}>
           <View style={[styles.uptimeFill, { width: '99.9%' }]} />
         </View>
-        <View style={[styles.healthRow, { marginTop: 16 }]}>
+        <View style={[styles.healthRow, { marginTop: SPACE.s16 }]}> 
           <Text style={styles.healthLabel}>SECURITY THREATS</Text>
-          <Text style={[styles.healthValue, securityThreats > 0 ? { color: ERROR } : { color: '#fc7127' }]}>
+          <Text style={[styles.healthValue, securityThreats > 0 ? { color: ERROR } : { color: THEME_COLORS.secondaryContainer }]}>
             {securityThreats === 0 ? 'None' : securityThreats}
           </Text>
         </View>
         <View style={styles.threatRow}>
-          <View style={[styles.threatDot, { backgroundColor: securityThreats === 0 ? '#fc7127' : ERROR }]} />
+          <View style={[styles.threatDot, { backgroundColor: securityThreats === 0 ? THEME_COLORS.secondaryContainer : ERROR }]} />
           <Text style={styles.threatText}>
             {securityThreats === 0 ? 'All systems operational' : 'Active threats detected'}
           </Text>
@@ -976,7 +1057,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Recent Activity */}
       <View style={styles.bentoCard}>
         <Text style={styles.bentoTitle}>Recent Moderator Activity</Text>
-        <View style={{ gap: 10, marginTop: 12 }}>
+        <View style={{ gap: SPACE.xl, marginTop: SPACE.xxl }}>
           {activities.map((activity) => (
             <View key={activity.id} style={styles.activityItem}>
               <View style={[styles.activityIcon, { backgroundColor: activity.iconBg }]}>
@@ -1063,7 +1144,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Text style={styles.skipBtnText}>Skip All</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.doneBtn} onPress={handleDone} activeOpacity={0.85}>
-              <CheckCircle2 size={14} color="#fff" />
+              <CheckCircle2 size={14} color={THEME_COLORS.white} />
               <Text style={styles.doneBtnText}>Done</Text>
             </TouchableOpacity>
           </View>
@@ -1075,7 +1156,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <View style={styles.modalBackdrop}>
           <View style={styles.setupCompleteCard}>
             <View style={styles.setupCompleteIcon}>
-              <CheckCircle2 size={40} color="#fc7127" />
+              <CheckCircle2 size={40} color={THEME_COLORS.secondaryContainer} />
             </View>
             <Text style={styles.setupCompleteTitle}>Your Community is Ready!</Text>
             <Text style={styles.setupCompleteDesc}>
@@ -1084,7 +1165,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </Text>
             <TouchableOpacity style={styles.setupCompleteBtn} onPress={handleFinishSetup} activeOpacity={0.85}>
               <Text style={styles.setupCompleteBtnText}>Go to Home</Text>
-              <ArrowUpRight size={18} color="#fff" />
+              <ArrowUpRight size={18} color={THEME_COLORS.white} />
             </TouchableOpacity>
           </View>
         </View>
@@ -1097,364 +1178,364 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 export default AdminDashboard;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: THEME_COLORS.white },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: SPACE.xxxl,
+    paddingVertical: SPACE.xxl,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-    gap: 10,
+    borderBottomColor: THEME_COLORS.neutralBgSoft,
+    gap: SPACE.xl,
   },
-  backBtn: { padding: 6 },
+  backBtn: { padding: SPACE.md },
   logoBox: {
-    width: 34, height: 34, borderRadius: 10, backgroundColor: PRIMARY,
+    width: 34, height: 34, borderRadius: RADIUS.xl, backgroundColor: PRIMARY,
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
   },
   logoImg: { width: 26, height: 26 },
-  topBarTitle: { fontSize: 15, fontWeight: '900', color: PRIMARY, flex: 1 },
-  viewSwitcher: { flexDirection: 'row', gap: 4 },
+  topBarTitle: { fontSize: TYPE_SCALE.h3, fontWeight: FONT_WEIGHT.black, color: PRIMARY, flex: 1 },
+  viewSwitcher: { flexDirection: 'row', gap: SPACE.sm },
   viewSwitcherBtn: {
-    width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#f8fafc',
+    width: 36, height: 36, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: THEME_COLORS.neutralBg,
   },
-  viewSwitcherBtnActive: { backgroundColor: '#f0fdf4' },
+  viewSwitcherBtnActive: { backgroundColor: THEME_COLORS.successSurface },
 
   dashScroll: { flex: 1 },
-  dashContent: { paddingHorizontal: 16, paddingTop: 16, gap: 16 },
+  dashContent: { paddingHorizontal: SPACE.s16, paddingTop: SPACE.s16, gap: SPACE.s16 },
 
-  heroSection: { gap: 4, marginBottom: 4 },
-  heroTitle: { fontSize: 26, fontWeight: '900', color: PRIMARY },
-  heroSubtitle: { fontSize: 14, color: '#64748b', lineHeight: 20 },
+  heroSection: { gap: SPACE.sm, marginBottom: SPACE.xs },
+  heroTitle: { fontSize: TYPE_SCALE.hero, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
+  heroSubtitle: { fontSize: TYPE_SCALE.xxl, color: THEME_COLORS.neutralTextSubtle, lineHeight: LINE_HEIGHT.base },
 
-  statsRow: { flexDirection: 'row', gap: 10 },
+  statsRow: { flexDirection: 'row', gap: SPACE.xl },
   statCard: {
-    flex: 1, backgroundColor: '#fff', borderRadius: 15, paddingVertical: 10, paddingHorizontal: 12,
-    borderWidth: 1, borderColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
-    gap: 3,
+    flex: 1, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, paddingVertical: SPACE.xl, paddingHorizontal: SPACE.xxl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, 1, 0.04, 4, 1),
+    gap: SPACE.xs,
     alignItems: 'center',
   },
   statLabel: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.widest,
     textAlign: 'center',
     width: '100%',
   },
   statBottom: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 0,
-    gap: 2,
+    marginTop: SPACE.zero,
+    gap: SPACE.xxs,
     width: '100%',
   },
-  statValue: { fontSize: 22, fontWeight: '900', textAlign: 'center', lineHeight: 26 },
+  statValue: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, textAlign: 'center', lineHeight: LINE_HEIGHT.display },
   pulseDot: {
     position: 'absolute', top: -2, right: -2, width: 7, height: 7,
-    borderRadius: 4, backgroundColor: ERROR,
+    borderRadius: RADIUS.md, backgroundColor: ERROR,
   },
 
   bentoCard: {
-    backgroundColor: '#fff', borderRadius: 20, padding: 18, gap: 8,
-    borderWidth: 1, borderColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.panel, padding: SPACE.s18, gap: SPACE.lg,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, 2, 0.05, 8, 2),
   },
   bentoCardClickable: {},
   bentoHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  bentoIcon: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  bentoTitle: { fontSize: 18, fontWeight: '900', color: PRIMARY, marginTop: 4 },
-  bentoDesc: { fontSize: 13, color: '#64748b', lineHeight: 18 },
+  bentoIcon: { width: 48, height: 48, borderRadius: RADIUS.cardLg, alignItems: 'center', justifyContent: 'center' },
+  bentoTitle: { fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.black, color: PRIMARY, marginTop: SPACE.xs },
+  bentoDesc: { fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextSubtle, lineHeight: LINE_HEIGHT.compact },
   alertBox: {
-    backgroundColor: '#f8fafc', borderRadius: 12, padding: 12, marginTop: 4,
-    borderWidth: 1, borderColor: '#f1f5f9',
+    backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.xxl, padding: SPACE.xxl, marginTop: SPACE.xs,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
   },
-  alertBoxLabel: { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1 },
-  alertBoxValue: { fontSize: 22, fontWeight: '900', marginTop: 2 },
+  alertBoxLabel: { fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.widest },
+  alertBoxValue: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, marginTop: SPACE.xxs },
 
   coverageHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  syncBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99 },
-  syncBadgeText: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.8 },
-  mapPreview: { height: 140, borderRadius: 14, overflow: 'hidden', marginTop: 8 },
+  syncBadge: { paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill },
+  syncBadgeText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide },
+  mapPreview: { height: 140, borderRadius: RADIUS.card, overflow: 'hidden', marginTop: SPACE.lg },
   mapFooter: {
     flexDirection: 'row', justifyContent: 'space-between',
-    paddingTop: 8, borderTopWidth: 1, borderTopColor: '#f1f5f9', marginTop: 4,
+    paddingTop: SPACE.lg, borderTopWidth: 1, borderTopColor: THEME_COLORS.neutralBgSoft, marginTop: SPACE.xs,
   },
-  mapFooterText: { fontSize: 10, fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 },
+  mapFooterText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextMuted, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },
 
   manageFundsBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: PRIMARY, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 99,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.md,
+    backgroundColor: PRIMARY, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.lg, borderRadius: RADIUS.pill,
   },
-  manageFundsBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  manageFundsBtnText: { color: THEME_COLORS.white, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold },
 
   featuredCharity: {
-    backgroundColor: PRIMARY, borderRadius: 16, padding: 16, gap: 6, marginTop: 8,
+    backgroundColor: PRIMARY, borderRadius: RADIUS.cardLg, padding: SPACE.s16, gap: SPACE.md, marginTop: SPACE.lg,
   },
   featuredCharityLabel: {
-    fontSize: 9, fontWeight: '900', color: 'rgba(255,255,255,0.6)',
-    textTransform: 'uppercase', letterSpacing: 1.5,
+    fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.alias_rgba_255_255_255_0_6,
+    textTransform: 'uppercase', letterSpacing: LETTER_SPACING.hero,
   },
-  featuredCharityName: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  featuredCharityName: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white },
   completedBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    alignSelf: 'flex-start', backgroundColor: 'rgba(74,222,128,0.15)',
-    paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    alignSelf: 'flex-start', backgroundColor: THEME_COLORS.alias_rgba_74_222_128_0_15,
+    paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill,
   },
-  completedBadgeText: { fontSize: 11, fontWeight: '700', color: '#fc7127' },
-  progressRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
-  progressText: { fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.9)' },
-  goalText: { fontSize: 12, color: 'rgba(255,255,255,0.6)' },
-  progressTrack: { height: 6, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 3, overflow: 'hidden', marginTop: 6 },
-  progressFill: { height: '100%', backgroundColor: '#fc7127', borderRadius: 3 },
+  completedBadgeText: { fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.secondaryContainer },
+  progressRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: SPACE.xs },
+  progressText: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.whiteOverlay90 },
+  goalText: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.alias_rgba_255_255_255_0_6 },
+  progressTrack: { height: 6, backgroundColor: THEME_COLORS.blackOverlay20, borderRadius: RADIUS.sm, overflow: 'hidden', marginTop: SPACE.md },
+  progressFill: { height: '100%', backgroundColor: THEME_COLORS.secondaryContainer, borderRadius: RADIUS.sm },
   completeBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    backgroundColor: '#fff', borderRadius: 12, paddingVertical: 10, marginTop: 8,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xxl, paddingVertical: SPACE.xl, marginTop: SPACE.lg,
   },
-  completeBtnText: { color: PRIMARY, fontWeight: '700', fontSize: 14 },
+  completeBtnText: { color: PRIMARY, fontWeight: FONT_WEIGHT.bold, fontSize: TYPE_SCALE.xxl },
   noCharity: {
-    alignItems: 'center', justifyContent: 'center', paddingVertical: 24,
-    backgroundColor: '#f8fafc', borderRadius: 12, gap: 8, marginTop: 8,
+    alignItems: 'center', justifyContent: 'center', paddingVertical: SPACE.s24,
+    backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.xxl, gap: SPACE.lg, marginTop: SPACE.lg,
   },
-  noCharityText: { fontSize: 13, color: '#94a3b8', fontWeight: '500' },
-  noCharitySubtext: { fontSize: 12, color: '#94a3b8' },
+  noCharityText: { fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextMuted, fontWeight: FONT_WEIGHT.medium },
+  noCharitySubtext: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextMuted },
   potentialCatBox: {
-    marginTop: 12,
+    marginTop: SPACE.xxl,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(30, 86, 103, 0.06)',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    backgroundColor: THEME_COLORS.primaryContainerTint06,
+    borderRadius: RADIUS.cardLg,
+    paddingHorizontal: SPACE.xxxl,
+    paddingVertical: SPACE.xl,
   },
   potentialCatLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 0.4,
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.semibold,
+    letterSpacing: LETTER_SPACING.tight,
     textTransform: 'uppercase',
-    color: 'rgba(30, 86, 103, 0.7)',
+    color: THEME_COLORS.primaryContainerTint70,
   },
   potentialCatValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1e5667',
+    fontSize: TYPE_SCALE.h1,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.primaryContainer,
   },
   potentialCatMeta: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: 'rgba(30, 86, 103, 0.7)',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.semibold,
+    color: THEME_COLORS.primaryContainerTint70,
   },
-  previousCampaigns: { marginTop: 8, gap: 8 },
-  previousCampaignsTitle: { fontSize: 13, fontWeight: '700', color: PRIMARY },
+  previousCampaigns: { marginTop: SPACE.lg, gap: SPACE.lg },
+  previousCampaignsTitle: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
   prevCampaignRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: '#f8fafc', padding: 10, borderRadius: 12,
-    borderWidth: 1, borderColor: '#f1f5f9',
+    backgroundColor: THEME_COLORS.neutralBg, padding: SPACE.xl, borderRadius: RADIUS.xxl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
   },
-  prevCampaignName: { fontSize: 13, fontWeight: '700', color: '#0f172a', flex: 1 },
-  prevCampaignAmount: { fontSize: 13, fontWeight: '900', color: '#fc7127' },
+  prevCampaignName: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong, flex: 1 },
+  prevCampaignAmount: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.secondaryContainer },
 
   emergencyBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#fef2f2', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    backgroundColor: THEME_COLORS.errorSurface, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill,
   },
-  emergencyDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: ERROR },
-  emergencyText: { fontSize: 10, fontWeight: '900', color: ERROR, textTransform: 'uppercase', letterSpacing: 0.8 },
-  emergencyInfo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  emergencyDot: { width: 6, height: 6, borderRadius: RADIUS.sm, backgroundColor: ERROR },
+  emergencyText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, color: ERROR, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide },
+  emergencyInfo: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
   warningBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
     marginLeft: 'auto',
-    backgroundColor: '#fffbeb', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 99,
+    backgroundColor: THEME_COLORS.warningSurface, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill,
   },
-  warningDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#d97706' },
-  warningText: { fontSize: 10, fontWeight: '900', color: '#d97706', textTransform: 'uppercase', letterSpacing: 0.8 },
-  securityStats: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
-  securityStat: { flex: 1, gap: 4, alignItems: 'center' },
+  warningDot: { width: 6, height: 6, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.warning },
+  warningText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.warning, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide },
+  securityStats: { flexDirection: 'row', justifyContent: 'space-between', marginTop: SPACE.lg },
+  securityStat: { flex: 1, gap: SPACE.sm, alignItems: 'center' },
   securityStatLabel: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.widest,
     textAlign: 'center',
   },
-  securityStatValue: { fontSize: 28, fontWeight: '900', color: PRIMARY, textAlign: 'center' },
+  securityStatValue: { fontSize: TYPE_SCALE.metric, fontWeight: FONT_WEIGHT.black, color: PRIMARY, textAlign: 'center' },
   incidentListWrap: {
-    marginTop: 10,
-    gap: 10,
+    marginTop: SPACE.xl,
+    gap: SPACE.xl,
   },
   incidentSection: {
-    gap: 6,
+    gap: SPACE.md,
   },
   incidentSectionLabel: {
-    fontSize: 10,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
     textTransform: 'uppercase',
-    letterSpacing: 0.9,
+    letterSpacing: LETTER_SPACING.wider,
   },
   incidentRow: {
-    borderRadius: 12,
+    borderRadius: RADIUS.xxl,
     borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: SPACE.lg,
   },
   incidentRowEmergency: {
-    backgroundColor: 'rgba(254,242,242,0.8)',
-    borderColor: '#fecaca',
+    backgroundColor: THEME_COLORS.alias_rgba_254_242_242_0_8,
+    borderColor: THEME_COLORS.errorBorder,
   },
   incidentRowWarning: {
-    backgroundColor: 'rgba(255,251,235,0.8)',
-    borderColor: '#fde68a',
+    backgroundColor: THEME_COLORS.alias_rgba_255_251_235_0_8,
+    borderColor: THEME_COLORS.warningBorder,
   },
   incidentMain: {
     flex: 1,
     minWidth: 0,
   },
   incidentTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#0f172a',
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextStrong,
   },
   incidentMeta: {
-    fontSize: 11,
-    color: '#64748b',
-    marginTop: 2,
+    fontSize: TYPE_SCALE.md,
+    color: THEME_COLORS.neutralTextSubtle,
+    marginTop: SPACE.xxs,
   },
   incidentTime: {
-    fontSize: 10,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
     textTransform: 'uppercase',
   },
 
   healthRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  healthLabel: { fontSize: 11, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.8 },
-  healthValue: { fontSize: 12, fontWeight: '700' },
-  uptimeBar: { height: 6, backgroundColor: '#f1f5f9', borderRadius: 3, overflow: 'hidden', marginTop: 6 },
-  uptimeFill: { height: '100%', backgroundColor: '#fc7127' },
-  threatRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  threatDot: { width: 8, height: 8, borderRadius: 4 },
-  threatText: { fontSize: 12, color: '#64748b' },
+  healthLabel: { fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide },
+  healthValue: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold },
+  uptimeBar: { height: 6, backgroundColor: THEME_COLORS.neutralBgSoft, borderRadius: RADIUS.sm, overflow: 'hidden', marginTop: SPACE.md },
+  uptimeFill: { height: '100%', backgroundColor: THEME_COLORS.secondaryContainer },
+  threatRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, marginTop: SPACE.xs },
+  threatDot: { width: 8, height: 8, borderRadius: RADIUS.md },
+  threatText: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextSubtle },
 
   activityItem: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#fff', borderRadius: 14, padding: 12,
-    borderWidth: 1, borderColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 4, elevation: 1,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, padding: SPACE.xxl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, 1, 0.03, 4, 1),
   },
-  activityIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  activityTitle: { fontSize: 13, fontWeight: '700', color: '#0f172a' },
-  activitySubtitle: { fontSize: 11, color: '#64748b', marginTop: 1 },
-  activityTime: { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 },
+  activityIcon: { width: 40, height: 40, borderRadius: RADIUS.panel, alignItems: 'center', justifyContent: 'center' },
+  activityTitle: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  activitySubtitle: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxxs },
+  activityTime: { fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },
 
   // Setup bar
   setupBar: {
-    position: 'absolute', bottom: 0, left: 0, right: 0,
-    backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 8,
+    position: 'absolute', bottom: SPACE.zero, left: SPACE.zero, right: SPACE.zero,
+    backgroundColor: THEME_COLORS.white, borderTopWidth: 1, borderTopColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, -4, 0.08, 12, 8),
   },
-  setupProgress: { height: 3, backgroundColor: '#f1f5f9' },
+  setupProgress: { height: 3, backgroundColor: THEME_COLORS.neutralBgSoft },
   setupProgressFill: { height: '100%', backgroundColor: PRIMARY },
-  setupBarInner: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingTop: 10 },
-  setupStepRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  setupStepLabel: { fontSize: 12, fontWeight: '900', color: PRIMARY },
+  setupBarInner: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xl, paddingHorizontal: SPACE.xxxl, paddingTop: SPACE.xl },
+  setupStepRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
+  setupStepLabel: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
   setupStepCount: {
-    fontSize: 9, fontWeight: '900', color: '#94a3b8',
-    backgroundColor: '#f8fafc', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 99,
+    fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted,
+    backgroundColor: THEME_COLORS.neutralBg, paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, borderRadius: RADIUS.pill,
   },
-  setupStepDesc: { fontSize: 10, color: '#94a3b8', marginTop: 2 },
-  skipBtn: { paddingHorizontal: 8, paddingVertical: 8 },
-  skipBtnText: { fontSize: 10, fontWeight: '700', color: '#94a3b8' },
+  setupStepDesc: { fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextMuted, marginTop: SPACE.xxs },
+  skipBtn: { paddingHorizontal: SPACE.lg, paddingVertical: SPACE.lg },
+  skipBtnText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextMuted },
   doneBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: PRIMARY, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12,
-    shadowColor: PRIMARY, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 4,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.md,
+    backgroundColor: PRIMARY, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.xl, borderRadius: RADIUS.xxl,
+    ...createShadow(PRIMARY, 0, 2, 0.25, 6, 4),
   },
-  doneBtnText: { fontSize: 10, fontWeight: '900', color: '#fff', textTransform: 'uppercase', letterSpacing: 0.8 },
+  doneBtnText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide },
 
   // Modals
   modalBackdrop: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center', justifyContent: 'center', padding: 16,
+    flex: 1, backgroundColor: THEME_COLORS.blackOverlay50,
+    alignItems: 'center', justifyContent: 'center', padding: SPACE.s16,
   },
   setupCompleteCard: {
-    backgroundColor: '#fff', borderRadius: 32, padding: 32,
-    width: '100%', maxWidth: 400, alignItems: 'center', gap: 14,
-    borderWidth: 1, borderColor: '#f1f5f9',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.15, shadowRadius: 32, elevation: 10,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.modal, padding: SPACE.s32,
+    width: '100%', maxWidth: 400, alignItems: 'center', gap: SPACE.xxxl,
+    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, 0, 12, 0.15, 32, 10),
   },
   setupCompleteIcon: {
-    width: 80, height: 80, borderRadius: 40, backgroundColor: '#f0fdf4',
+    width: 80, height: 80, borderRadius: RADIUS.circle, backgroundColor: THEME_COLORS.successSurface,
     alignItems: 'center', justifyContent: 'center',
   },
-  setupCompleteTitle: { fontSize: 22, fontWeight: '900', color: PRIMARY, textAlign: 'center' },
-  setupCompleteDesc: { fontSize: 13, color: '#64748b', textAlign: 'center', lineHeight: 20 },
+  setupCompleteTitle: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, color: PRIMARY, textAlign: 'center' },
+  setupCompleteDesc: { fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextSubtle, textAlign: 'center', lineHeight: LINE_HEIGHT.base },
   setupCompleteBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: PRIMARY, borderRadius: 16, paddingVertical: 14, paddingHorizontal: 28,
-    shadowColor: PRIMARY, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
-    marginTop: 8,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.lg,
+    backgroundColor: PRIMARY, borderRadius: RADIUS.cardLg, paddingVertical: SPACE.xxxl, paddingHorizontal: SPACE.s24,
+    ...createShadow(PRIMARY, 0, 4, 0.3, 12, 6),
+    marginTop: SPACE.lg,
   },
-  setupCompleteBtnText: { color: '#fff', fontWeight: '900', fontSize: 15 },
+  setupCompleteBtnText: { color: THEME_COLORS.white, fontWeight: FONT_WEIGHT.black, fontSize: TYPE_SCALE.h3 },
 
   suggestCard: {
-    backgroundColor: '#fff', borderRadius: 32, padding: 24,
+    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.modal, padding: SPACE.s24,
     width: '100%', maxWidth: 480,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.15, shadowRadius: 32, elevation: 10,
+    ...createShadow(THEME_COLORS.black, 0, 12, 0.15, 32, 10),
     maxHeight: '90%',
   },
-  suggestHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
-  suggestTitle: { fontSize: 22, fontWeight: '900', color: PRIMARY },
-  suggestSubtitle: { fontSize: 12, color: '#64748b', marginTop: 4 },
-  suggestField: { gap: 6 },
-  suggestRow: { flexDirection: 'row', gap: 12 },
+  suggestHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: SPACE.s20 },
+  suggestTitle: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
+  suggestSubtitle: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs },
+  suggestField: { gap: SPACE.md },
+  suggestRow: { flexDirection: 'row', gap: SPACE.xxl },
   suggestLabel: {
-    fontSize: 9, fontWeight: '900', color: '#94a3b8',
-    textTransform: 'uppercase', letterSpacing: 1.2,
+    fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted,
+    textTransform: 'uppercase', letterSpacing: LETTER_SPACING.ultra,
   },
   suggestInput: {
-    backgroundColor: '#f8fafc', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10,
-    fontSize: 14, color: '#0f172a', borderWidth: 1, borderColor: '#f1f5f9',
+    backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.xxl, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.xl,
+    fontSize: TYPE_SCALE.xxl, color: THEME_COLORS.neutralTextStrong, borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
   },
   suggestTextarea: { minHeight: 72, textAlignVertical: 'top' },
-  errorText: { fontSize: 12, color: ERROR, fontWeight: '600' },
-  suggestButtons: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  errorText: { fontSize: TYPE_SCALE.lg, color: ERROR, fontWeight: FONT_WEIGHT.semibold },
+  suggestButtons: { flexDirection: 'row', gap: SPACE.xxl, marginTop: SPACE.lg },
   cancelSuggestBtn: {
-    flex: 1, paddingVertical: 12, borderRadius: 16, borderWidth: 2, borderColor: '#e2e8f0',
+    flex: 1, paddingVertical: SPACE.xxl, borderRadius: RADIUS.cardLg, borderWidth: 2, borderColor: THEME_COLORS.neutralBorder,
     alignItems: 'center', justifyContent: 'center',
   },
-  cancelSuggestBtnText: { color: '#64748b', fontWeight: '700', fontSize: 14 },
+  cancelSuggestBtnText: { color: THEME_COLORS.neutralTextSubtle, fontWeight: FONT_WEIGHT.bold, fontSize: TYPE_SCALE.xxl },
   submitSuggestBtn: {
-    flex: 2, paddingVertical: 12, borderRadius: 16, backgroundColor: PRIMARY,
+    flex: 2, paddingVertical: SPACE.xxl, borderRadius: RADIUS.cardLg, backgroundColor: PRIMARY,
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: PRIMARY, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 4,
+    ...createShadow(PRIMARY, 0, 3, 0.25, 8, 4),
   },
-  submitSuggestBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  submitSuggestBtnText: { color: THEME_COLORS.white, fontWeight: FONT_WEIGHT.bold, fontSize: TYPE_SCALE.xxl },
 
   // Donor ticker chips
-  donorTickerRow: { flexDirection: 'row', gap: 6, marginTop: 8, flexWrap: 'wrap' },
+  donorTickerRow: { flexDirection: 'row', gap: SPACE.md, marginTop: SPACE.lg, flexWrap: 'wrap' },
   donorChip: {
-    backgroundColor: 'rgba(252,113,39,0.15)',
-    borderRadius: 99, paddingHorizontal: 10, paddingVertical: 5,
-    borderWidth: 1, borderColor: 'rgba(252,113,39,0.35)',
+    backgroundColor: THEME_COLORS.alias_rgba_252_113_39_0_15,
+    borderRadius: RADIUS.pill, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.md,
+    borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_252_113_39_0_35,
   },
-  donorChipText: { fontSize: 11, fontWeight: '900', color: '#fc7127' },
+  donorChipText: { fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.secondaryContainer },
 
   // Security online pulse
-  securityValueRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  securityValueRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
   onlinePulseDot: {
-    width: 10, height: 10, borderRadius: 5, backgroundColor: PRIMARY,
+    width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.md, backgroundColor: PRIMARY,
   },
   onlineHint: {
-    fontSize: 10, fontWeight: '700', color: PRIMARY,
-    textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2,
+    fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: PRIMARY,
+    textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide, marginTop: SPACE.xxs,
   },
 });

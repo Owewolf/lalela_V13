@@ -30,11 +30,67 @@ import {
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { isCommunityActive, isCommunityTrial, isCommunityLicensed, isUserLicensed } from '../../lib/licensing';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
+const PRIMARY = THEME_COLORS.primary;
 const APP_LOGO = require('../../../assets/icon.png');
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PANEL_WIDTH = Math.min(320, SCREEN_WIDTH * 0.85);
+const TYPE_SCALE = {
+  xxs: 7,
+  xs: 8,
+  sm: 9,
+  md: 12,
+  lg: 13,
+  xl: 14,
+  xxl: 16,
+  title: 18,
+};
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  xxs: 2,
+  xs: 4,
+  s5: 5,
+  sm: 6,
+  md: 8,
+  lg: 10,
+  xl: 12,
+  xxl: 14,
+  s16: 16,
+  s20: 20,
+  s28: 28,
+  s32: 32,
+  s36: 36,
+  s40: 40,
+  s24: 24,
+  s52: 52,
+};
+const RADIUS = {
+  xs: 4,
+  sm: 8,
+  md: 10,
+  lg: 12,
+  xl: 16,
+  pill: 20,
+  full: 99,
+};
+const LINE_HEIGHT = {
+  compact: 13,
+};
+const LETTER_SPACING = {
+  tightNegative: -0.3,
+  tight: 0.5,
+  normal: 1,
+  wide: 1.5,
+};
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -176,7 +232,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
             <Text style={styles.menuLabel}>Menu</Text>
           </View>
           <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <X size={20} color="#94a3b8" />
+            <X size={20} color={THEME_COLORS.neutralTextMuted} />
           </TouchableOpacity>
         </View>
 
@@ -194,7 +250,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                   onPress={() => handleNavigate(item.id)}
                   activeOpacity={0.7}
                 >
-                  <item.icon size={20} color={isActive ? PRIMARY : '#334155'} />
+                  <item.icon size={20} color={isActive ? PRIMARY : THEME_COLORS.neutralTextHeading} />
                   <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
                     {item.label}
                   </Text>
@@ -213,11 +269,11 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
               activeOpacity={0.7}
             >
               <View style={styles.communitiesLeft}>
-                <Users size={20} color="#334155" />
+                <Users size={20} color={THEME_COLORS.neutralTextHeading} />
                 <Text style={styles.navLabel}>Communities</Text>
               </View>
               <Animated.View style={{ transform: [{ rotate: chevronAngle }] }}>
-                <ChevronDown size={16} color="#94a3b8" />
+                <ChevronDown size={16} color={THEME_COLORS.neutralTextMuted} />
               </Animated.View>
             </TouchableOpacity>
 
@@ -235,7 +291,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                       <View
                         style={[
                           styles.communityLogo,
-                          { backgroundColor: isSelected ? PRIMARY : '#f1f5f9' },
+                          { backgroundColor: isSelected ? PRIMARY : THEME_COLORS.neutralBgSoft },
                         ]}
                       >
                         <Image source={APP_LOGO} style={styles.communityLogoImg} resizeMode="contain" />
@@ -249,8 +305,8 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                             const active = isCommunityLicensed(c);
                             const trial = isCommunityTrial(c);
                             const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
-                            const bg = active ? '#ecfdf5' : trial ? '#fffbeb' : '#fef2f2';
-                            const fg = active ? '#1e5667' : trial ? '#b45309' : '#dc2626';
+                            const bg = active ? THEME_COLORS.successSurfaceSoft : trial ? THEME_COLORS.warningSurface : THEME_COLORS.errorSurface;
+                            const fg = active ? THEME_COLORS.primaryContainer : trial ? THEME_COLORS.warningText : THEME_COLORS.errorStrong;
                             const Icon = active ? ShieldCheck : AlertCircle;
                             return (
                               <View
@@ -272,10 +328,10 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                               {
                                 backgroundColor:
                                   c.userRole === "ADMIN"
-                                    ? '#fef2f2'
+                                    ? THEME_COLORS.errorSurface
                                     : c.userRole === "MODERATOR"
-                                    ? '#f5f3ff'
-                                    : '#f0fdf4',
+                                    ? THEME_COLORS.brandPurpleSurface
+                                    : THEME_COLORS.successSurface,
                               },
                             ]}
                           >
@@ -285,9 +341,9 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                                 {
                                   color:
                                     c.userRole === "ADMIN"
-                                      ? '#dc2626'
+                                      ? THEME_COLORS.errorStrong
                                       : c.userRole === "MODERATOR"
-                                      ? '#6750a4'
+                                      ? THEME_COLORS.md3Primary
                                       : PRIMARY,
                                 },
                               ]}
@@ -313,11 +369,11 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                   onPress={handleCreateCommunity}
                   activeOpacity={0.7}
                 >
-                  <Plus size={16} color={canCreateNewCommunity ? PRIMARY : '#94a3b8'} />
+                  <Plus size={16} color={canCreateNewCommunity ? PRIMARY : THEME_COLORS.neutralTextMuted} />
                   <Text
                     style={[
                       styles.createCommunityText,
-                      { color: canCreateNewCommunity ? PRIMARY : '#94a3b8' },
+                      { color: canCreateNewCommunity ? PRIMARY : THEME_COLORS.neutralTextMuted },
                     ]}
                   >
                     + Create Community
@@ -357,17 +413,17 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                         {
                           color:
                             currentCommunity.userRole === "ADMIN"
-                              ? '#dc2626'
+                              ? THEME_COLORS.errorStrong
                               : currentCommunity.userRole === "MODERATOR"
-                              ? '#6750a4'
-                              : '#94a3b8',
+                              ? THEME_COLORS.md3Primary
+                              : THEME_COLORS.neutralTextMuted,
                         },
                       ]}
                     >
                       {(currentCommunity.userRole ?? 'Member').toUpperCase()} DASHBOARD
                     </Text>
                   </View>
-                  <ChevronRight size={16} color="#94a3b8" style={{ marginLeft: 'auto' }} />
+                  <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} style={{ marginLeft: 'auto' }} />
                 </TouchableOpacity>
               </View>
             </>
@@ -381,7 +437,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
               <View
                 style={[
                   styles.avatarRing,
-                  { borderColor: isLicensed ? '#10b981' : '#e2e8f0' },
+                  { borderColor: isLicensed ? THEME_COLORS.success : THEME_COLORS.neutralBorder },
                 ]}
               >
                 <Image
@@ -394,17 +450,17 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                   <Text style={styles.settingsName} numberOfLines={1}>
                     {userProfile?.name ?? 'User'}
                   </Text>
-                  {isLicensed && <Check size={14} color="#10b981" />}
+                  {isLicensed && <Check size={14} color={THEME_COLORS.success} />}
                 </View>
                 <Text style={styles.settingsSubtitle}>Account & Settings</Text>
               </View>
-              <ChevronRight size={16} color="#94a3b8" style={{ marginLeft: 'auto' }} />
+              <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} style={{ marginLeft: 'auto' }} />
             </TouchableOpacity>
           )}
 
           {userProfile ? (
             <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut} activeOpacity={0.7}>
-              <LogOut size={20} color="#dc2626" />
+              <LogOut size={20} color={THEME_COLORS.errorStrong} />
               <Text style={styles.signOutText}>Logout</Text>
             </TouchableOpacity>
           ) : (
@@ -438,210 +494,206 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: THEME_COLORS.blackOverlay50,
     zIndex: 100,
   },
   panel: {
     position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
+    top: SPACE.zero,
+    bottom: SPACE.zero,
+    left: SPACE.zero,
     width: PANEL_WIDTH,
-    backgroundColor: '#fff',
+    backgroundColor: THEME_COLORS.white,
     zIndex: 110,
-    shadowColor: '#000',
-    shadowOffset: { width: 4, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 12,
+    ...createShadow(THEME_COLORS.black, SPACE.xs, SPACE.zero, 0.2, 16, 12),
     flexDirection: 'column',
   },
   panelHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 52,
-    paddingBottom: 20,
+    paddingHorizontal: SPACE.s20,
+    paddingTop: SPACE.s52,
+    paddingBottom: SPACE.s20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: THEME_COLORS.neutralBgSoft,
   },
   panelHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: SPACE.xl,
   },
   logoBox: {
-    width: 36,
-    height: 36,
+    width: SPACE.s36,
+    height: SPACE.s36,
     backgroundColor: PRIMARY,
-    borderRadius: 10,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
   logoImg: {
-    width: 28,
-    height: 28,
+    width: SPACE.s28,
+    height: SPACE.s28,
   },
   menuLabel: {
-    fontSize: 16,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.xxl,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
-    letterSpacing: -0.3,
+    letterSpacing: LETTER_SPACING.tightNegative,
   },
   closeBtn: {
-    padding: 8,
-    borderRadius: 20,
+    padding: SPACE.md,
+    borderRadius: RADIUS.pill,
   },
   body: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: SPACE.xl,
   },
   section: {
-    paddingHorizontal: 12,
-    marginBottom: 8,
+    paddingHorizontal: SPACE.xl,
+    marginBottom: SPACE.md,
   },
   sectionLabel: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    paddingHorizontal: 12,
-    marginBottom: 4,
+    letterSpacing: LETTER_SPACING.wide,
+    paddingHorizontal: SPACE.xl,
+    marginBottom: SPACE.xs,
   },
   navItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 16,
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.xl,
+    borderRadius: RADIUS.xl,
   },
   navItemActive: {
-    backgroundColor: '#f0fdf4',
+    backgroundColor: THEME_COLORS.successSurface,
   },
   navLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#334155',
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextHeading,
   },
   navLabelActive: {
-    fontWeight: '900',
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
   },
   separator: {
-    height: 1,
-    backgroundColor: '#f1f5f9',
-    marginHorizontal: 20,
-    marginVertical: 8,
+    height: SPACE.xxs,
+    backgroundColor: THEME_COLORS.neutralBgSoft,
+    marginHorizontal: SPACE.s20,
+    marginVertical: SPACE.md,
   },
   communitiesHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 16,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.xl,
+    borderRadius: RADIUS.xl,
   },
   communitiesLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: SPACE.xl,
   },
   communitiesList: {
-    paddingLeft: 12,
-    paddingTop: 4,
-    gap: 4,
+    paddingLeft: SPACE.xl,
+    paddingTop: SPACE.xs,
+    gap: SPACE.xs,
   },
   communityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 12,
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.lg,
   },
   communityItemActive: {
-    backgroundColor: '#f0fdf4',
+    backgroundColor: THEME_COLORS.successSurface,
   },
   communityLogo: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+    width: SPACE.s32,
+    height: SPACE.s32,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     flexShrink: 0,
   },
   communityLogoImg: {
-    width: 20,
-    height: 20,
+    width: SPACE.s20,
+    height: SPACE.s20,
   },
   communityInfo: {
     flex: 1,
     minWidth: 0,
   },
   communityName: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#334155',
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextHeading,
   },
   communityBadges: {
     flexDirection: 'row',
-    gap: 4,
-    marginTop: 2,
+    gap: SPACE.xs,
+    marginTop: SPACE.xxs,
   },
   smallBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 99,
+    gap: SPACE.xxs,
+    paddingHorizontal: SPACE.s5,
+    paddingVertical: SPACE.xxs,
+    borderRadius: RADIUS.full,
   },
   smallBadgeText: {
-    fontSize: 7,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.xxs,
+    fontWeight: FONT_WEIGHT.black,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: LETTER_SPACING.tight,
   },
   selectedDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: SPACE.md,
+    height: SPACE.md,
+    borderRadius: RADIUS.xs,
     backgroundColor: PRIMARY,
     flexShrink: 0,
   },
   createCommunityBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 12,
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.lg,
   },
   createCommunityBtnDisabled: {
     opacity: 0.5,
   },
   createCommunityText: {
-    fontSize: 12,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.black,
   },
   upgradeHint: {
-    fontSize: 8,
-    color: '#b45309',
-    fontWeight: '700',
-    paddingHorizontal: 12,
-    paddingBottom: 4,
-    lineHeight: 13,
+    fontSize: TYPE_SCALE.xs,
+    color: THEME_COLORS.warningText,
+    fontWeight: FONT_WEIGHT.bold,
+    paddingHorizontal: SPACE.xl,
+    paddingBottom: SPACE.xs,
+    lineHeight: LINE_HEIGHT.compact,
   },
   adminLogo: {
-    width: 36,
-    height: 36,
+    width: SPACE.s36,
+    height: SPACE.s36,
     backgroundColor: PRIMARY,
-    borderRadius: 10,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -652,35 +704,35 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   adminName: {
-    fontSize: 14,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
   },
   adminRole: {
-    fontSize: 8,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.black,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
   footer: {
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    paddingHorizontal: 12,
-    paddingVertical: 16,
-    gap: 4,
+    borderTopColor: THEME_COLORS.neutralBgSoft,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.s16,
+    gap: SPACE.xs,
   },
   settingsBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 16,
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.xl,
+    borderRadius: RADIUS.xl,
   },
   avatarRing: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: SPACE.s40,
+    height: SPACE.s40,
+    borderRadius: RADIUS.pill,
     borderWidth: 2,
     overflow: 'hidden',
     flexShrink: 0,
@@ -696,79 +748,79 @@ const styles = StyleSheet.create({
   settingsNameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: SPACE.sm,
   },
   settingsName: {
-    fontSize: 14,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
     flex: 1,
   },
   settingsSubtitle: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
   signOutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 16,
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.xl,
+    borderRadius: RADIUS.xl,
   },
   signOutText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#dc2626',
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.errorStrong,
   },
   authBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 16,
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.xl,
+    borderRadius: RADIUS.xl,
   },
   authBtnText: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.bold,
   },
   dialogOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: THEME_COLORS.blackOverlay50,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: SPACE.s24,
   },
   dialog: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 24,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.pill,
+    padding: SPACE.s24,
     width: '100%',
-    gap: 12,
+    gap: SPACE.xl,
   },
-  dialogTitle: { fontSize: 18, fontWeight: '700', color: PRIMARY },
-  dialogSub: { fontSize: 13, color: '#737971' },
+  dialogTitle: { fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
+  dialogSub: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.outline },
   dialogInput: {
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    fontSize: 14,
-    color: '#1a1c1a',
+    borderColor: THEME_COLORS.neutralBorderSoft,
+    borderRadius: RADIUS.lg,
+    paddingHorizontal: SPACE.xxl,
+    paddingVertical: TYPE_SCALE.md,
+    fontSize: TYPE_SCALE.xl,
+    color: THEME_COLORS.onSurface,
   },
-  dialogActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 4 },
-  dialogCancel: { paddingHorizontal: 16, paddingVertical: 10 },
-  dialogCancelText: { fontSize: 14, color: '#737971', fontWeight: '600' },
+  dialogActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: SPACE.lg, marginTop: SPACE.xs },
+  dialogCancel: { paddingHorizontal: SPACE.s16, paddingVertical: SPACE.lg },
+  dialogCancelText: { fontSize: TYPE_SCALE.xl, color: THEME_COLORS.outline, fontWeight: FONT_WEIGHT.semibold },
   dialogConfirm: {
     backgroundColor: PRIMARY,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingHorizontal: SPACE.s20,
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.lg,
   },
-  dialogConfirmText: { fontSize: 14, color: '#fff', fontWeight: '700' },
+  dialogConfirmText: { fontSize: TYPE_SCALE.xl, color: THEME_COLORS.white, fontWeight: FONT_WEIGHT.bold },
 });

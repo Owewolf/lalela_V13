@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 import { LocationSettings } from './LocationSettings';
+import { THEME_COLORS } from '../../theme/colors';
 
 interface ProfileSectionProps {
   initialEdit?: boolean;
@@ -161,7 +162,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
           <View className="w-10 h-10 rounded-2xl bg-blue-50 items-center justify-center">
-            <User size={22} color="#2563eb" />
+            <User size={22} color={THEME_COLORS.brandBlueText} />
           </View>
           <Text className="text-lg font-bold text-primary">Account Information</Text>
         </View>
@@ -185,7 +186,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
           <View className="w-24 h-24 rounded-full overflow-hidden border-4 border-outline-variant">
             {isUploading ? (
               <View className="w-full h-full bg-gray-200 items-center justify-center">
-                <ActivityIndicator color="#0d3d47" />
+                <ActivityIndicator color={THEME_COLORS.primary} />
               </View>
             ) : (
               <Image source={{ uri: avatarUri }} className="w-full h-full" resizeMode="cover" />
@@ -196,7 +197,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
               onPress={handleImagePick}
               className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full items-center justify-center border-2 border-white"
             >
-              <Camera size={14} color="#fff" />
+              <Camera size={14} color={THEME_COLORS.white} />
             </TouchableOpacity>
           )}
         </View>
@@ -232,7 +233,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
             />
           ) : (
             <View className="flex-row items-center gap-2 p-3 bg-gray-50 rounded-xl">
-              <Smartphone size={16} color="#6b7280" />
+              <Smartphone size={16} color={THEME_COLORS.neutralTextSubtle} />
               <Text className="text-sm font-bold text-gray-900">{userProfile?.phone || 'Not set'}</Text>
             </View>
           )}
@@ -276,13 +277,13 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
             </View>
           ) : (
             <View className="flex-row items-center gap-2 p-3 bg-gray-50 rounded-xl">
-              <Mail size={16} color="#6b7280" />
+              <Mail size={16} color={THEME_COLORS.neutralTextSubtle} />
               <Text className="text-sm font-bold text-gray-900 flex-1" numberOfLines={1}>
                 {userProfile?.email || 'Not set'}
               </Text>
               {userProfile?.email && userProfile?.emailVerified && (
                 <View className="flex-row items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-full">
-                  <CheckCircle2 size={10} color="#10b981" />
+                  <CheckCircle2 size={10} color={THEME_COLORS.success} />
                   <Text className="text-[10px] font-bold text-primary uppercase">Verified</Text>
                 </View>
               )}
@@ -302,7 +303,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-3">
             <View className="w-10 h-10 rounded-full items-center justify-center bg-red-50">
-              <Siren size={18} color="#ef4444" />
+              <Siren size={18} color={THEME_COLORS.errorStrong} />
             </View>
             <View>
               <Text className="text-sm font-bold text-gray-900">Emergency Responder</Text>
@@ -332,7 +333,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
               >
                 <View className="flex-row items-center gap-3 flex-1">
                   <View className="w-8 h-8 rounded-lg bg-surface-container-low items-center justify-center">
-                    <ShieldCheck size={16} color="#0d3d47" />
+                    <ShieldCheck size={16} color={THEME_COLORS.primary} />
                   </View>
                   <View className="flex-1">
                     <Text className="text-sm font-bold text-gray-900">{community.name}</Text>
@@ -346,8 +347,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
                 <Switch
                   value={!!community.isSecurityMember}
                   onValueChange={(val) => toggleCommunityResponder(community.id, val)}
-                  trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
-                  thumbColor="#ffffff"
+                  trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
+                  thumbColor={THEME_COLORS.white}
                 />
               </View>
             ))}
@@ -386,7 +387,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
             className="flex-1 py-3 rounded-xl bg-blue-600 items-center"
           >
             {isSaving ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={THEME_COLORS.white} />
             ) : (
               <Text className="text-sm font-bold text-white">Save Changes</Text>
             )}
@@ -397,7 +398,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
       {/* Status message */}
       {status && (
         <View className={`p-4 rounded-2xl flex-row items-center justify-center gap-2 ${status.type === 'success' ? 'bg-surface-container-low' : 'bg-red-50'}`}>
-          {status.type === 'success' && <CheckCircle2 size={16} color="#10b981" />}
+          {status.type === 'success' && <CheckCircle2 size={16} color={THEME_COLORS.success} />}
           <Text className={`text-sm font-bold ${status.type === 'success' ? 'text-primary' : 'text-red-600'}`}>
             {status.message}
           </Text>

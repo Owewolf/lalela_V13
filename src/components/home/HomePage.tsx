@@ -36,6 +36,7 @@ import { resolveMediaUrl } from '../../lib/config';
 import { InteractiveCoverageMap } from './InteractiveCoverageMap';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
 import { CommunityNotice } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -80,35 +81,43 @@ const resolvedUrgency = (level?: string, urgency?: string) =>
     ? 'general'
     : urgency);
 
+const SPACE = {
+  xxs: 4,
+  sm: 8,
+  s32: 32,
+  s36: 36,
+  s40: 40,
+};
+
 // ─── Notice card helpers ─────────────────────────────────────────────────────
 
 const urgencyBgColor = (level?: string, urgency?: string): string => {
   switch (resolvedUrgency(level, urgency)) {
-    case 'emergency': return '#fef2f2';
-    case 'warning':   return '#fffbeb';
-    case 'info':      return '#eff6ff';
-    case 'general':   return '#f0fdf4';
-    default:          return '#f9fafb';
+    case 'emergency': return THEME_COLORS.errorSurface;
+    case 'warning':   return THEME_COLORS.warningSurface;
+    case 'info':      return THEME_COLORS.infoSurfaceSoft;
+    case 'general':   return THEME_COLORS.successSurface;
+    default:          return THEME_COLORS.neutralBg;
   }
 };
 
 const urgencyBorderColor = (level?: string, urgency?: string): string => {
   switch (resolvedUrgency(level, urgency)) {
-    case 'emergency': return '#fca5a5';
-    case 'warning':   return '#fcd34d';
-    case 'info':      return '#93c5fd';
-    case 'general':   return '#ffddb9';
-    default:          return '#e5e7eb';
+    case 'emergency': return THEME_COLORS.aliasHex_fca5a5;
+    case 'warning':   return THEME_COLORS.warningBorderStrong;
+    case 'info':      return THEME_COLORS.infoBorderStrong;
+    case 'general':   return THEME_COLORS.tertiaryFixed;
+    default:          return THEME_COLORS.neutralBorderSoft;
   }
 };
 
 const urgencyTextColor = (level?: string, urgency?: string): string => {
   switch (resolvedUrgency(level, urgency)) {
-    case 'emergency': return '#dc2626';
-    case 'warning':   return '#d97706';
-    case 'info':      return '#2563eb';
-    case 'general':   return '#0d3d47';
-    default:          return '#6b7280';
+    case 'emergency': return THEME_COLORS.error;
+    case 'warning':   return THEME_COLORS.warning;
+    case 'info':      return THEME_COLORS.brandBlueText;
+    case 'general':   return THEME_COLORS.primary;
+    default:          return THEME_COLORS.neutralTextSubtle;
   }
 };
 
@@ -536,19 +545,19 @@ export const HomePage: React.FC<HomePageProps> = ({
     {
       level: 'warning',
       label: 'Warning',
-      color: '#d97706',
+      color: THEME_COLORS.warning,
       sub: 'Immediate attention needed',
     },
     {
       level: 'info',
       label: 'Info',
-      color: '#2563eb',
+      color: THEME_COLORS.brandBlueText,
       sub: 'Standard community notice',
     },
     {
       level: 'general',
       label: 'General',
-      color: '#0d3d47',
+      color: THEME_COLORS.primary,
       sub: 'General information',
     },
   ];
@@ -599,8 +608,8 @@ export const HomePage: React.FC<HomePageProps> = ({
                 backgroundColor:
                   notice.urgency === 'emergency' ||
                   notice.urgencyLevel === 'emergency'
-                    ? '#dc2626'
-                    : '#f59e0b',
+                    ? THEME_COLORS.error
+                    : THEME_COLORS.warningStrong,
               }}
             >
               <Text className="text-white text-[8px] font-bold uppercase tracking-widest">
@@ -642,12 +651,12 @@ export const HomePage: React.FC<HomePageProps> = ({
                 }
                 className="p-2 rounded-full bg-gray-100"
               >
-                <MoreVertical size={16} color="#6b7280" />
+                <MoreVertical size={16} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
               {activeMenuId === notice.id && (
                 <View
                   className="absolute right-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
-                  style={{ top: 36 }}
+                  style={{ top: SPACE.s36 }}
                 >
                   {(notice.authorId === userProfile?.id ||
                     currentCommunity?.userRole === 'ADMIN') && (
@@ -661,7 +670,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                           }}
                           className="flex-row items-center gap-2 px-4 py-2"
                         >
-                          <Tag size={14} color="#0d3d47" />
+                          <Tag size={14} color={THEME_COLORS.primary} />
                           <Text className="text-sm font-bold text-primary">
                             Edit Notice
                           </Text>
@@ -675,7 +684,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         }}
                         className="flex-row items-center gap-2 px-4 py-2"
                       >
-                        <AlertTriangle size={14} color="#dc2626" />
+                        <AlertTriangle size={14} color={THEME_COLORS.error} />
                         <Text className="text-sm font-bold text-red-600">
                           Delete Notice
                         </Text>
@@ -687,7 +696,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     onPress={() => setActiveMenuId(null)}
                     className="flex-row items-center gap-2 px-4 py-2"
                   >
-                    <Share2 size={14} color="#6b7280" />
+                    <Share2 size={14} color={THEME_COLORS.neutralTextSubtle} />
                     <Text className="text-sm font-bold text-gray-500">
                       Share
                     </Text>
@@ -731,7 +740,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               }}
               className="flex-row items-center gap-1.5 bg-surface-container-low self-start px-2 py-1 rounded-md mb-3"
             >
-              <MapPin size={10} color="#0d3d47" />
+              <MapPin size={10} color={THEME_COLORS.primary} />
               <Text className="text-[10px] font-bold text-primary">
                 {notice.locationName || 'Location Provided'}
               </Text>
@@ -784,7 +793,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   className="p-2 rounded-full bg-red-50"
                   onPress={() => openEmergencyHub(notice)}
                 >
-                  <Siren size={16} color="#dc2626" />
+                  <Siren size={16} color={THEME_COLORS.error} />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -792,7 +801,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 className="p-2 rounded-full bg-surface-container-low"
                 onPress={() => onOpenChat ? onOpenChat(notice) : handleOpenContextChat(notice)}
               >
-                <MessageSquare size={16} color="#0d3d47" />
+                <MessageSquare size={16} color={THEME_COLORS.primary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -812,12 +821,12 @@ export const HomePage: React.FC<HomePageProps> = ({
                 }
                 className="w-7 h-7 rounded-full bg-gray-100 items-center justify-center"
               >
-                <MoreVertical size={14} color="#6b7280" />
+                <MoreVertical size={14} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
               {activeMenuId === notice.id && (
                 <View
                   className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
-                  style={{ top: 32 }}
+                  style={{ top: SPACE.s32 }}
                 >
                   {(notice.authorId === userProfile?.id ||
                     currentCommunity?.userRole === 'ADMIN') && (
@@ -831,7 +840,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                           }}
                           className="flex-row items-center gap-2 px-4 py-2"
                         >
-                          <Tag size={14} color="#0d3d47" />
+                          <Tag size={14} color={THEME_COLORS.primary} />
                           <Text className="text-sm font-bold text-primary">
                             Edit Notice
                           </Text>
@@ -845,7 +854,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         }}
                         className="flex-row items-center gap-2 px-4 py-2"
                       >
-                        <AlertTriangle size={14} color="#dc2626" />
+                        <AlertTriangle size={14} color={THEME_COLORS.error} />
                         <Text className="text-sm font-bold text-red-600">
                           Delete Notice
                         </Text>
@@ -857,7 +866,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     onPress={() => setActiveMenuId(null)}
                     className="flex-row items-center gap-2 px-4 py-2"
                   >
-                    <Share2 size={14} color="#6b7280" />
+                    <Share2 size={14} color={THEME_COLORS.neutralTextSubtle} />
                     <Text className="text-sm font-bold text-gray-500">
                       Share
                     </Text>
@@ -901,7 +910,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               }}
               className="flex-row items-center gap-1 bg-surface-container-low self-start px-2 py-0.5 rounded-md"
             >
-              <MapPin size={10} color="#0d3d47" />
+              <MapPin size={10} color={THEME_COLORS.primary} />
               <Text className="text-[10px] font-bold text-primary" numberOfLines={1}>
                 {notice.locationName || 'Location Provided'}
               </Text>
@@ -948,7 +957,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 onOpenChat ? onOpenChat(notice) : handleOpenContextChat(notice)
               }
             >
-              <MessageSquare size={14} color="#0d3d47" />
+              <MessageSquare size={14} color={THEME_COLORS.primary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -1007,12 +1016,12 @@ export const HomePage: React.FC<HomePageProps> = ({
                 }
                 className="w-7 h-7 rounded-full bg-gray-100 items-center justify-center"
               >
-                <MoreVertical size={14} color="#6b7280" />
+                <MoreVertical size={14} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
               {activeMenuId === listing.id && (
                 <View
                   className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
-                  style={{ top: 32 }}
+                  style={{ top: SPACE.s32 }}
                 >
                   {isOwner && (
                     <TouchableOpacity
@@ -1023,7 +1032,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       }}
                       className="flex-row items-center gap-2 px-4 py-2"
                     >
-                      <Tag size={14} color="#0d3d47" />
+                      <Tag size={14} color={THEME_COLORS.primary} />
                       <Text className="text-sm font-bold text-primary">
                         Edit Listing
                       </Text>
@@ -1038,7 +1047,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       }}
                       className="flex-row items-center gap-2 px-4 py-2"
                     >
-                      <AlertTriangle size={14} color="#dc2626" />
+                      <AlertTriangle size={14} color={THEME_COLORS.error} />
                       <Text className="text-sm font-bold text-red-600">
                         Delete Listing
                       </Text>
@@ -1054,7 +1063,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       }}
                       className="flex-row items-center gap-2 px-4 py-2"
                     >
-                      <CheckCircle2 size={14} color="#059669" />
+                      <CheckCircle2 size={14} color={THEME_COLORS.successStrongAlt} />
                       <Text className="text-sm font-bold text-green-600">
                         {isMarkingSold ? 'Marking...' : 'Mark as Sold'}
                       </Text>
@@ -1069,7 +1078,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       }}
                       className="flex-row items-center gap-2 px-4 py-2"
                     >
-                      <Share2 size={14} color="#6b7280" />
+                      <Share2 size={14} color={THEME_COLORS.neutralTextSubtle} />
                       <Text className="text-sm font-bold text-gray-500">
                         Share
                       </Text>
@@ -1094,7 +1103,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               </Text>
               {hasPublicPrice && (
                 <View className="flex-row items-center gap-1.5 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">
-                  <Heart size={10} color="#4f46e5" />
+                  <Heart size={10} color={THEME_COLORS.indigo} />
                   <Text
                     className="text-[10px] font-bold text-indigo-700"
                     numberOfLines={1}
@@ -1118,7 +1127,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 }}
                 className="flex-row items-center justify-center rounded-full bg-indigo-50 w-8 h-8"
               >
-                <MapPin size={14} color="#4f46e5" />
+                <MapPin size={14} color={THEME_COLORS.indigo} />
               </TouchableOpacity>
             )}
           </View>
@@ -1152,7 +1161,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 onOpenChat ? onOpenChat(listing) : handleOpenContextChat(listing)
               }
             >
-              <MessageSquare size={14} color="#0d3d47" />
+              <MessageSquare size={14} color={THEME_COLORS.primary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -1170,11 +1179,11 @@ export const HomePage: React.FC<HomePageProps> = ({
     >
       <View
         className="flex-1 items-center justify-center px-6"
-        style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+        style={{ backgroundColor: THEME_COLORS.blackOverlay60 }}
       >
         <View className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl">
           <View className="bg-red-50 w-16 h-16 rounded-full items-center justify-center mx-auto mb-4">
-            <AlertTriangle size={28} color="#dc2626" />
+            <AlertTriangle size={28} color={THEME_COLORS.error} />
           </View>
           <Text className="text-xl font-bold text-primary text-center mb-2">
             Delete Post?
@@ -1214,7 +1223,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       onRequestClose={() => setShowIncidentMenu(false)}
     >
       <TouchableOpacity
-        style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+        style={{ flex: 1, backgroundColor: THEME_COLORS.blackOverlay50, justifyContent: 'flex-end' }}
         activeOpacity={1}
         onPress={() => setShowIncidentMenu(false)}
       >
@@ -1263,11 +1272,11 @@ export const HomePage: React.FC<HomePageProps> = ({
     >
       <View
         className="flex-1 items-center justify-center px-6"
-        style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+        style={{ backgroundColor: THEME_COLORS.blackOverlay60 }}
       >
         <View className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl gap-6">
           <View className="bg-red-50 w-16 h-16 rounded-full items-center justify-center mx-auto">
-            <Siren size={32} color="#dc2626" />
+            <Siren size={32} color={THEME_COLORS.error} />
           </View>
           <View className="items-center gap-2">
             <Text className="text-xl font-bold text-primary">
@@ -1290,7 +1299,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 setShowEmergencyDialog(false);
               }}
             >
-              <MessageSquare size={18} color="#fff" />
+              <MessageSquare size={18} color={THEME_COLORS.white} />
               <Text className="text-white font-bold">
                 Join Coordination Hub
               </Text>
@@ -1328,7 +1337,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     <ScrollView
       ref={scrollViewRef}
       className="flex-1 bg-gray-50"
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: SPACE.s40 }}
       showsVerticalScrollIndicator={false}
       onScrollBeginDrag={() => {
         if (activeMenuId) setActiveMenuId(null);
@@ -1353,12 +1362,12 @@ export const HomePage: React.FC<HomePageProps> = ({
               'flex-1 flex-col items-center justify-center py-3 rounded-2xl gap-1.5 shadow-md',
               currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
             )}
-            style={{ backgroundColor: '#fc7127' }}
+            style={{ backgroundColor: THEME_COLORS.secondaryContainer }}
           >
             <Siren
               size={20}
-              color="#fff"
-              fill={isEmergencyActive ? '#fff' : 'transparent'}
+              color={THEME_COLORS.white}
+              fill={isEmergencyActive ? THEME_COLORS.white : 'transparent'}
             />
             <Text className="text-white font-bold text-base text-center">
               {isEmergencyActive ? 'ACTIVE EMERGENCY' : 'Emergency Help'}
@@ -1378,9 +1387,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                 'flex-col items-center justify-center py-3 rounded-2xl gap-1.5 shadow-md',
                 currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
               )}
-              style={{ backgroundColor: '#1e5667' }}
+              style={{ backgroundColor: THEME_COLORS.primaryContainer }}
             >
-              <Plus size={20} color="#fff" />
+              <Plus size={20} color={THEME_COLORS.white} />
               <Text className="text-white font-bold text-base">
                 Create Notice
               </Text>
@@ -1393,7 +1402,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <View className="relative overflow-hidden bg-red-600 rounded-3xl p-6 shadow-xl">
             <View className="flex-row items-start justify-between mb-4">
               <View className="flex-row items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
-                <AlertTriangle size={14} color="#fff" fill="#fff" />
+                <AlertTriangle size={14} color={THEME_COLORS.white} fill={THEME_COLORS.white} />
                 <Text className="text-white text-[10px] font-bold tracking-widest uppercase">
                   {alert.priority} Priority Alert
                 </Text>
@@ -1481,14 +1490,14 @@ export const HomePage: React.FC<HomePageProps> = ({
               <Text className="text-primary font-semibold text-sm">
                 View All
               </Text>
-              <ArrowRight size={14} color="#1e5667" />
+              <ArrowRight size={14} color={THEME_COLORS.primaryContainer} />
             </TouchableOpacity>
           </View>
 
           {notices.length === 0 ? (
             <View className="items-center justify-center gap-3 py-10 px-6 bg-white rounded-3xl border border-gray-100 shadow-sm">
               <View className="w-14 h-14 rounded-full bg-surface-container-low items-center justify-center">
-                <Shield size={28} color="#10b981" />
+                <Shield size={28} color={THEME_COLORS.success} />
               </View>
               <View className="items-center">
                 <Text className="font-bold text-primary text-lg">
@@ -1526,7 +1535,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   key="notices-compact"
                   data={compactNotices}
                   numColumns={2}
-                  columnWrapperStyle={{ gap: 8, paddingHorizontal: 4 }}
+                  columnWrapperStyle={{ gap: SPACE.sm, paddingHorizontal: SPACE.xxs }}
                   keyExtractor={(item) => item.id}
                   renderItem={renderNoticeCard}
                   scrollEnabled={false}
@@ -1575,7 +1584,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     />
                   ) : (
                     <View className="w-full h-full items-center justify-center">
-                      <Heart size={20} color="#9ca3af" />
+                      <Heart size={20} color={THEME_COLORS.neutralTextSoft} />
                     </View>
                   )}
                 </View>
@@ -1670,7 +1679,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <Text className="text-primary font-semibold text-sm">
                   View Market
                 </Text>
-                <ArrowRight size={14} color="#1e5667" />
+                <ArrowRight size={14} color={THEME_COLORS.primaryContainer} />
               </TouchableOpacity>
             </View>
 
@@ -1678,7 +1687,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               key={2}
               data={listings}
               numColumns={2}
-              columnWrapperStyle={{ gap: 8, paddingHorizontal: 4 }}
+              columnWrapperStyle={{ gap: SPACE.sm, paddingHorizontal: SPACE.xxs }}
               keyExtractor={(item) => item.id}
               renderItem={renderListingCard}
               scrollEnabled={false}

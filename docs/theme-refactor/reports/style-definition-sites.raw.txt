@@ -1,0 +1,727 @@
+app/phone-reset.tsx:81:    <SafeAreaView style={{ flex: 1, backgroundColor: THEME_COLORS.white }}>
+app/phone-reset.tsx:82:      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12 }}>
+app/phone-reset.tsx:85:          style={{ padding: 8, borderRadius: 12, backgroundColor: THEME_COLORS.surfaceContainerLow }}
+app/phone-reset.tsx:89:        <Text style={{ fontSize: 18, fontWeight: '800', color: THEME_COLORS.primary }}>Reset Password via SMS</Text>
+app/phone-reset.tsx:93:        style={{ flex: 1 }}
+app/phone-reset.tsx:98:            <View style={{ backgroundColor: THEME_COLORS.errorSurface, borderColor: THEME_COLORS.errorBorder, borderWidth: 1, borderRadius: 16, padding: 12 }}>
+app/phone-reset.tsx:99:              <Text style={{ color: THEME_COLORS.error, fontSize: 12, fontWeight: '600', textAlign: 'center' }}>{error}</Text>
+app/phone-reset.tsx:105:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+app/phone-reset.tsx:107:                <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.primary }}>Your phone number</Text>
+app/phone-reset.tsx:124:                style={{
+app/phone-reset.tsx:131:                  : <Text style={{ color: THEME_COLORS.white, fontSize: 14, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Send Reset Code</Text>}
+app/phone-reset.tsx:133:              <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft, textAlign: 'center', marginTop: 8 }}>
+app/phone-reset.tsx:141:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+app/phone-reset.tsx:143:                <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.primary }}>Enter the 6-digit code</Text>
+app/phone-reset.tsx:145:              <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSoftAlt }}>Sent to {phoneFormatted}</Text>
+app/phone-reset.tsx:156:                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 24, paddingVertical: 16, fontSize: 24, fontWeight: '800', color: THEME_COLORS.onSurface, textAlign: 'center', letterSpacing: 8 }}
+app/phone-reset.tsx:159:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+app/phone-reset.tsx:161:                <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.primary }}>New password</Text>
+app/phone-reset.tsx:169:                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: THEME_COLORS.onSurface }}
+app/phone-reset.tsx:177:                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: THEME_COLORS.onSurface }}
+app/phone-reset.tsx:183:                style={{
+app/phone-reset.tsx:190:                  : <Text style={{ color: THEME_COLORS.white, fontSize: 14, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Reset Password</Text>}
+app/phone-reset.tsx:194:                <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSoft, textAlign: 'center' }}>Change phone number</Text>
+app/phone-reset.tsx:200:            <View style={{ alignItems: 'center', gap: 16, paddingVertical: 32 }}>
+app/phone-reset.tsx:201:              <Text style={{ fontSize: 18, fontWeight: '800', color: THEME_COLORS.primary, textAlign: 'center' }}>
+app/phone-reset.tsx:204:              <Text style={{ fontSize: 13, color: THEME_COLORS.neutralTextSoftAlt, textAlign: 'center' }}>
+app/phone-reset.tsx:209:                style={{ backgroundColor: THEME_COLORS.primary, borderRadius: 20, paddingVertical: 16, paddingHorizontal: 32 }}
+app/phone-reset.tsx:211:                <Text style={{ color: THEME_COLORS.white, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Back to Sign In</Text>
+app/join.tsx:63:  return <View style={{ flex: 1, backgroundColor: THEME_COLORS.primary }} />;
+app/_layout.tsx:292:const styles = StyleSheet.create({
+app/_layout.tsx:308:    <GestureHandlerRootView style={{ flex: 1 }}>
+app/emergency/index.tsx:134:const styles = StyleSheet.create({
+src/components/call/IncomingCallOverlay.tsx:111:const styles = StyleSheet.create({
+src/components/call/CallScreen.tsx:217:const styles = StyleSheet.create({
+app/(tabs)/_layout.tsx:47:    <View style={{ flex: 1 }}>
+src/components/posts/CreatePostPage.tsx:407:              style={{
+src/components/posts/CreatePostPage.tsx:424:                style={{
+src/components/posts/CreatePostPage.tsx:443:                    style={{
+src/components/posts/CreatePostPage.tsx:505:                    style={{ height: 220 }}
+src/components/posts/CreatePostPage.tsx:508:                      style={{ flex: 1 }}
+src/components/posts/CreatePostPage.tsx:567:                        style={{
+src/components/posts/CreatePostPage.tsx:579:                          style={{
+src/components/posts/CreatePostPage.tsx:605:                    style={{ minHeight: 80 }}
+src/components/posts/CreatePostPage.tsx:621:                    style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg }}
+src/components/posts/CreatePostPage.tsx:678:                      style={{ minHeight: 100 }}
+src/components/posts/CreatePostPage.tsx:705:                        style={{
+src/components/posts/CreatePostPage.tsx:716:                          style={{
+src/components/posts/CreatePostPage.tsx:733:                        style={{
+src/components/posts/CreatePostPage.tsx:740:                          style={{ color: !isPublic ? THEME_COLORS.primary : THEME_COLORS.neutralTextSubtle }}
+src/components/posts/CreatePostPage.tsx:748:                        style={{
+src/components/posts/CreatePostPage.tsx:755:                          style={{ color: isPublic ? THEME_COLORS.primary : THEME_COLORS.neutralTextSubtle }}
+src/components/posts/CreatePostPage.tsx:901:            style={{
+src/components/posts/CreatePostPage.tsx:915:              style={{ color: canSubmit ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft }}
+src/components/posts/CreatePostPage.tsx:946:                  style={{
+src/components/posts/CreatePostPage.tsx:982:            <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '70%' }}>
+src/components/posts/CreatePostPage.tsx:997:                      style={{ color: category === cat ? THEME_COLORS.primary : THEME_COLORS.aliasHex_1f2937, fontWeight: category === cat ? '700' : '400' }}
+src/components/shared/PostConfirmationModal.tsx:101:              <Send size={16} color={THEME_COLORS.white} style={{ marginLeft: 6 }} />
+src/components/shared/PostConfirmationModal.tsx:110:const styles = StyleSheet.create({
+src/components/auth/PhoneAuth.tsx:57:            style={{ opacity: confirmDisabled ? 0.5 : 1 }}
+src/components/auth/PhoneAuth.tsx:169:              style={{ backgroundColor: isLoading || !isPhoneValid ? THEME_COLORS.tertiaryFixed : THEME_COLORS.primary, opacity: isLoading || !isPhoneValid ? 0.6 : 1 }}
+src/components/auth/PhoneAuth.tsx:213:              style={{ backgroundColor: THEME_COLORS.primary, opacity: isLoading || otpCode.length !== 6 ? 0.5 : 1 }}
+src/components/posts/CreateNoticeForm.tsx:298:            style={{ backgroundColor: theme.bannerBgColor, borderColor: theme.accentColor + '40' }}
+src/components/posts/CreateNoticeForm.tsx:302:              style={{ backgroundColor: theme.iconBgColor }}
+src/components/posts/CreateNoticeForm.tsx:310:                <Text className="font-bold text-xl" style={{ color: theme.accentColor }}>
+src/components/posts/CreateNoticeForm.tsx:316:                    style={{ backgroundColor: theme.badgeBgColor }}
+src/components/posts/CreateNoticeForm.tsx:318:                    <Text className="text-xs font-bold" style={{ color: theme.badgeTextColor }}>
+src/components/posts/CreateNoticeForm.tsx:361:              <View className="w-full rounded-3xl overflow-hidden border-2 border-amber-300" style={{ height: 220 }}>
+src/components/posts/CreateNoticeForm.tsx:363:                  style={{ flex: 1 }}
+src/components/posts/CreateNoticeForm.tsx:418:                style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg }}
+src/components/posts/CreateNoticeForm.tsx:470:              style={{ minHeight: 100 }}
+src/components/posts/CreateNoticeForm.tsx:537:          style={{ backgroundColor: canSubmit ? theme.iconBgColor : THEME_COLORS.neutralBorderSoft }}
+src/components/posts/CreateNoticeForm.tsx:570:                style={{ backgroundColor: theme.iconBgColor }}
+src/components/shared/MobileSidebar.tsx:220:              <Animated.View style={{ transform: [{ rotate: chevronAngle }] }}>
+src/components/shared/MobileSidebar.tsx:371:                  <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} style={{ marginLeft: 'auto' }} />
+src/components/shared/MobileSidebar.tsx:402:              <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} style={{ marginLeft: 'auto' }} />
+src/components/shared/MobileSidebar.tsx:439:const styles = StyleSheet.create({
+src/components/auth/Onboarding.tsx:67:            style={{ backgroundColor: THEME_COLORS.primary }}
+src/components/auth/Onboarding.tsx:406:            <View className="gap-2" style={{ zIndex: 10, elevation: 10 }}>
+src/components/auth/Onboarding.tsx:463:              style={{ backgroundColor: isProfileValid ? THEME_COLORS.primary : THEME_COLORS.neutralBorderMuted }}
+src/components/market/BusinessCard.tsx:115:        style={{ backgroundColor: iconBg || THEME_COLORS.neutralBgSofter }}
+src/components/market/BusinessCard.tsx:129:            style={{ color: iconColor || THEME_COLORS.primary }}
+src/components/market/BusinessCard.tsx:233:                      style={{ marginLeft: i > 1 ? -8 : 0 }}
+src/components/market/BusinessCard.tsx:271:                style={{ shadowColor: THEME_COLORS.primary, shadowOpacity: 0.3, shadowRadius: 4, elevation: 2 }}
+src/components/posts/PostsPage.tsx:328:          style={{
+src/components/posts/PostsPage.tsx:342:              style={{ height: 160, overflow: 'hidden', borderBottomWidth: 1, borderColor: THEME_COLORS.neutralBgSofter }}
+src/components/posts/PostsPage.tsx:345:                style={{ flex: 1 }}
+src/components/posts/PostsPage.tsx:409:                    style={{ shadowColor: THEME_COLORS.black, shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 }}
+src/components/posts/PostsPage.tsx:453:              style={{
+src/components/posts/PostsPage.tsx:461:                style={{ color: urgencyColors.text }}
+src/components/posts/PostsPage.tsx:546:                style={{ flex: 1 }}
+src/components/posts/PostsPage.tsx:585:                      style={{
+src/components/posts/PostsPage.tsx:593:                        style={{ color: urgencyColors.text }}
+src/components/posts/PostsPage.tsx:624:                    style={{ shadowColor: THEME_COLORS.black, shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 }}
+src/components/posts/PostsPage.tsx:993:        style={{ shadowColor: PRIMARY, shadowOpacity: 0.4, shadowRadius: 12, elevation: 8 }}
+src/components/posts/PostsPage.tsx:1026:              style={{ flex: 1 }}
+src/components/home/InteractiveCoverageMap.tsx:290:        style={{ height }}
+src/components/home/InteractiveCoverageMap.tsx:295:          style={{ flex: 1 }}
+src/components/home/InteractiveCoverageMap.tsx:382:                  style={{ backgroundColor: visual.bgColor }}
+src/components/home/InteractiveCoverageMap.tsx:441:                      style={{
+src/components/home/InteractiveCoverageMap.tsx:530:                      style={{
+src/components/home/InteractiveCoverageMap.tsx:618:            style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_01 }}
+src/components/home/InteractiveCoverageMap.tsx:631:              style={{
+src/components/home/InteractiveCoverageMap.tsx:637:              style={{ color: isEmergencyActive ? THEME_COLORS.errorStrong : THEME_COLORS.primary }}
+src/components/home/InteractiveCoverageMap.tsx:688:                style={{
+src/components/shared/NotificationCenter.tsx:399:const styles = StyleSheet.create({
+src/components/home/HomePage.tsx:574:        style={{ borderColor, backgroundColor: bgColor }}
+src/components/home/HomePage.tsx:599:              style={{
+src/components/home/HomePage.tsx:651:                  style={{ top: 36 }}
+src/components/home/HomePage.tsx:704:              style={{ borderColor, backgroundColor: `${textColor}15` }}
+src/components/home/HomePage.tsx:713:                style={{ color: textColor }}
+src/components/home/HomePage.tsx:821:                  style={{ top: 32 }}
+src/components/home/HomePage.tsx:874:            style={{ borderColor, backgroundColor: `${textColor}15` }}
+src/components/home/HomePage.tsx:883:              style={{ color: textColor }}
+src/components/home/HomePage.tsx:1016:                  style={{ top: 32 }}
+src/components/home/HomePage.tsx:1174:        style={{ backgroundColor: THEME_COLORS.blackOverlay60 }}
+src/components/home/HomePage.tsx:1218:        style={{ flex: 1, backgroundColor: THEME_COLORS.blackOverlay50, justifyContent: 'flex-end' }}
+src/components/home/HomePage.tsx:1242:                <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: `${item.color}18` }}>
+src/components/home/HomePage.tsx:1246:                  <Text className="font-bold text-sm" style={{ color: item.color }}>{item.label}</Text>
+src/components/home/HomePage.tsx:1267:        style={{ backgroundColor: THEME_COLORS.blackOverlay60 }}
+src/components/home/HomePage.tsx:1357:            style={{ backgroundColor: THEME_COLORS.secondaryContainer }}
+src/components/home/HomePage.tsx:1382:              style={{ backgroundColor: THEME_COLORS.primaryContainer }}
+src/components/home/HomePage.tsx:1563:                style={{ opacity: 0.12 }}
+src/components/home/HomePage.tsx:1615:                          style={{
+src/components/auth/OnboardingCreate.tsx:77:          <TouchableOpacity onPress={onConfirm} className="py-4 rounded-2xl items-center" style={{ backgroundColor: THEME_COLORS.primary }}>
+src/components/auth/OnboardingCreate.tsx:508:          style={{ backgroundColor: THEME_COLORS.primary }}
+src/components/auth/OnboardingCreate.tsx:543:                <Image source={require('../../../assets/lalela_logo.png')} style={{ width: 36, height: 36 }} resizeMode="cover" />
+src/components/auth/OnboardingCreate.tsx:556:                  <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: step === 'profile' ? THEME_COLORS.primary : THEME_COLORS.success }}>
+src/components/auth/OnboardingCreate.tsx:559:                  <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: step === 'profile' ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft }}>Your Profile</Text>
+src/components/auth/OnboardingCreate.tsx:561:                <View className="h-0.5 w-8 rounded-full mb-4" style={{ backgroundColor: step !== 'profile' ? THEME_COLORS.success : THEME_COLORS.neutralBgSofter }} />
+src/components/auth/OnboardingCreate.tsx:566:              <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: inCommunityPhase ? THEME_COLORS.primary : THEME_COLORS.neutralBgSofter }}>
+src/components/auth/OnboardingCreate.tsx:567:                <Text className="text-xs font-bold" style={{ color: inCommunityPhase ? 'white' : THEME_COLORS.neutralTextSoft }}>
+src/components/auth/OnboardingCreate.tsx:571:              <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: inCommunityPhase ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft }}>
+src/components/auth/OnboardingCreate.tsx:578:                  <View key={s} className="w-2 h-2 rounded-full" style={{ backgroundColor: COMMUNITY_STEPS.indexOf(step) >= COMMUNITY_STEPS.indexOf(s) ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }} />
+src/components/auth/OnboardingCreate.tsx:661:                  style={{ backgroundColor: isProfileValid ? THEME_COLORS.primary : THEME_COLORS.neutralBorderMuted }}
+src/components/auth/OnboardingCreate.tsx:749:                    style={{ backgroundColor: THEME_COLORS.primary, opacity: !communityName.trim() || isSavingCommunity ? 0.5 : 1 }}
+src/components/auth/OnboardingCreate.tsx:771:                <View className="gap-1" style={{ zIndex: 10, elevation: 10 }}>
+src/components/auth/OnboardingCreate.tsx:773:                  <View style={{ zIndex: 10, elevation: 10 }}>
+src/components/auth/OnboardingCreate.tsx:816:                  <View style={{ height: 240, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: THEME_COLORS.neutralBorderSoft }}>
+src/components/auth/OnboardingCreate.tsx:820:                      style={{ flex: 1 }}
+src/components/auth/OnboardingCreate.tsx:870:                    <View className="px-3 py-1 rounded-full" style={{ backgroundColor: THEME_COLORS.primary }}>
+src/components/auth/OnboardingCreate.tsx:875:                    style={{ width: '100%', height: 40 }}
+src/components/auth/OnboardingCreate.tsx:897:                  <TouchableOpacity onPress={() => { setError(null); setStep('categories'); }} className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2" style={{ backgroundColor: THEME_COLORS.primary }}>
+src/components/auth/OnboardingCreate.tsx:918:                          style={{ backgroundColor: done ? THEME_COLORS.secondaryContainer : THEME_COLORS.neutralBorderSoft }}
+src/components/auth/OnboardingCreate.tsx:937:                    <View className="px-3 py-1 rounded-full" style={{ backgroundColor: THEME_COLORS.primary }}>
+src/components/auth/OnboardingCreate.tsx:951:                    <Text className="text-xs font-bold" style={{ color: THEME_COLORS.secondaryContainer }}>
+src/components/auth/OnboardingCreate.tsx:967:                        style={{
+src/components/auth/OnboardingCreate.tsx:983:                            style={{
+src/components/auth/OnboardingCreate.tsx:998:                        <Text style={{ fontSize: 26 }}>{cat.icon}</Text>
+src/components/auth/OnboardingCreate.tsx:1001:                          style={{ color: enabled ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft }}
+src/components/auth/OnboardingCreate.tsx:1013:                    style={{
+src/components/auth/OnboardingCreate.tsx:1027:                    <Text style={{ color: THEME_COLORS.white, fontSize: 10, fontWeight: '800' }}>Next</Text>
+src/components/auth/OnboardingCreate.tsx:1062:                    style={{ backgroundColor: coverageLat === 0 ? THEME_COLORS.neutralBorderSoft : THEME_COLORS.secondaryContainer, opacity: isDiscovering ? 0.7 : 1 }}
+src/components/auth/OnboardingCreate.tsx:1066:                      : <><Text style={{ fontSize: 18 }}>🔍</Text><Text className="text-white font-bold text-sm">Search businesses near me</Text></>}
+src/components/auth/OnboardingCreate.tsx:1094:                        <Text className="text-[11px] font-bold" style={{ color: THEME_COLORS.secondaryContainer }}>
+src/components/auth/OnboardingCreate.tsx:1111:                            style={{
+src/components/auth/OnboardingCreate.tsx:1123:                              style={{
+src/components/auth/OnboardingCreate.tsx:1131:                            <View style={{ flex: 1 }}>
+src/components/auth/OnboardingCreate.tsx:1154:                        style={{ backgroundColor: selectedDiscovered.size > 0 ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }}
+src/components/auth/OnboardingCreate.tsx:1156:                        <Text style={{ color: selectedDiscovered.size > 0 ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft, fontWeight: 'bold', fontSize: 13 }}>
+src/components/auth/OnboardingCreate.tsx:1200:                      style={{ backgroundColor: newBizName.trim() ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }}
+src/components/auth/OnboardingCreate.tsx:1202:                      <Text style={{ color: newBizName.trim() ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft, fontWeight: 'bold', fontSize: 13 }}>+</Text>
+src/components/auth/OnboardingCreate.tsx:1211:                  <TouchableOpacity onPress={() => { setError(null); setStep('rules'); }} className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2" style={{ backgroundColor: THEME_COLORS.primary }}>
+src/components/auth/OnboardingCreate.tsx:1224:                    <Text style={{ fontSize: 22 }}>📋</Text>
+src/components/auth/OnboardingCreate.tsx:1259:                      style={{ backgroundColor: requireVerification ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }}
+src/components/auth/OnboardingCreate.tsx:1261:                      <View className="w-5 h-5 rounded-full bg-white" style={{ alignSelf: requireVerification ? 'flex-end' : 'flex-start', margin: 3 }} />
+src/components/auth/OnboardingCreate.tsx:1285:                    style={{ backgroundColor: THEME_COLORS.primary, opacity: isSubmitting ? 0.6 : 1 }}
+src/components/security/SessionsSection.tsx:67:    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: 24, gap: 16 }}>
+src/components/security/SessionsSection.tsx:69:      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/security/SessionsSection.tsx:70:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/SessionsSection.tsx:71:          <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SessionsSection.tsx:74:          <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.primary }}>Active Sessions</Text>
+src/components/security/SessionsSection.tsx:78:            <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.errorStrong, textTransform: 'uppercase', letterSpacing: 1, opacity: isRevokingAll ? 0.5 : 1 }}>
+src/components/security/SessionsSection.tsx:85:      <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSoft }}>
+src/components/security/SessionsSection.tsx:90:        <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+src/components/security/SessionsSection.tsx:94:        <View style={{ gap: 10 }}>
+src/components/security/SessionsSection.tsx:102:                style={{
+src/components/security/SessionsSection.tsx:111:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+src/components/security/SessionsSection.tsx:112:                  <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SessionsSection.tsx:115:                  <View style={{ flex: 1 }}>
+src/components/security/SessionsSection.tsx:116:                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+src/components/security/SessionsSection.tsx:117:                      <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.onSurface }}>
+src/components/security/SessionsSection.tsx:121:                        <View style={{ backgroundColor: THEME_COLORS.successTintSoftAlt, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20, borderWidth: 1, borderColor: THEME_COLORS.successTintStrongAlt }}>
+src/components/security/SessionsSection.tsx:122:                          <Text style={{ fontSize: 9, fontWeight: '800', color: THEME_COLORS.successStrongAlt, textTransform: 'uppercase' }}>Current</Text>
+src/components/security/SessionsSection.tsx:126:                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
+src/components/security/SessionsSection.tsx:127:                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+src/components/security/SessionsSection.tsx:129:                        <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>{session.location || 'Unknown'}</Text>
+src/components/security/SessionsSection.tsx:131:                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+src/components/security/SessionsSection.tsx:133:                        <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>{session.ip || '—'}</Text>
+src/components/security/SessionsSection.tsx:135:                      <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>
+src/components/security/SessionsSection.tsx:144:                    style={{ padding: 10, borderRadius: 12, backgroundColor: THEME_COLORS.alias_rgba_239_68_68_0_08, marginLeft: 8 }}
+src/components/security/SessionsSection.tsx:154:        <View style={{ paddingVertical: 32, alignItems: 'center', gap: 10, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20 }}>
+src/components/security/SessionsSection.tsx:155:          <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SessionsSection.tsx:158:          <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.neutralTextSoft }}>No active sessions found</Text>
+src/components/admin/AdminDashboard.tsx:648:              <View style={{ position: 'relative' }}>
+src/components/admin/AdminDashboard.tsx:649:                <stat.icon size={16} color={stat.color} style={{ opacity: 0.35 }} />
+src/components/admin/AdminDashboard.tsx:980:        <View style={{ gap: 10, marginTop: 12 }}>
+src/components/admin/AdminDashboard.tsx:986:              <View style={{ flex: 1 }}>
+src/components/admin/AdminDashboard.tsx:996:      <View style={{ height: insets.bottom + 80 }} />
+src/components/admin/AdminDashboard.tsx:1050:            <View style={{ flex: 1 }}>
+src/components/admin/AdminDashboard.tsx:1100:const styles = StyleSheet.create({
+src/components/shared/AppShell.tsx:29:    <View style={{ flex: 1 }}>
+src/components/shared/AppShell.tsx:35:      <View style={{ flex: 1 }}>
+src/components/admin/BusinessImportTool.tsx:162:    <View style={{ flex: 1, backgroundColor: SURFACE }}>
+src/components/admin/BusinessImportTool.tsx:168:        <View style={{ flex: 1 }}>
+src/components/admin/BusinessImportTool.tsx:181:      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 100 }}>
+src/components/admin/BusinessImportTool.tsx:288:          <View style={{ gap: 12 }}>
+src/components/admin/BusinessImportTool.tsx:313:                  <View style={{ flex: 1, gap: 2 }}>
+src/components/admin/BusinessImportTool.tsx:314:                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+src/components/admin/BusinessImportTool.tsx:365:const styles = StyleSheet.create({
+src/components/shared/LocationPickerSection.tsx:144:    <View style={{ gap: 16 }}>
+src/components/shared/LocationPickerSection.tsx:157:        <View style={{ gap: 10, zIndex: 9999, elevation: 999 }}>
+src/components/shared/LocationPickerSection.tsx:209:      <View style={{ gap: 10 }}>
+src/components/shared/LocationPickerSection.tsx:210:        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/shared/LocationPickerSection.tsx:214:            style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+src/components/shared/LocationPickerSection.tsx:217:            <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.primary }}>Use current location</Text>
+src/components/shared/LocationPickerSection.tsx:220:        <View style={{ flexDirection: 'row', gap: 10 }}>
+src/components/shared/LocationPickerSection.tsx:240:      <View style={{ gap: 8 }}>
+src/components/shared/LocationPickerSection.tsx:242:        <View style={{ height: 240, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: THEME_COLORS.overlayBorder }}>
+src/components/shared/LocationPickerSection.tsx:245:            style={{ flex: 1 }}
+src/components/shared/LocationPickerSection.tsx:261:        <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSubtle }}>{hint}</Text>
+src/components/emergency/EmergencyMap.tsx:127:        style={{ flex: 1 }}
+src/components/emergency/EmergencyMap.tsx:203:                style={{ shadowColor: THEME_COLORS.black, shadowOpacity: 0.3, shadowRadius: 4 }}
+src/components/emergency/EmergencyMap.tsx:259:                style={{ width: 14, height: 14, shadowColor: THEME_COLORS.black, shadowOpacity: 0.2, shadowRadius: 3 }}
+src/components/chat/ChatComposer.tsx:120:      style={{ paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 12 }}
+src/components/chat/ChatComposer.tsx:152:            style={{
+src/components/shared/Header.tsx:191:const styles = StyleSheet.create({
+src/components/admin/MockStripeCheckout.tsx:168:const styles = StyleSheet.create({
+src/components/auth/LandingPage.tsx:29:    style={{ borderColor: checked ? THEME_COLORS.primary : THEME_COLORS.neutralBorderMuted, backgroundColor: checked ? THEME_COLORS.primary : 'transparent' }}
+src/components/auth/LandingPage.tsx:218:              style={{ width: 40, height: 40, borderRadius: 12 }}
+src/components/auth/LandingPage.tsx:241:          <Text style={{ fontSize: Platform.OS === 'web' ? 36 : 48, fontWeight: '900', color: THEME_COLORS.primary, lineHeight: Platform.OS === 'web' ? 42 : 54, marginBottom: 16 }}>
+src/components/auth/LandingPage.tsx:243:            <Text style={{ color: THEME_COLORS.aliasHex_f97316 }}>it's listen, listen, do.</Text>
+src/components/auth/LandingPage.tsx:252:              style={{ backgroundColor: THEME_COLORS.secondaryContainer }}
+src/components/auth/LandingPage.tsx:318:                  style={{ opacity: isSubmitting ? 0.5 : 1 }}
+src/components/auth/LandingPage.tsx:339:                      style={{ backgroundColor: joinMode === m ? 'white' : 'transparent' }}
+src/components/auth/LandingPage.tsx:343:                        style={{ color: joinMode === m ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft }}
+src/components/auth/LandingPage.tsx:420:                      style={{ backgroundColor: THEME_COLORS.secondaryContainer, opacity: isSubmitting || otpCode.length !== 6 ? 0.5 : 1 }}
+src/components/auth/LandingPage.tsx:478:                        style={{ opacity: mobileNumber.length > 0 ? 0.4 : 1 }}
+src/components/auth/LandingPage.tsx:494:                      <View className="flex-row gap-2" style={{ opacity: email.length > 0 ? 0.4 : 1 }}>
+src/components/auth/LandingPage.tsx:580:                      style={{ backgroundColor: THEME_COLORS.secondaryContainer, opacity: isSubmitting ? 0.5 : 1 }}
+src/components/auth/LandingPage.tsx:607:                style={{ width: 32, height: 32, borderRadius: 8 }}
+src/components/auth/LandingPage.tsx:639:                <Text className="font-bold text-base" style={{ color: countryCode === code ? THEME_COLORS.primary : THEME_COLORS.neutralTextEmphasis }}>
+src/components/auth/LandingPage.tsx:659:            style={{ paddingBottom: 40 }}
+src/components/auth/LandingPage.tsx:711:                    style={{ backgroundColor: THEME_COLORS.secondaryContainer, opacity: forgotSubmitting || !forgotEmail ? 0.5 : 1 }}
+src/components/chat/ChatPage.tsx:336:                    style={{ backgroundColor: roleBadgeBg(member.role) }}
+src/components/settings/CreateBusinessForm.tsx:230:      <View style={{ flex: 1, backgroundColor: THEME_COLORS.alias_rgba_15_23_42_0_38, justifyContent: 'flex-end' }}>
+src/components/settings/CreateBusinessForm.tsx:232:          <View style={{ maxHeight: '92%', backgroundColor: THEME_COLORS.neutralBg, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+src/components/settings/CreateBusinessForm.tsx:233:            <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/settings/CreateBusinessForm.tsx:235:                <Text style={{ fontSize: 18, fontWeight: '800', color: THEME_COLORS.primary }}>
+src/components/settings/CreateBusinessForm.tsx:238:                <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle, marginTop: 4 }}>
+src/components/settings/CreateBusinessForm.tsx:242:              <TouchableOpacity onPress={onClose} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/settings/CreateBusinessForm.tsx:248:              <View style={{ gap: 10 }}>
+src/components/settings/CreateBusinessForm.tsx:250:                <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8} style={{ borderRadius: 20, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+src/components/settings/CreateBusinessForm.tsx:251:                  <View style={{ width: 72, height: 72, borderRadius: 18, backgroundColor: THEME_COLORS.infoSurfaceAlt, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/CreateBusinessForm.tsx:253:                      <Image source={{ uri: image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+src/components/settings/CreateBusinessForm.tsx:258:                  <View style={{ flex: 1 }}>
+src/components/settings/CreateBusinessForm.tsx:259:                    <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>
+src/components/settings/CreateBusinessForm.tsx:262:                    <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle, marginTop: 4 }}>
+src/components/settings/CreateBusinessForm.tsx:275:              <View style={{ gap: 10 }}>
+src/components/settings/CreateBusinessForm.tsx:277:                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+src/components/settings/CreateBusinessForm.tsx:284:                        style={{
+src/components/settings/CreateBusinessForm.tsx:296:                        <Text style={{ fontSize: 16 }}>{item.icon}</Text>
+src/components/settings/CreateBusinessForm.tsx:297:                        <Text style={{ fontSize: 12, fontWeight: '700', color: selected ? THEME_COLORS.primary : THEME_COLORS.neutralTextEmphasis }}>
+src/components/settings/CreateBusinessForm.tsx:332:              <View style={{ gap: 10 }}>
+src/components/settings/CreateBusinessForm.tsx:334:                <View style={{ gap: 10 }}>
+src/components/settings/CreateBusinessForm.tsx:335:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 14, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, paddingHorizontal: 14 }}>
+src/components/settings/CreateBusinessForm.tsx:337:                    <TextInput value={contactPhone} onChangeText={setContactPhone} placeholder="Phone number" placeholderTextColor={THEME_COLORS.neutralTextSoft} style={{ flex: 1, paddingVertical: 12, fontSize: 14, color: THEME_COLORS.onSurface }} keyboardType="phone-pad" />
+src/components/settings/CreateBusinessForm.tsx:339:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 14, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, paddingHorizontal: 14 }}>
+src/components/settings/CreateBusinessForm.tsx:341:                    <TextInput value={contactEmail} onChangeText={setContactEmail} placeholder="Email address" placeholderTextColor={THEME_COLORS.neutralTextSoft} style={{ flex: 1, paddingVertical: 12, fontSize: 14, color: THEME_COLORS.onSurface }} keyboardType="email-address" autoCapitalize="none" />
+src/components/settings/CreateBusinessForm.tsx:346:              <View style={{ gap: 10 }}>
+src/components/settings/CreateBusinessForm.tsx:348:                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+src/components/settings/CreateBusinessForm.tsx:355:                        style={{
+src/components/settings/CreateBusinessForm.tsx:364:                        <Text style={{ fontSize: 12, fontWeight: '700', color: selected ? THEME_COLORS.aliasHex_047857 : THEME_COLORS.neutralTextEmphasis }}>
+src/components/settings/CreateBusinessForm.tsx:373:              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderRadius: 16, backgroundColor: THEME_COLORS.white, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/settings/CreateBusinessForm.tsx:375:                  <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Business is active</Text>
+src/components/settings/CreateBusinessForm.tsx:376:                  <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle, marginTop: 4 }}>
+src/components/settings/CreateBusinessForm.tsx:386:                style={{
+src/components/settings/CreateBusinessForm.tsx:397:                <Text style={{ fontSize: 13, fontWeight: '800', color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/AuditLogsSection.tsx:49:    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: 24, gap: 16 }}>
+src/components/security/AuditLogsSection.tsx:51:      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/security/AuditLogsSection.tsx:52:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/AuditLogsSection.tsx:53:          <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/AuditLogsSection.tsx:56:          <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.primary }}>Security Activity</Text>
+src/components/security/AuditLogsSection.tsx:59:          <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.brandBlueText, textTransform: 'uppercase', letterSpacing: 1 }}>View All</Text>
+src/components/security/AuditLogsSection.tsx:64:        <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+src/components/security/AuditLogsSection.tsx:68:        <View style={{ gap: 8 }}>
+src/components/security/AuditLogsSection.tsx:74:                style={{
+src/components/security/AuditLogsSection.tsx:83:                <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: bg, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/security/AuditLogsSection.tsx:86:                <View style={{ flex: 1, minWidth: 0 }}>
+src/components/security/AuditLogsSection.tsx:87:                  <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.onSurface }} numberOfLines={1}>
+src/components/security/AuditLogsSection.tsx:90:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 2 }}>
+src/components/security/AuditLogsSection.tsx:91:                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+src/components/security/AuditLogsSection.tsx:93:                      <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>
+src/components/security/AuditLogsSection.tsx:98:                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+src/components/security/AuditLogsSection.tsx:100:                        <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>{log.ip}</Text>
+src/components/security/AuditLogsSection.tsx:115:        <View style={{ paddingVertical: 32, alignItems: 'center', gap: 12, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, borderWidth: 2, borderColor: THEME_COLORS.alias_rgba_0_0_0_0_04, borderStyle: 'dashed' }}>
+src/components/security/AuditLogsSection.tsx:116:          <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/AuditLogsSection.tsx:119:          <View style={{ alignItems: 'center', gap: 4 }}>
+src/components/security/AuditLogsSection.tsx:120:            <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.neutralTextSoft }}>No recent activity</Text>
+src/components/security/AuditLogsSection.tsx:121:            <Text style={{ fontSize: 10, color: THEME_COLORS.alias_rgba_136_136_136_0_6 }}>Your security events will appear here</Text>
+src/components/security/CommunityAccessSection.tsx:13:    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: 24, gap: 16 }}>
+src/components/security/CommunityAccessSection.tsx:15:      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/CommunityAccessSection.tsx:16:        <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/CommunityAccessSection.tsx:19:        <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.primary }}>Community Access</Text>
+src/components/security/CommunityAccessSection.tsx:22:      <View style={{ gap: 10 }}>
+src/components/security/CommunityAccessSection.tsx:31:            style={{
+src/components/security/CommunityAccessSection.tsx:40:            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/CommunityAccessSection.tsx:41:              <View style={{
+src/components/security/CommunityAccessSection.tsx:46:                <Text style={{ fontSize: 20, fontWeight: '800', color: THEME_COLORS.primary }}>
+src/components/security/CommunityAccessSection.tsx:51:                <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.onSurface }}>{community.name}</Text>
+src/components/security/CommunityAccessSection.tsx:52:                <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/DangerZoneSection.tsx:35:    <View style={{ backgroundColor: THEME_COLORS.alias_rgba_239_68_68_0_05, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.errorTintSoft, padding: 24, gap: 20 }}>
+src/components/security/DangerZoneSection.tsx:37:      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/DangerZoneSection.tsx:38:        <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: THEME_COLORS.errorTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/DangerZoneSection.tsx:41:        <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.errorStrong }}>Account Management</Text>
+src/components/security/DangerZoneSection.tsx:45:        <View style={{ padding: 14, backgroundColor: THEME_COLORS.errorTintSoft, borderRadius: 16 }}>
+src/components/security/DangerZoneSection.tsx:46:          <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.errorStrong, textAlign: 'center' }}>{error}</Text>
+src/components/security/DangerZoneSection.tsx:50:      <View style={{ gap: 14 }}>
+src/components/security/DangerZoneSection.tsx:52:        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 24, padding: 20, gap: 14, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/security/DangerZoneSection.tsx:53:          <View style={{ gap: 4 }}>
+src/components/security/DangerZoneSection.tsx:54:            <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.onSurface }}>Logout Account</Text>
+src/components/security/DangerZoneSection.tsx:55:            <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, lineHeight: 16 }}>
+src/components/security/DangerZoneSection.tsx:61:            style={{
+src/components/security/DangerZoneSection.tsx:67:            <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.primary }}>Logout Account</Text>
+src/components/security/DangerZoneSection.tsx:72:        <View style={{ backgroundColor: THEME_COLORS.errorStrong, borderRadius: 24, padding: 20, gap: 14 }}>
+src/components/security/DangerZoneSection.tsx:73:          <View style={{ gap: 4 }}>
+src/components/security/DangerZoneSection.tsx:74:            <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.white }}>Delete Account</Text>
+src/components/security/DangerZoneSection.tsx:75:            <Text style={{ fontSize: 10, color: THEME_COLORS.whiteOverlay70, lineHeight: 16 }}>
+src/components/security/DangerZoneSection.tsx:81:            style={{
+src/components/security/DangerZoneSection.tsx:87:            <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.white }}>Delete Permanently</Text>
+src/components/security/DangerZoneSection.tsx:99:        <View style={{
+src/components/security/DangerZoneSection.tsx:106:          <View style={{
+src/components/security/DangerZoneSection.tsx:114:            <View style={{ alignItems: 'center', gap: 10 }}>
+src/components/security/DangerZoneSection.tsx:115:              <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: THEME_COLORS.errorTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/DangerZoneSection.tsx:118:              <Text style={{ fontSize: 20, fontWeight: '700', color: THEME_COLORS.onSurface, textAlign: 'center' }}>
+src/components/security/DangerZoneSection.tsx:121:              <Text style={{ fontSize: 13, color: THEME_COLORS.neutralTextSubtle, textAlign: 'center', lineHeight: 20 }}>
+src/components/security/DangerZoneSection.tsx:127:              <View style={{ padding: 12, backgroundColor: THEME_COLORS.errorTintSoft, borderRadius: 12 }}>
+src/components/security/DangerZoneSection.tsx:128:                <Text style={{ fontSize: 12, color: THEME_COLORS.errorStrong, fontWeight: '700', textAlign: 'center' }}>{error}</Text>
+src/components/security/DangerZoneSection.tsx:132:            <View style={{ flexDirection: 'row', gap: 12 }}>
+src/components/security/DangerZoneSection.tsx:135:                style={{ flex: 1, paddingVertical: 14, borderRadius: 16, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center' }}
+src/components/security/DangerZoneSection.tsx:137:                <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle }}>Keep My Account</Text>
+src/components/security/DangerZoneSection.tsx:142:                style={{ flex: 1, paddingVertical: 14, borderRadius: 16, backgroundColor: THEME_COLORS.errorStrong, alignItems: 'center', opacity: isDeleting ? 0.6 : 1 }}
+src/components/security/DangerZoneSection.tsx:147:                  <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.white }}>Delete Everything</Text>
+src/components/admin/BenefitsPricingPage.tsx:154:            <Text style={{ color: SECONDARY }}>Then R99/year.</Text>
+src/components/admin/BenefitsPricingPage.tsx:306:        <View style={{ height: insets.bottom + 24 }} />
+src/components/admin/BenefitsPricingPage.tsx:314:const styles = StyleSheet.create({
+src/components/admin/ModerationCenter.tsx:599:            style={{ width: '100%', height: 40 }}
+src/components/admin/ModerationCenter.tsx:613:          <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextMuted, marginBottom: 10 }}>
+src/components/admin/ModerationCenter.tsx:660:          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+src/components/admin/ModerationCenter.tsx:661:            <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSubtle }}>
+src/components/admin/ModerationCenter.tsx:664:            <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSubtle }}>
+src/components/admin/ModerationCenter.tsx:671:          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+src/components/admin/ModerationCenter.tsx:714:                  <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:747:                  <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:854:                  <Text style={{ color: inviteEmailStatus.type === 'success' ? THEME_COLORS.primaryContainer : ERROR, fontSize: 12, fontWeight: '700' }}>
+src/components/admin/ModerationCenter.tsx:905:                  <Text style={{ color: inviteSmsStatus.type === 'success' ? THEME_COLORS.primaryContainer : ERROR, fontSize: 12, fontWeight: '700' }}>
+src/components/admin/ModerationCenter.tsx:1050:            <View style={{ gap: 8 }}>
+src/components/admin/ModerationCenter.tsx:1072:                <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1094:                <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1126:                <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1190:          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 4 }}>
+src/components/admin/ModerationCenter.tsx:1191:            <View style={{ flexDirection: 'row', gap: 8, paddingVertical: 4 }}>
+src/components/admin/ModerationCenter.tsx:1213:                <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1239:                <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1301:          <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1304:            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+src/components/admin/ModerationCenter.tsx:1305:              <View style={{ backgroundColor: THEME_COLORS.successSurfaceStrong, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+src/components/admin/ModerationCenter.tsx:1306:                <Text style={{ fontSize: 10, color: THEME_COLORS.successStrong, fontWeight: '700' }}>Live in Marketplace</Text>
+src/components/admin/ModerationCenter.tsx:1308:              <View style={{ backgroundColor: biz.source === 'IMPORT' ? THEME_COLORS.brandPurpleSurface : THEME_COLORS.infoSurfaceSoft, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+src/components/admin/ModerationCenter.tsx:1309:                <Text style={{ fontSize: 10, color: biz.source === 'IMPORT' ? THEME_COLORS.brandPurple : THEME_COLORS.brandBlueText, fontWeight: '700' }}>
+src/components/admin/ModerationCenter.tsx:1331:          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+src/components/admin/ModerationCenter.tsx:1334:              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: THEME_COLORS.primary, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 }}
+src/components/admin/ModerationCenter.tsx:1339:              <Text style={{ color: THEME_COLORS.white, fontSize: 12, fontWeight: '700' }}>AI Import</Text>
+src/components/admin/ModerationCenter.tsx:1343:          <View style={{ flexDirection: 'row', gap: 8 }}>
+src/components/admin/ModerationCenter.tsx:1392:          <View style={{ flexDirection: 'row', gap: 8 }}>
+src/components/admin/ModerationCenter.tsx:1416:                  <Text style={{ fontSize: 24 }}>{cat.icon}</Text>
+src/components/admin/ModerationCenter.tsx:1418:                <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1465:          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
+src/components/admin/ModerationCenter.tsx:1469:            <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1496:              <View style={{ flex: 1 }}>
+src/components/admin/ModerationCenter.tsx:1498:                  <Text style={{ textTransform: 'capitalize' }}>{log.action}</Text> on {log.target_type}
+src/components/admin/ModerationCenter.tsx:1649:const styles = StyleSheet.create({
+src/components/chat/MessageBubble.tsx:96:    <View style={{ marginTop: rowTopSpacing }} className={isMe ? 'items-end' : 'items-start'}>
+src/components/chat/MessageBubble.tsx:103:                style={{ width: AVATAR_SIZE, height: AVATAR_SIZE, marginBottom: 1, marginRight: 8, borderRadius: AVATAR_SIZE / 2 }}
+src/components/chat/MessageBubble.tsx:108:                style={{
+src/components/chat/MessageBubble.tsx:121:            <View style={{ width: AVATAR_GUTTER }} />
+src/components/chat/MessageBubble.tsx:129:                <Text className="text-[14px] font-black leading-4" style={{ color: senderNameColor }}>
+src/components/chat/MessageBubble.tsx:160:                  style={{
+src/components/chat/MessageBubble.tsx:168:                  style={{
+src/components/chat/MessageBubble.tsx:174:                    style={{
+src/components/chat/MessageBubble.tsx:184:                    <View className="justify-center" style={{ minWidth: 16 }}>
+src/components/chat/MessageBubble.tsx:199:                style={{
+src/components/chat/MessageBubble.tsx:207:                  style={{
+src/components/chat/MessageBubble.tsx:217:                  <View className="justify-center" style={{ minWidth: 16 }}>
+src/components/emergency/EmergencyHub.tsx:219:      style={{ flex: 1 }}
+src/components/emergency/EmergencyHub.tsx:224:      <Animated.View style={{ height: mapHeightAnim }} className="relative bg-gray-100 border-b border-gray-200">
+src/components/emergency/EmergencyHub.tsx:233:            <View className="p-2 rounded-full mr-3" style={{ backgroundColor: accentBg }}>
+src/components/emergency/EmergencyHub.tsx:253:          style={{ zIndex: 30, elevation: 8 }}
+src/components/emergency/EmergencyHub.tsx:306:                <View className="px-1.5 py-0.5 rounded flex-row items-center gap-1" style={{ backgroundColor: accentBg }}>
+src/components/emergency/EmergencyHub.tsx:308:                  <Text className="text-[10px] font-bold uppercase tracking-wider" style={{ color: accentColor }}>
+src/components/emergency/EmergencyHub.tsx:351:                      style={{ backgroundColor: chipBg, borderWidth: 1, borderColor: chipBorder }}
+src/components/emergency/EmergencyHub.tsx:354:                      <Text className="text-[11px] font-bold" style={{ color: chipText }} numberOfLines={1}>
+src/components/admin/CommunityInsightPanels.tsx:190:const styles = StyleSheet.create({
+src/components/settings/ManageUserBusinesses.tsx:92:    <View style={{ gap: 12 }}>
+src/components/settings/ManageUserBusinesses.tsx:93:      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
+src/components/settings/ManageUserBusinesses.tsx:95:          <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 2 }}>
+src/components/settings/ManageUserBusinesses.tsx:98:          <Text style={{ fontSize: 13, color: THEME_COLORS.neutralTextSubtle, marginTop: 6 }}>
+src/components/settings/ManageUserBusinesses.tsx:102:        <TouchableOpacity onPress={openCreate} style={{ width: 42, height: 42, borderRadius: 21, backgroundColor: THEME_COLORS.primary, alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/ManageUserBusinesses.tsx:111:          style={{
+src/components/settings/ManageUserBusinesses.tsx:122:          <View style={{ width: 58, height: 58, borderRadius: 29, backgroundColor: THEME_COLORS.primaryTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/ManageUserBusinesses.tsx:125:          <View style={{ alignItems: 'center', gap: 6 }}>
+src/components/settings/ManageUserBusinesses.tsx:126:            <Text style={{ fontSize: 16, fontWeight: '800', color: THEME_COLORS.primary }}>Add your first business</Text>
+src/components/settings/ManageUserBusinesses.tsx:127:            <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle, textAlign: 'center', lineHeight: 18 }}>
+src/components/settings/ManageUserBusinesses.tsx:131:          <View style={{ backgroundColor: THEME_COLORS.primary, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12 }}>
+src/components/settings/ManageUserBusinesses.tsx:132:            <Text style={{ fontSize: 12, fontWeight: '800', color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/ManageUserBusinesses.tsx:138:        <View style={{ gap: 12 }}>
+src/components/settings/ManageUserBusinesses.tsx:145:              <View key={business.id} style={{ backgroundColor: THEME_COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: 16, gap: 14 }}>
+src/components/settings/ManageUserBusinesses.tsx:146:                <View style={{ flexDirection: 'row', gap: 14 }}>
+src/components/settings/ManageUserBusinesses.tsx:147:                  <View style={{ width: 78, height: 78, borderRadius: 20, overflow: 'hidden', backgroundColor: THEME_COLORS.primaryTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/ManageUserBusinesses.tsx:149:                      <Image source={{ uri: business.image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+src/components/settings/ManageUserBusinesses.tsx:151:                      <Text style={{ fontSize: 28 }}>{business.name.charAt(0).toUpperCase()}</Text>
+src/components/settings/ManageUserBusinesses.tsx:155:                  <View style={{ flex: 1, gap: 8 }}>
+src/components/settings/ManageUserBusinesses.tsx:156:                    <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+src/components/settings/ManageUserBusinesses.tsx:157:                      <View style={{ flex: 1 }}>
+src/components/settings/ManageUserBusinesses.tsx:158:                        <Text style={{ fontSize: 16, fontWeight: '800', color: THEME_COLORS.onSurface }} numberOfLines={1}>
+src/components/settings/ManageUserBusinesses.tsx:161:                        <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle, marginTop: 4 }}>
+src/components/settings/ManageUserBusinesses.tsx:165:                      <View style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: isActive ? THEME_COLORS.successTintSoftAlt : THEME_COLORS.alias_rgba_107_114_128_0_12 }}>
+src/components/settings/ManageUserBusinesses.tsx:166:                        <Text style={{ fontSize: 10, fontWeight: '800', color: isActive ? THEME_COLORS.successStrongAlt : THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/ManageUserBusinesses.tsx:172:                    <Text style={{ fontSize: 12, lineHeight: 18, color: THEME_COLORS.neutralTextDefault }} numberOfLines={3}>
+src/components/settings/ManageUserBusinesses.tsx:176:                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+src/components/settings/ManageUserBusinesses.tsx:178:                      <Text style={{ flex: 1, fontSize: 11, color: THEME_COLORS.neutralTextSubtle }} numberOfLines={1}>
+src/components/settings/ManageUserBusinesses.tsx:186:                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+src/components/settings/ManageUserBusinesses.tsx:188:                      <View key={`${business.id}-${name}`} style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 999, backgroundColor: THEME_COLORS.alias_rgba_13_61_71_0_07 }}>
+src/components/settings/ManageUserBusinesses.tsx:189:                        <Text style={{ fontSize: 11, fontWeight: '700', color: THEME_COLORS.primary }}>{name}</Text>
+src/components/settings/ManageUserBusinesses.tsx:195:                <View style={{ flexDirection: 'row', gap: 10 }}>
+src/components/settings/ManageUserBusinesses.tsx:196:                  <TouchableOpacity onPress={() => openEdit(business)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: 14, backgroundColor: THEME_COLORS.surfaceContainerLow }}>
+src/components/settings/ManageUserBusinesses.tsx:198:                    <Text style={{ fontSize: 12, fontWeight: '800', color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/ManageUserBusinesses.tsx:203:                  <TouchableOpacity onPress={() => handleToggleStatus(business)} disabled={isBusy} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: 14, backgroundColor: isActive ? THEME_COLORS.alias_rgba_245_158_11_0_12 : THEME_COLORS.alias_rgba_16_185_129_0_12 }}>
+src/components/settings/ManageUserBusinesses.tsx:205:                    <Text style={{ fontSize: 12, fontWeight: '800', color: isActive ? THEME_COLORS.warning : THEME_COLORS.successStrongAlt, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/ManageUserBusinesses.tsx:210:                  <TouchableOpacity onPress={() => handleDelete(business)} disabled={isBusy} style={{ width: 50, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: THEME_COLORS.errorTintSoft }}>
+src/components/security/AccountSecurityPage.tsx:110:    <SafeAreaView style={{ flex: 1, backgroundColor: THEME_COLORS.neutralBg }}>
+src/components/security/AccountSecurityPage.tsx:112:      <View style={{
+src/components/security/AccountSecurityPage.tsx:131:          style={{ padding: 8, borderRadius: 12, backgroundColor: THEME_COLORS.surfaceContainerLow }}
+src/components/security/AccountSecurityPage.tsx:135:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+src/components/security/AccountSecurityPage.tsx:137:          <Text style={{ fontSize: 20, fontWeight: '700', color: THEME_COLORS.onSurface }}>Account & Security</Text>
+src/components/security/AccountSecurityPage.tsx:142:      <View style={{ backgroundColor: THEME_COLORS.white, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/security/AccountSecurityPage.tsx:167:                style={{
+src/components/security/AccountSecurityPage.tsx:185:        style={{ flex: 1 }}
+src/components/chat/ChatWindow.tsx:84:            style={{ transform: [{ scale: dot }] }}
+src/components/market/MarketPage.tsx:337:                style={{ backgroundColor: 'transparent' }}
+src/components/market/MarketPage.tsx:528:        <View className="flex-1 justify-end" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_45 }}>
+src/components/market/MarketPage.tsx:534:                  style={{ width: '100%', height: 240 }}
+src/components/market/MarketPage.tsx:539:              <View style={{ padding: 20, gap: 16 }}>
+src/components/market/MarketPage.tsx:540:                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+src/components/market/MarketPage.tsx:541:                  <View style={{ flex: 1, gap: 8 }}>
+src/components/market/MarketPage.tsx:542:                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+src/components/market/MarketPage.tsx:543:                      <View style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: THEME_COLORS.aliasHex_eef2ff }}>
+src/components/market/MarketPage.tsx:544:                        <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.indigo, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/market/MarketPage.tsx:549:                        <View style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: THEME_COLORS.aliasHex_fff7ed, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+src/components/market/MarketPage.tsx:551:                          <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.secondaryContainer }}>{selectedListing.locationName}</Text>
+src/components/market/MarketPage.tsx:555:                    <Text style={{ fontSize: 22, fontWeight: '800', color: THEME_COLORS.neutralTextStrong, lineHeight: 28 }}>{selectedListing.title}</Text>
+src/components/market/MarketPage.tsx:560:                    style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}
+src/components/market/MarketPage.tsx:562:                    <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle }}>×</Text>
+src/components/market/MarketPage.tsx:566:                <View style={{ backgroundColor: THEME_COLORS.neutralBg, borderRadius: 18, padding: 14, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_79_70_229_0_12 }}>
+src/components/market/MarketPage.tsx:567:                  <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: 1 }}>Community Price</Text>
+src/components/market/MarketPage.tsx:568:                  <Text style={{ fontSize: 28, fontWeight: '900', color: THEME_COLORS.indigo, marginTop: 6 }}>
+src/components/market/MarketPage.tsx:572:                    <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle, marginTop: 8 }}>
+src/components/market/MarketPage.tsx:578:                <Text style={{ fontSize: 14, lineHeight: 22, color: THEME_COLORS.neutralTextEmphasis }}>{selectedListing.description}</Text>
+src/components/market/MarketPage.tsx:581:                  <View style={{ backgroundColor: THEME_COLORS.aliasHex_fff7ed, borderRadius: 18, padding: 14, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_249_115_22_0_18 }}>
+src/components/market/MarketPage.tsx:582:                    <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.aliasHex_9a3412 }}>Charity contribution</Text>
+src/components/market/MarketPage.tsx:583:                    <Text style={{ fontSize: 12, color: THEME_COLORS.aliasHex_7c2d12, marginTop: 6 }}>
+src/components/market/MarketPage.tsx:589:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+src/components/market/MarketPage.tsx:590:                  <View style={{ width: 40, height: 40, borderRadius: 20, overflow: 'hidden', backgroundColor: THEME_COLORS.neutralBorderSoft }}>
+src/components/market/MarketPage.tsx:594:                        style={{ width: '100%', height: '100%' }}
+src/components/market/MarketPage.tsx:598:                      <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: THEME_COLORS.primaryTintSoft }}>
+src/components/market/MarketPage.tsx:599:                        <Text style={{ fontSize: 13, fontWeight: '800', color: THEME_COLORS.primary }}>
+src/components/market/MarketPage.tsx:606:                    <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.neutralTextStrong }}>{selectedListing.authorName || 'Community Member'}</Text>
+src/components/market/MarketPage.tsx:607:                    <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSubtle }}>{new Date(selectedListing.timestamp).toLocaleDateString()}</Text>
+src/components/market/MarketPage.tsx:613:                  style={{ backgroundColor: THEME_COLORS.primary, borderRadius: 16, paddingVertical: 14, alignItems: 'center' }}
+src/components/market/MarketPage.tsx:615:                  <Text style={{ color: THEME_COLORS.white, fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/market/MarketPage.tsx:624:                    style={{ backgroundColor: THEME_COLORS.warningStrong, borderRadius: 16, paddingVertical: 14, alignItems: 'center' }}
+src/components/market/MarketPage.tsx:626:                    <Text style={{ color: THEME_COLORS.neutralTextStrong, fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/market/MarketPage.tsx:819:              style={{ flex: 1 }}
+src/components/chat/ChatDetailPage.tsx:217:    <SafeAreaView className="flex-1" style={{ backgroundColor: THEME_COLORS.aliasHex_f7f8fc }}>
+src/components/chat/ChatDetailPage.tsx:362:                      style={{ backgroundColor: roleBadgeBg(role) }}
+src/components/security/SecuritySection.tsx:243:    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: 24, gap: 20 }}>
+src/components/security/SecuritySection.tsx:245:      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/SecuritySection.tsx:246:        <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SecuritySection.tsx:249:        <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.primary }}>Login & Authentication</Text>
+src/components/security/SecuritySection.tsx:253:      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/security/SecuritySection.tsx:254:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/SecuritySection.tsx:255:          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SecuritySection.tsx:259:            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Password</Text>
+src/components/security/SecuritySection.tsx:260:            <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>
+src/components/security/SecuritySection.tsx:267:          style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: 12 }}
+src/components/security/SecuritySection.tsx:269:          <Text style={{ fontSize: 11, fontWeight: '800', color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/SecuritySection.tsx:276:        <View style={{ gap: 12 }}>
+src/components/security/SecuritySection.tsx:279:            <View style={{ position: 'relative' }}>
+src/components/security/SecuritySection.tsx:286:                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, paddingRight: 50, fontSize: 14, color: THEME_COLORS.onSurface }}
+src/components/security/SecuritySection.tsx:290:                style={{ position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' }}
+src/components/security/SecuritySection.tsx:298:          <View style={{ position: 'relative' }}>
+src/components/security/SecuritySection.tsx:305:              style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, paddingRight: 50, fontSize: 14, color: THEME_COLORS.onSurface }}
+src/components/security/SecuritySection.tsx:309:              style={{ position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' }}
+src/components/security/SecuritySection.tsx:322:            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: THEME_COLORS.onSurface }}
+src/components/security/SecuritySection.tsx:327:            style={{ backgroundColor: THEME_COLORS.primary, borderRadius: 20, paddingVertical: 16, alignItems: 'center' }}
+src/components/security/SecuritySection.tsx:329:            <Text style={{ color: THEME_COLORS.white, fontSize: 14, fontWeight: '700' }}>{hasPassword ? 'Update Password' : 'Set Password'}</Text>
+src/components/security/SecuritySection.tsx:335:      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/security/SecuritySection.tsx:336:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+src/components/security/SecuritySection.tsx:337:          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SecuritySection.tsx:340:          <View style={{ flex: 1 }}>
+src/components/security/SecuritySection.tsx:341:            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Email Address</Text>
+src/components/security/SecuritySection.tsx:342:            <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>
+src/components/security/SecuritySection.tsx:354:          style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: 12 }}
+src/components/security/SecuritySection.tsx:356:          <Text style={{ fontSize: 11, fontWeight: '800', color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/SecuritySection.tsx:365:          <Text style={{ fontSize: 12, color: THEME_COLORS.brandBlueText, textAlign: 'center', textDecorationLine: 'underline' }}>
+src/components/security/SecuritySection.tsx:372:        <View style={{ gap: 12 }}>
+src/components/security/SecuritySection.tsx:382:            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: THEME_COLORS.onSurface }}
+src/components/security/SecuritySection.tsx:387:              <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle }}>
+src/components/security/SecuritySection.tsx:390:              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 20 }}>
+src/components/security/SecuritySection.tsx:400:                  style={{ flex: 1, paddingVertical: 16, fontSize: 14, color: THEME_COLORS.onSurface }}
+src/components/security/SecuritySection.tsx:415:                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: THEME_COLORS.onSurface }}
+src/components/security/SecuritySection.tsx:423:            style={{
+src/components/security/SecuritySection.tsx:430:              : <Text style={{ color: THEME_COLORS.white, fontSize: 14, fontWeight: '700' }}>
+src/components/security/SecuritySection.tsx:434:          <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft, textAlign: 'center' }}>
+src/components/security/SecuritySection.tsx:441:      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/security/SecuritySection.tsx:442:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+src/components/security/SecuritySection.tsx:443:          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SecuritySection.tsx:446:          <View style={{ flex: 1 }}>
+src/components/security/SecuritySection.tsx:447:            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Phone Number</Text>
+src/components/security/SecuritySection.tsx:448:            <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>
+src/components/security/SecuritySection.tsx:461:          style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: 12 }}
+src/components/security/SecuritySection.tsx:463:          <Text style={{ fontSize: 11, fontWeight: '800', color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/SecuritySection.tsx:470:        <View style={{ gap: 12 }}>
+src/components/security/SecuritySection.tsx:488:                style={{
+src/components/security/SecuritySection.tsx:495:                  : <Text style={{ color: THEME_COLORS.white, fontSize: 14, fontWeight: '700' }}>Send SMS Code</Text>}
+src/components/security/SecuritySection.tsx:500:              <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle, textAlign: 'center' }}>
+src/components/security/SecuritySection.tsx:513:                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, paddingHorizontal: 24, paddingVertical: 16, fontSize: 24, fontWeight: '800', color: THEME_COLORS.onSurface, textAlign: 'center', letterSpacing: 8 }}
+src/components/security/SecuritySection.tsx:518:                style={{
+src/components/security/SecuritySection.tsx:525:                  : <Text style={{ color: THEME_COLORS.white, fontSize: 14, fontWeight: '700' }}>Verify & Link Phone</Text>}
+src/components/security/SecuritySection.tsx:528:                <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSoft, textAlign: 'center' }}>Change number</Text>
+src/components/security/SecuritySection.tsx:536:      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/security/SecuritySection.tsx:537:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/SecuritySection.tsx:538:          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SecuritySection.tsx:542:            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Two-Factor Authentication</Text>
+src/components/security/SecuritySection.tsx:543:            <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>Add an extra layer of security</Text>
+src/components/security/SecuritySection.tsx:549:          style={{
+src/components/security/SecuritySection.tsx:557:            <ActivityIndicator size="small" color={THEME_COLORS.white} style={{ alignSelf: 'center' }} />
+src/components/security/SecuritySection.tsx:559:            <View style={{
+src/components/security/SecuritySection.tsx:571:        <View style={{ backgroundColor: THEME_COLORS.neutralBg, borderRadius: 24, padding: 24, gap: 20, borderWidth: 1, borderColor: THEME_COLORS.successTintSoft }}>
+src/components/security/SecuritySection.tsx:572:          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+src/components/security/SecuritySection.tsx:573:            <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: THEME_COLORS.successTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SecuritySection.tsx:576:            <Text style={{ fontSize: 16, fontWeight: '800', color: THEME_COLORS.primary }}>Enable Two-Factor Authentication</Text>
+src/components/security/SecuritySection.tsx:580:          <View style={{ alignItems: 'center', gap: 8 }}>
+src/components/security/SecuritySection.tsx:581:            <View style={{ padding: 16, backgroundColor: THEME_COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/security/SecuritySection.tsx:585:                <View style={{ width: 160, height: 160, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/SecuritySection.tsx:590:            <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 2 }}>Step 1: Scan QR Code</Text>
+src/components/security/SecuritySection.tsx:595:            <View style={{ gap: 6 }}>
+src/components/security/SecuritySection.tsx:596:              <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 2 }}>Step 2: Manual Entry Key</Text>
+src/components/security/SecuritySection.tsx:597:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 14, backgroundColor: THEME_COLORS.white, borderRadius: 16, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder }}>
+src/components/security/SecuritySection.tsx:598:                <Text style={{ flex: 1, fontFamily: 'monospace', fontSize: 13, fontWeight: '700', color: THEME_COLORS.primary, letterSpacing: 2 }} selectable>
+src/components/security/SecuritySection.tsx:603:                  style={{ padding: 8, borderRadius: 10, backgroundColor: THEME_COLORS.successTintSofterAlt }}
+src/components/security/SecuritySection.tsx:612:          <View style={{ gap: 8 }}>
+src/components/security/SecuritySection.tsx:613:            <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 2 }}>Step 3: Verify & Enable</Text>
+src/components/security/SecuritySection.tsx:621:              style={{
+src/components/security/SecuritySection.tsx:637:          <View style={{ flexDirection: 'row', gap: 12 }}>
+src/components/security/SecuritySection.tsx:641:              style={{
+src/components/security/SecuritySection.tsx:650:                <Text style={{ color: THEME_COLORS.white, fontSize: 13, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Verify & Enable</Text>
+src/components/security/SecuritySection.tsx:655:              style={{ paddingHorizontal: 24, paddingVertical: 16, borderRadius: 20, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center' }}
+src/components/security/SecuritySection.tsx:657:              <Text style={{ color: THEME_COLORS.neutralTextSoft, fontSize: 13, fontWeight: '700' }}>Cancel</Text>
+src/components/security/SecuritySection.tsx:665:        <View style={{
+src/components/security/SecuritySection.tsx:672:          <Text style={{ fontSize: 12, fontWeight: '700', color: status.type === 'success' ? THEME_COLORS.successStrongAlt : THEME_COLORS.errorStrong }}>
+src/components/settings/ManageCommunityCharity.tsx:445:          <View style={{ flex: 1, gap: 3 }}>
+src/components/settings/ManageCommunityCharity.tsx:510:                    <View style={{ flex: 1, gap: 4 }}>
+src/components/settings/ManageCommunityCharity.tsx:566:                        <View style={{ flex: 1, gap: 4 }}>
+src/components/settings/ManageCommunityCharity.tsx:661:                <View style={{ gap: 12 }}>
+src/components/settings/ManageCommunityCharity.tsx:918:const styles = StyleSheet.create({
+src/components/security/LicensingSection.tsx:58:    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: 24, gap: 20 }}>
+src/components/security/LicensingSection.tsx:60:      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/security/LicensingSection.tsx:61:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/LicensingSection.tsx:62:          <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/LicensingSection.tsx:65:          <Text style={{ fontSize: 18, fontWeight: '700', color: PRIMARY }}>Licensing & Access</Text>
+src/components/security/LicensingSection.tsx:67:        <View style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, backgroundColor: statusBg, borderColor: statusBorder }}>
+src/components/security/LicensingSection.tsx:68:          <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color: statusColor }}>
+src/components/security/LicensingSection.tsx:75:      <View style={{ backgroundColor: THEME_COLORS.neutralBg, borderRadius: 20, padding: 16, gap: 10, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/security/LicensingSection.tsx:76:        <Text style={{ fontSize: 11, fontWeight: '800', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 1 }}>Platform Membership</Text>
+src/components/security/LicensingSection.tsx:78:          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+src/components/security/LicensingSection.tsx:80:            <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.neutralTextStrong }}>
+src/components/security/LicensingSection.tsx:86:          <View style={{ gap: 6 }}>
+src/components/security/LicensingSection.tsx:87:            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+src/components/security/LicensingSection.tsx:89:              <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.neutralTextStrong }}>
+src/components/security/LicensingSection.tsx:93:            <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSubtle, lineHeight: 16 }}>
+src/components/security/LicensingSection.tsx:99:          <View style={{ gap: 10 }}>
+src/components/security/LicensingSection.tsx:100:            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+src/components/security/LicensingSection.tsx:102:              <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.aliasHex_b91c1c }}>Access expired</Text>
+src/components/security/LicensingSection.tsx:104:            <Text style={{ fontSize: 11, color: THEME_COLORS.errorStrong, lineHeight: 16 }}>
+src/components/security/LicensingSection.tsx:109:              style={{ alignSelf: 'flex-start', backgroundColor: THEME_COLORS.errorStrong, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 }}
+src/components/security/LicensingSection.tsx:111:              <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/LicensingSection.tsx:120:            style={{ alignSelf: 'flex-start', backgroundColor: PRIMARY, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 }}
+src/components/security/LicensingSection.tsx:122:            <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/LicensingSection.tsx:131:        <View style={{ gap: 8 }}>
+src/components/security/LicensingSection.tsx:132:          <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/LicensingSection.tsx:139:              <View key={community.id} style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 20, padding: 16, gap: 12 }}>
+src/components/security/LicensingSection.tsx:140:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/security/LicensingSection.tsx:141:                  <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: THEME_COLORS.successTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/security/LicensingSection.tsx:142:                    <Text style={{ fontSize: 18, fontWeight: '800', color: PRIMARY }}>{community.name.charAt(0)}</Text>
+src/components/security/LicensingSection.tsx:144:                  <View style={{ flex: 1 }}>
+src/components/security/LicensingSection.tsx:145:                    <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.onSurface }}>{community.name}</Text>
+src/components/security/LicensingSection.tsx:146:                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+src/components/security/LicensingSection.tsx:147:                      <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, backgroundColor: statusInfo.bg }}>
+src/components/security/LicensingSection.tsx:148:                        <Text style={{ fontSize: 9, fontWeight: '800', color: statusInfo.color, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/LicensingSection.tsx:152:                      <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.neutralTextSoft }}>
+src/components/security/LicensingSection.tsx:162:                    style={{ alignSelf: 'flex-start', backgroundColor: PRIMARY, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 }}
+src/components/security/LicensingSection.tsx:164:                    <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/security/LicensingSection.tsx:170:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+src/components/security/LicensingSection.tsx:172:                    <Text style={{ fontSize: 11, fontWeight: '600', color: THEME_COLORS.successStrongAlt }}>
+src/components/settings/SettingsPage.tsx:121:    <View style={{ flex: 1, backgroundColor: THEME_COLORS.neutralBg }}>
+src/components/settings/SettingsPage.tsx:123:        style={{ flex: 1 }}
+src/components/settings/SettingsPage.tsx:131:        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: 20, gap: 16 }}>
+src/components/settings/SettingsPage.tsx:133:          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+src/components/settings/SettingsPage.tsx:134:            <View style={{ position: 'relative' }}>
+src/components/settings/SettingsPage.tsx:135:              <View style={{ width: 80, height: 80, borderRadius: 40, overflow: 'hidden', borderWidth: 3, borderColor: ringColor }}>
+src/components/settings/SettingsPage.tsx:136:                <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+src/components/settings/SettingsPage.tsx:139:            <View style={{ flex: 1 }}>
+src/components/settings/SettingsPage.tsx:140:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+src/components/settings/SettingsPage.tsx:141:                <Text style={{ fontSize: 20, fontWeight: '700', color: THEME_COLORS.onSurface, flex: 1 }} numberOfLines={1}>
+src/components/settings/SettingsPage.tsx:147:              <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 6 }}>
+src/components/settings/SettingsPage.tsx:148:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+src/components/settings/SettingsPage.tsx:150:                  <Text style={{ fontSize: 13, color: THEME_COLORS.neutralTextDefault }}>{currentCommunity?.name}</Text>
+src/components/settings/SettingsPage.tsx:163:                    <View style={{
+src/components/settings/SettingsPage.tsx:170:                      <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color: palette.fg }}>
+src/components/settings/SettingsPage.tsx:179:              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+src/components/settings/SettingsPage.tsx:180:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, backgroundColor: rc.bg }}>
+src/components/settings/SettingsPage.tsx:181:                  <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: rc.dot }} />
+src/components/settings/SettingsPage.tsx:182:                  <Text style={{ fontSize: 10, fontWeight: '800', color: rc.text, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:187:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
+src/components/settings/SettingsPage.tsx:189:                    <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.brandBlueText, textTransform: 'uppercase', letterSpacing: 1 }}>Security Responder</Text>
+src/components/settings/SettingsPage.tsx:197:          <View style={{ borderTopWidth: 1, borderTopColor: THEME_COLORS.overlayBorderSoft, paddingTop: 16, gap: 10 }}>
+src/components/settings/SettingsPage.tsx:198:            <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: 2 }}>
+src/components/settings/SettingsPage.tsx:204:              style={{
+src/components/settings/SettingsPage.tsx:210:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/settings/SettingsPage.tsx:211:                <Image source={APP_LOGO_SELECTED} style={{ width: 40, height: 40, borderRadius: 12 }} resizeMode="cover" />
+src/components/settings/SettingsPage.tsx:213:                  <Text style={{ fontSize: 9, fontWeight: '800', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 1 }}>Active Community</Text>
+src/components/settings/SettingsPage.tsx:214:                  <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.onSurface, marginTop: 2 }}>
+src/components/settings/SettingsPage.tsx:219:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+src/components/settings/SettingsPage.tsx:223:                    style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: THEME_COLORS.primary, borderRadius: 8 }}
+src/components/settings/SettingsPage.tsx:225:                    <Text style={{ fontSize: 9, fontWeight: '800', color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:230:                <View style={{ transform: [{ rotate: showCommunitySwitcher ? '180deg' : '0deg' }] }}>
+src/components/settings/SettingsPage.tsx:237:              <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 16, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, overflow: 'hidden' }}>
+src/components/settings/SettingsPage.tsx:245:                      style={{
+src/components/settings/SettingsPage.tsx:251:                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+src/components/settings/SettingsPage.tsx:252:                        <Image source={isActive ? APP_LOGO_SELECTED : APP_LOGO} style={{ width: 32, height: 32, borderRadius: 10 }} resizeMode="cover" />
+src/components/settings/SettingsPage.tsx:254:                          <Text style={{ fontSize: 13, fontWeight: '700', color: isActive ? THEME_COLORS.primary : THEME_COLORS.onSurface }}>{c.name}</Text>
+src/components/settings/SettingsPage.tsx:255:                          <View style={{ flexDirection: 'row', gap: 6, marginTop: 2 }}>
+src/components/settings/SettingsPage.tsx:256:                            <Text style={{ fontSize: 9, fontWeight: '800', color: isAdminOrMod ? THEME_COLORS.brandBlueText : THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:265:                                <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color }}>
+src/components/settings/SettingsPage.tsx:283:        <View style={{ gap: 4 }}>
+src/components/settings/SettingsPage.tsx:284:          <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: 2, paddingHorizontal: 4, paddingBottom: 6 }}>
+src/components/settings/SettingsPage.tsx:291:            style={{
+src/components/settings/SettingsPage.tsx:296:            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+src/components/settings/SettingsPage.tsx:297:              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/SettingsPage.tsx:300:              <Text style={{ fontSize: 14, fontWeight: '600', color: THEME_COLORS.onSurface }}>My Profile & Account</Text>
+src/components/settings/SettingsPage.tsx:306:          <View style={{
+src/components/settings/SettingsPage.tsx:312:              style={{ flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 }}
+src/components/settings/SettingsPage.tsx:314:              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/SettingsPage.tsx:318:                <Text style={{ fontSize: 14, fontWeight: '600', color: THEME_COLORS.onSurface }}>Notifications</Text>
+src/components/settings/SettingsPage.tsx:319:                <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft }}>
+src/components/settings/SettingsPage.tsx:324:            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+src/components/settings/SettingsPage.tsx:352:          <View style={{ backgroundColor: THEME_COLORS.primaryContainer, borderRadius: 24, padding: 20, gap: 16 }}>
+src/components/settings/SettingsPage.tsx:353:            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+src/components/settings/SettingsPage.tsx:354:              <Text style={{ fontSize: 18, fontWeight: '800', color: THEME_COLORS.white, flex: 1 }} numberOfLines={1}>
+src/components/settings/SettingsPage.tsx:357:              <View style={{
+src/components/settings/SettingsPage.tsx:364:                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: THEME_COLORS.warningBorderStrong }} />
+src/components/settings/SettingsPage.tsx:365:                <Text style={{ fontSize: 10, fontWeight: '800', color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:371:            <View style={{ backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_1, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20, gap: 8 }}>
+src/components/settings/SettingsPage.tsx:372:              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+src/components/settings/SettingsPage.tsx:374:                <View style={{ flex: 1 }}>
+src/components/settings/SettingsPage.tsx:375:                  <Text style={{ fontSize: 13, fontWeight: '700', color: THEME_COLORS.white }}>Unlock Full Potential</Text>
+src/components/settings/SettingsPage.tsx:376:                  <Text style={{ fontSize: 11, color: THEME_COLORS.whiteOverlay70, marginTop: 4, lineHeight: 17 }}>
+src/components/settings/SettingsPage.tsx:383:                style={{ backgroundColor: THEME_COLORS.white, paddingVertical: 12, borderRadius: 14, alignItems: 'center' }}
+src/components/settings/SettingsPage.tsx:385:                <Text style={{ fontSize: 12, fontWeight: '800', color: THEME_COLORS.primaryContainer, textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:399:            style={{
+src/components/settings/SettingsPage.tsx:415:            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.success }}>Create New Community</Text>
+src/components/settings/NotificationSettingsPage.tsx:123:    <SafeAreaView style={{ flex: 1, backgroundColor: THEME_COLORS.neutralBg }}>
+src/components/settings/NotificationSettingsPage.tsx:126:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+src/components/settings/NotificationSettingsPage.tsx:135:            style={{ padding: 8, borderRadius: 12, backgroundColor: THEME_COLORS.surfaceContainerLow }}
+src/components/settings/NotificationSettingsPage.tsx:139:          <View style={{ flex: 1 }}>
+src/components/settings/NotificationSettingsPage.tsx:140:            <Text style={{ fontSize: 22, fontWeight: '700', color: THEME_COLORS.onSurface }}>Notification Settings</Text>
+src/components/settings/NotificationSettingsPage.tsx:141:            <Text style={{ fontSize: 13, color: THEME_COLORS.neutralTextSoft }}>Manage how you receive notifications</Text>
+src/components/settings/NotificationSettingsPage.tsx:149:        <View style={{ backgroundColor: THEME_COLORS.errorTintSoft, borderRadius: 20, padding: 18, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_239_68_68_0_2, flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
+src/components/settings/NotificationSettingsPage.tsx:150:          <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: THEME_COLORS.alias_rgba_239_68_68_0_2, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/settings/NotificationSettingsPage.tsx:153:          <View style={{ flex: 1 }}>
+src/components/settings/NotificationSettingsPage.tsx:154:            <Text style={{ fontSize: 16, fontWeight: '700', color: THEME_COLORS.errorStrong }}>Emergency Notifications</Text>
+src/components/settings/NotificationSettingsPage.tsx:155:            <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSubtle, marginTop: 4, lineHeight: 18 }}>
+src/components/settings/NotificationSettingsPage.tsx:162:        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 20, padding: 18, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/settings/NotificationSettingsPage.tsx:163:          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+src/components/settings/NotificationSettingsPage.tsx:164:            <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: prefs.globalEnabled ? THEME_COLORS.successTintSoft : THEME_COLORS.neutralTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/NotificationSettingsPage.tsx:168:              <Text style={{ fontSize: 14, fontWeight: '600', color: THEME_COLORS.onSurface }}>All Notifications</Text>
+src/components/settings/NotificationSettingsPage.tsx:169:              <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft }}>
+src/components/settings/NotificationSettingsPage.tsx:183:        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 20, padding: 20, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, gap: 16, opacity: prefs.globalEnabled ? 1 : 0.5 }}>
+src/components/settings/NotificationSettingsPage.tsx:185:            <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.onSurface }}>Notification Types</Text>
+src/components/settings/NotificationSettingsPage.tsx:186:            <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSoft, marginTop: 4 }}>Default settings applied to all communities unless overridden below</Text>
+src/components/settings/NotificationSettingsPage.tsx:194:                style={{
+src/components/settings/NotificationSettingsPage.tsx:205:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+src/components/settings/NotificationSettingsPage.tsx:206:                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: enabled ? THEME_COLORS.successTintSoft : THEME_COLORS.neutralTintSoft, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/settings/NotificationSettingsPage.tsx:209:                  <View style={{ flex: 1 }}>
+src/components/settings/NotificationSettingsPage.tsx:210:                    <Text style={{ fontSize: 13, fontWeight: '600', color: THEME_COLORS.onSurface }}>{item.label}</Text>
+src/components/settings/NotificationSettingsPage.tsx:211:                    <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft }} numberOfLines={1}>{item.description}</Text>
+src/components/settings/NotificationSettingsPage.tsx:228:          <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: 20, padding: 20, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, gap: 14, opacity: prefs.globalEnabled ? 1 : 0.5 }}>
+src/components/settings/NotificationSettingsPage.tsx:230:              <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.onSurface }}>Community Settings</Text>
+src/components/settings/NotificationSettingsPage.tsx:231:              <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSoft, marginTop: 4, lineHeight: 18 }}>
+src/components/settings/NotificationSettingsPage.tsx:235:            <View style={{ gap: 8 }}>
+src/components/settings/NotificationSettingsPage.tsx:244:                    style={{
+src/components/settings/NotificationSettingsPage.tsx:255:                      style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 }}
+src/components/settings/NotificationSettingsPage.tsx:258:                      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/settings/NotificationSettingsPage.tsx:261:                      <View style={{ flex: 1 }}>
+src/components/settings/NotificationSettingsPage.tsx:262:                        <Text style={{ fontSize: 13, fontWeight: '600', color: THEME_COLORS.onSurface }} numberOfLines={1}>{community.name}</Text>
+src/components/settings/NotificationSettingsPage.tsx:263:                        <Text style={{ fontSize: 11, fontWeight: '600', color: statusColor, marginTop: 2 }}>{statusLabel}</Text>
+src/components/settings/NotificationSettingsPage.tsx:265:                      <View style={{ transform: [{ rotate: isExpanded ? '180deg' : '0deg' }] }}>
+src/components/settings/NotificationSettingsPage.tsx:272:                      <View style={{ borderTopWidth: 1, borderTopColor: THEME_COLORS.overlayBorderSoft, paddingHorizontal: 14, paddingVertical: 12, gap: 6 }}>
+src/components/settings/NotificationSettingsPage.tsx:274:                          <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft, fontStyle: 'italic', marginBottom: 6 }}>
+src/components/settings/NotificationSettingsPage.tsx:285:                              style={{
+src/components/settings/NotificationSettingsPage.tsx:295:                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+src/components/settings/NotificationSettingsPage.tsx:296:                                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: effectiveValue ? THEME_COLORS.successTintSoft : THEME_COLORS.neutralTintSoft, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/settings/NotificationSettingsPage.tsx:299:                                <View style={{ flex: 1 }}>
+src/components/settings/NotificationSettingsPage.tsx:300:                                  <Text style={{ fontSize: 13, fontWeight: '500', color: THEME_COLORS.onSurface }}>{item.label}</Text>
+src/components/settings/NotificationSettingsPage.tsx:302:                                    <Text style={{ fontSize: 10, color: THEME_COLORS.warningStrong }}>Overriding global</Text>
+src/components/settings/NotificationSettingsPage.tsx:322:                            style={{ paddingVertical: 10, alignItems: 'center', marginTop: 4 }}
+src/components/settings/NotificationSettingsPage.tsx:324:                            <Text style={{ fontSize: 12, color: THEME_COLORS.neutralTextSoft }}>Reset to global defaults</Text>

@@ -13,6 +13,15 @@ import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { uploadImage } from '../../lib/uploadImage';
 import { useAuth } from '../../context/AuthContext';
+import { THEME_COLORS } from '../../theme/colors';
+
+const SPACE = {
+  zero: 0,
+};
+
+const TYPE_SCALE = {
+  input: 15,
+} as const;
 
 interface ChatComposerProps {
   onSend: (text: string) => void;
@@ -130,32 +139,32 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             activeOpacity={0.7}
             className="p-2 rounded-full"
           >
-            <ImageIcon size={20} color="#667781" />
+            <ImageIcon size={20} color={THEME_COLORS.neutralTextWhatsapp} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleTakePhoto}
             activeOpacity={0.7}
             className="p-2 rounded-full"
           >
-            <Camera size={20} color="#667781" />
+            <Camera size={20} color={THEME_COLORS.neutralTextWhatsapp} />
           </TouchableOpacity>
 
           <TextInput
             value={text}
             onChangeText={handleChangeText}
             placeholder={uploading ? 'Uploading photo...' : placeholder}
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={THEME_COLORS.neutralTextSoft}
             editable={!uploading}
             multiline
             maxLength={2000}
             style={{
               flex: 1,
-              fontSize: 15,
-              color: '#111827',
+              fontSize: TYPE_SCALE.input,
+              color: THEME_COLORS.neutralTextStrong,
               maxHeight: 120,
               alignSelf: 'center',
-              paddingTop: 0,
-              paddingBottom: 0,
+              paddingTop: SPACE.zero,
+              paddingBottom: SPACE.zero,
             }}
             returnKeyType="default"
           />
@@ -168,14 +177,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           className={[
             'w-12 h-12 rounded-full items-center justify-center',
             text.trim() && !uploading
-              ? 'bg-[#25d366]'
+              ? 'bg-green-500'
               : 'bg-gray-200',
           ].join(' ')}
         >
           {uploading ? (
-            <ActivityIndicator size="small" color="#0d3d47" />
+            <ActivityIndicator size="small" color={THEME_COLORS.primary} />
           ) : (
-            <Send size={19} color={text.trim() ? '#ffffff' : '#9ca3af'} />
+            <Send size={19} color={text.trim() ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft} />
           )}
         </TouchableOpacity>
       </View>

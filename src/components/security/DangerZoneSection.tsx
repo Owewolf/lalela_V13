@@ -8,6 +8,49 @@ import {
 } from 'react-native';
 import { ShieldAlert, Trash2, LogOut } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
+import { THEME_COLORS } from '../../theme/colors';
+
+const TYPE_SCALE = {
+  xs: 10,
+  sm: 12,
+  md: 13,
+  lg: 18,
+  h1: 20,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+
+const SPACE = {
+  xxs: 4,
+  xs: 8,
+  sm: 10,
+  md: 12,
+  lg: 14,
+  xl: 20,
+  xxl: 24,
+  s28: 28,
+  s40: 40,
+  s56: 56,
+  s360: 360,
+};
+
+const RADIUS = {
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 28,
+  round: 20,
+};
+const LINE_HEIGHT = {
+  compact: 16,
+  body: 20,
+};
 
 export const DangerZoneSection: React.FC = () => {
   const { signOut, deleteAccount } = useAuth();
@@ -31,59 +74,59 @@ export const DangerZoneSection: React.FC = () => {
   };
 
   return (
-    <View style={{ backgroundColor: 'rgba(239,68,68,0.05)', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(239,68,68,0.1)', padding: 24, gap: 20 }}>
+    <View style={{ backgroundColor: THEME_COLORS.alias_rgba_239_68_68_0_05, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: THEME_COLORS.errorTintSoft, padding: SPACE.xxl, gap: SPACE.xl }}>
       {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: 'rgba(239,68,68,0.1)', alignItems: 'center', justifyContent: 'center' }}>
-          <ShieldAlert size={22} color="#ef4444" />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
+        <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.errorTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+          <ShieldAlert size={22} color={THEME_COLORS.errorStrong} />
         </View>
-        <Text style={{ fontSize: 18, fontWeight: '700', color: '#ef4444' }}>Account Management</Text>
+        <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.errorStrong }}>Account Management</Text>
       </View>
 
       {error && (
-        <View style={{ padding: 14, backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 16 }}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#ef4444', textAlign: 'center' }}>{error}</Text>
+        <View style={{ padding: SPACE.lg, backgroundColor: THEME_COLORS.errorTintSoft, borderRadius: RADIUS.lg }}>
+          <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.errorStrong, textAlign: 'center' }}>{error}</Text>
         </View>
       )}
 
-      <View style={{ gap: 14 }}>
+      <View style={{ gap: SPACE.lg }}>
         {/* Logout Card */}
-        <View style={{ backgroundColor: '#fff', borderRadius: 24, padding: 20, gap: 14, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' }}>
-          <View style={{ gap: 4 }}>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a1a' }}>Logout Account</Text>
-            <Text style={{ fontSize: 10, color: '#888', lineHeight: 16 }}>
+        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xl, padding: SPACE.xl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+          <View style={{ gap: SPACE.xxs }}>
+            <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Logout Account</Text>
+            <Text style={{ fontSize: TYPE_SCALE.xs, color: THEME_COLORS.neutralTextSoft, lineHeight: LINE_HEIGHT.compact }}>
               Safely sign out of your account on this device. You can log back in anytime.
             </Text>
           </View>
           <TouchableOpacity
             onPress={signOut}
             style={{
-              paddingVertical: 14, borderRadius: 16, backgroundColor: 'rgba(22,163,74,0.06)',
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+              paddingVertical: SPACE.lg, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.alias_rgba_22_163_74_0_06,
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.xs,
             }}
           >
-            <LogOut size={16} color="#0d3d47" />
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#0d3d47' }}>Logout Account</Text>
+            <LogOut size={16} color={THEME_COLORS.primary} />
+            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary }}>Logout Account</Text>
           </TouchableOpacity>
         </View>
 
         {/* Delete Card */}
-        <View style={{ backgroundColor: '#ef4444', borderRadius: 24, padding: 20, gap: 14 }}>
-          <View style={{ gap: 4 }}>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>Delete Account</Text>
-            <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', lineHeight: 16 }}>
+        <View style={{ backgroundColor: THEME_COLORS.errorStrong, borderRadius: RADIUS.xl, padding: SPACE.xl, gap: SPACE.lg }}>
+          <View style={{ gap: SPACE.xxs }}>
+            <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Delete Account</Text>
+            <Text style={{ fontSize: TYPE_SCALE.xs, color: THEME_COLORS.whiteOverlay70, lineHeight: LINE_HEIGHT.compact }}>
               Permanently delete your account and all associated data. This action cannot be undone.
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => setShowConfirmDelete(true)}
             style={{
-              paddingVertical: 14, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.2)',
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+              paddingVertical: SPACE.lg, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.whiteOverlay20,
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.xs,
             }}
           >
-            <Trash2 size={16} color="#fff" />
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>Delete Permanently</Text>
+            <Trash2 size={16} color={THEME_COLORS.white} />
+            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Delete Permanently</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -97,53 +140,53 @@ export const DangerZoneSection: React.FC = () => {
       >
         <View style={{
           flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.6)',
+          backgroundColor: THEME_COLORS.blackOverlay60,
           alignItems: 'center',
           justifyContent: 'center',
-          padding: 24,
+          padding: SPACE.xxl,
         }}>
           <View style={{
-            backgroundColor: '#fff',
-            borderRadius: 28,
-            padding: 28,
+            backgroundColor: THEME_COLORS.white,
+            borderRadius: RADIUS.xxl,
+            padding: SPACE.s28,
             width: '100%',
-            maxWidth: 360,
-            gap: 20,
+            maxWidth: SPACE.s360,
+            gap: SPACE.xl,
           }}>
-            <View style={{ alignItems: 'center', gap: 10 }}>
-              <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(239,68,68,0.1)', alignItems: 'center', justifyContent: 'center' }}>
-                <Trash2 size={26} color="#ef4444" />
+            <View style={{ alignItems: 'center', gap: SPACE.sm }}>
+              <View style={{ width: SPACE.s56, height: SPACE.s56, borderRadius: RADIUS.xxl, backgroundColor: THEME_COLORS.errorTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+                <Trash2 size={26} color={THEME_COLORS.errorStrong} />
               </View>
-              <Text style={{ fontSize: 20, fontWeight: '700', color: '#1a1a1a', textAlign: 'center' }}>
+              <Text style={{ fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface, textAlign: 'center' }}>
                 Are you absolutely sure?
               </Text>
-              <Text style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', lineHeight: 20 }}>
+              <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, textAlign: 'center', lineHeight: LINE_HEIGHT.body }}>
                 This will permanently remove your account and all associated data. You will not be able to use this email to create a new account.
               </Text>
             </View>
 
             {error && (
-              <View style={{ padding: 12, backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 12 }}>
-                <Text style={{ fontSize: 12, color: '#ef4444', fontWeight: '700', textAlign: 'center' }}>{error}</Text>
+              <View style={{ padding: SPACE.md, backgroundColor: THEME_COLORS.errorTintSoft, borderRadius: RADIUS.md }}>
+                <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.errorStrong, fontWeight: FONT_WEIGHT.bold, textAlign: 'center' }}>{error}</Text>
               </View>
             )}
 
-            <View style={{ flexDirection: 'row', gap: 12 }}>
+            <View style={{ flexDirection: 'row', gap: SPACE.md }}>
               <TouchableOpacity
                 onPress={() => { if (!isDeleting) { setShowConfirmDelete(false); setError(null); } }}
-                style={{ flex: 1, paddingVertical: 14, borderRadius: 16, backgroundColor: '#f5f5f5', alignItems: 'center' }}
+                style={{ flex: 1, paddingVertical: SPACE.lg, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center' }}
               >
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#6b7280' }}>Keep My Account</Text>
+                <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSubtle }}>Keep My Account</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleDelete}
                 disabled={isDeleting}
-                style={{ flex: 1, paddingVertical: 14, borderRadius: 16, backgroundColor: '#ef4444', alignItems: 'center', opacity: isDeleting ? 0.6 : 1 }}
+                style={{ flex: 1, paddingVertical: SPACE.lg, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.errorStrong, alignItems: 'center', opacity: isDeleting ? 0.6 : 1 }}
               >
                 {isDeleting ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={THEME_COLORS.white} />
                 ) : (
-                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>Delete Everything</Text>
+                  <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Delete Everything</Text>
                 )}
               </TouchableOpacity>
             </View>

@@ -28,6 +28,45 @@ import {
   RefreshCw,
 } from 'lucide-react-native';
 import { useCall } from '../../context/CallContext';
+import { THEME_COLORS } from '../../theme/colors';
+
+const TYPE_SCALE = {
+  xs: 10,
+  sm: 14,
+  md: 15,
+  lg: 20,
+  xl: 24,
+  hero: 44,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  s60: 60,
+  s72: 72,
+  s108: 108,
+  s112: 112,
+  s120: 120,
+  s160: 160,
+};
+const RADIUS = {
+  md: 12,
+  lg: 32,
+  xl: 36,
+  full: 56,
+};
 
 // Lazy-load RTCView so the module doesn't crash in Expo Go (no native WebRTC).
 let RTCView: React.ComponentType<any>;
@@ -81,7 +120,7 @@ export function CallScreen({ remoteName, remoteAvatar, callType }: CallScreenPro
   if (callState === 'ringing') {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#0d3d47" />
+        <StatusBar barStyle="light-content" backgroundColor={THEME_COLORS.primary} />
         <SafeAreaView style={styles.centered}>
           {remoteAvatar ? (
             <Image source={{ uri: remoteAvatar }} style={styles.bigAvatar} />
@@ -96,7 +135,7 @@ export function CallScreen({ remoteName, remoteAvatar, callType }: CallScreenPro
           <Text style={styles.statusLabel}>Calling…</Text>
 
           <TouchableOpacity style={[styles.controlBtn, styles.btnHangUp]} onPress={endCall}>
-            <PhoneOff size={32} color="#fff" />
+            <PhoneOff size={32} color={THEME_COLORS.white} />
           </TouchableOpacity>
         </SafeAreaView>
       </View>
@@ -107,7 +146,7 @@ export function CallScreen({ remoteName, remoteAvatar, callType }: CallScreenPro
   if (callState === 'ended') {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#0d3d47" />
+        <StatusBar barStyle="light-content" backgroundColor={THEME_COLORS.primary} />
         <SafeAreaView style={styles.centered}>
           <Text style={styles.endedLabel}>Call ended</Text>
         </SafeAreaView>
@@ -172,16 +211,16 @@ export function CallScreen({ remoteName, remoteAvatar, callType }: CallScreenPro
             onPress={toggleMute}
           >
             {isMuted ? (
-              <MicOff size={26} color="#fff" />
+              <MicOff size={26} color={THEME_COLORS.white} />
             ) : (
-              <Mic size={26} color="#fff" />
+              <Mic size={26} color={THEME_COLORS.white} />
             )}
             <Text style={styles.controlLabel}>{isMuted ? 'Unmute' : 'Mute'}</Text>
           </TouchableOpacity>
 
           {/* Hang up */}
           <TouchableOpacity style={[styles.controlBtn, styles.btnHangUp]} onPress={endCall}>
-            <PhoneOff size={32} color="#fff" />
+            <PhoneOff size={32} color={THEME_COLORS.white} />
             <Text style={styles.controlLabel}>End</Text>
           </TouchableOpacity>
 
@@ -192,9 +231,9 @@ export function CallScreen({ remoteName, remoteAvatar, callType }: CallScreenPro
               onPress={toggleCamera}
             >
               {isCameraEnabled ? (
-                <Camera size={26} color="#fff" />
+                <Camera size={26} color={THEME_COLORS.white} />
               ) : (
-                <CameraOff size={26} color="#fff" />
+                <CameraOff size={26} color={THEME_COLORS.white} />
               )}
               <Text style={styles.controlLabel}>{isCameraEnabled ? 'Camera' : 'Off'}</Text>
             </TouchableOpacity>
@@ -203,7 +242,7 @@ export function CallScreen({ remoteName, remoteAvatar, callType }: CallScreenPro
           {/* Switch camera (video only) */}
           {isVideo && isCameraEnabled && (
             <TouchableOpacity style={styles.controlBtn} onPress={switchCamera}>
-              <RefreshCw size={26} color="#fff" />
+              <RefreshCw size={26} color={THEME_COLORS.white} />
               <Text style={styles.controlLabel}>Flip</Text>
             </TouchableOpacity>
           )}
@@ -216,116 +255,116 @@ export function CallScreen({ remoteName, remoteAvatar, callType }: CallScreenPro
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: THEME_COLORS.black,
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
+    gap: SPACE.lg,
   },
   audioBackground: {
-    backgroundColor: '#0d3d47',
+    backgroundColor: THEME_COLORS.primary,
   },
   bigAvatar: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
+    width: SPACE.s112,
+    height: SPACE.s112,
+    borderRadius: RADIUS.full,
     borderWidth: 3,
-    borderColor: '#fc7127',
+    borderColor: THEME_COLORS.secondaryContainer,
   },
   bigAvatarPlaceholder: {
-    backgroundColor: '#1a5c6e',
+    backgroundColor: THEME_COLORS.aliasHex_1a5c6e,
     justifyContent: 'center',
     alignItems: 'center',
   },
   bigAvatarInitial: {
-    fontSize: 44,
-    fontWeight: '700',
-    color: '#fff8f0',
+    fontSize: TYPE_SCALE.hero,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.surface,
   },
   remoteName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff8f0',
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.surface,
   },
   statusLabel: {
-    fontSize: 15,
-    color: '#a8c4cb',
+    fontSize: TYPE_SCALE.md,
+    color: THEME_COLORS.tealMuted,
     marginTop: -8,
   },
   endedLabel: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#fff8f0',
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.semibold,
+    color: THEME_COLORS.surface,
   },
   localPreview: {
     position: 'absolute',
-    bottom: 120,
-    right: 16,
-    width: 108,
-    height: 160,
-    borderRadius: 12,
+    bottom: SPACE.s120,
+    right: SPACE.lg,
+    width: SPACE.s108,
+    height: SPACE.s160,
+    borderRadius: RADIUS.md,
     borderWidth: 2,
-    borderColor: '#fc7127',
+    borderColor: THEME_COLORS.secondaryContainer,
     overflow: 'hidden',
   },
   controlsWrapper: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    bottom: SPACE.zero,
+    left: SPACE.zero,
+    right: SPACE.zero,
   },
   controls: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 20,
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    gap: SPACE.xl,
+    paddingHorizontal: SPACE.xxl,
+    paddingVertical: SPACE.xxl,
+    backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_55,
   },
   controlBtn: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    gap: 4,
+    width: TYPE_SCALE.hero,
+    height: TYPE_SCALE.hero,
+    borderRadius: RADIUS.lg,
+    backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_15,
+    gap: SPACE.xs,
   },
   controlBtnActive: {
-    backgroundColor: 'rgba(252,113,39,0.6)',
+    backgroundColor: THEME_COLORS.alias_rgba_252_113_39_0_6,
   },
   btnHangUp: {
-    backgroundColor: '#ef4444',
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    backgroundColor: THEME_COLORS.errorStrong,
+    width: SPACE.s72,
+    height: SPACE.s72,
+    borderRadius: RADIUS.xl,
   },
   controlLabel: {
-    fontSize: 10,
-    color: '#fff',
-    fontWeight: '600',
+    fontSize: TYPE_SCALE.xs,
+    color: THEME_COLORS.white,
+    fontWeight: FONT_WEIGHT.semibold,
   },
   timerLabel: {
-    fontSize: 14,
-    color: '#a8c4cb',
-    fontWeight: '500',
+    fontSize: TYPE_SCALE.sm,
+    color: THEME_COLORS.tealMuted,
+    fontWeight: FONT_WEIGHT.medium,
   },
   videoTimerWrapper: {
     position: 'absolute',
-    top: 60,
+    top: SPACE.s60,
     alignSelf: 'center',
     zIndex: 10,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_45,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACE.md,
+    paddingVertical: SPACE.xs,
   },
   videoTimerLabel: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
+    color: THEME_COLORS.white,
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.semibold,
   },
 });

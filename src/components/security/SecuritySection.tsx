@@ -28,6 +28,55 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 import { accountService } from '../../services/accountService';
 import { TwoFASetupResponse } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
+
+const TYPE_SCALE = {
+  sm: 10,
+  md: 11,
+  body: 13,
+  lg: 12,
+  xl: 14,
+  xxl: 16,
+  h: 18,
+  otp: 24,
+  otpLarge: 28,
+} as const;
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+
+const SPACE = {
+  xxs: 4,
+  xs: 6,
+  sm: 8,
+  s10: 10,
+  md: 12,
+  s14: 14,
+  lg: 16,
+  s18: 18,
+  xl: 20,
+  xxl: 24,
+  s32: 32,
+  s40: 40,
+  s44: 44,
+  s50: 50,
+  s52: 52,
+  s160: 160,
+} as const;
+
+const RADIUS = {
+  sm: 10,
+  md: 12,
+  pill: 14,
+  lg: 16,
+  xl: 20,
+  card: 24,
+} as const;
 
 export const SecuritySection: React.FC = () => {
   const { userProfile, updateUserProfile, linkPhone, verifyLinkPhone, linkEmail, setInitialPassword, resendVerification } = useAuth();
@@ -239,40 +288,40 @@ export const SecuritySection: React.FC = () => {
   };
 
   return (
-    <View style={{ backgroundColor: '#fff', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', padding: 24, gap: 20 }}>
+    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.xxl, gap: SPACE.xl }}>
       {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: 'rgba(37,99,235,0.1)', alignItems: 'center', justifyContent: 'center' }}>
-          <ShieldCheck size={22} color="#2563eb" />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
+        <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+          <ShieldCheck size={22} color={THEME_COLORS.brandBlueText} />
         </View>
-        <Text style={{ fontSize: 18, fontWeight: '700', color: '#0d3d47' }}>Login & Authentication</Text>
+        <Text style={{ fontSize: TYPE_SCALE.h, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary }}>Login & Authentication</Text>
       </View>
 
       {/* Password Card */}
-      <View style={{ backgroundColor: '#f5f5f5', borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-            <Key size={22} color="#0d3d47" />
+      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
+          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+            <Key size={22} color={THEME_COLORS.primary} />
           </View>
           <View>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Password</Text>
-            <Text style={{ fontSize: 10, color: '#888' }}>
+            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Password</Text>
+            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft }}>
               {hasPassword ? `Last changed: ${lastChangedText()}` : 'Not set — add one to log in with email'}
             </Text>
           </View>
         </View>
         <TouchableOpacity
           onPress={() => setShowPasswordForm(!showPasswordForm)}
-          style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: 'rgba(22,163,74,0.08)', borderRadius: 12 }}
+          style={{ paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: RADIUS.md }}
         >
-          <Text style={{ fontSize: 11, fontWeight: '800', color: '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
             {showPasswordForm ? 'Cancel' : hasPassword ? 'Change' : 'Set'}
           </Text>
         </TouchableOpacity>
       </View>
 
       {showPasswordForm && (
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: SPACE.md }}>
           {/* Current password — only when changing an existing one */}
           {hasPassword && (
             <View style={{ position: 'relative' }}>
@@ -280,15 +329,15 @@ export const SecuritySection: React.FC = () => {
                 value={passwordData.current}
                 onChangeText={(v) => setPasswordData({ ...passwordData, current: v })}
                 placeholder="Current Password"
-                placeholderTextColor="#aaa"
+                placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
                 secureTextEntry={!showCurrentPass}
-                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, paddingRight: 50, fontSize: 14, color: '#1a1a1a' }}
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg, paddingRight: SPACE.s50, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }}
               />
               <TouchableOpacity
                 onPress={() => setShowCurrentPass(!showCurrentPass)}
-                style={{ position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' }}
+                style={{ position: 'absolute', right: SPACE.s14, top: 0, bottom: 0, justifyContent: 'center' }}
               >
-                {showCurrentPass ? <EyeOff size={18} color="#888" /> : <Eye size={18} color="#888" />}
+                {showCurrentPass ? <EyeOff size={18} color={THEME_COLORS.neutralTextSoft} /> : <Eye size={18} color={THEME_COLORS.neutralTextSoft} />}
               </TouchableOpacity>
             </View>
           )}
@@ -299,15 +348,15 @@ export const SecuritySection: React.FC = () => {
               value={passwordData.new}
               onChangeText={(v) => setPasswordData({ ...passwordData, new: v })}
               placeholder="New Password"
-              placeholderTextColor="#aaa"
+              placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
               secureTextEntry={!showNewPass}
-              style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, paddingRight: 50, fontSize: 14, color: '#1a1a1a' }}
+              style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg, paddingRight: SPACE.s50, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }}
             />
             <TouchableOpacity
               onPress={() => setShowNewPass(!showNewPass)}
-              style={{ position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' }}
+              style={{ position: 'absolute', right: SPACE.s14, top: 0, bottom: 0, justifyContent: 'center' }}
             >
-              {showNewPass ? <EyeOff size={18} color="#888" /> : <Eye size={18} color="#888" />}
+              {showNewPass ? <EyeOff size={18} color={THEME_COLORS.neutralTextSoft} /> : <Eye size={18} color={THEME_COLORS.neutralTextSoft} />}
             </TouchableOpacity>
           </View>
 
@@ -316,29 +365,29 @@ export const SecuritySection: React.FC = () => {
             value={passwordData.confirm}
             onChangeText={(v) => setPasswordData({ ...passwordData, confirm: v })}
             placeholder="Confirm New Password"
-            placeholderTextColor="#aaa"
+            placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
             secureTextEntry
-            style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }}
           />
 
           <TouchableOpacity
             onPress={handleChangePassword}
-            style={{ backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center' }}
+            style={{ backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.xl, paddingVertical: SPACE.lg, alignItems: 'center' }}
           >
-            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>{hasPassword ? 'Update Password' : 'Set Password'}</Text>
+            <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold }}>{hasPassword ? 'Update Password' : 'Set Password'}</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {/* Email Address Card */}
-      <View style={{ backgroundColor: '#f5f5f5', borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
-          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-            <Mail size={22} color="#0d3d47" />
+      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, flex: 1 }}>
+          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+            <Mail size={22} color={THEME_COLORS.primary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Email Address</Text>
-            <Text style={{ fontSize: 10, color: '#888' }}>
+            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Email Address</Text>
+            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft }}>
               {userProfile?.email
                 ? `${userProfile.email}${userProfile.emailVerified ? '  • Verified' : '  • Unverified'}`
                 : 'Add an email to log in with email + password'}
@@ -350,9 +399,9 @@ export const SecuritySection: React.FC = () => {
             setShowEmailLink((v) => !v);
             setEmailInput('');
           }}
-          style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: 'rgba(22,163,74,0.08)', borderRadius: 12 }}
+          style={{ paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: RADIUS.md }}
         >
-          <Text style={{ fontSize: 11, fontWeight: '800', color: '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
             {showEmailLink ? 'Cancel' : userProfile?.email ? 'Change' : 'Link'}
           </Text>
         </TouchableOpacity>
@@ -361,57 +410,57 @@ export const SecuritySection: React.FC = () => {
       {/* Unverified-email helper: resend link */}
       {userProfile?.email && !userProfile.emailVerified && !showEmailLink && (
         <TouchableOpacity onPress={handleResendEmailVerification}>
-          <Text style={{ fontSize: 12, color: '#2563eb', textAlign: 'center', textDecorationLine: 'underline' }}>
+          <Text style={{ fontSize: TYPE_SCALE.lg, color: THEME_COLORS.brandBlueText, textAlign: 'center', textDecorationLine: 'underline' }}>
             Resend verification email
           </Text>
         </TouchableOpacity>
       )}
 
       {showEmailLink && (
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: SPACE.md }}>
           <TextInput
             value={emailInput}
             onChangeText={setEmailInput}
             placeholder="you@example.com"
-            placeholderTextColor="#aaa"
+            placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
             textContentType="emailAddress"
-            style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }}
           />
 
           {!hasPassword && (
             <>
-              <Text style={{ fontSize: 12, color: '#666' }}>
+              <Text style={{ fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextSubtle }}>
                 Set a password now so you can sign in with this email later.
               </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.xl }}>
                 <TextInput
                   value={emailPasswordInput}
                   onChangeText={setEmailPasswordInput}
                   placeholder="New password (min 8 characters)"
-                  placeholderTextColor="#aaa"
+                  placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
                   secureTextEntry={!showEmailPassword}
                   autoCapitalize="none"
                   autoComplete="new-password"
                   textContentType="newPassword"
-                  style={{ flex: 1, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+                  style={{ flex: 1, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }}
                 />
                 <TouchableOpacity onPress={() => setShowEmailPassword((v) => !v)}>
-                  {showEmailPassword ? <EyeOff size={18} color="#666" /> : <Eye size={18} color="#666" />}
+                  {showEmailPassword ? <EyeOff size={18} color={THEME_COLORS.neutralTextSoftAlt} /> : <Eye size={18} color={THEME_COLORS.neutralTextSoftAlt} />}
                 </TouchableOpacity>
               </View>
               <TextInput
                 value={emailPasswordConfirm}
                 onChangeText={setEmailPasswordConfirm}
                 placeholder="Confirm password"
-                placeholderTextColor="#aaa"
+                placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
                 secureTextEntry={!showEmailPassword}
                 autoCapitalize="none"
                 autoComplete="new-password"
                 textContentType="newPassword"
-                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }}
               />
             </>
           )}
@@ -420,31 +469,31 @@ export const SecuritySection: React.FC = () => {
             onPress={handleLinkEmail}
             disabled={emailLoading || !emailValid || (!hasPassword && (emailPasswordInput.length < 8 || emailPasswordInput !== emailPasswordConfirm))}
             style={{
-              backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center',
+              backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.xl, paddingVertical: SPACE.lg, alignItems: 'center',
               opacity: emailLoading || !emailValid || (!hasPassword && (emailPasswordInput.length < 8 || emailPasswordInput !== emailPasswordConfirm)) ? 0.5 : 1,
             }}
           >
             {emailLoading
-              ? <ActivityIndicator color="#fff" />
-              : <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>
+              ? <ActivityIndicator color={THEME_COLORS.white} />
+              : <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold }}>
                   {hasPassword ? 'Send Verification Email' : 'Set Password & Send Verification'}
                 </Text>}
           </TouchableOpacity>
-          <Text style={{ fontSize: 11, color: '#888', textAlign: 'center' }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSoft, textAlign: 'center' }}>
             We’ll send a verification link to confirm the address.
           </Text>
         </View>
       )}
 
       {/* Phone Number Card */}
-      <View style={{ backgroundColor: '#f5f5f5', borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
-          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-            <Phone size={22} color="#0d3d47" />
+      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, flex: 1 }}>
+          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+            <Phone size={22} color={THEME_COLORS.primary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Phone Number</Text>
-            <Text style={{ fontSize: 10, color: '#888' }}>
+            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Phone Number</Text>
+            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft }}>
               {userProfile?.phone
                 ? `${userProfile.phone}${userProfile.phoneVerified ? '  • Verified' : ''}`
                 : 'Add a phone number to log in via SMS'}
@@ -457,16 +506,16 @@ export const SecuritySection: React.FC = () => {
             setPhoneOtpSent(false);
             setPhoneOtp('');
           }}
-          style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: 'rgba(22,163,74,0.08)', borderRadius: 12 }}
+          style={{ paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: RADIUS.md }}
         >
-          <Text style={{ fontSize: 11, fontWeight: '800', color: '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
             {showPhoneLink ? 'Cancel' : userProfile?.phone ? 'Change' : 'Link'}
           </Text>
         </TouchableOpacity>
       </View>
 
       {showPhoneLink && (
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: SPACE.md }}>
           {!phoneOtpSent ? (
             <>
               <PhoneInput
@@ -476,55 +525,55 @@ export const SecuritySection: React.FC = () => {
                 layout="first"
                 onChangeText={setPhoneRaw}
                 onChangeFormattedText={setPhoneFormatted}
-                containerStyle={{ width: '100%', backgroundColor: '#f5f5f5', borderRadius: 20 }}
-                textContainerStyle={{ backgroundColor: '#f5f5f5', borderRadius: 20 }}
-                textInputStyle={{ color: '#0d3d47', fontWeight: '700' }}
-                codeTextStyle={{ color: '#0d3d47', fontWeight: '700' }}
+                containerStyle={{ width: '100%', backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl }}
+                textContainerStyle={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl }}
+                textInputStyle={{ color: THEME_COLORS.primary, fontWeight: FONT_WEIGHT.bold }}
+                codeTextStyle={{ color: THEME_COLORS.primary, fontWeight: FONT_WEIGHT.bold }}
               />
               <TouchableOpacity
                 onPress={handleSendLinkOtp}
                 disabled={phoneLoading || !isLinkedPhoneValid}
                 style={{
-                  backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center',
+                  backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.xl, paddingVertical: SPACE.lg, alignItems: 'center',
                   opacity: phoneLoading || !isLinkedPhoneValid ? 0.5 : 1,
                 }}
               >
                 {phoneLoading
-                  ? <ActivityIndicator color="#fff" />
-                  : <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>Send SMS Code</Text>}
+                  ? <ActivityIndicator color={THEME_COLORS.white} />
+                  : <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold }}>Send SMS Code</Text>}
               </TouchableOpacity>
             </>
           ) : (
             <>
-              <Text style={{ fontSize: 12, color: '#666', textAlign: 'center' }}>
+              <Text style={{ fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextSubtle, textAlign: 'center' }}>
                 We sent a 6-digit code to {phoneFormatted}
               </Text>
               <TextInput
                 value={phoneOtp}
                 onChangeText={(t) => setPhoneOtp(t.replace(/\D/g, '').slice(0, 6))}
                 placeholder="000000"
-                placeholderTextColor="#aaa"
+                placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
                 autoComplete="sms-otp"
                 importantForAutofill="yes"
                 maxLength={6}
-                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 24, paddingVertical: 16, fontSize: 24, fontWeight: '800', color: '#1a1a1a', textAlign: 'center', letterSpacing: 8 }}
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.otp, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.onSurface, textAlign: 'center', letterSpacing: SPACE.sm }}
               />
               <TouchableOpacity
                 onPress={handleVerifyLinkOtp}
                 disabled={phoneLoading || phoneOtp.length !== 6}
                 style={{
-                  backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center',
+                  backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.xl, paddingVertical: SPACE.lg, alignItems: 'center',
                   opacity: phoneLoading || phoneOtp.length !== 6 ? 0.5 : 1,
                 }}
               >
                 {phoneLoading
-                  ? <ActivityIndicator color="#fff" />
-                  : <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>Verify & Link Phone</Text>}
+                  ? <ActivityIndicator color={THEME_COLORS.white} />
+                  : <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold }}>Verify & Link Phone</Text>}
               </TouchableOpacity>
               <TouchableOpacity onPress={() => { setPhoneOtpSent(false); setPhoneOtp(''); }}>
-                <Text style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Change number</Text>
+                <Text style={{ fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextSoft, textAlign: 'center' }}>Change number</Text>
               </TouchableOpacity>
             </>
           )}
@@ -532,34 +581,34 @@ export const SecuritySection: React.FC = () => {
       )}
 
       {/* 2FA Card */}
-      <View style={{ backgroundColor: '#f5f5f5', borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-            <Smartphone size={22} color="#2563eb" />
+      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
+          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+            <Smartphone size={22} color={THEME_COLORS.brandBlueText} />
           </View>
           <View>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Two-Factor Authentication</Text>
-            <Text style={{ fontSize: 10, color: '#888' }}>Add an extra layer of security</Text>
+            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Two-Factor Authentication</Text>
+            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft }}>Add an extra layer of security</Text>
           </View>
         </View>
         <TouchableOpacity
           onPress={handleToggle2FA}
           disabled={loading2FA}
           style={{
-            width: 52, height: 28, borderRadius: 14,
-            backgroundColor: userProfile?.twoFactorEnabled ? '#10b981' : '#d1d5db',
+            width: SPACE.s52, height: TYPE_SCALE.otpLarge, borderRadius: RADIUS.pill,
+            backgroundColor: userProfile?.twoFactorEnabled ? THEME_COLORS.success : THEME_COLORS.neutralBorderMuted,
             justifyContent: 'center',
             opacity: loading2FA ? 0.5 : 1,
           }}
         >
           {loading2FA ? (
-            <ActivityIndicator size="small" color="#fff" style={{ alignSelf: 'center' }} />
+            <ActivityIndicator size="small" color={THEME_COLORS.white} style={{ alignSelf: 'center' }} />
           ) : (
             <View style={{
-              width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff',
+              width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.white,
               position: 'absolute',
-              left: userProfile?.twoFactorEnabled ? undefined : 4,
-              right: userProfile?.twoFactorEnabled ? 4 : undefined,
+              left: userProfile?.twoFactorEnabled ? undefined : SPACE.xxs,
+              right: userProfile?.twoFactorEnabled ? SPACE.xxs : undefined,
             }} />
           )}
         </TouchableOpacity>
@@ -567,93 +616,93 @@ export const SecuritySection: React.FC = () => {
 
       {/* 2FA Setup Flow */}
       {show2FASetup && twoFASetupData && (
-        <View style={{ backgroundColor: '#f9fafb', borderRadius: 24, padding: 24, gap: 20, borderWidth: 1, borderColor: 'rgba(22,163,74,0.1)' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: 'rgba(22,163,74,0.1)', alignItems: 'center', justifyContent: 'center' }}>
-              <Info size={18} color="#0d3d47" />
+        <View style={{ backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.card, padding: SPACE.xxl, gap: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.successTintSoft }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s10 }}>
+            <View style={{ width: SPACE.s32, height: SPACE.s32, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.successTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+              <Info size={18} color={THEME_COLORS.primary} />
             </View>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: '#0d3d47' }}>Enable Two-Factor Authentication</Text>
+            <Text style={{ fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary }}>Enable Two-Factor Authentication</Text>
           </View>
 
           {/* QR Code */}
-          <View style={{ alignItems: 'center', gap: 8 }}>
-            <View style={{ padding: 16, backgroundColor: '#fff', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' }}>
+          <View style={{ alignItems: 'center', gap: SPACE.sm }}>
+            <View style={{ padding: SPACE.lg, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
               {twoFASetupData.qrCode ? (
                 <QRCode value={twoFASetupData.qrCode} size={160} />
               ) : (
-                <View style={{ width: 160, height: 160, backgroundColor: '#f5f5f5', borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
-                  <ActivityIndicator color="#0d3d47" />
+                <View style={{ width: SPACE.s160, height: SPACE.s160, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' }}>
+                  <ActivityIndicator color={THEME_COLORS.primary} />
                 </View>
               )}
             </View>
-            <Text style={{ fontSize: 10, fontWeight: '700', color: '#888', textTransform: 'uppercase', letterSpacing: 2 }}>Step 1: Scan QR Code</Text>
+            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: SPACE.xs }}>Step 1: Scan QR Code</Text>
           </View>
 
           {/* Manual entry key */}
           {twoFASetupData.secret && (
-            <View style={{ gap: 6 }}>
-              <Text style={{ fontSize: 10, fontWeight: '800', color: '#888', textTransform: 'uppercase', letterSpacing: 2 }}>Step 2: Manual Entry Key</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 14, backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
-                <Text style={{ flex: 1, fontFamily: 'monospace', fontSize: 13, fontWeight: '700', color: '#0d3d47', letterSpacing: 2 }} selectable>
+            <View style={{ gap: SPACE.md }}>
+              <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: SPACE.xs }}>Step 2: Manual Entry Key</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, padding: SPACE.s14, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder }}>
+                <Text style={{ flex: 1, fontFamily: 'monospace', fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary, letterSpacing: SPACE.xs }} selectable>
                   {twoFASetupData.secret}
                 </Text>
                 <TouchableOpacity
                   onPress={handleCopyKey}
-                  style={{ padding: 8, borderRadius: 10, backgroundColor: 'rgba(22,163,74,0.08)' }}
+                  style={{ padding: SPACE.sm, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.successTintSofterAlt }}
                 >
-                  {copied ? <Check size={16} color="#0d3d47" /> : <Copy size={16} color="#0d3d47" />}
+                  {copied ? <Check size={16} color={THEME_COLORS.primary} /> : <Copy size={16} color={THEME_COLORS.primary} />}
                 </TouchableOpacity>
               </View>
             </View>
           )}
 
           {/* Verification code */}
-          <View style={{ gap: 8 }}>
-            <Text style={{ fontSize: 10, fontWeight: '800', color: '#888', textTransform: 'uppercase', letterSpacing: 2 }}>Step 3: Verify & Enable</Text>
+          <View style={{ gap: SPACE.sm }}>
+            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: SPACE.xs }}>Step 3: Verify & Enable</Text>
             <TextInput
               value={verificationCode}
               onChangeText={(t) => setVerificationCode(t.replace(/\D/g, '').slice(0, 6))}
               placeholder="000000"
-              placeholderTextColor="rgba(0,0,0,0.2)"
+              placeholderTextColor={THEME_COLORS.blackOverlay20}
               keyboardType="numeric"
               maxLength={6}
               style={{
-                backgroundColor: '#fff',
-                borderRadius: 20,
-                paddingHorizontal: 24,
-                paddingVertical: 18,
-                fontSize: 28,
-                fontWeight: '800',
-                color: '#1a1a1a',
+                backgroundColor: THEME_COLORS.white,
+                borderRadius: RADIUS.xl,
+                paddingHorizontal: SPACE.xxl,
+                paddingVertical: SPACE.s18,
+                fontSize: TYPE_SCALE.otpLarge,
+                fontWeight: FONT_WEIGHT.extrabold,
+                color: THEME_COLORS.onSurface,
                 textAlign: 'center',
-                letterSpacing: 12,
+                letterSpacing: SPACE.md,
                 borderWidth: 2,
-                borderColor: verificationCode.length === 6 ? '#10b981' : 'rgba(0,0,0,0.1)',
+                borderColor: verificationCode.length === 6 ? THEME_COLORS.success : THEME_COLORS.alias_rgba_0_0_0_0_1,
               }}
             />
           </View>
 
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View style={{ flexDirection: 'row', gap: SPACE.md }}>
             <TouchableOpacity
               onPress={handleVerify2FA}
               disabled={loading2FA || verificationCode.length !== 6}
               style={{
-                flex: 1, paddingVertical: 16, borderRadius: 20,
-                backgroundColor: '#0d3d47', alignItems: 'center',
+                flex: 1, paddingVertical: SPACE.lg, borderRadius: RADIUS.xl,
+                backgroundColor: THEME_COLORS.primary, alignItems: 'center',
                 opacity: (loading2FA || verificationCode.length !== 6) ? 0.5 : 1,
               }}
             >
               {loading2FA ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={THEME_COLORS.white} />
               ) : (
-                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Verify & Enable</Text>
+                <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>Verify & Enable</Text>
               )}
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => { setShow2FASetup(false); setTwoFASetupData(null); setVerificationCode(''); }}
-              style={{ paddingHorizontal: 24, paddingVertical: 16, borderRadius: 20, backgroundColor: '#f5f5f5', alignItems: 'center' }}
+              style={{ paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.lg, borderRadius: RADIUS.xl, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center' }}
             >
-              <Text style={{ color: '#888', fontSize: 13, fontWeight: '700' }}>Cancel</Text>
+              <Text style={{ color: THEME_COLORS.neutralTextSoft, fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.bold }}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -662,13 +711,13 @@ export const SecuritySection: React.FC = () => {
       {/* Status */}
       {status && (
         <View style={{
-          padding: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'center', gap: 10,
-          backgroundColor: status.type === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+          padding: SPACE.s14, borderRadius: RADIUS.lg, flexDirection: 'row', alignItems: 'center', gap: SPACE.s10,
+          backgroundColor: status.type === 'success' ? THEME_COLORS.successTintSoftAlt : THEME_COLORS.errorTintSoft,
         }}>
           {status.type === 'success'
-            ? <CheckCircle2 size={18} color="#10b981" />
-            : <AlertTriangle size={18} color="#ef4444" />}
-          <Text style={{ fontSize: 12, fontWeight: '700', color: status.type === 'success' ? '#059669' : '#ef4444' }}>
+            ? <CheckCircle2 size={18} color={THEME_COLORS.success} />
+            : <AlertTriangle size={18} color={THEME_COLORS.errorStrong} />}
+          <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: status.type === 'success' ? THEME_COLORS.successStrongAlt : THEME_COLORS.errorStrong }}>
             {status.message}
           </Text>
         </View>

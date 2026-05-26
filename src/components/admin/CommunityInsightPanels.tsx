@@ -1,9 +1,47 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { AlertTriangle, Building2, ShieldCheck, Store } from 'lucide-react-native';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
-const WARNING = '#d97706';
+const PRIMARY = THEME_COLORS.primary;
+const WARNING = THEME_COLORS.warning;
+const TYPE_SCALE = {
+  xs: 9,
+  sm: 10,
+  md: 11,
+  body: 13,
+  lg: 14,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  xxs: 2,
+  xs: 3,
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 10,
+  xxl: 14,
+  s32: 32,
+};
+const RADIUS = {
+  sm: 10,
+  md: 16,
+  full: 999,
+};
+const LETTER_SPACING = {
+  compact: 0.6,
+  normal: 1,
+  wide: 1.2,
+};
 
 type InsightResponder = {
   id: string;
@@ -125,8 +163,8 @@ export const CommunityInsightPanels: React.FC<Props> = ({
         </View>
 
         <View style={styles.card}>
-          <View style={[styles.iconWrap, { backgroundColor: '#0284c7' + '15' }]}>
-            <Store size={18} color="#0284c7" />
+          <View style={[styles.iconWrap, { backgroundColor: THEME_COLORS.aliasHex_0284c7 + '15' }]}>
+            <Store size={18} color={THEME_COLORS.aliasHex_0284c7} />
           </View>
           <Text style={styles.label}>Last 3 Listings Made</Text>
           {listings.length === 0 ? (
@@ -154,8 +192,8 @@ export const CommunityInsightPanels: React.FC<Props> = ({
         </View>
 
         <View style={styles.card}>
-          <View style={[styles.iconWrap, { backgroundColor: '#16a34a' + '15' }]}>
-            <Building2 size={18} color="#16a34a" />
+          <View style={[styles.iconWrap, { backgroundColor: THEME_COLORS.successStrong + '15' }]}>
+            <Building2 size={18} color={THEME_COLORS.successStrong} />
           </View>
           <Text style={styles.label}>Last 3 Businesses Listed</Text>
           {businesses.length === 0 ? (
@@ -187,91 +225,87 @@ export const CommunityInsightPanels: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  container: { gap: 10 },
+  container: { gap: SPACE.xl },
   heading: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
-    paddingHorizontal: 4,
+    letterSpacing: LETTER_SPACING.wide,
+    paddingHorizontal: SPACE.sm,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: SPACE.xl,
   },
   card: {
     width: '48.5%',
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 14,
-    gap: 6,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.md,
+    padding: SPACE.xxl,
+    gap: SPACE.md,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
+    borderColor: THEME_COLORS.neutralBgSoft,
+    ...createShadow(THEME_COLORS.black, SPACE.zero, 1, 0.04, 4, 1),
   },
   iconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: SPACE.s32,
+    height: SPACE.s32,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   label: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginTop: 4,
+    letterSpacing: LETTER_SPACING.normal,
+    marginTop: SPACE.sm,
   },
   listWrap: {
-    gap: 6,
+    gap: SPACE.md,
   },
   rowItem: {
-    gap: 2,
+    gap: SPACE.xxs,
   },
   tapRow: {
-    borderRadius: 10,
-    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+    paddingVertical: SPACE.xxs,
   },
   listPrimary: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.extrabold,
     color: PRIMARY,
   },
   listMeta: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#64748b',
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextSubtle,
   },
   emptyText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.body,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextMuted,
   },
   pill: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    fontSize: 10,
-    fontWeight: '900',
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.xs,
+    borderRadius: RADIUS.full,
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
     textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    letterSpacing: LETTER_SPACING.compact,
   },
   pillEmergency: {
-    backgroundColor: '#fee2e2',
-    color: '#dc2626',
+    backgroundColor: THEME_COLORS.aliasHex_fee2e2,
+    color: THEME_COLORS.errorStrong,
   },
   pillWarning: {
-    backgroundColor: '#fef3c7',
-    color: '#d97706',
+    backgroundColor: THEME_COLORS.warningSurfaceAlt,
+    color: THEME_COLORS.warning,
   },
 });
 

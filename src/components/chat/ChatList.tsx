@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { Camera } from 'lucide-react-native';
 import { Conversation } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { THEME_COLORS } from '../../theme/colors';
 
 interface ChatListProps {
   conversations: Conversation[];
@@ -124,7 +125,7 @@ export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, act
           <View className="flex-row items-center gap-2">
             {isPhotoPreview ? (
               <View className="flex-row items-center gap-1 flex-1">
-                <Camera size={12} color="#6b7280" />
+                <Camera size={12} color={THEME_COLORS.neutralTextSubtle} />
                 <Text
                   numberOfLines={1}
                   className={[

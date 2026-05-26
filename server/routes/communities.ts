@@ -135,6 +135,21 @@ router.post('/', async (req, res) => {
       } as any,
     });
 
+    const defaultCommunityTheme = {
+      communityId: community.id,
+      name: `${community.name} Theme`,
+      primaryColor: '#0d3d47',
+      secondaryColor: '#9c4421',
+      backgroundColor: '#fff8f0',
+      surfaceColor: '#efeeeb',
+      textPrimary: '#0f172a',
+      textSecondary: '#64748b',
+      borderRadius: '16px',
+      fontFamily: 'System',
+      iconUrl: null,
+      isDefault: false,
+    };
+
     // Add creator as Admin member — populate cached display fields immediately
     const creator = await prisma.user.findUnique({
       where: { id: req.auth!.userId },
@@ -162,6 +177,9 @@ router.post('/', async (req, res) => {
       prisma.community.update({
         where: { id: community.id },
         data: { trialExpiresAt: trialEnd, type: 'TRIAL', catFeaturedCharityId: catCharity.id } as any,
+      }),
+      prisma.theme.create({
+        data: defaultCommunityTheme,
       }),
       prisma.user.update({
         where: { id: req.auth!.userId },

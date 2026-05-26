@@ -3,6 +3,7 @@ import { View, Text, Switch } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import LocationPickerSection from '../shared/LocationPickerSection';
+import { THEME_COLORS } from '../../theme/colors';
 
 interface LocationSettingsProps {
   isEditing?: boolean;
@@ -53,7 +54,7 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
           <View className="w-10 h-10 rounded-full bg-surface-container-low items-center justify-center">
-            <MapPin size={18} color="#0d3d47" />
+            <MapPin size={18} color={THEME_COLORS.primary} />
           </View>
           <View>
             <Text className="text-sm font-bold text-gray-900">Default Location</Text>
@@ -67,8 +68,8 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
           <Switch
             value={!!userProfile?.locationSharing}
             onValueChange={(val) => updateUserProfile({ locationSharing: val })}
-            trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
-            thumbColor="#ffffff"
+            trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
+            thumbColor={THEME_COLORS.white}
           />
         </View>
       </View>

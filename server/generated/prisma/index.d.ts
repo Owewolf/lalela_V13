@@ -54,6 +54,11 @@ export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
  */
 export type Community = $Result.DefaultSelection<Prisma.$CommunityPayload>
 /**
+ * Model Theme
+ * 
+ */
+export type Theme = $Result.DefaultSelection<Prisma.$ThemePayload>
+/**
  * Model CommunityMember
  * 
  */
@@ -354,6 +359,16 @@ export class PrismaClient<
     * ```
     */
   get community(): Prisma.CommunityDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.theme`: Exposes CRUD operations for the **Theme** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Themes
+    * const themes = await prisma.theme.findMany()
+    * ```
+    */
+  get theme(): Prisma.ThemeDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.communityMember`: Exposes CRUD operations for the **CommunityMember** model.
@@ -996,6 +1011,7 @@ export namespace Prisma {
     UserSession: 'UserSession',
     AuditLog: 'AuditLog',
     Community: 'Community',
+    Theme: 'Theme',
     CommunityMember: 'CommunityMember',
     MemberLocation: 'MemberLocation',
     SecurityLocation: 'SecurityLocation',
@@ -1031,7 +1047,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "emailVerificationToken" | "passwordResetToken" | "otpCode" | "blacklistedEmail" | "userSession" | "auditLog" | "community" | "communityMember" | "memberLocation" | "securityLocation" | "message" | "post" | "charity" | "charitySuggestion" | "catTransaction" | "business" | "report" | "communityInvitation" | "communityInviteLink" | "conversation" | "conversationParticipant" | "notification" | "license" | "moderationLog" | "securityEvent" | "billingRecord" | "invoice"
+      modelProps: "user" | "emailVerificationToken" | "passwordResetToken" | "otpCode" | "blacklistedEmail" | "userSession" | "auditLog" | "community" | "theme" | "communityMember" | "memberLocation" | "securityLocation" | "message" | "post" | "charity" | "charitySuggestion" | "catTransaction" | "business" | "report" | "communityInvitation" | "communityInviteLink" | "conversation" | "conversationParticipant" | "notification" | "license" | "moderationLog" | "securityEvent" | "billingRecord" | "invoice"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1624,6 +1640,80 @@ export namespace Prisma {
           count: {
             args: Prisma.CommunityCountArgs<ExtArgs>
             result: $Utils.Optional<CommunityCountAggregateOutputType> | number
+          }
+        }
+      }
+      Theme: {
+        payload: Prisma.$ThemePayload<ExtArgs>
+        fields: Prisma.ThemeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ThemeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ThemeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          findFirst: {
+            args: Prisma.ThemeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ThemeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          findMany: {
+            args: Prisma.ThemeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>[]
+          }
+          create: {
+            args: Prisma.ThemeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          createMany: {
+            args: Prisma.ThemeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ThemeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>[]
+          }
+          delete: {
+            args: Prisma.ThemeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          update: {
+            args: Prisma.ThemeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          deleteMany: {
+            args: Prisma.ThemeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ThemeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ThemeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>[]
+          }
+          upsert: {
+            args: Prisma.ThemeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          aggregate: {
+            args: Prisma.ThemeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTheme>
+          }
+          groupBy: {
+            args: Prisma.ThemeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ThemeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ThemeCountArgs<ExtArgs>
+            result: $Utils.Optional<ThemeCountAggregateOutputType> | number
           }
         }
       }
@@ -3223,6 +3313,7 @@ export namespace Prisma {
     userSession?: UserSessionOmit
     auditLog?: AuditLogOmit
     community?: CommunityOmit
+    theme?: ThemeOmit
     communityMember?: CommunityMemberOmit
     memberLocation?: MemberLocationOmit
     securityLocation?: SecurityLocationOmit
@@ -12849,6 +12940,7 @@ export namespace Prisma {
     securityLocations?: boolean | Community$securityLocationsArgs<ExtArgs>
     moderationLogs?: boolean | Community$moderationLogsArgs<ExtArgs>
     securityEvents?: boolean | Community$securityEventsArgs<ExtArgs>
+    theme?: boolean | Community$themeArgs<ExtArgs>
     licenses?: boolean | Community$licensesArgs<ExtArgs>
     billingRecords?: boolean | Community$billingRecordsArgs<ExtArgs>
     catTransactions?: boolean | Community$catTransactionsArgs<ExtArgs>
@@ -12950,6 +13042,7 @@ export namespace Prisma {
     securityLocations?: boolean | Community$securityLocationsArgs<ExtArgs>
     moderationLogs?: boolean | Community$moderationLogsArgs<ExtArgs>
     securityEvents?: boolean | Community$securityEventsArgs<ExtArgs>
+    theme?: boolean | Community$themeArgs<ExtArgs>
     licenses?: boolean | Community$licensesArgs<ExtArgs>
     billingRecords?: boolean | Community$billingRecordsArgs<ExtArgs>
     catTransactions?: boolean | Community$catTransactionsArgs<ExtArgs>
@@ -12978,6 +13071,7 @@ export namespace Prisma {
       securityLocations: Prisma.$SecurityLocationPayload<ExtArgs>[]
       moderationLogs: Prisma.$ModerationLogPayload<ExtArgs>[]
       securityEvents: Prisma.$SecurityEventPayload<ExtArgs>[]
+      theme: Prisma.$ThemePayload<ExtArgs> | null
       licenses: Prisma.$LicensePayload<ExtArgs>[]
       billingRecords: Prisma.$BillingRecordPayload<ExtArgs>[]
       catTransactions: Prisma.$CatTransactionPayload<ExtArgs>[]
@@ -13413,6 +13507,7 @@ export namespace Prisma {
     securityLocations<T extends Community$securityLocationsArgs<ExtArgs> = {}>(args?: Subset<T, Community$securityLocationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityLocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     moderationLogs<T extends Community$moderationLogsArgs<ExtArgs> = {}>(args?: Subset<T, Community$moderationLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     securityEvents<T extends Community$securityEventsArgs<ExtArgs> = {}>(args?: Subset<T, Community$securityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    theme<T extends Community$themeArgs<ExtArgs> = {}>(args?: Subset<T, Community$themeArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     licenses<T extends Community$licensesArgs<ExtArgs> = {}>(args?: Subset<T, Community$licensesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LicensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billingRecords<T extends Community$billingRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Community$billingRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     catTransactions<T extends Community$catTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Community$catTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -14157,6 +14252,25 @@ export namespace Prisma {
   }
 
   /**
+   * Community.theme
+   */
+  export type Community$themeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    where?: ThemeWhereInput
+  }
+
+  /**
    * Community.licenses
    */
   export type Community$licensesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14244,6 +14358,1218 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CommunityInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Theme
+   */
+
+  export type AggregateTheme = {
+    _count: ThemeCountAggregateOutputType | null
+    _min: ThemeMinAggregateOutputType | null
+    _max: ThemeMaxAggregateOutputType | null
+  }
+
+  export type ThemeMinAggregateOutputType = {
+    id: string | null
+    communityId: string | null
+    name: string | null
+    primaryColor: string | null
+    secondaryColor: string | null
+    backgroundColor: string | null
+    surfaceColor: string | null
+    textPrimary: string | null
+    textSecondary: string | null
+    borderRadius: string | null
+    fontFamily: string | null
+    iconUrl: string | null
+    isDefault: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ThemeMaxAggregateOutputType = {
+    id: string | null
+    communityId: string | null
+    name: string | null
+    primaryColor: string | null
+    secondaryColor: string | null
+    backgroundColor: string | null
+    surfaceColor: string | null
+    textPrimary: string | null
+    textSecondary: string | null
+    borderRadius: string | null
+    fontFamily: string | null
+    iconUrl: string | null
+    isDefault: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ThemeCountAggregateOutputType = {
+    id: number
+    communityId: number
+    name: number
+    primaryColor: number
+    secondaryColor: number
+    backgroundColor: number
+    surfaceColor: number
+    textPrimary: number
+    textSecondary: number
+    borderRadius: number
+    fontFamily: number
+    iconUrl: number
+    isDefault: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ThemeMinAggregateInputType = {
+    id?: true
+    communityId?: true
+    name?: true
+    primaryColor?: true
+    secondaryColor?: true
+    backgroundColor?: true
+    surfaceColor?: true
+    textPrimary?: true
+    textSecondary?: true
+    borderRadius?: true
+    fontFamily?: true
+    iconUrl?: true
+    isDefault?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ThemeMaxAggregateInputType = {
+    id?: true
+    communityId?: true
+    name?: true
+    primaryColor?: true
+    secondaryColor?: true
+    backgroundColor?: true
+    surfaceColor?: true
+    textPrimary?: true
+    textSecondary?: true
+    borderRadius?: true
+    fontFamily?: true
+    iconUrl?: true
+    isDefault?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ThemeCountAggregateInputType = {
+    id?: true
+    communityId?: true
+    name?: true
+    primaryColor?: true
+    secondaryColor?: true
+    backgroundColor?: true
+    surfaceColor?: true
+    textPrimary?: true
+    textSecondary?: true
+    borderRadius?: true
+    fontFamily?: true
+    iconUrl?: true
+    isDefault?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ThemeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Theme to aggregate.
+     */
+    where?: ThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Themes to fetch.
+     */
+    orderBy?: ThemeOrderByWithRelationInput | ThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Themes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Themes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Themes
+    **/
+    _count?: true | ThemeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ThemeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ThemeMaxAggregateInputType
+  }
+
+  export type GetThemeAggregateType<T extends ThemeAggregateArgs> = {
+        [P in keyof T & keyof AggregateTheme]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTheme[P]>
+      : GetScalarType<T[P], AggregateTheme[P]>
+  }
+
+
+
+
+  export type ThemeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ThemeWhereInput
+    orderBy?: ThemeOrderByWithAggregationInput | ThemeOrderByWithAggregationInput[]
+    by: ThemeScalarFieldEnum[] | ThemeScalarFieldEnum
+    having?: ThemeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ThemeCountAggregateInputType | true
+    _min?: ThemeMinAggregateInputType
+    _max?: ThemeMaxAggregateInputType
+  }
+
+  export type ThemeGroupByOutputType = {
+    id: string
+    communityId: string | null
+    name: string
+    primaryColor: string
+    secondaryColor: string
+    backgroundColor: string
+    surfaceColor: string
+    textPrimary: string
+    textSecondary: string
+    borderRadius: string
+    fontFamily: string
+    iconUrl: string | null
+    isDefault: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: ThemeCountAggregateOutputType | null
+    _min: ThemeMinAggregateOutputType | null
+    _max: ThemeMaxAggregateOutputType | null
+  }
+
+  type GetThemeGroupByPayload<T extends ThemeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ThemeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ThemeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ThemeGroupByOutputType[P]>
+            : GetScalarType<T[P], ThemeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ThemeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    name?: boolean
+    primaryColor?: boolean
+    secondaryColor?: boolean
+    backgroundColor?: boolean
+    surfaceColor?: boolean
+    textPrimary?: boolean
+    textSecondary?: boolean
+    borderRadius?: boolean
+    fontFamily?: boolean
+    iconUrl?: boolean
+    isDefault?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    community?: boolean | Theme$communityArgs<ExtArgs>
+  }, ExtArgs["result"]["theme"]>
+
+  export type ThemeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    name?: boolean
+    primaryColor?: boolean
+    secondaryColor?: boolean
+    backgroundColor?: boolean
+    surfaceColor?: boolean
+    textPrimary?: boolean
+    textSecondary?: boolean
+    borderRadius?: boolean
+    fontFamily?: boolean
+    iconUrl?: boolean
+    isDefault?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    community?: boolean | Theme$communityArgs<ExtArgs>
+  }, ExtArgs["result"]["theme"]>
+
+  export type ThemeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    name?: boolean
+    primaryColor?: boolean
+    secondaryColor?: boolean
+    backgroundColor?: boolean
+    surfaceColor?: boolean
+    textPrimary?: boolean
+    textSecondary?: boolean
+    borderRadius?: boolean
+    fontFamily?: boolean
+    iconUrl?: boolean
+    isDefault?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    community?: boolean | Theme$communityArgs<ExtArgs>
+  }, ExtArgs["result"]["theme"]>
+
+  export type ThemeSelectScalar = {
+    id?: boolean
+    communityId?: boolean
+    name?: boolean
+    primaryColor?: boolean
+    secondaryColor?: boolean
+    backgroundColor?: boolean
+    surfaceColor?: boolean
+    textPrimary?: boolean
+    textSecondary?: boolean
+    borderRadius?: boolean
+    fontFamily?: boolean
+    iconUrl?: boolean
+    isDefault?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ThemeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "name" | "primaryColor" | "secondaryColor" | "backgroundColor" | "surfaceColor" | "textPrimary" | "textSecondary" | "borderRadius" | "fontFamily" | "iconUrl" | "isDefault" | "createdAt" | "updatedAt", ExtArgs["result"]["theme"]>
+  export type ThemeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | Theme$communityArgs<ExtArgs>
+  }
+  export type ThemeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | Theme$communityArgs<ExtArgs>
+  }
+  export type ThemeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | Theme$communityArgs<ExtArgs>
+  }
+
+  export type $ThemePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Theme"
+    objects: {
+      community: Prisma.$CommunityPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      communityId: string | null
+      name: string
+      primaryColor: string
+      secondaryColor: string
+      backgroundColor: string
+      surfaceColor: string
+      textPrimary: string
+      textSecondary: string
+      borderRadius: string
+      fontFamily: string
+      iconUrl: string | null
+      isDefault: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["theme"]>
+    composites: {}
+  }
+
+  type ThemeGetPayload<S extends boolean | null | undefined | ThemeDefaultArgs> = $Result.GetResult<Prisma.$ThemePayload, S>
+
+  type ThemeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ThemeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ThemeCountAggregateInputType | true
+    }
+
+  export interface ThemeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Theme'], meta: { name: 'Theme' } }
+    /**
+     * Find zero or one Theme that matches the filter.
+     * @param {ThemeFindUniqueArgs} args - Arguments to find a Theme
+     * @example
+     * // Get one Theme
+     * const theme = await prisma.theme.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ThemeFindUniqueArgs>(args: SelectSubset<T, ThemeFindUniqueArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Theme that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ThemeFindUniqueOrThrowArgs} args - Arguments to find a Theme
+     * @example
+     * // Get one Theme
+     * const theme = await prisma.theme.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ThemeFindUniqueOrThrowArgs>(args: SelectSubset<T, ThemeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Theme that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeFindFirstArgs} args - Arguments to find a Theme
+     * @example
+     * // Get one Theme
+     * const theme = await prisma.theme.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ThemeFindFirstArgs>(args?: SelectSubset<T, ThemeFindFirstArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Theme that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeFindFirstOrThrowArgs} args - Arguments to find a Theme
+     * @example
+     * // Get one Theme
+     * const theme = await prisma.theme.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ThemeFindFirstOrThrowArgs>(args?: SelectSubset<T, ThemeFindFirstOrThrowArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Themes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Themes
+     * const themes = await prisma.theme.findMany()
+     * 
+     * // Get first 10 Themes
+     * const themes = await prisma.theme.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const themeWithIdOnly = await prisma.theme.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ThemeFindManyArgs>(args?: SelectSubset<T, ThemeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Theme.
+     * @param {ThemeCreateArgs} args - Arguments to create a Theme.
+     * @example
+     * // Create one Theme
+     * const Theme = await prisma.theme.create({
+     *   data: {
+     *     // ... data to create a Theme
+     *   }
+     * })
+     * 
+     */
+    create<T extends ThemeCreateArgs>(args: SelectSubset<T, ThemeCreateArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Themes.
+     * @param {ThemeCreateManyArgs} args - Arguments to create many Themes.
+     * @example
+     * // Create many Themes
+     * const theme = await prisma.theme.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ThemeCreateManyArgs>(args?: SelectSubset<T, ThemeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Themes and returns the data saved in the database.
+     * @param {ThemeCreateManyAndReturnArgs} args - Arguments to create many Themes.
+     * @example
+     * // Create many Themes
+     * const theme = await prisma.theme.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Themes and only return the `id`
+     * const themeWithIdOnly = await prisma.theme.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ThemeCreateManyAndReturnArgs>(args?: SelectSubset<T, ThemeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Theme.
+     * @param {ThemeDeleteArgs} args - Arguments to delete one Theme.
+     * @example
+     * // Delete one Theme
+     * const Theme = await prisma.theme.delete({
+     *   where: {
+     *     // ... filter to delete one Theme
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ThemeDeleteArgs>(args: SelectSubset<T, ThemeDeleteArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Theme.
+     * @param {ThemeUpdateArgs} args - Arguments to update one Theme.
+     * @example
+     * // Update one Theme
+     * const theme = await prisma.theme.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ThemeUpdateArgs>(args: SelectSubset<T, ThemeUpdateArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Themes.
+     * @param {ThemeDeleteManyArgs} args - Arguments to filter Themes to delete.
+     * @example
+     * // Delete a few Themes
+     * const { count } = await prisma.theme.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ThemeDeleteManyArgs>(args?: SelectSubset<T, ThemeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Themes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Themes
+     * const theme = await prisma.theme.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ThemeUpdateManyArgs>(args: SelectSubset<T, ThemeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Themes and returns the data updated in the database.
+     * @param {ThemeUpdateManyAndReturnArgs} args - Arguments to update many Themes.
+     * @example
+     * // Update many Themes
+     * const theme = await prisma.theme.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Themes and only return the `id`
+     * const themeWithIdOnly = await prisma.theme.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ThemeUpdateManyAndReturnArgs>(args: SelectSubset<T, ThemeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Theme.
+     * @param {ThemeUpsertArgs} args - Arguments to update or create a Theme.
+     * @example
+     * // Update or create a Theme
+     * const theme = await prisma.theme.upsert({
+     *   create: {
+     *     // ... data to create a Theme
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Theme we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ThemeUpsertArgs>(args: SelectSubset<T, ThemeUpsertArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Themes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeCountArgs} args - Arguments to filter Themes to count.
+     * @example
+     * // Count the number of Themes
+     * const count = await prisma.theme.count({
+     *   where: {
+     *     // ... the filter for the Themes we want to count
+     *   }
+     * })
+    **/
+    count<T extends ThemeCountArgs>(
+      args?: Subset<T, ThemeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ThemeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Theme.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ThemeAggregateArgs>(args: Subset<T, ThemeAggregateArgs>): Prisma.PrismaPromise<GetThemeAggregateType<T>>
+
+    /**
+     * Group by Theme.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ThemeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ThemeGroupByArgs['orderBy'] }
+        : { orderBy?: ThemeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ThemeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetThemeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Theme model
+   */
+  readonly fields: ThemeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Theme.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ThemeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    community<T extends Theme$communityArgs<ExtArgs> = {}>(args?: Subset<T, Theme$communityArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Theme model
+   */
+  interface ThemeFieldRefs {
+    readonly id: FieldRef<"Theme", 'String'>
+    readonly communityId: FieldRef<"Theme", 'String'>
+    readonly name: FieldRef<"Theme", 'String'>
+    readonly primaryColor: FieldRef<"Theme", 'String'>
+    readonly secondaryColor: FieldRef<"Theme", 'String'>
+    readonly backgroundColor: FieldRef<"Theme", 'String'>
+    readonly surfaceColor: FieldRef<"Theme", 'String'>
+    readonly textPrimary: FieldRef<"Theme", 'String'>
+    readonly textSecondary: FieldRef<"Theme", 'String'>
+    readonly borderRadius: FieldRef<"Theme", 'String'>
+    readonly fontFamily: FieldRef<"Theme", 'String'>
+    readonly iconUrl: FieldRef<"Theme", 'String'>
+    readonly isDefault: FieldRef<"Theme", 'Boolean'>
+    readonly createdAt: FieldRef<"Theme", 'DateTime'>
+    readonly updatedAt: FieldRef<"Theme", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Theme findUnique
+   */
+  export type ThemeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Theme to fetch.
+     */
+    where: ThemeWhereUniqueInput
+  }
+
+  /**
+   * Theme findUniqueOrThrow
+   */
+  export type ThemeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Theme to fetch.
+     */
+    where: ThemeWhereUniqueInput
+  }
+
+  /**
+   * Theme findFirst
+   */
+  export type ThemeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Theme to fetch.
+     */
+    where?: ThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Themes to fetch.
+     */
+    orderBy?: ThemeOrderByWithRelationInput | ThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Themes.
+     */
+    cursor?: ThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Themes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Themes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Themes.
+     */
+    distinct?: ThemeScalarFieldEnum | ThemeScalarFieldEnum[]
+  }
+
+  /**
+   * Theme findFirstOrThrow
+   */
+  export type ThemeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Theme to fetch.
+     */
+    where?: ThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Themes to fetch.
+     */
+    orderBy?: ThemeOrderByWithRelationInput | ThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Themes.
+     */
+    cursor?: ThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Themes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Themes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Themes.
+     */
+    distinct?: ThemeScalarFieldEnum | ThemeScalarFieldEnum[]
+  }
+
+  /**
+   * Theme findMany
+   */
+  export type ThemeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Themes to fetch.
+     */
+    where?: ThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Themes to fetch.
+     */
+    orderBy?: ThemeOrderByWithRelationInput | ThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Themes.
+     */
+    cursor?: ThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Themes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Themes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Themes.
+     */
+    distinct?: ThemeScalarFieldEnum | ThemeScalarFieldEnum[]
+  }
+
+  /**
+   * Theme create
+   */
+  export type ThemeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Theme.
+     */
+    data: XOR<ThemeCreateInput, ThemeUncheckedCreateInput>
+  }
+
+  /**
+   * Theme createMany
+   */
+  export type ThemeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Themes.
+     */
+    data: ThemeCreateManyInput | ThemeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Theme createManyAndReturn
+   */
+  export type ThemeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * The data used to create many Themes.
+     */
+    data: ThemeCreateManyInput | ThemeCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Theme update
+   */
+  export type ThemeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Theme.
+     */
+    data: XOR<ThemeUpdateInput, ThemeUncheckedUpdateInput>
+    /**
+     * Choose, which Theme to update.
+     */
+    where: ThemeWhereUniqueInput
+  }
+
+  /**
+   * Theme updateMany
+   */
+  export type ThemeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Themes.
+     */
+    data: XOR<ThemeUpdateManyMutationInput, ThemeUncheckedUpdateManyInput>
+    /**
+     * Filter which Themes to update
+     */
+    where?: ThemeWhereInput
+    /**
+     * Limit how many Themes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Theme updateManyAndReturn
+   */
+  export type ThemeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * The data used to update Themes.
+     */
+    data: XOR<ThemeUpdateManyMutationInput, ThemeUncheckedUpdateManyInput>
+    /**
+     * Filter which Themes to update
+     */
+    where?: ThemeWhereInput
+    /**
+     * Limit how many Themes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Theme upsert
+   */
+  export type ThemeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Theme to update in case it exists.
+     */
+    where: ThemeWhereUniqueInput
+    /**
+     * In case the Theme found by the `where` argument doesn't exist, create a new Theme with this data.
+     */
+    create: XOR<ThemeCreateInput, ThemeUncheckedCreateInput>
+    /**
+     * In case the Theme was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ThemeUpdateInput, ThemeUncheckedUpdateInput>
+  }
+
+  /**
+   * Theme delete
+   */
+  export type ThemeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter which Theme to delete.
+     */
+    where: ThemeWhereUniqueInput
+  }
+
+  /**
+   * Theme deleteMany
+   */
+  export type ThemeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Themes to delete
+     */
+    where?: ThemeWhereInput
+    /**
+     * Limit how many Themes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Theme.community
+   */
+  export type Theme$communityArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Community
+     */
+    select?: CommunitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Community
+     */
+    omit?: CommunityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommunityInclude<ExtArgs> | null
+    where?: CommunityWhereInput
+  }
+
+  /**
+   * Theme without action
+   */
+  export type ThemeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
   }
 
 
@@ -38303,6 +39629,27 @@ export namespace Prisma {
   export type CommunityScalarFieldEnum = (typeof CommunityScalarFieldEnum)[keyof typeof CommunityScalarFieldEnum]
 
 
+  export const ThemeScalarFieldEnum: {
+    id: 'id',
+    communityId: 'communityId',
+    name: 'name',
+    primaryColor: 'primaryColor',
+    secondaryColor: 'secondaryColor',
+    backgroundColor: 'backgroundColor',
+    surfaceColor: 'surfaceColor',
+    textPrimary: 'textPrimary',
+    textSecondary: 'textSecondary',
+    borderRadius: 'borderRadius',
+    fontFamily: 'fontFamily',
+    iconUrl: 'iconUrl',
+    isDefault: 'isDefault',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ThemeScalarFieldEnum = (typeof ThemeScalarFieldEnum)[keyof typeof ThemeScalarFieldEnum]
+
+
   export const CommunityMemberScalarFieldEnum: {
     communityId: 'communityId',
     userId: 'userId',
@@ -39522,6 +40869,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationListRelationFilter
     moderationLogs?: ModerationLogListRelationFilter
     securityEvents?: SecurityEventListRelationFilter
+    theme?: XOR<ThemeNullableScalarRelationFilter, ThemeWhereInput> | null
     licenses?: LicenseListRelationFilter
     billingRecords?: BillingRecordListRelationFilter
     catTransactions?: CatTransactionListRelationFilter
@@ -39564,6 +40912,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationOrderByRelationAggregateInput
     moderationLogs?: ModerationLogOrderByRelationAggregateInput
     securityEvents?: SecurityEventOrderByRelationAggregateInput
+    theme?: ThemeOrderByWithRelationInput
     licenses?: LicenseOrderByRelationAggregateInput
     billingRecords?: BillingRecordOrderByRelationAggregateInput
     catTransactions?: CatTransactionOrderByRelationAggregateInput
@@ -39609,6 +40958,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationListRelationFilter
     moderationLogs?: ModerationLogListRelationFilter
     securityEvents?: SecurityEventListRelationFilter
+    theme?: XOR<ThemeNullableScalarRelationFilter, ThemeWhereInput> | null
     licenses?: LicenseListRelationFilter
     billingRecords?: BillingRecordListRelationFilter
     catTransactions?: CatTransactionListRelationFilter
@@ -39672,6 +41022,111 @@ export namespace Prisma {
     catFeaturedCharityId?: StringNullableWithAggregatesFilter<"Community"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Community"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Community"> | Date | string
+  }
+
+  export type ThemeWhereInput = {
+    AND?: ThemeWhereInput | ThemeWhereInput[]
+    OR?: ThemeWhereInput[]
+    NOT?: ThemeWhereInput | ThemeWhereInput[]
+    id?: StringFilter<"Theme"> | string
+    communityId?: StringNullableFilter<"Theme"> | string | null
+    name?: StringFilter<"Theme"> | string
+    primaryColor?: StringFilter<"Theme"> | string
+    secondaryColor?: StringFilter<"Theme"> | string
+    backgroundColor?: StringFilter<"Theme"> | string
+    surfaceColor?: StringFilter<"Theme"> | string
+    textPrimary?: StringFilter<"Theme"> | string
+    textSecondary?: StringFilter<"Theme"> | string
+    borderRadius?: StringFilter<"Theme"> | string
+    fontFamily?: StringFilter<"Theme"> | string
+    iconUrl?: StringNullableFilter<"Theme"> | string | null
+    isDefault?: BoolFilter<"Theme"> | boolean
+    createdAt?: DateTimeFilter<"Theme"> | Date | string
+    updatedAt?: DateTimeFilter<"Theme"> | Date | string
+    community?: XOR<CommunityNullableScalarRelationFilter, CommunityWhereInput> | null
+  }
+
+  export type ThemeOrderByWithRelationInput = {
+    id?: SortOrder
+    communityId?: SortOrderInput | SortOrder
+    name?: SortOrder
+    primaryColor?: SortOrder
+    secondaryColor?: SortOrder
+    backgroundColor?: SortOrder
+    surfaceColor?: SortOrder
+    textPrimary?: SortOrder
+    textSecondary?: SortOrder
+    borderRadius?: SortOrder
+    fontFamily?: SortOrder
+    iconUrl?: SortOrderInput | SortOrder
+    isDefault?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    community?: CommunityOrderByWithRelationInput
+  }
+
+  export type ThemeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    communityId?: string
+    AND?: ThemeWhereInput | ThemeWhereInput[]
+    OR?: ThemeWhereInput[]
+    NOT?: ThemeWhereInput | ThemeWhereInput[]
+    name?: StringFilter<"Theme"> | string
+    primaryColor?: StringFilter<"Theme"> | string
+    secondaryColor?: StringFilter<"Theme"> | string
+    backgroundColor?: StringFilter<"Theme"> | string
+    surfaceColor?: StringFilter<"Theme"> | string
+    textPrimary?: StringFilter<"Theme"> | string
+    textSecondary?: StringFilter<"Theme"> | string
+    borderRadius?: StringFilter<"Theme"> | string
+    fontFamily?: StringFilter<"Theme"> | string
+    iconUrl?: StringNullableFilter<"Theme"> | string | null
+    isDefault?: BoolFilter<"Theme"> | boolean
+    createdAt?: DateTimeFilter<"Theme"> | Date | string
+    updatedAt?: DateTimeFilter<"Theme"> | Date | string
+    community?: XOR<CommunityNullableScalarRelationFilter, CommunityWhereInput> | null
+  }, "id" | "communityId">
+
+  export type ThemeOrderByWithAggregationInput = {
+    id?: SortOrder
+    communityId?: SortOrderInput | SortOrder
+    name?: SortOrder
+    primaryColor?: SortOrder
+    secondaryColor?: SortOrder
+    backgroundColor?: SortOrder
+    surfaceColor?: SortOrder
+    textPrimary?: SortOrder
+    textSecondary?: SortOrder
+    borderRadius?: SortOrder
+    fontFamily?: SortOrder
+    iconUrl?: SortOrderInput | SortOrder
+    isDefault?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ThemeCountOrderByAggregateInput
+    _max?: ThemeMaxOrderByAggregateInput
+    _min?: ThemeMinOrderByAggregateInput
+  }
+
+  export type ThemeScalarWhereWithAggregatesInput = {
+    AND?: ThemeScalarWhereWithAggregatesInput | ThemeScalarWhereWithAggregatesInput[]
+    OR?: ThemeScalarWhereWithAggregatesInput[]
+    NOT?: ThemeScalarWhereWithAggregatesInput | ThemeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Theme"> | string
+    communityId?: StringNullableWithAggregatesFilter<"Theme"> | string | null
+    name?: StringWithAggregatesFilter<"Theme"> | string
+    primaryColor?: StringWithAggregatesFilter<"Theme"> | string
+    secondaryColor?: StringWithAggregatesFilter<"Theme"> | string
+    backgroundColor?: StringWithAggregatesFilter<"Theme"> | string
+    surfaceColor?: StringWithAggregatesFilter<"Theme"> | string
+    textPrimary?: StringWithAggregatesFilter<"Theme"> | string
+    textSecondary?: StringWithAggregatesFilter<"Theme"> | string
+    borderRadius?: StringWithAggregatesFilter<"Theme"> | string
+    fontFamily?: StringWithAggregatesFilter<"Theme"> | string
+    iconUrl?: StringNullableWithAggregatesFilter<"Theme"> | string | null
+    isDefault?: BoolWithAggregatesFilter<"Theme"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Theme"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Theme"> | Date | string
   }
 
   export type CommunityMemberWhereInput = {
@@ -42400,6 +43855,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -42441,6 +43897,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -42482,6 +43939,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -42523,6 +43981,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -42601,6 +44060,131 @@ export namespace Prisma {
     isPublic?: BoolFieldUpdateOperationsInput | boolean
     catCycleActive?: BoolFieldUpdateOperationsInput | boolean
     catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ThemeCreateInput = {
+    id?: string
+    name: string
+    primaryColor: string
+    secondaryColor: string
+    backgroundColor: string
+    surfaceColor: string
+    textPrimary: string
+    textSecondary: string
+    borderRadius: string
+    fontFamily: string
+    iconUrl?: string | null
+    isDefault?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    community?: CommunityCreateNestedOneWithoutThemeInput
+  }
+
+  export type ThemeUncheckedCreateInput = {
+    id?: string
+    communityId?: string | null
+    name: string
+    primaryColor: string
+    secondaryColor: string
+    backgroundColor: string
+    surfaceColor: string
+    textPrimary: string
+    textSecondary: string
+    borderRadius: string
+    fontFamily: string
+    iconUrl?: string | null
+    isDefault?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ThemeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    secondaryColor?: StringFieldUpdateOperationsInput | string
+    backgroundColor?: StringFieldUpdateOperationsInput | string
+    surfaceColor?: StringFieldUpdateOperationsInput | string
+    textPrimary?: StringFieldUpdateOperationsInput | string
+    textSecondary?: StringFieldUpdateOperationsInput | string
+    borderRadius?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    iconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneWithoutThemeNestedInput
+  }
+
+  export type ThemeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    secondaryColor?: StringFieldUpdateOperationsInput | string
+    backgroundColor?: StringFieldUpdateOperationsInput | string
+    surfaceColor?: StringFieldUpdateOperationsInput | string
+    textPrimary?: StringFieldUpdateOperationsInput | string
+    textSecondary?: StringFieldUpdateOperationsInput | string
+    borderRadius?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    iconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ThemeCreateManyInput = {
+    id?: string
+    communityId?: string | null
+    name: string
+    primaryColor: string
+    secondaryColor: string
+    backgroundColor: string
+    surfaceColor: string
+    textPrimary: string
+    textSecondary: string
+    borderRadius: string
+    fontFamily: string
+    iconUrl?: string | null
+    isDefault?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ThemeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    secondaryColor?: StringFieldUpdateOperationsInput | string
+    backgroundColor?: StringFieldUpdateOperationsInput | string
+    surfaceColor?: StringFieldUpdateOperationsInput | string
+    textPrimary?: StringFieldUpdateOperationsInput | string
+    textSecondary?: StringFieldUpdateOperationsInput | string
+    borderRadius?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    iconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ThemeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    secondaryColor?: StringFieldUpdateOperationsInput | string
+    backgroundColor?: StringFieldUpdateOperationsInput | string
+    surfaceColor?: StringFieldUpdateOperationsInput | string
+    textPrimary?: StringFieldUpdateOperationsInput | string
+    textSecondary?: StringFieldUpdateOperationsInput | string
+    borderRadius?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    iconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -45436,6 +47020,11 @@ export namespace Prisma {
     none?: SecurityEventWhereInput
   }
 
+  export type ThemeNullableScalarRelationFilter = {
+    is?: ThemeWhereInput | null
+    isNot?: ThemeWhereInput | null
+  }
+
   export type CharityOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -45540,6 +47129,65 @@ export namespace Prisma {
     coverageLat?: SortOrder
     coverageLng?: SortOrder
     coverageRadius?: SortOrder
+  }
+
+  export type CommunityNullableScalarRelationFilter = {
+    is?: CommunityWhereInput | null
+    isNot?: CommunityWhereInput | null
+  }
+
+  export type ThemeCountOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    name?: SortOrder
+    primaryColor?: SortOrder
+    secondaryColor?: SortOrder
+    backgroundColor?: SortOrder
+    surfaceColor?: SortOrder
+    textPrimary?: SortOrder
+    textSecondary?: SortOrder
+    borderRadius?: SortOrder
+    fontFamily?: SortOrder
+    iconUrl?: SortOrder
+    isDefault?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ThemeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    name?: SortOrder
+    primaryColor?: SortOrder
+    secondaryColor?: SortOrder
+    backgroundColor?: SortOrder
+    surfaceColor?: SortOrder
+    textPrimary?: SortOrder
+    textSecondary?: SortOrder
+    borderRadius?: SortOrder
+    fontFamily?: SortOrder
+    iconUrl?: SortOrder
+    isDefault?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ThemeMinOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    name?: SortOrder
+    primaryColor?: SortOrder
+    secondaryColor?: SortOrder
+    backgroundColor?: SortOrder
+    surfaceColor?: SortOrder
+    textPrimary?: SortOrder
+    textSecondary?: SortOrder
+    borderRadius?: SortOrder
+    fontFamily?: SortOrder
+    iconUrl?: SortOrder
+    isDefault?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type CommunityScalarRelationFilter = {
@@ -45721,11 +47369,6 @@ export namespace Prisma {
   export type SecurityLocationSumOrderByAggregateInput = {
     latitude?: SortOrder
     longitude?: SortOrder
-  }
-
-  export type CommunityNullableScalarRelationFilter = {
-    is?: CommunityWhereInput | null
-    isNot?: CommunityWhereInput | null
   }
 
   export type ConversationNullableScalarRelationFilter = {
@@ -47750,6 +49393,12 @@ export namespace Prisma {
     connect?: SecurityEventWhereUniqueInput | SecurityEventWhereUniqueInput[]
   }
 
+  export type ThemeCreateNestedOneWithoutCommunityInput = {
+    create?: XOR<ThemeCreateWithoutCommunityInput, ThemeUncheckedCreateWithoutCommunityInput>
+    connectOrCreate?: ThemeCreateOrConnectWithoutCommunityInput
+    connect?: ThemeWhereUniqueInput
+  }
+
   export type LicenseCreateNestedManyWithoutCommunityInput = {
     create?: XOR<LicenseCreateWithoutCommunityInput, LicenseUncheckedCreateWithoutCommunityInput> | LicenseCreateWithoutCommunityInput[] | LicenseUncheckedCreateWithoutCommunityInput[]
     connectOrCreate?: LicenseCreateOrConnectWithoutCommunityInput | LicenseCreateOrConnectWithoutCommunityInput[]
@@ -47853,6 +49502,12 @@ export namespace Prisma {
     connectOrCreate?: SecurityEventCreateOrConnectWithoutCommunityInput | SecurityEventCreateOrConnectWithoutCommunityInput[]
     createMany?: SecurityEventCreateManyCommunityInputEnvelope
     connect?: SecurityEventWhereUniqueInput | SecurityEventWhereUniqueInput[]
+  }
+
+  export type ThemeUncheckedCreateNestedOneWithoutCommunityInput = {
+    create?: XOR<ThemeCreateWithoutCommunityInput, ThemeUncheckedCreateWithoutCommunityInput>
+    connectOrCreate?: ThemeCreateOrConnectWithoutCommunityInput
+    connect?: ThemeWhereUniqueInput
   }
 
   export type LicenseUncheckedCreateNestedManyWithoutCommunityInput = {
@@ -48060,6 +49715,16 @@ export namespace Prisma {
     update?: SecurityEventUpdateWithWhereUniqueWithoutCommunityInput | SecurityEventUpdateWithWhereUniqueWithoutCommunityInput[]
     updateMany?: SecurityEventUpdateManyWithWhereWithoutCommunityInput | SecurityEventUpdateManyWithWhereWithoutCommunityInput[]
     deleteMany?: SecurityEventScalarWhereInput | SecurityEventScalarWhereInput[]
+  }
+
+  export type ThemeUpdateOneWithoutCommunityNestedInput = {
+    create?: XOR<ThemeCreateWithoutCommunityInput, ThemeUncheckedCreateWithoutCommunityInput>
+    connectOrCreate?: ThemeCreateOrConnectWithoutCommunityInput
+    upsert?: ThemeUpsertWithoutCommunityInput
+    disconnect?: ThemeWhereInput | boolean
+    delete?: ThemeWhereInput | boolean
+    connect?: ThemeWhereUniqueInput
+    update?: XOR<XOR<ThemeUpdateToOneWithWhereWithoutCommunityInput, ThemeUpdateWithoutCommunityInput>, ThemeUncheckedUpdateWithoutCommunityInput>
   }
 
   export type LicenseUpdateManyWithoutCommunityNestedInput = {
@@ -48272,6 +49937,16 @@ export namespace Prisma {
     deleteMany?: SecurityEventScalarWhereInput | SecurityEventScalarWhereInput[]
   }
 
+  export type ThemeUncheckedUpdateOneWithoutCommunityNestedInput = {
+    create?: XOR<ThemeCreateWithoutCommunityInput, ThemeUncheckedCreateWithoutCommunityInput>
+    connectOrCreate?: ThemeCreateOrConnectWithoutCommunityInput
+    upsert?: ThemeUpsertWithoutCommunityInput
+    disconnect?: ThemeWhereInput | boolean
+    delete?: ThemeWhereInput | boolean
+    connect?: ThemeWhereUniqueInput
+    update?: XOR<XOR<ThemeUpdateToOneWithWhereWithoutCommunityInput, ThemeUpdateWithoutCommunityInput>, ThemeUncheckedUpdateWithoutCommunityInput>
+  }
+
   export type LicenseUncheckedUpdateManyWithoutCommunityNestedInput = {
     create?: XOR<LicenseCreateWithoutCommunityInput, LicenseUncheckedCreateWithoutCommunityInput> | LicenseCreateWithoutCommunityInput[] | LicenseUncheckedCreateWithoutCommunityInput[]
     connectOrCreate?: LicenseCreateOrConnectWithoutCommunityInput | LicenseCreateOrConnectWithoutCommunityInput[]
@@ -48312,6 +49987,22 @@ export namespace Prisma {
     update?: CatTransactionUpdateWithWhereUniqueWithoutCommunityInput | CatTransactionUpdateWithWhereUniqueWithoutCommunityInput[]
     updateMany?: CatTransactionUpdateManyWithWhereWithoutCommunityInput | CatTransactionUpdateManyWithWhereWithoutCommunityInput[]
     deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
+  export type CommunityCreateNestedOneWithoutThemeInput = {
+    create?: XOR<CommunityCreateWithoutThemeInput, CommunityUncheckedCreateWithoutThemeInput>
+    connectOrCreate?: CommunityCreateOrConnectWithoutThemeInput
+    connect?: CommunityWhereUniqueInput
+  }
+
+  export type CommunityUpdateOneWithoutThemeNestedInput = {
+    create?: XOR<CommunityCreateWithoutThemeInput, CommunityUncheckedCreateWithoutThemeInput>
+    connectOrCreate?: CommunityCreateOrConnectWithoutThemeInput
+    upsert?: CommunityUpsertWithoutThemeInput
+    disconnect?: CommunityWhereInput | boolean
+    delete?: CommunityWhereInput | boolean
+    connect?: CommunityWhereUniqueInput
+    update?: XOR<XOR<CommunityUpdateToOneWithWhereWithoutThemeInput, CommunityUpdateWithoutThemeInput>, CommunityUncheckedUpdateWithoutThemeInput>
   }
 
   export type CommunityCreateNestedOneWithoutMembersInput = {
@@ -49693,6 +51384,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -49733,6 +51425,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -52984,6 +54677,45 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ThemeCreateWithoutCommunityInput = {
+    id?: string
+    name: string
+    primaryColor: string
+    secondaryColor: string
+    backgroundColor: string
+    surfaceColor: string
+    textPrimary: string
+    textSecondary: string
+    borderRadius: string
+    fontFamily: string
+    iconUrl?: string | null
+    isDefault?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ThemeUncheckedCreateWithoutCommunityInput = {
+    id?: string
+    name: string
+    primaryColor: string
+    secondaryColor: string
+    backgroundColor: string
+    surfaceColor: string
+    textPrimary: string
+    textSecondary: string
+    borderRadius: string
+    fontFamily: string
+    iconUrl?: string | null
+    isDefault?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ThemeCreateOrConnectWithoutCommunityInput = {
+    where: ThemeWhereUniqueInput
+    create: XOR<ThemeCreateWithoutCommunityInput, ThemeUncheckedCreateWithoutCommunityInput>
+  }
+
   export type LicenseCreateWithoutCommunityInput = {
     id?: string
     type: string
@@ -53501,6 +55233,51 @@ export namespace Prisma {
     timestamp?: DateTimeFilter<"SecurityEvent"> | Date | string
   }
 
+  export type ThemeUpsertWithoutCommunityInput = {
+    update: XOR<ThemeUpdateWithoutCommunityInput, ThemeUncheckedUpdateWithoutCommunityInput>
+    create: XOR<ThemeCreateWithoutCommunityInput, ThemeUncheckedCreateWithoutCommunityInput>
+    where?: ThemeWhereInput
+  }
+
+  export type ThemeUpdateToOneWithWhereWithoutCommunityInput = {
+    where?: ThemeWhereInput
+    data: XOR<ThemeUpdateWithoutCommunityInput, ThemeUncheckedUpdateWithoutCommunityInput>
+  }
+
+  export type ThemeUpdateWithoutCommunityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    secondaryColor?: StringFieldUpdateOperationsInput | string
+    backgroundColor?: StringFieldUpdateOperationsInput | string
+    surfaceColor?: StringFieldUpdateOperationsInput | string
+    textPrimary?: StringFieldUpdateOperationsInput | string
+    textSecondary?: StringFieldUpdateOperationsInput | string
+    borderRadius?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    iconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ThemeUncheckedUpdateWithoutCommunityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    secondaryColor?: StringFieldUpdateOperationsInput | string
+    backgroundColor?: StringFieldUpdateOperationsInput | string
+    surfaceColor?: StringFieldUpdateOperationsInput | string
+    textPrimary?: StringFieldUpdateOperationsInput | string
+    textSecondary?: StringFieldUpdateOperationsInput | string
+    borderRadius?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    iconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type LicenseUpsertWithWhereUniqueWithoutCommunityInput = {
     where: LicenseWhereUniqueInput
     update: XOR<LicenseUpdateWithoutCommunityInput, LicenseUncheckedUpdateWithoutCommunityInput>
@@ -53549,6 +55326,186 @@ export namespace Prisma {
     data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyWithoutCommunityInput>
   }
 
+  export type CommunityCreateWithoutThemeInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    status?: string
+    isEmergencyMode?: boolean
+    coverageLat?: number | null
+    coverageLng?: number | null
+    coverageRadius?: number | null
+    coverageLocation?: string | null
+    enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
+    activeEmergencyId?: string | null
+    onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: boolean
+    isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
+    members?: CommunityMemberCreateNestedManyWithoutCommunityInput
+    posts?: PostCreateNestedManyWithoutCommunityInput
+    messages?: MessageCreateNestedManyWithoutCommunityInput
+    charities?: CharityCreateNestedManyWithoutCommunityInput
+    charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCommunityInput
+    reports?: ReportCreateNestedManyWithoutCommunityInput
+    invitations?: CommunityInvitationCreateNestedManyWithoutCommunityInput
+    inviteLinks?: CommunityInviteLinkCreateNestedManyWithoutCommunityInput
+    memberLocations?: MemberLocationCreateNestedManyWithoutCommunityInput
+    securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
+    securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    licenses?: LicenseCreateNestedManyWithoutCommunityInput
+    billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+  }
+
+  export type CommunityUncheckedCreateWithoutThemeInput = {
+    id?: string
+    name: string
+    description?: string | null
+    ownerId: string
+    type?: string
+    status?: string
+    isEmergencyMode?: boolean
+    coverageLat?: number | null
+    coverageLng?: number | null
+    coverageRadius?: number | null
+    coverageLocation?: string | null
+    enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
+    activeEmergencyId?: string | null
+    onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: boolean
+    isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
+    posts?: PostUncheckedCreateNestedManyWithoutCommunityInput
+    messages?: MessageUncheckedCreateNestedManyWithoutCommunityInput
+    charities?: CharityUncheckedCreateNestedManyWithoutCommunityInput
+    charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCommunityInput
+    reports?: ReportUncheckedCreateNestedManyWithoutCommunityInput
+    invitations?: CommunityInvitationUncheckedCreateNestedManyWithoutCommunityInput
+    inviteLinks?: CommunityInviteLinkUncheckedCreateNestedManyWithoutCommunityInput
+    memberLocations?: MemberLocationUncheckedCreateNestedManyWithoutCommunityInput
+    securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
+    securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
+    billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+  }
+
+  export type CommunityCreateOrConnectWithoutThemeInput = {
+    where: CommunityWhereUniqueInput
+    create: XOR<CommunityCreateWithoutThemeInput, CommunityUncheckedCreateWithoutThemeInput>
+  }
+
+  export type CommunityUpsertWithoutThemeInput = {
+    update: XOR<CommunityUpdateWithoutThemeInput, CommunityUncheckedUpdateWithoutThemeInput>
+    create: XOR<CommunityCreateWithoutThemeInput, CommunityUncheckedCreateWithoutThemeInput>
+    where?: CommunityWhereInput
+  }
+
+  export type CommunityUpdateToOneWithWhereWithoutThemeInput = {
+    where?: CommunityWhereInput
+    data: XOR<CommunityUpdateWithoutThemeInput, CommunityUncheckedUpdateWithoutThemeInput>
+  }
+
+  export type CommunityUpdateWithoutThemeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    isEmergencyMode?: BoolFieldUpdateOperationsInput | boolean
+    coverageLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
+    members?: CommunityMemberUpdateManyWithoutCommunityNestedInput
+    posts?: PostUpdateManyWithoutCommunityNestedInput
+    messages?: MessageUpdateManyWithoutCommunityNestedInput
+    charities?: CharityUpdateManyWithoutCommunityNestedInput
+    charitySuggestions?: CharitySuggestionUpdateManyWithoutCommunityNestedInput
+    reports?: ReportUpdateManyWithoutCommunityNestedInput
+    invitations?: CommunityInvitationUpdateManyWithoutCommunityNestedInput
+    inviteLinks?: CommunityInviteLinkUpdateManyWithoutCommunityNestedInput
+    memberLocations?: MemberLocationUpdateManyWithoutCommunityNestedInput
+    securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
+    securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    licenses?: LicenseUpdateManyWithoutCommunityNestedInput
+    billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+  }
+
+  export type CommunityUncheckedUpdateWithoutThemeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    ownerId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    isEmergencyMode?: BoolFieldUpdateOperationsInput | boolean
+    coverageLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
+    posts?: PostUncheckedUpdateManyWithoutCommunityNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutCommunityNestedInput
+    charities?: CharityUncheckedUpdateManyWithoutCommunityNestedInput
+    charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCommunityNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutCommunityNestedInput
+    invitations?: CommunityInvitationUncheckedUpdateManyWithoutCommunityNestedInput
+    inviteLinks?: CommunityInviteLinkUncheckedUpdateManyWithoutCommunityNestedInput
+    memberLocations?: MemberLocationUncheckedUpdateManyWithoutCommunityNestedInput
+    securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
+    securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
+    billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+  }
+
   export type CommunityCreateWithoutMembersInput = {
     id?: string
     name: string
@@ -53584,6 +55541,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -53624,6 +55582,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -53823,6 +55782,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -53863,6 +55823,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -54052,6 +56013,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -54092,6 +56054,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -54148,6 +56111,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -54188,6 +56152,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -54228,6 +56193,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -54268,6 +56234,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -54324,6 +56291,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -54364,6 +56332,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -54404,6 +56373,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -54444,6 +56414,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -54753,6 +56724,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -54793,6 +56765,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -55078,6 +57051,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -55118,6 +57092,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -55347,6 +57322,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -55387,6 +57363,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -55592,6 +57569,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -55632,6 +57610,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -55756,6 +57735,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -55796,6 +57776,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -55868,6 +57849,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -55908,6 +57890,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -56178,6 +58161,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -56218,6 +58202,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -56485,6 +58470,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
   }
@@ -56525,6 +58511,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
   }
@@ -56880,6 +58867,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
   }
@@ -56920,6 +58908,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
   }
@@ -57568,6 +59557,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -57608,6 +59598,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -57807,6 +59798,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -57847,6 +59839,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -58036,6 +60029,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -58076,6 +60070,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -58418,6 +60413,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -58458,6 +60454,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -58796,6 +60793,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -58836,6 +60834,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -59035,6 +61034,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -59075,6 +61075,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -60158,6 +62159,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
@@ -60198,6 +62200,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
@@ -60403,6 +62406,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
@@ -60443,6 +62447,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
@@ -60482,6 +62487,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationCreateNestedManyWithoutCommunityInput
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -60522,6 +62528,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUncheckedCreateNestedManyWithoutCommunityInput
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -60578,6 +62585,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUpdateManyWithoutCommunityNestedInput
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -60618,6 +62626,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUncheckedUpdateManyWithoutCommunityNestedInput
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -60658,6 +62667,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationCreateNestedManyWithoutCommunityInput
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
@@ -60698,6 +62708,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUncheckedCreateNestedManyWithoutCommunityInput
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
@@ -60754,6 +62765,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUpdateManyWithoutCommunityNestedInput
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -60794,6 +62806,7 @@ export namespace Prisma {
     memberLocations?: MemberLocationUncheckedUpdateManyWithoutCommunityNestedInput
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
@@ -60978,6 +62991,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
   }
@@ -61018,6 +63032,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
     securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
   }
@@ -61223,6 +63238,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
   }
@@ -61263,6 +63279,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
   }
@@ -62173,6 +64190,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
@@ -62213,6 +64231,7 @@ export namespace Prisma {
     securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
     securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput

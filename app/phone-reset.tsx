@@ -14,6 +14,42 @@ import { useRouter } from 'expo-router';
 import PhoneInput from 'react-native-phone-number-input';
 import { ArrowLeft, Phone, KeyRound, Lock } from 'lucide-react-native';
 import { useAuth } from '../src/context/AuthContext';
+import { THEME_COLORS } from '../src/theme/colors';
+
+const TYPE_SCALE = {
+  xs: 11,
+  sm: 12,
+  md: 13,
+  lg: 14,
+  xl: 18,
+  hero: 24,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xxs: 4,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 20,
+  xl: 24,
+  xxl: 32,
+};
+const RADIUS = {
+  md: 12,
+  lg: 16,
+  xl: 20,
+};
+const LETTER_SPACING = {
+  normal: 1,
+  otp: 8,
+};
 
 type Step = 'phone' | 'otp' | 'done';
 
@@ -77,33 +113,33 @@ export default function PhoneResetScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: THEME_COLORS.white }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', padding: SPACE.md, gap: SPACE.sm }}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={{ padding: 8, borderRadius: 12, backgroundColor: '#f5f5f5' }}
+          style={{ padding: SPACE.xs, borderRadius: RADIUS.md, backgroundColor: THEME_COLORS.surfaceContainerLow }}
         >
-          <ArrowLeft size={20} color="#0d3d47" />
+          <ArrowLeft size={20} color={THEME_COLORS.primary} />
         </TouchableOpacity>
-        <Text style={{ fontSize: 18, fontWeight: '800', color: '#0d3d47' }}>Reset Password via SMS</Text>
+        <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary }}>Reset Password via SMS</Text>
       </View>
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <ScrollView contentContainerStyle={{ padding: 24, gap: 16 }} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={{ padding: SPACE.xl, gap: SPACE.md }} keyboardShouldPersistTaps="handled">
           {error && (
-            <View style={{ backgroundColor: '#fef2f2', borderColor: '#fecaca', borderWidth: 1, borderRadius: 16, padding: 12 }}>
-              <Text style={{ color: '#dc2626', fontSize: 12, fontWeight: '600', textAlign: 'center' }}>{error}</Text>
+            <View style={{ backgroundColor: THEME_COLORS.errorSurface, borderColor: THEME_COLORS.errorBorder, borderWidth: 1, borderRadius: RADIUS.lg, padding: SPACE.sm }}>
+              <Text style={{ color: THEME_COLORS.error, fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.semibold, textAlign: 'center' }}>{error}</Text>
             </View>
           )}
 
           {step === 'phone' && (
             <>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Phone size={18} color="#0d3d47" />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#0d3d47' }}>Your phone number</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xs }}>
+                <Phone size={18} color={THEME_COLORS.primary} />
+                <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary }}>Your phone number</Text>
               </View>
               <PhoneInput
                 ref={phoneInputRef}
@@ -112,24 +148,24 @@ export default function PhoneResetScreen() {
                 layout="first"
                 onChangeText={setPhoneRaw}
                 onChangeFormattedText={setPhoneFormatted}
-                containerStyle={{ width: '100%', backgroundColor: '#f5f5f5', borderRadius: 20 }}
-                textContainerStyle={{ backgroundColor: '#f5f5f5', borderRadius: 20 }}
-                textInputStyle={{ color: '#0d3d47', fontWeight: '700' }}
-                codeTextStyle={{ color: '#0d3d47', fontWeight: '700' }}
+                containerStyle={{ width: '100%', backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl }}
+                textContainerStyle={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl }}
+                textInputStyle={{ color: THEME_COLORS.primary, fontWeight: FONT_WEIGHT.bold }}
+                codeTextStyle={{ color: THEME_COLORS.primary, fontWeight: FONT_WEIGHT.bold }}
               />
               <TouchableOpacity
                 onPress={handleSendOtp}
                 disabled={loading || !isPhoneValid}
                 style={{
-                  backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center',
+                  backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.xl, paddingVertical: SPACE.md, alignItems: 'center',
                   opacity: loading || !isPhoneValid ? 0.5 : 1,
                 }}
               >
                 {loading
-                  ? <ActivityIndicator color="#fff" />
-                  : <Text style={{ color: '#fff', fontSize: 14, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Send Reset Code</Text>}
+                  ? <ActivityIndicator color={THEME_COLORS.white} />
+                  : <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>Send Reset Code</Text>}
               </TouchableOpacity>
-              <Text style={{ fontSize: 11, color: '#888', textAlign: 'center', marginTop: 8 }}>
+              <Text style={{ fontSize: TYPE_SCALE.xs, color: THEME_COLORS.neutralTextSoft, textAlign: 'center', marginTop: SPACE.xs }}>
                 If your phone is linked to an account with a password, we'll text you a code.
               </Text>
             </>
@@ -137,77 +173,77 @@ export default function PhoneResetScreen() {
 
           {step === 'otp' && (
             <>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <KeyRound size={18} color="#0d3d47" />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#0d3d47' }}>Enter the 6-digit code</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xs }}>
+                <KeyRound size={18} color={THEME_COLORS.primary} />
+                <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary }}>Enter the 6-digit code</Text>
               </View>
-              <Text style={{ fontSize: 12, color: '#666' }}>Sent to {phoneFormatted}</Text>
+              <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoftAlt }}>Sent to {phoneFormatted}</Text>
               <TextInput
                 value={otp}
                 onChangeText={(t) => setOtp(t.replace(/\D/g, '').slice(0, 6))}
                 placeholder="000000"
-                placeholderTextColor="#aaa"
+                placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
                 autoComplete="sms-otp"
                 importantForAutofill="yes"
                 maxLength={6}
-                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 24, paddingVertical: 16, fontSize: 24, fontWeight: '800', color: '#1a1a1a', textAlign: 'center', letterSpacing: 8 }}
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.md, fontSize: TYPE_SCALE.hero, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.onSurface, textAlign: 'center', letterSpacing: LETTER_SPACING.otp }}
               />
 
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                <Lock size={18} color="#0d3d47" />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#0d3d47' }}>New password</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xs, marginTop: SPACE.xs }}>
+                <Lock size={18} color={THEME_COLORS.primary} />
+                <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary }}>New password</Text>
               </View>
               <TextInput
                 value={newPassword}
                 onChangeText={setNewPassword}
                 placeholder="New password (min 8 chars)"
-                placeholderTextColor="#aaa"
+                placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
                 secureTextEntry
-                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.md, fontSize: TYPE_SCALE.lg, color: THEME_COLORS.onSurface }}
               />
               <TextInput
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 placeholder="Confirm new password"
-                placeholderTextColor="#aaa"
+                placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
                 secureTextEntry
-                style={{ backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, fontSize: 14, color: '#1a1a1a' }}
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.md, fontSize: TYPE_SCALE.lg, color: THEME_COLORS.onSurface }}
               />
 
               <TouchableOpacity
                 onPress={handleReset}
                 disabled={loading}
                 style={{
-                  backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, alignItems: 'center',
+                  backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.xl, paddingVertical: SPACE.md, alignItems: 'center',
                   opacity: loading ? 0.5 : 1,
                 }}
               >
                 {loading
-                  ? <ActivityIndicator color="#fff" />
-                  : <Text style={{ color: '#fff', fontSize: 14, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Reset Password</Text>}
+                  ? <ActivityIndicator color={THEME_COLORS.white} />
+                  : <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>Reset Password</Text>}
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => { setStep('phone'); setOtp(''); }}>
-                <Text style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Change phone number</Text>
+                <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft, textAlign: 'center' }}>Change phone number</Text>
               </TouchableOpacity>
             </>
           )}
 
           {step === 'done' && (
-            <View style={{ alignItems: 'center', gap: 16, paddingVertical: 32 }}>
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#0d3d47', textAlign: 'center' }}>
+            <View style={{ alignItems: 'center', gap: SPACE.md, paddingVertical: SPACE.xxl }}>
+              <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary, textAlign: 'center' }}>
                 Password updated
               </Text>
-              <Text style={{ fontSize: 13, color: '#666', textAlign: 'center' }}>
+              <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSoftAlt, textAlign: 'center' }}>
                 You can now sign in with your new password.
               </Text>
               <TouchableOpacity
                 onPress={() => router.replace('/landing')}
-                style={{ backgroundColor: '#0d3d47', borderRadius: 20, paddingVertical: 16, paddingHorizontal: 32 }}
+                style={{ backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.xl, paddingVertical: SPACE.md, paddingHorizontal: SPACE.xxl }}
               >
-                <Text style={{ color: '#fff', fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Back to Sign In</Text>
+                <Text style={{ color: THEME_COLORS.white, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>Back to Sign In</Text>
               </TouchableOpacity>
             </View>
           )}

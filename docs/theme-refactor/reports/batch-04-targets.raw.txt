@@ -1,0 +1,280 @@
+src/components/settings/SettingsPage.tsx:101:      case 'ADMIN': return { bg: 'rgba(239,68,68,0.1)', text: '#ef4444', dot: '#ef4444' };
+src/components/settings/SettingsPage.tsx:102:      case 'MODERATOR': return { bg: 'rgba(37,99,235,0.1)', text: '#2563eb', dot: '#2563eb' };
+src/components/settings/SettingsPage.tsx:103:      default: return { bg: 'rgba(22,163,74,0.1)', text: '#0d3d47', dot: '#0d3d47' };
+src/components/settings/SettingsPage.tsx:117:  const ringColor = isLicensed ? '#10b981' : '#dc2626';
+src/components/settings/SettingsPage.tsx:120:    <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+src/components/settings/SettingsPage.tsx:130:        <View style={{ backgroundColor: '#fff', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', padding: 20, gap: 16 }}>
+src/components/settings/SettingsPage.tsx:140:                <Text style={{ fontSize: 20, fontWeight: '700', color: '#1a1a1a', flex: 1 }} numberOfLines={1}>
+src/components/settings/SettingsPage.tsx:148:                  <MapPin size={14} color="#0d3d47" />
+src/components/settings/SettingsPage.tsx:149:                  <Text style={{ fontSize: 13, color: '#4b5563' }}>{currentCommunity?.name}</Text>
+src/components/settings/SettingsPage.tsx:158:                    ? { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)', fg: '#059669' }
+src/components/settings/SettingsPage.tsx:159:                    : { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)', fg: '#d97706' };
+src/components/settings/SettingsPage.tsx:186:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, backgroundColor: 'rgba(37,99,235,0.1)', borderWidth: 1, borderColor: 'rgba(37,99,235,0.2)' }}>
+src/components/settings/SettingsPage.tsx:187:                    <Shield size={11} color="#2563eb" />
+src/components/settings/SettingsPage.tsx:188:                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#2563eb', textTransform: 'uppercase', letterSpacing: 1 }}>Security Responder</Text>
+src/components/settings/SettingsPage.tsx:196:          <View style={{ borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)', paddingTop: 16, gap: 10 }}>
+src/components/settings/SettingsPage.tsx:197:            <Text style={{ fontSize: 10, fontWeight: '700', color: '#0d3d47', textTransform: 'uppercase', letterSpacing: 2 }}>
+src/components/settings/SettingsPage.tsx:205:                padding: 14, backgroundColor: '#f5f5f5', borderRadius: 16, borderWidth: 1,
+src/components/settings/SettingsPage.tsx:206:                borderColor: showCommunitySwitcher ? 'rgba(22,163,74,0.3)' : 'rgba(0,0,0,0.06)',
+src/components/settings/SettingsPage.tsx:212:                  <Text style={{ fontSize: 9, fontWeight: '800', color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>Active Community</Text>
+src/components/settings/SettingsPage.tsx:213:                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a1a', marginTop: 2 }}>
+src/components/settings/SettingsPage.tsx:222:                    style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#0d3d47', borderRadius: 8 }}
+src/components/settings/SettingsPage.tsx:224:                    <Text style={{ fontSize: 9, fontWeight: '800', color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:230:                  <ChevronDown size={20} color="#6b7280" />
+src/components/settings/SettingsPage.tsx:236:              <View style={{ backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+src/components/settings/SettingsPage.tsx:246:                        padding: 14, borderBottomWidth: idx < (communities?.length || 1) - 1 ? 1 : 0, borderBottomColor: 'rgba(0,0,0,0.05)',
+src/components/settings/SettingsPage.tsx:247:                        backgroundColor: isActive ? 'rgba(22,163,74,0.05)' : '#fff',
+src/components/settings/SettingsPage.tsx:253:                          <Text style={{ fontSize: 13, fontWeight: '700', color: isActive ? '#0d3d47' : '#1a1a1a' }}>{c.name}</Text>
+src/components/settings/SettingsPage.tsx:255:                            <Text style={{ fontSize: 9, fontWeight: '800', color: isAdminOrMod ? '#2563eb' : '#0d3d47', textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:262:                              const color = active ? '#059669' : trial ? '#d97706' : '#dc2626';
+src/components/settings/SettingsPage.tsx:272:                      {isActive && <CheckCircle2 size={18} color="#10b981" />}
+src/components/settings/SettingsPage.tsx:283:          <Text style={{ fontSize: 10, fontWeight: '700', color: '#888', textTransform: 'uppercase', letterSpacing: 2, paddingHorizontal: 4, paddingBottom: 6 }}>
+src/components/settings/SettingsPage.tsx:292:              padding: 16, borderRadius: 16, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)',
+src/components/settings/SettingsPage.tsx:296:              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/SettingsPage.tsx:297:                <Lock size={20} color="#0d3d47" />
+src/components/settings/SettingsPage.tsx:299:              <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a1a' }}>My Profile & Account</Text>
+src/components/settings/SettingsPage.tsx:301:            <ChevronRight size={20} color="#9ca3af" />
+src/components/settings/SettingsPage.tsx:307:            padding: 16, borderRadius: 16, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)',
+src/components/settings/SettingsPage.tsx:313:              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/SettingsPage.tsx:314:                <BellRing size={20} color={globalNotificationsEnabled ? '#0d3d47' : '#9ca3af'} />
+src/components/settings/SettingsPage.tsx:317:                <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a1a' }}>Notifications</Text>
+src/components/settings/SettingsPage.tsx:318:                <Text style={{ fontSize: 11, color: '#888' }}>
+src/components/settings/SettingsPage.tsx:327:                trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
+src/components/settings/SettingsPage.tsx:328:                thumbColor="#ffffff"
+src/components/settings/SettingsPage.tsx:332:                  <ChevronRight size={20} color="#9ca3af" />
+src/components/settings/SettingsPage.tsx:351:          <View style={{ backgroundColor: '#1e5667', borderRadius: 24, padding: 20, gap: 16 }}>
+src/components/settings/SettingsPage.tsx:353:              <Text style={{ fontSize: 18, fontWeight: '800', color: '#fff', flex: 1 }} numberOfLines={1}>
+src/components/settings/SettingsPage.tsx:359:                borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
+src/components/settings/SettingsPage.tsx:360:                backgroundColor: 'rgba(245,158,11,0.25)',
+src/components/settings/SettingsPage.tsx:363:                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#fcd34d' }} />
+src/components/settings/SettingsPage.tsx:364:                <Text style={{ fontSize: 10, fontWeight: '800', color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:370:            <View style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', gap: 8 }}>
+src/components/settings/SettingsPage.tsx:372:                <Sparkles size={18} color="#fcd34d" />
+src/components/settings/SettingsPage.tsx:374:                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>Unlock Full Potential</Text>
+src/components/settings/SettingsPage.tsx:375:                  <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 4, lineHeight: 17 }}>
+src/components/settings/SettingsPage.tsx:382:                style={{ backgroundColor: '#fff', paddingVertical: 12, borderRadius: 14, alignItems: 'center' }}
+src/components/settings/SettingsPage.tsx:384:                <Text style={{ fontSize: 12, fontWeight: '800', color: '#1e5667', textTransform: 'uppercase', letterSpacing: 1 }}>
+src/components/settings/SettingsPage.tsx:405:              borderColor: '#10b981',
+src/components/settings/SettingsPage.tsx:407:              backgroundColor: 'rgba(16,185,129,0.05)',
+src/components/settings/SettingsPage.tsx:413:            <Plus size={20} color="#10b981" />
+src/components/settings/SettingsPage.tsx:414:            <Text style={{ fontSize: 14, fontWeight: '700', color: '#10b981' }}>Create New Community</Text>
+src/components/auth/LandingPage.tsx:28:    style={{ borderColor: checked ? '#0d3d47' : '#d1d5db', backgroundColor: checked ? '#0d3d47' : 'transparent' }}
+src/components/auth/LandingPage.tsx:220:            <Text className="text-2xl font-black text-[#0d3d47] tracking-tight">lalela</Text>
+src/components/auth/LandingPage.tsx:225:              className="px-4 py-2 rounded-full border border-[#0d3d47]"
+src/components/auth/LandingPage.tsx:227:              <Text className="text-[#0d3d47] font-black text-xs uppercase tracking-widest">Login</Text>
+src/components/auth/LandingPage.tsx:231:              className="px-4 py-2 rounded-full bg-[#0d3d47]"
+src/components/auth/LandingPage.tsx:240:          <Text style={{ fontSize: Platform.OS === 'web' ? 36 : 48, fontWeight: '900', color: '#0d3d47', lineHeight: Platform.OS === 'web' ? 42 : 54, marginBottom: 16 }}>
+src/components/auth/LandingPage.tsx:242:            <Text style={{ color: '#f97316' }}>it's listen, listen, do.</Text>
+src/components/auth/LandingPage.tsx:251:              style={{ backgroundColor: '#fc7127' }}
+src/components/auth/LandingPage.tsx:257:              className="px-6 py-4 bg-[#0d3d47] rounded-2xl"
+src/components/auth/LandingPage.tsx:273:              <Text className="text-3xl font-black text-[#0d3d47] leading-tight">
+src/components/auth/LandingPage.tsx:278:                  <Text className="text-[#0d3d47] text-base font-black">✓</Text>
+src/components/auth/LandingPage.tsx:280:                <Text className="font-bold text-[#0d3d47] text-sm">30 days free for admins</Text>
+src/components/auth/LandingPage.tsx:284:                  <Text className="text-[#fc7127] text-base font-black">+ +</Text>
+src/components/auth/LandingPage.tsx:286:                <Text className="font-bold text-[#0d3d47] text-sm">Unlimited member invites</Text>
+src/components/auth/LandingPage.tsx:293:                <View className="w-20 h-20 rounded-full bg-[#f0fdf4] items-center justify-center">
+src/components/auth/LandingPage.tsx:294:                  <Text className="text-[#0d3d47] text-3xl font-black">@</Text>
+src/components/auth/LandingPage.tsx:296:                <Text className="text-2xl font-black text-[#0d3d47] text-center">Verify Your Email</Text>
+src/components/auth/LandingPage.tsx:299:                  <Text className="font-bold text-[#0d3d47]">{email}</Text>
+src/components/auth/LandingPage.tsx:309:                  className="w-full py-4 bg-[#0d3d47] rounded-2xl items-center"
+src/components/auth/LandingPage.tsx:319:                  <Text className="text-sm font-bold text-[#0d3d47]">
+src/components/auth/LandingPage.tsx:342:                        style={{ color: joinMode === m ? '#0d3d47' : '#9ca3af' }}
+src/components/auth/LandingPage.tsx:353:                    <Users size={18} color="#0d3d47" />
+src/components/auth/LandingPage.tsx:355:                      <Text className="text-sm font-black text-[#0d3d47]">
+src/components/auth/LandingPage.tsx:375:                  <Text className="text-2xl font-black text-[#0d3d47] text-center leading-tight">
+src/components/auth/LandingPage.tsx:393:                      <Text className="text-lg font-black text-[#0d3d47]">Verify Your Number</Text>
+src/components/auth/LandingPage.tsx:411:                        className="w-full px-6 py-4 bg-gray-100 rounded-2xl font-bold text-center tracking-widest text-2xl text-[#0d3d47]"
+src/components/auth/LandingPage.tsx:412:                        placeholderTextColor="#9ca3af"
+src/components/auth/LandingPage.tsx:419:                      style={{ backgroundColor: '#fc7127', opacity: isSubmitting || otpCode.length !== 6 ? 0.5 : 1 }}
+src/components/auth/LandingPage.tsx:446:                            className="px-4 py-3 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
+src/components/auth/LandingPage.tsx:447:                            placeholderTextColor="#9ca3af"
+src/components/auth/LandingPage.tsx:456:                            className="px-4 py-3 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
+src/components/auth/LandingPage.tsx:457:                            placeholderTextColor="#9ca3af"
+src/components/auth/LandingPage.tsx:475:                        className="px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
+src/components/auth/LandingPage.tsx:476:                        placeholderTextColor="#9ca3af"
+src/components/auth/LandingPage.tsx:498:                          <Text className="font-bold text-[#0d3d47]">{countryCode}</Text>
+src/components/auth/LandingPage.tsx:506:                          className="flex-1 px-4 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
+src/components/auth/LandingPage.tsx:507:                          placeholderTextColor="#9ca3af"
+src/components/auth/LandingPage.tsx:524:                            className="flex-1 px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47] pr-12"
+src/components/auth/LandingPage.tsx:525:                            placeholderTextColor="#9ca3af"
+src/components/auth/LandingPage.tsx:528:                            <Text className="text-xs font-bold text-[#9ca3af]">{showPassword ? 'Hide' : 'Show'}</Text>
+src/components/auth/LandingPage.tsx:536:                            <Text className="text-xs font-bold text-[#0d3d47]">Forgot password?</Text>
+src/components/auth/LandingPage.tsx:554:                            className="flex-1 px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47] pr-12"
+src/components/auth/LandingPage.tsx:555:                            placeholderTextColor="#9ca3af"
+src/components/auth/LandingPage.tsx:558:                            <Text className="text-xs font-bold text-[#9ca3af]">{showConfirmPassword ? 'Hide' : 'Show'}</Text>
+src/components/auth/LandingPage.tsx:568:                        <Text className="text-[#0d3d47]">Terms & Conditions</Text>
+src/components/auth/LandingPage.tsx:570:                        <Text className="text-[#0d3d47]">Privacy Policy</Text>.
+src/components/auth/LandingPage.tsx:579:                      style={{ backgroundColor: '#fc7127', opacity: isSubmitting ? 0.5 : 1 }}
+src/components/auth/LandingPage.tsx:602:          <View className="bg-[#0d3d47] px-6 py-12">
+src/components/auth/LandingPage.tsx:631:            <Text className="text-lg font-black text-[#0d3d47] mb-4 text-center">Select Country Code</Text>
+src/components/auth/LandingPage.tsx:638:                <Text className="font-bold text-base" style={{ color: countryCode === code ? '#0d3d47' : '#374151' }}>
+src/components/auth/LandingPage.tsx:663:                  <Text className="text-[#0d3d47] text-2xl font-black">@</Text>
+src/components/auth/LandingPage.tsx:665:                <Text className="text-2xl font-black text-[#0d3d47] text-center">Check Your Email</Text>
+src/components/auth/LandingPage.tsx:668:                  <Text className="font-bold text-[#0d3d47]">{forgotEmail}</Text>
+src/components/auth/LandingPage.tsx:675:                  className="w-full py-4 bg-[#0d3d47] rounded-2xl items-center"
+src/components/auth/LandingPage.tsx:683:                  <Text className="text-2xl font-black text-[#0d3d47] text-center">Reset Password</Text>
+src/components/auth/LandingPage.tsx:697:                      className="px-5 py-4 bg-gray-100 rounded-2xl font-bold text-[#0d3d47]"
+src/components/auth/LandingPage.tsx:698:                      placeholderTextColor="#9ca3af"
+src/components/auth/LandingPage.tsx:710:                    style={{ backgroundColor: '#fc7127', opacity: forgotSubmitting || !forgotEmail ? 0.5 : 1 }}
+src/components/auth/LandingPage.tsx:721:                    <Text className="text-sm font-bold text-[#0d3d47] underline">Reset via SMS instead</Text>
+src/components/home/HomePage.tsx:87:    case 'emergency': return '#fef2f2';
+src/components/home/HomePage.tsx:88:    case 'warning':   return '#fffbeb';
+src/components/home/HomePage.tsx:89:    case 'info':      return '#eff6ff';
+src/components/home/HomePage.tsx:90:    case 'general':   return '#f0fdf4';
+src/components/home/HomePage.tsx:91:    default:          return '#f9fafb';
+src/components/home/HomePage.tsx:97:    case 'emergency': return '#fca5a5';
+src/components/home/HomePage.tsx:98:    case 'warning':   return '#fcd34d';
+src/components/home/HomePage.tsx:99:    case 'info':      return '#93c5fd';
+src/components/home/HomePage.tsx:100:    case 'general':   return '#ffddb9';
+src/components/home/HomePage.tsx:101:    default:          return '#e5e7eb';
+src/components/home/HomePage.tsx:107:    case 'emergency': return '#dc2626';
+src/components/home/HomePage.tsx:108:    case 'warning':   return '#d97706';
+src/components/home/HomePage.tsx:109:    case 'info':      return '#2563eb';
+src/components/home/HomePage.tsx:110:    case 'general':   return '#0d3d47';
+src/components/home/HomePage.tsx:111:    default:          return '#6b7280';
+src/components/home/HomePage.tsx:539:      color: '#d97706',
+src/components/home/HomePage.tsx:545:      color: '#2563eb',
+src/components/home/HomePage.tsx:551:      color: '#0d3d47',
+src/components/home/HomePage.tsx:602:                    ? '#dc2626'
+src/components/home/HomePage.tsx:603:                    : '#f59e0b',
+src/components/home/HomePage.tsx:645:                <MoreVertical size={16} color="#6b7280" />
+src/components/home/HomePage.tsx:664:                          <Tag size={14} color="#0d3d47" />
+src/components/home/HomePage.tsx:678:                        <AlertTriangle size={14} color="#dc2626" />
+src/components/home/HomePage.tsx:690:                    <Share2 size={14} color="#6b7280" />
+src/components/home/HomePage.tsx:734:              <MapPin size={10} color="#0d3d47" />
+src/components/home/HomePage.tsx:787:                  <Siren size={16} color="#dc2626" />
+src/components/home/HomePage.tsx:795:                <MessageSquare size={16} color="#0d3d47" />
+src/components/home/HomePage.tsx:815:                <MoreVertical size={14} color="#6b7280" />
+src/components/home/HomePage.tsx:834:                          <Tag size={14} color="#0d3d47" />
+src/components/home/HomePage.tsx:848:                        <AlertTriangle size={14} color="#dc2626" />
+src/components/home/HomePage.tsx:860:                    <Share2 size={14} color="#6b7280" />
+src/components/home/HomePage.tsx:904:              <MapPin size={10} color="#0d3d47" />
+src/components/home/HomePage.tsx:951:              <MessageSquare size={14} color="#0d3d47" />
+src/components/home/HomePage.tsx:1010:                <MoreVertical size={14} color="#6b7280" />
+src/components/home/HomePage.tsx:1026:                      <Tag size={14} color="#0d3d47" />
+src/components/home/HomePage.tsx:1041:                      <AlertTriangle size={14} color="#dc2626" />
+src/components/home/HomePage.tsx:1057:                      <CheckCircle2 size={14} color="#059669" />
+src/components/home/HomePage.tsx:1072:                      <Share2 size={14} color="#6b7280" />
+src/components/home/HomePage.tsx:1097:                  <Heart size={10} color="#4f46e5" />
+src/components/home/HomePage.tsx:1121:                <MapPin size={14} color="#4f46e5" />
+src/components/home/HomePage.tsx:1155:              <MessageSquare size={14} color="#0d3d47" />
+src/components/home/HomePage.tsx:1173:        style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+src/components/home/HomePage.tsx:1177:            <AlertTriangle size={28} color="#dc2626" />
+src/components/home/HomePage.tsx:1217:        style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+src/components/home/HomePage.tsx:1266:        style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+src/components/home/HomePage.tsx:1270:            <Siren size={32} color="#dc2626" />
+src/components/home/HomePage.tsx:1293:              <MessageSquare size={18} color="#fff" />
+src/components/home/HomePage.tsx:1356:            style={{ backgroundColor: '#fc7127' }}
+src/components/home/HomePage.tsx:1360:              color="#fff"
+src/components/home/HomePage.tsx:1361:              fill={isEmergencyActive ? '#fff' : 'transparent'}
+src/components/home/HomePage.tsx:1381:              style={{ backgroundColor: '#1e5667' }}
+src/components/home/HomePage.tsx:1383:              <Plus size={20} color="#fff" />
+src/components/home/HomePage.tsx:1396:                <AlertTriangle size={14} color="#fff" fill="#fff" />
+src/components/home/HomePage.tsx:1484:              <ArrowRight size={14} color="#1e5667" />
+src/components/home/HomePage.tsx:1491:                <Shield size={28} color="#10b981" />
+src/components/home/HomePage.tsx:1578:                      <Heart size={20} color="#9ca3af" />
+src/components/home/HomePage.tsx:1673:                <ArrowRight size={14} color="#1e5667" />
+src/components/settings/NotificationSettingsPage.tsx:113:    if (!override) return { label: 'Follows global', color: '#9ca3af' };
+src/components/settings/NotificationSettingsPage.tsx:116:    if (onCount === 0) return { label: 'Muted', color: '#ef4444' };
+src/components/settings/NotificationSettingsPage.tsx:117:    if (onCount === types.length) return { label: 'All on', color: '#0d3d47' };
+src/components/settings/NotificationSettingsPage.tsx:118:    return { label: `${onCount} of ${types.length} on`, color: '#f59e0b' };
+src/components/settings/NotificationSettingsPage.tsx:122:    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+src/components/settings/NotificationSettingsPage.tsx:134:            style={{ padding: 8, borderRadius: 12, backgroundColor: '#f5f5f5' }}
+src/components/settings/NotificationSettingsPage.tsx:136:            <ArrowLeft size={20} color="#1a1a1a" />
+src/components/settings/NotificationSettingsPage.tsx:139:            <Text style={{ fontSize: 22, fontWeight: '700', color: '#1a1a1a' }}>Notification Settings</Text>
+src/components/settings/NotificationSettingsPage.tsx:140:            <Text style={{ fontSize: 13, color: '#888' }}>Manage how you receive notifications</Text>
+src/components/settings/NotificationSettingsPage.tsx:143:            <ActivityIndicator size="small" color="#0d3d47" />
+src/components/settings/NotificationSettingsPage.tsx:148:        <View style={{ backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 20, padding: 18, borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)', flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
+src/components/settings/NotificationSettingsPage.tsx:149:          <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(239,68,68,0.2)', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/settings/NotificationSettingsPage.tsx:150:            <ShieldAlert size={20} color="#ef4444" />
+src/components/settings/NotificationSettingsPage.tsx:153:            <Text style={{ fontSize: 16, fontWeight: '700', color: '#ef4444' }}>Emergency Notifications</Text>
+src/components/settings/NotificationSettingsPage.tsx:154:            <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 4, lineHeight: 18 }}>
+src/components/settings/NotificationSettingsPage.tsx:161:        <View style={{ backgroundColor: '#fff', borderRadius: 20, padding: 18, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+src/components/settings/NotificationSettingsPage.tsx:163:            <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: prefs.globalEnabled ? 'rgba(22,163,74,0.1)' : 'rgba(107,114,128,0.1)', alignItems: 'center', justifyContent: 'center' }}>
+src/components/settings/NotificationSettingsPage.tsx:164:              <Bell size={20} color={prefs.globalEnabled ? '#0d3d47' : '#9ca3af'} />
+src/components/settings/NotificationSettingsPage.tsx:167:              <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a1a' }}>All Notifications</Text>
+src/components/settings/NotificationSettingsPage.tsx:168:              <Text style={{ fontSize: 11, color: '#888' }}>
+src/components/settings/NotificationSettingsPage.tsx:176:            trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
+src/components/settings/NotificationSettingsPage.tsx:177:            thumbColor="#ffffff"
+src/components/settings/NotificationSettingsPage.tsx:182:        <View style={{ backgroundColor: '#fff', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', gap: 16, opacity: prefs.globalEnabled ? 1 : 0.5 }}>
+src/components/settings/NotificationSettingsPage.tsx:184:            <Text style={{ fontSize: 18, fontWeight: '700', color: '#1a1a1a' }}>Notification Types</Text>
+src/components/settings/NotificationSettingsPage.tsx:185:            <Text style={{ fontSize: 12, color: '#888', marginTop: 4 }}>Default settings applied to all communities unless overridden below</Text>
+src/components/settings/NotificationSettingsPage.tsx:200:                  backgroundColor: enabled ? 'rgba(22,163,74,0.05)' : '#f5f5f5',
+src/components/settings/NotificationSettingsPage.tsx:201:                  borderColor: enabled ? 'rgba(22,163,74,0.2)' : 'rgba(0,0,0,0.06)',
+src/components/settings/NotificationSettingsPage.tsx:205:                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: enabled ? 'rgba(22,163,74,0.1)' : 'rgba(107,114,128,0.1)', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/settings/NotificationSettingsPage.tsx:206:                    <Icon size={20} color={enabled ? '#0d3d47' : '#9ca3af'} />
+src/components/settings/NotificationSettingsPage.tsx:209:                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#1a1a1a' }}>{item.label}</Text>
+src/components/settings/NotificationSettingsPage.tsx:210:                    <Text style={{ fontSize: 11, color: '#888' }} numberOfLines={1}>{item.description}</Text>
+src/components/settings/NotificationSettingsPage.tsx:216:                  trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
+src/components/settings/NotificationSettingsPage.tsx:217:                  thumbColor="#ffffff"
+src/components/settings/NotificationSettingsPage.tsx:227:          <View style={{ backgroundColor: '#fff', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', gap: 14, opacity: prefs.globalEnabled ? 1 : 0.5 }}>
+src/components/settings/NotificationSettingsPage.tsx:229:              <Text style={{ fontSize: 18, fontWeight: '700', color: '#1a1a1a' }}>Community Settings</Text>
+src/components/settings/NotificationSettingsPage.tsx:230:              <Text style={{ fontSize: 12, color: '#888', marginTop: 4, lineHeight: 18 }}>
+src/components/settings/NotificationSettingsPage.tsx:247:                      borderColor: isExpanded ? 'rgba(22,163,74,0.2)' : 'rgba(0,0,0,0.06)',
+src/components/settings/NotificationSettingsPage.tsx:248:                      backgroundColor: isExpanded ? 'rgba(22,163,74,0.05)' : '#f5f5f5',
+src/components/settings/NotificationSettingsPage.tsx:257:                      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(37,99,235,0.1)', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/settings/NotificationSettingsPage.tsx:258:                        <Bell size={16} color="#2563eb" />
+src/components/settings/NotificationSettingsPage.tsx:261:                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#1a1a1a' }} numberOfLines={1}>{community.name}</Text>
+src/components/settings/NotificationSettingsPage.tsx:265:                        <ChevronDown size={16} color="#9ca3af" />
+src/components/settings/NotificationSettingsPage.tsx:271:                      <View style={{ borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)', paddingHorizontal: 14, paddingVertical: 12, gap: 6 }}>
+src/components/settings/NotificationSettingsPage.tsx:273:                          <Text style={{ fontSize: 11, color: '#888', fontStyle: 'italic', marginBottom: 6 }}>
+src/components/settings/NotificationSettingsPage.tsx:291:                                backgroundColor: effectiveValue ? 'rgba(22,163,74,0.05)' : '#fff',
+src/components/settings/NotificationSettingsPage.tsx:295:                                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: effectiveValue ? 'rgba(22,163,74,0.1)' : 'rgba(107,114,128,0.1)', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+src/components/settings/NotificationSettingsPage.tsx:296:                                  <Icon size={16} color={effectiveValue ? '#0d3d47' : '#9ca3af'} />
+src/components/settings/NotificationSettingsPage.tsx:299:                                  <Text style={{ fontSize: 13, fontWeight: '500', color: '#1a1a1a' }}>{item.label}</Text>
+src/components/settings/NotificationSettingsPage.tsx:301:                                    <Text style={{ fontSize: 10, color: '#f59e0b' }}>Overriding global</Text>
+src/components/settings/NotificationSettingsPage.tsx:308:                                trackColor={{ false: '#d1d5db', true: '#0d3d47' }}
+src/components/settings/NotificationSettingsPage.tsx:309:                                thumbColor="#ffffff"
+src/components/settings/NotificationSettingsPage.tsx:323:                            <Text style={{ fontSize: 12, color: '#888' }}>Reset to global defaults</Text>
+src/components/admin/BenefitsPricingPage.tsx:24:const PRIMARY = '#0d3d47';
+src/components/admin/BenefitsPricingPage.tsx:25:const SECONDARY = '#7c3aed';
+src/components/admin/BenefitsPricingPage.tsx:26:const ERROR = '#dc2626';
+src/components/admin/BenefitsPricingPage.tsx:122:        <Check size={16} color="#fc7127" />
+src/components/admin/BenefitsPricingPage.tsx:128:      <Text style={[styles.tableValue, isLicensed && { color: '#fc7127' }]}>
+src/components/admin/BenefitsPricingPage.tsx:174:              <Crown size={28} color="#fc7127" />
+src/components/admin/BenefitsPricingPage.tsx:186:                <Check size={14} color="#fc7127" />
+src/components/admin/BenefitsPricingPage.tsx:205:                <Check size={14} color="#fc7127" />
+src/components/admin/BenefitsPricingPage.tsx:314:  container: { flex: 1, backgroundColor: '#fff' },
+src/components/admin/BenefitsPricingPage.tsx:316:    backgroundColor: 'rgba(255,255,255,0.9)',
+src/components/admin/BenefitsPricingPage.tsx:318:    borderBottomColor: 'rgba(0,0,0,0.06)',
+src/components/admin/BenefitsPricingPage.tsx:346:    color: '#64748b',
+src/components/admin/BenefitsPricingPage.tsx:364:    color: '#fff',
+src/components/admin/BenefitsPricingPage.tsx:371:    backgroundColor: '#f0fdf4',
+src/components/admin/BenefitsPricingPage.tsx:388:    borderColor: 'rgba(34,197,94,0.3)',
+src/components/admin/BenefitsPricingPage.tsx:390:    backgroundColor: '#f8fafc',
+src/components/admin/BenefitsPricingPage.tsx:392:    shadowColor: '#fc7127',
+src/components/admin/BenefitsPricingPage.tsx:403:    backgroundColor: 'rgba(34,197,94,0.1)',
+src/components/admin/BenefitsPricingPage.tsx:412:    color: '#fc7127',
+src/components/admin/BenefitsPricingPage.tsx:423:    backgroundColor: 'rgba(34,197,94,0.1)',
+src/components/admin/BenefitsPricingPage.tsx:429:  featureText: { flex: 1, fontSize: 13, color: '#475569', fontWeight: '500', lineHeight: 20 },
+src/components/admin/BenefitsPricingPage.tsx:430:  divider: { height: 1, backgroundColor: 'rgba(0,0,0,0.06)', marginVertical: 8 },
+src/components/admin/BenefitsPricingPage.tsx:434:    backgroundColor: '#f8fafc',
+src/components/admin/BenefitsPricingPage.tsx:442:    backgroundColor: 'rgba(255,255,255,0.8)',
+src/components/admin/BenefitsPricingPage.tsx:447:    borderColor: '#f1f5f9',
+src/components/admin/BenefitsPricingPage.tsx:449:  ruleCardTitle: { fontSize: 14, fontWeight: '700', color: '#0f172a' },
+src/components/admin/BenefitsPricingPage.tsx:450:  ruleCardBullet: { fontSize: 12, color: '#475569', fontWeight: '500', lineHeight: 18 },
+src/components/admin/BenefitsPricingPage.tsx:451:  ruleCardDesc: { fontSize: 12, color: '#475569', fontWeight: '500', lineHeight: 18 },
+src/components/admin/BenefitsPricingPage.tsx:455:    backgroundColor: 'rgba(255,255,255,0.8)',
+src/components/admin/BenefitsPricingPage.tsx:460:    borderColor: '#f1f5f9',
+src/components/admin/BenefitsPricingPage.tsx:465:    color: '#94a3b8',
+src/components/admin/BenefitsPricingPage.tsx:469:  ruleGridValue: { fontSize: 12, fontWeight: '700', color: '#0f172a', lineHeight: 17 },
+src/components/admin/BenefitsPricingPage.tsx:482:    backgroundColor: '#fff',
+src/components/admin/BenefitsPricingPage.tsx:486:    borderColor: 'rgba(0,0,0,0.06)',
+src/components/admin/BenefitsPricingPage.tsx:487:    shadowColor: '#000',
+src/components/admin/BenefitsPricingPage.tsx:497:    backgroundColor: 'rgba(22,163,74,0.05)',
+src/components/admin/BenefitsPricingPage.tsx:505:  benefitDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(22,163,74,0.3)' },
+src/components/admin/BenefitsPricingPage.tsx:506:  benefitBulletText: { fontSize: 12, color: '#475569', fontWeight: '500', flex: 1, lineHeight: 18 },
+src/components/admin/BenefitsPricingPage.tsx:514:    borderColor: 'rgba(0,0,0,0.06)',
+src/components/admin/BenefitsPricingPage.tsx:516:    backgroundColor: '#fff',
+src/components/admin/BenefitsPricingPage.tsx:517:    shadowColor: '#000',
+src/components/admin/BenefitsPricingPage.tsx:525:    backgroundColor: '#f8fafc',
+src/components/admin/BenefitsPricingPage.tsx:529:    borderBottomColor: 'rgba(0,0,0,0.06)',
+src/components/admin/BenefitsPricingPage.tsx:534:    color: '#94a3b8',
+src/components/admin/BenefitsPricingPage.tsx:544:    borderBottomColor: '#f8fafc',
+src/components/admin/BenefitsPricingPage.tsx:546:  tableRowAlt: { backgroundColor: '#fafafa' },
+src/components/admin/BenefitsPricingPage.tsx:547:  tableCell: { fontSize: 12, fontWeight: '700', color: '#0f172a' },
+src/components/admin/BenefitsPricingPage.tsx:552:    color: '#94a3b8',
+src/components/admin/BenefitsPricingPage.tsx:570:  finalCtaTitle: { fontSize: 24, fontWeight: '900', color: '#fff', textAlign: 'center' },
+src/components/admin/BenefitsPricingPage.tsx:573:    color: 'rgba(255,255,255,0.8)',
+src/components/admin/BenefitsPricingPage.tsx:579:    backgroundColor: '#fff',
+src/components/admin/BenefitsPricingPage.tsx:583:    shadowColor: '#000',

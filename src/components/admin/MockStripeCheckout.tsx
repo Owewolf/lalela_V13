@@ -14,8 +14,51 @@ import { useAuth } from '../../context/AuthContext';
 import { accountService } from '../../services/accountService';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import api from '../../lib/api';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
+const PRIMARY = THEME_COLORS.primary;
+const TYPE_SCALE = {
+  xs: 10,
+  sm: 11,
+  md: 14,
+  lg: 15,
+  xl: 16,
+  xxl: 18,
+  title: 20,
+  hero: 24,
+  price: 40,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const LINE_HEIGHT = {
+  body: 20,
+} as const;
+const LETTER_SPACING = {
+  normal: 1,
+  wide: 1.5,
+  ultra: 2,
+} as const;
+const SPACE = {
+  xxs: 4,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 20,
+  xl: 24,
+  xxl: 32,
+};
+const RADIUS = {
+  lg: 16,
+  xl: 24,
+  full: 40,
+};
 
 interface MockStripeCheckoutProps {
   type?: 'membership' | 'community';
@@ -94,7 +137,7 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
       <View style={[styles.successContainer, { paddingTop: insets.top }]}>
         <View style={styles.successInner}>
           <View style={styles.successIconCircle}>
-            <CheckCircle2 size={40} color="#fff" />
+            <CheckCircle2 size={40} color={THEME_COLORS.white} />
           </View>
           <Text style={styles.successTitle}>Payment Successful</Text>
           <Text style={styles.successMsg}>Redirecting back to Lalela...</Text>
@@ -115,10 +158,10 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
               disabled={loading}
               activeOpacity={0.7}
             >
-              <ArrowLeft size={24} color="rgba(255,255,255,0.8)" />
+              <ArrowLeft size={24} color={THEME_COLORS.whiteOverlay80} />
             </TouchableOpacity>
             <View style={styles.headerIcon}>
-              <CreditCard size={32} color="#fff" />
+              <CreditCard size={32} color={THEME_COLORS.white} />
             </View>
             <Text style={styles.headerTitle}>Lalela Checkout (Mock)</Text>
             <Text style={styles.headerSub}>TEST ENVIRONMENT</Text>
@@ -144,7 +187,7 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
             >
               {loading ? (
                 <>
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={THEME_COLORS.white} />
                   <Text style={styles.payBtnText}>Processing...</Text>
                 </>
               ) : (
@@ -167,153 +210,145 @@ export default MockStripeCheckout;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: THEME_COLORS.neutralBg,
   },
   scroll: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: SPACE.xl,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 24,
+    backgroundColor: THEME_COLORS.white,
+    borderRadius: RADIUS.xl,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 8,
+    ...createShadow(THEME_COLORS.black, 0, 8, 0.12, 24, 8),
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
+    borderColor: THEME_COLORS.overlayBorderSoft,
   },
   cardHeader: {
     backgroundColor: PRIMARY,
-    padding: 24,
+    padding: SPACE.xl,
     alignItems: 'center',
     position: 'relative',
   },
   backBtn: {
     position: 'absolute',
-    left: 20,
-    top: 20,
-    padding: 4,
+    left: SPACE.lg,
+    top: SPACE.lg,
+    padding: SPACE.xxs,
   },
   headerIcon: {
     width: 64,
     height: 64,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 16,
+    backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_15,
+    borderRadius: RADIUS.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: SPACE.sm,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: TYPE_SCALE.title,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.white,
   },
   headerSub: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.7)',
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginTop: 4,
+    fontSize: TYPE_SCALE.xs,
+    color: THEME_COLORS.whiteOverlay70,
+    fontWeight: FONT_WEIGHT.bold,
+    letterSpacing: LETTER_SPACING.ultra,
+    marginTop: SPACE.xxs,
   },
   cardBody: {
-    padding: 32,
+    padding: SPACE.xxl,
     alignItems: 'center',
-    gap: 12,
+    gap: SPACE.sm,
   },
   productTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#0f172a',
+    fontSize: TYPE_SCALE.xxl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextStrong,
     textAlign: 'center',
   },
   productDesc: {
-    fontSize: 14,
-    color: '#64748b',
+    fontSize: TYPE_SCALE.md,
+    color: THEME_COLORS.neutralTextSubtle,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: LINE_HEIGHT.body,
   },
   priceDivider: {
     height: 1,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: THEME_COLORS.neutralBgSoft,
     alignSelf: 'stretch',
-    marginVertical: 4,
+    marginVertical: SPACE.xxs,
   },
   priceAmount: {
-    fontSize: 40,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.price,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
   },
   priceLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#94a3b8',
-    letterSpacing: 1.5,
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextMuted,
+    letterSpacing: LETTER_SPACING.wide,
     textTransform: 'uppercase',
   },
   payBtn: {
     backgroundColor: PRIMARY,
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: RADIUS.lg,
+    paddingVertical: SPACE.md,
     alignSelf: 'stretch',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    gap: 8,
-    shadowColor: PRIMARY,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
-    marginTop: 8,
+    gap: SPACE.xs,
+    ...createShadow(PRIMARY, 0, 4, 0.3, 12, 6),
+    marginTop: SPACE.xs,
   },
   payBtnDisabled: {
     opacity: 0.5,
   },
   payBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '900',
+    color: THEME_COLORS.white,
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.black,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
   disclaimer: {
-    fontSize: 10,
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.xs,
+    color: THEME_COLORS.neutralTextMuted,
     textAlign: 'center',
-    lineHeight: 16,
-    marginTop: 4,
+    lineHeight: TYPE_SCALE.xl,
+    marginTop: SPACE.xxs,
   },
   successContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: THEME_COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: SPACE.xl,
   },
   successInner: {
     alignItems: 'center',
-    gap: 16,
+    gap: SPACE.md,
   },
   successIconCircle: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    backgroundColor: '#fc7127',
+    borderRadius: RADIUS.full,
+    backgroundColor: THEME_COLORS.secondaryContainer,
     alignItems: 'center',
     justifyContent: 'center',
   },
   successTitle: {
-    fontSize: 24,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.hero,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
   },
   successMsg: {
-    fontSize: 15,
-    color: '#64748b',
-    fontWeight: '500',
+    fontSize: TYPE_SCALE.lg,
+    color: THEME_COLORS.neutralTextSubtle,
+    fontWeight: FONT_WEIGHT.medium,
   },
 });

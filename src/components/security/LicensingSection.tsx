@@ -4,8 +4,51 @@ import { CreditCard, ShieldAlert, Star, Calendar, CheckCircle2 } from 'lucide-re
 import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 import { useRouter } from 'expo-router';
+import { THEME_COLORS } from '../../theme/colors';
 
-const PRIMARY = '#0d3d47';
+const PRIMARY = THEME_COLORS.primary;
+const TYPE_SCALE = {
+  xs: 9,
+  sm: 10,
+  md: 11,
+  lg: 13,
+  xl: 18,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xxs: 2,
+  xs: 4,
+  sm: 6,
+  md: 8,
+  lg: 10,
+  xl: 12,
+  xxl: 16,
+  s20: 20,
+  s24: 24,
+  s40: 40,
+  s44: 44,
+};
+const RADIUS = {
+  chip: 6,
+  md: 12,
+  lg: 14,
+  xl: 16,
+  panel: 20,
+  card: 24,
+};
+const LETTER_SPACING = {
+  normal: 1,
+};
+const LINE_HEIGHT = {
+  compact: 16,
+};
 
 export const LicensingSection: React.FC = () => {
   const { userProfile } = useAuth();
@@ -26,9 +69,9 @@ export const LicensingSection: React.FC = () => {
     : null;
 
   const overallStatus = isActive ? 'Active Subscription' : isTrial ? 'Free Trial' : 'Expired';
-  const statusColor = isActive ? '#059669' : isTrial ? '#d97706' : '#dc2626';
-  const statusBg = isActive ? 'rgba(16,185,129,0.1)' : isTrial ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)';
-  const statusBorder = isActive ? 'rgba(16,185,129,0.2)' : isTrial ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.2)';
+  const statusColor = isActive ? THEME_COLORS.successStrongAlt : isTrial ? THEME_COLORS.warning : THEME_COLORS.errorStrong;
+  const statusBg = isActive ? THEME_COLORS.successTintSoftAlt : isTrial ? THEME_COLORS.warningTintSoft : THEME_COLORS.errorTintSoft;
+  const statusBorder = isActive ? THEME_COLORS.successTintStrongAlt : isTrial ? THEME_COLORS.alias_rgba_245_158_11_0_2 : THEME_COLORS.alias_rgba_239_68_68_0_2;
 
   const handleCheckout = (type: 'membership' | 'community', targetId?: string) => {
     let path = `/checkout?type=${type}`;
@@ -38,14 +81,14 @@ export const LicensingSection: React.FC = () => {
 
   const getCommunityStatus = (community: any) => {
     if (community.type === 'ACTIVE' || community.isPaid) {
-      return { label: 'Active', color: '#10b981', bg: 'rgba(16,185,129,0.1)' };
+      return { label: 'Active', color: THEME_COLORS.success, bg: THEME_COLORS.successTintSoftAlt };
     }
     const trialEnd = community.trialExpiresAt ? new Date(community.trialExpiresAt) : null;
     if (!trialEnd || trialEnd < now) {
-      return { label: 'Expired', color: '#ef4444', bg: 'rgba(239,68,68,0.1)' };
+      return { label: 'Expired', color: THEME_COLORS.errorStrong, bg: THEME_COLORS.errorTintSoft };
     }
     const days = Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-    return { label: `Trial (${days}d left)`, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' };
+    return { label: `Trial (${days}d left)`, color: THEME_COLORS.warningStrong, bg: THEME_COLORS.warningTintSoft };
   };
 
   const formatDate = (date: Date | null) => {
@@ -54,60 +97,60 @@ export const LicensingSection: React.FC = () => {
   };
 
   return (
-    <View style={{ backgroundColor: '#fff', borderRadius: 24, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', padding: 24, gap: 20 }}>
+    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.s20 }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={{ width: 40, height: 40, borderRadius: 16, backgroundColor: 'rgba(37,99,235,0.1)', alignItems: 'center', justifyContent: 'center' }}>
-            <CreditCard size={22} color="#2563eb" />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
+          <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.xl, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+            <CreditCard size={22} color={THEME_COLORS.brandBlueText} />
           </View>
-          <Text style={{ fontSize: 18, fontWeight: '700', color: PRIMARY }}>Licensing & Access</Text>
+          <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY }}>Licensing & Access</Text>
         </View>
-        <View style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, backgroundColor: statusBg, borderColor: statusBorder }}>
-          <Text style={{ fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, color: statusColor }}>
+        <View style={{ paddingHorizontal: SPACE.xl, paddingVertical: SPACE.sm, borderRadius: RADIUS.panel, borderWidth: 1, backgroundColor: statusBg, borderColor: statusBorder }}>
+          <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal, color: statusColor }}>
             {overallStatus}
           </Text>
         </View>
       </View>
 
       {/* Membership status card */}
-      <View style={{ backgroundColor: '#f8fafc', borderRadius: 20, padding: 16, gap: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' }}>
-        <Text style={{ fontSize: 11, fontWeight: '800', color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>Platform Membership</Text>
+      <View style={{ backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+        <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>Platform Membership</Text>
         {isActive && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <CheckCircle2 size={16} color="#10b981" />
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
+            <CheckCircle2 size={16} color={THEME_COLORS.success} />
+            <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong }}>
               Active — renews {formatDate(renewalDate)} (R99/year)
             </Text>
           </View>
         )}
         {isTrial && (
-          <View style={{ gap: 6 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Calendar size={14} color="#d97706" />
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>
+          <View style={{ gap: SPACE.sm }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
+              <Calendar size={14} color={THEME_COLORS.warning} />
+              <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong }}>
                 Free trial — {daysLeft} day{daysLeft !== 1 ? 's' : ''} remaining
               </Text>
             </View>
-            <Text style={{ fontSize: 11, color: '#6b7280', lineHeight: 16 }}>
+            <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, lineHeight: LINE_HEIGHT.compact }}>
               Trial ends {formatDate(trialExpiresAt)}. After that, subscribe for R99/year to keep access.
             </Text>
           </View>
         )}
         {isExpired && (
-          <View style={{ gap: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <ShieldAlert size={16} color="#ef4444" />
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#b91c1c' }}>Access expired</Text>
+          <View style={{ gap: SPACE.lg }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
+              <ShieldAlert size={16} color={THEME_COLORS.errorStrong} />
+              <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.aliasHex_b91c1c }}>Access expired</Text>
             </View>
-            <Text style={{ fontSize: 11, color: '#dc2626', lineHeight: 16 }}>
+            <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.errorStrong, lineHeight: LINE_HEIGHT.compact }}>
               Your trial or subscription has ended. Subscribe for R99/year to restore access.
             </Text>
             <TouchableOpacity
               onPress={() => handleCheckout('membership')}
-              style={{ alignSelf: 'flex-start', backgroundColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 }}
+              style={{ alignSelf: 'flex-start', backgroundColor: THEME_COLORS.errorStrong, paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.lg, borderRadius: RADIUS.md }}
             >
-              <Text style={{ fontSize: 10, fontWeight: '800', color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>
+              <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                 Subscribe — R99/year
               </Text>
             </TouchableOpacity>
@@ -116,9 +159,9 @@ export const LicensingSection: React.FC = () => {
         {isTrial && !isActive && (
           <TouchableOpacity
             onPress={() => handleCheckout('membership')}
-            style={{ alignSelf: 'flex-start', backgroundColor: PRIMARY, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 }}
+            style={{ alignSelf: 'flex-start', backgroundColor: PRIMARY, paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.lg, borderRadius: RADIUS.md }}
           >
-            <Text style={{ fontSize: 10, fontWeight: '800', color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>
+            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
               Subscribe Early — R99/year
             </Text>
           </TouchableOpacity>
@@ -127,28 +170,28 @@ export const LicensingSection: React.FC = () => {
 
       {/* Community list */}
       {communities.length > 0 && (
-        <View style={{ gap: 8 }}>
-          <Text style={{ fontSize: 10, fontWeight: '800', color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+        <View style={{ gap: SPACE.md }}>
+          <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
             Community Status
           </Text>
           {communities.map((community) => {
             const statusInfo = getCommunityStatus(community);
             const isOwner = community.ownerId === userProfile?.id;
             return (
-              <View key={community.id} style={{ backgroundColor: '#f5f5f5', borderRadius: 20, padding: 16, gap: 12 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(22,163,74,0.1)', alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ fontSize: 18, fontWeight: '800', color: PRIMARY }}>{community.name.charAt(0)}</Text>
+              <View key={community.id} style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.xl }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
+                  <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.successTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: PRIMARY }}>{community.name.charAt(0)}</Text>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a1a' }}>{community.name}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                      <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, backgroundColor: statusInfo.bg }}>
-                        <Text style={{ fontSize: 9, fontWeight: '800', color: statusInfo.color, textTransform: 'uppercase', letterSpacing: 1 }}>
+                    <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>{community.name}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, marginTop: SPACE.xs }}>
+                      <View style={{ paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, borderRadius: RADIUS.chip, backgroundColor: statusInfo.bg }}>
+                        <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: statusInfo.color, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                           {statusInfo.label}
                         </Text>
                       </View>
-                      <Text style={{ fontSize: 10, fontWeight: '700', color: '#888' }}>
+                      <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft }}>
                         {community.userRole || 'Member'}
                       </Text>
                     </View>
@@ -158,17 +201,17 @@ export const LicensingSection: React.FC = () => {
                 {isOwner && community.type === 'TRIAL' && (
                   <TouchableOpacity
                     onPress={() => handleCheckout('community', community.id)}
-                    style={{ alignSelf: 'flex-start', backgroundColor: PRIMARY, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 }}
+                    style={{ alignSelf: 'flex-start', backgroundColor: PRIMARY, paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.md, borderRadius: RADIUS.md }}
                   >
-                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>
+                    <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                       Activate Community — R999
                     </Text>
                   </TouchableOpacity>
                 )}
                 {community.type === 'ACTIVE' && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <CheckCircle2 size={14} color="#10b981" />
-                    <Text style={{ fontSize: 11, fontWeight: '600', color: '#059669' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm }}>
+                    <CheckCircle2 size={14} color={THEME_COLORS.success} />
+                    <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.successStrongAlt }}>
                       Permanently active {community.activatedAt ? `since ${formatDate(new Date(community.activatedAt))}` : ''}
                     </Text>
                   </View>

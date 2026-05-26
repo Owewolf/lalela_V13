@@ -17,6 +17,8 @@
     "server:dev": "tsx watch server/index.ts",
     "build": "npx expo export --platform web",
     "lint": "tsc --noEmit",
+    "lint:theme-guard": "node scripts/check-hardcoded-colors.js",
+    "audit:theme-noncolor": "node scripts/check-noncolor-style-literals.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",

@@ -25,9 +25,60 @@ import {
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { PostConfirmationModal } from './PostConfirmationModal';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
-const ERROR = '#dc2626';
+const PRIMARY = THEME_COLORS.primary;
+const ERROR = THEME_COLORS.errorStrong;
+const TYPE_SCALE = {
+  xs: 9,
+  sm: 10,
+  md: 11,
+  base: 12,
+  lg: 13,
+  xl: 18,
+  title: 20,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  xxs: 2,
+  xs: 4,
+  sm: 6,
+  md: 8,
+  lg: 10,
+  xl: 12,
+  xxl: 14,
+  s16: 16,
+  s20: 20,
+  s32: 32,
+  s40: 40,
+  s64: 64,
+  s360: 360,
+  s80: 80,
+};
+const RADIUS = {
+  sm: 8,
+  md: 10,
+  lg: 12,
+  xl: 16,
+  round: 20,
+  circle: 32,
+};
+const LETTER_SPACING = {
+  normal: 1,
+  compact: 0.8,
+};
+const LINE_HEIGHT = {
+  body: 18,
+};
 
 interface NotificationCenterProps {
   isOpen: boolean;
@@ -56,7 +107,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const [pendingDeleteTitle, setPendingDeleteTitle] = React.useState('');
   const [isDeleting, setIsDeleting] = React.useState(false);
 
-  const translateX = React.useRef(new Animated.Value(350)).current;
+  const translateX = React.useRef(new Animated.Value(SPACE.s360)).current;
 
   React.useEffect(() => {
     if (isOpen) {
@@ -68,7 +119,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       }).start();
     } else {
       Animated.timing(translateX, {
-        toValue: 350,
+        toValue: SPACE.s360,
         duration: 200,
         useNativeDriver: Platform.OS !== 'web',
       }).start();
@@ -182,24 +233,24 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     switch (type) {
       case 'invitation': return <Mail size={16} color={PRIMARY} />;
       case 'alert': return <AlertTriangle size={16} color={ERROR} />;
-      case 'listing': return <Tag size={16} color="#2563eb" />;
-      case 'notice': return <Megaphone size={16} color="#b45309" />;
-      case 'charity_suggestion': return <HeartHandshake size={16} color="#16a34a" />;
-      case 'system': return <Shield size={16} color="#6750a4" />;
-      default: return <Bell size={16} color="#94a3b8" />;
+      case 'listing': return <Tag size={16} color={THEME_COLORS.brandBlueText} />;
+      case 'notice': return <Megaphone size={16} color={THEME_COLORS.warningText} />;
+      case 'charity_suggestion': return <HeartHandshake size={16} color={THEME_COLORS.successStrong} />;
+      case 'system': return <Shield size={16} color={THEME_COLORS.md3Primary} />;
+      default: return <Bell size={16} color={THEME_COLORS.neutralTextMuted} />;
     }
   };
 
   const getIconBg = (type: string, read: boolean) => {
-    if (read) return '#f8fafc';
+    if (read) return THEME_COLORS.neutralBg;
     switch (type) {
-      case 'invitation': return '#f0fdf4';
-      case 'alert': return '#fef2f2';
-      case 'listing': return '#eff6ff';
-      case 'notice': return '#fffbeb';
-      case 'charity_suggestion': return '#f0fdf4';
-      case 'system': return '#f5f3ff';
-      default: return '#f8fafc';
+      case 'invitation': return THEME_COLORS.successSurface;
+      case 'alert': return THEME_COLORS.errorSurface;
+      case 'listing': return THEME_COLORS.infoSurfaceSoft;
+      case 'notice': return THEME_COLORS.warningSurface;
+      case 'charity_suggestion': return THEME_COLORS.successSurface;
+      case 'system': return THEME_COLORS.brandPurpleSurface;
+      default: return THEME_COLORS.neutralBg;
     }
   };
 
@@ -239,7 +290,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <Text
               style={[
                 styles.notifTitle,
-                { color: notification.read ? '#64748b' : '#0f172a' },
+                { color: notification.read ? THEME_COLORS.neutralTextSubtle : THEME_COLORS.neutralTextStrong },
               ]}
               numberOfLines={1}
             >
@@ -253,7 +304,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Trash2 size={13} color="#94a3b8" />
+              <Trash2 size={13} color={THEME_COLORS.neutralTextMuted} />
             </TouchableOpacity>
           </View>
 
@@ -268,15 +319,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 style={[styles.actionBtn, { backgroundColor: PRIMARY }]}
                 onPress={() => handleAction(notification, 'accept')}
               >
-                <Check size={12} color="#fff" />
+                <Check size={12} color={THEME_COLORS.white} />
                 <Text style={styles.actionBtnText}>Accept</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: '#f1f5f9' }]}
+                style={[styles.actionBtn, { backgroundColor: THEME_COLORS.neutralBgSoft }]}
                 onPress={() => handleAction(notification, 'decline')}
               >
-                <X size={12} color="#64748b" />
-                <Text style={[styles.actionBtnText, { color: '#64748b' }]}>Decline</Text>
+                <X size={12} color={THEME_COLORS.neutralTextSubtle} />
+                <Text style={[styles.actionBtnText, { color: THEME_COLORS.neutralTextSubtle }]}>Decline</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -289,14 +340,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 style={styles.alertAckBtn}
                 onPress={() => handleAcknowledgeAlert(notification)}
               >
-                <AlertTriangle size={14} color="#fff" />
+                <AlertTriangle size={14} color={THEME_COLORS.white} />
                 <Text style={styles.alertAckText}>Acknowledge & Open Emergency Hub</Text>
               </TouchableOpacity>
             )}
 
           {/* Time */}
           <View style={styles.timeRow}>
-            <Clock size={12} color="#94a3b8" />
+            <Clock size={12} color={THEME_COLORS.neutralTextMuted} />
             <Text style={styles.timeText}>{formatTime(notification.createdAt ?? notification.created_at)}</Text>
           </View>
         </View>
@@ -335,7 +386,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               <Text style={styles.panelTitle}>Notifications</Text>
             </View>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-              <X size={20} color="#94a3b8" />
+              <X size={20} color={THEME_COLORS.neutralTextMuted} />
             </TouchableOpacity>
           </View>
 
@@ -351,7 +402,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           ) : (
             <View style={styles.emptyState}>
               <View style={styles.emptyIcon}>
-                <Bell size={32} color="#cbd5e1" />
+                <Bell size={32} color={THEME_COLORS.neutralBorderStrong} />
               </View>
               <Text style={styles.emptyTitle}>All caught up!</Text>
               <Text style={styles.emptyMsg}>No new notifications at the moment.</Text>
@@ -398,214 +449,206 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: THEME_COLORS.blackOverlay20,
   },
   panel: {
     position: 'absolute',
     top: 0,
     right: 0,
     bottom: 0,
-    width: 360,
+    width: SPACE.s360,
     maxWidth: '90%',
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: -4, height: 0 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 12,
+    backgroundColor: THEME_COLORS.white,
+    ...createShadow(THEME_COLORS.black, -SPACE.xs, SPACE.zero, 0.15, 24, 12),
     flexDirection: 'column',
   },
   panelHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 20,
+    padding: SPACE.s20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderBottomColor: THEME_COLORS.neutralBgSoft,
+    backgroundColor: THEME_COLORS.whiteOverlay90,
   },
   panelTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: SPACE.lg,
   },
   bellWrapper: {
     position: 'relative',
   },
   unreadBadge: {
     position: 'absolute',
-    top: -4,
-    right: -4,
-    width: 16,
-    height: 16,
-    backgroundColor: '#dc2626',
-    borderRadius: 8,
+    top: -SPACE.xs,
+    right: -SPACE.xs,
+    width: SPACE.s16,
+    height: SPACE.s16,
+    backgroundColor: THEME_COLORS.errorStrong,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   unreadBadgeText: {
-    color: '#fff',
-    fontSize: 9,
-    fontWeight: '700',
+    color: THEME_COLORS.white,
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.bold,
   },
   panelTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#0d3d47',
+    fontSize: TYPE_SCALE.title,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.primary,
   },
   closeBtn: {
-    padding: 8,
-    borderRadius: 20,
+    padding: SPACE.md,
+    borderRadius: RADIUS.round,
   },
   listContent: {
-    padding: 16,
-    gap: 12,
+    padding: SPACE.s16,
+    gap: SPACE.xl,
   },
   notifCard: {
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    padding: 16,
-    marginBottom: 8,
+    padding: SPACE.s16,
+    marginBottom: SPACE.md,
   },
   notifCardRead: {
-    backgroundColor: '#f8fafc',
-    borderColor: '#f1f5f9',
+    backgroundColor: THEME_COLORS.neutralBg,
+    borderColor: THEME_COLORS.neutralBgSoft,
     opacity: 0.8,
   },
   notifCardUnread: {
-    backgroundColor: '#fff',
-    borderColor: 'rgba(22,163,74,0.2)',
-    shadowColor: '#0d3d47',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: THEME_COLORS.white,
+    borderColor: THEME_COLORS.successTintBorderAlt,
+    ...createShadow(THEME_COLORS.primary, SPACE.zero, SPACE.xxs, 0.05, 8, 2),
   },
   notifRow: {
     flexDirection: 'row',
-    gap: 14,
+    gap: SPACE.xxl,
   },
   notifIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: SPACE.s40,
+    height: SPACE.s40,
+    borderRadius: RADIUS.lg,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
   notifContent: {
     flex: 1,
-    gap: 4,
+    gap: SPACE.xs,
   },
   notifTitleRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: 4,
+    gap: SPACE.xs,
   },
   notifTitle: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.bold,
     flex: 1,
   },
   deleteBtn: {
-    padding: 4,
+    padding: SPACE.xs,
   },
   notifMessage: {
-    fontSize: 12,
-    color: '#64748b',
-    lineHeight: 18,
+    fontSize: TYPE_SCALE.base,
+    color: THEME_COLORS.neutralTextSubtle,
+    lineHeight: LINE_HEIGHT.body,
   },
   actionRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
+    gap: SPACE.md,
+    marginTop: SPACE.md,
   },
   actionBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
-    paddingVertical: 8,
-    borderRadius: 10,
+    gap: SPACE.xs,
+    paddingVertical: SPACE.md,
+    borderRadius: RADIUS.md,
   },
   actionBtnText: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: '#fff',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.white,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: LETTER_SPACING.normal,
   },
   alertAckBtn: {
-    backgroundColor: '#dc2626',
-    borderRadius: 10,
-    paddingVertical: 10,
+    backgroundColor: THEME_COLORS.errorStrong,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACE.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    marginTop: 8,
+    gap: SPACE.sm,
+    marginTop: SPACE.md,
   },
   alertAckText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '900',
+    color: THEME_COLORS.white,
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: LETTER_SPACING.compact,
   },
   timeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginTop: 6,
+    gap: SPACE.xs,
+    marginTop: SPACE.sm,
   },
   timeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: LETTER_SPACING.compact,
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 80,
-    paddingHorizontal: 32,
-    gap: 12,
+    paddingVertical: SPACE.s80,
+    paddingHorizontal: SPACE.s32,
+    gap: SPACE.xl,
   },
   emptyIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#f8fafc',
+    width: SPACE.s64,
+    height: SPACE.s64,
+    borderRadius: RADIUS.circle,
+    backgroundColor: THEME_COLORS.neutralBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#0d3d47',
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.primary,
   },
   emptyMsg: {
-    fontSize: 13,
-    color: '#64748b',
+    fontSize: TYPE_SCALE.lg,
+    color: THEME_COLORS.neutralTextSubtle,
     textAlign: 'center',
   },
   footer: {
-    padding: 16,
+    padding: SPACE.s16,
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    backgroundColor: '#f8fafc',
+    borderTopColor: THEME_COLORS.neutralBgSoft,
+    backgroundColor: THEME_COLORS.neutralBg,
     alignItems: 'center',
   },
   markAllText: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: '#94a3b8',
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1,
-    paddingVertical: 12,
+    letterSpacing: LETTER_SPACING.normal,
+    paddingVertical: SPACE.xl,
   },
 });

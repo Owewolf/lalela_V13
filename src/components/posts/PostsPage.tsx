@@ -37,8 +37,14 @@ import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import type { CommunityNotice } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
-const PRIMARY = '#0d3d47';
+const PRIMARY = THEME_COLORS.primary;
+const SPACE = {
+  s24: 24,
+  s120: 120,
+};
 
 interface PostsPageProps {
   initialNoticeId?: string;
@@ -63,29 +69,29 @@ function getUrgencyColors(level?: string, urgency?: string) {
     (urgency === 'high' ? 'warning' : urgency === 'normal' ? 'info' : urgency === 'low' ? 'general' : urgency);
   switch (l) {
     case 'emergency':
-      return { text: '#dc2626', bg: '#fef2f2', border: '#fecaca' };
+      return { text: THEME_COLORS.errorStrong, bg: THEME_COLORS.errorSurface, border: THEME_COLORS.errorBorder };
     case 'warning':
-      return { text: '#d97706', bg: '#fffbeb', border: '#fcd34d' };
+      return { text: THEME_COLORS.warning, bg: THEME_COLORS.warningSurface, border: THEME_COLORS.warningBorderStrong };
     case 'info':
-      return { text: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' };
+      return { text: THEME_COLORS.brandBlueText, bg: THEME_COLORS.infoSurfaceSoft, border: THEME_COLORS.aliasHex_bfdbfe };
     case 'general':
-      return { text: '#059669', bg: '#ecfdf5', border: '#a7f3d0' };
+      return { text: THEME_COLORS.successStrongAlt, bg: THEME_COLORS.successSurfaceSoft, border: THEME_COLORS.aliasHex_a7f3d0 };
     default:
-      return { text: '#6b7280', bg: '#f9fafb', border: '#e5e7eb' };
+      return { text: THEME_COLORS.neutralTextSubtle, bg: THEME_COLORS.neutralBg, border: THEME_COLORS.neutralBorderSoft };
   }
 }
 
 function getPostBorderColor(post: CommunityNotice): string {
-  if (post.type !== 'notice') return '#e5e7eb';
+  if (post.type !== 'notice') return THEME_COLORS.neutralBorderSoft;
   const urgency =
     post.urgencyLevel ||
     (post.urgency === 'high' ? 'warning' : post.urgency === 'normal' ? 'info' : post.urgency === 'low' ? 'general' : post.urgency);
   switch (urgency) {
-    case 'emergency': return '#fca5a5';
-    case 'warning': return '#fcd34d';
-    case 'info': return '#93c5fd';
-    case 'general': return '#6ee7b7';
-    default: return '#e5e7eb';
+    case 'emergency': return THEME_COLORS.aliasHex_fca5a5;
+    case 'warning': return THEME_COLORS.warningBorderStrong;
+    case 'info': return THEME_COLORS.infoBorderStrong;
+    case 'general': return THEME_COLORS.aliasHex_6ee7b7;
+    default: return THEME_COLORS.neutralBorderSoft;
   }
 }
 
@@ -327,10 +333,14 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
           style={{
             borderWidth: 1,
             borderColor: highlightedNoticeId === notice.id ? PRIMARY : borderColor,
-            shadowColor: highlightedNoticeId === notice.id ? PRIMARY : borderColor,
-            shadowOpacity: highlightedNoticeId === notice.id ? 0.35 : 0.2,
-            shadowRadius: highlightedNoticeId === notice.id ? 10 : 4,
-            elevation: highlightedNoticeId === notice.id ? 5 : 2,
+            ...createShadow(
+              highlightedNoticeId === notice.id ? PRIMARY : borderColor,
+              0,
+              0,
+              highlightedNoticeId === notice.id ? 0.35 : 0.2,
+              highlightedNoticeId === notice.id ? 10 : 4,
+              highlightedNoticeId === notice.id ? 5 : 2,
+            ),
           }}
         >
           {/* Inline map for emergency/warning */}
@@ -338,7 +348,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             <TouchableOpacity
               onPress={() => setMapPost(notice)}
               activeOpacity={0.9}
-              style={{ height: 160, overflow: 'hidden', borderBottomWidth: 1, borderColor: '#f3f4f6' }}
+              style={{ height: 160, overflow: 'hidden', borderBottomWidth: 1, borderColor: THEME_COLORS.neutralBgSofter }}
             >
               <MapView {...defaultMapViewProps}
                 style={{ flex: 1 }}
@@ -355,13 +365,13 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               >
                 <Marker
                   coordinate={{ latitude: notice.latitude!, longitude: notice.longitude! }}
-                  pinColor={isEmergency ? '#dc2626' : '#d97706'}
+                  pinColor={isEmergency ? THEME_COLORS.errorStrong : THEME_COLORS.warning}
                 />
                 <Circle
                   center={{ latitude: notice.latitude!, longitude: notice.longitude! }}
                   radius={10000}
-                  strokeColor={isEmergency ? '#dc2626' : '#d97706'}
-                  fillColor={isEmergency ? 'rgba(220,38,38,0.05)' : 'rgba(217,119,6,0.05)'}
+                  strokeColor={isEmergency ? THEME_COLORS.errorStrong : THEME_COLORS.warning}
+                  fillColor={isEmergency ? THEME_COLORS.alias_rgba_220_38_38_0_05 : THEME_COLORS.alias_rgba_217_119_6_0_05}
                   strokeWidth={1}
                 />
               </MapView>
@@ -400,12 +410,12 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                   className="p-2 rounded-full bg-gray-100"
                   activeOpacity={0.8}
                 >
-                  <MoreVertical size={16} color="#9ca3af" />
+                  <MoreVertical size={16} color={THEME_COLORS.neutralTextSoft} />
                 </TouchableOpacity>
                 {activeMenuId === notice.id && (
                   <View
                     className="absolute right-0 top-10 w-48 bg-white rounded-2xl border border-gray-100 py-2 z-50"
-                    style={{ shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 }}
+                    style={createShadow(THEME_COLORS.black, 0, 0, 0.1, 12, 8)}
                   >
                     {isOwner && (
                       <TouchableOpacity
@@ -416,7 +426,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         className="flex-row items-center gap-2 px-4 py-2"
                         activeOpacity={0.8}
                       >
-                        <Pencil size={16} color="#0d3d47" />
+                        <Pencil size={16} color={THEME_COLORS.primary} />
                         <Text className="text-primary text-sm font-bold">Edit Notice</Text>
                       </TouchableOpacity>
                     )}
@@ -429,7 +439,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         className="flex-row items-center gap-2 px-4 py-2"
                         activeOpacity={0.8}
                       >
-                        <AlertTriangle size={16} color="#dc2626" />
+                        <AlertTriangle size={16} color={THEME_COLORS.errorStrong} />
                         <Text className="text-red-600 text-sm font-bold">Delete Notice</Text>
                       </TouchableOpacity>
                     )}
@@ -438,7 +448,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                       className="flex-row items-center gap-2 px-4 py-2"
                       activeOpacity={0.8}
                     >
-                      <Share2 size={16} color="#6b7280" />
+                      <Share2 size={16} color={THEME_COLORS.neutralTextSubtle} />
                       <Text className="text-gray-500 text-sm font-bold">Share</Text>
                     </TouchableOpacity>
                   </View>
@@ -466,7 +476,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             {/* Location tag */}
             {notice.locationName || notice.latitude ? (
               <View className="flex-row items-center gap-1.5 bg-orange-50 self-start px-2 py-1 rounded-md">
-                <MapPin size={12} color="#fc7127" />
+                <MapPin size={12} color={THEME_COLORS.secondaryContainer} />
                 <Text className="text-[10px] font-bold text-orange-500">
                   {notice.locationName || 'Location Provided'}
                 </Text>
@@ -507,7 +517,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                     className="p-2 rounded-full bg-red-50"
                     activeOpacity={0.8}
                   >
-                    <Siren size={16} color="#dc2626" />
+                    <Siren size={16} color={THEME_COLORS.errorStrong} />
                   </TouchableOpacity>
                 ) : null}
                 <TouchableOpacity
@@ -554,7 +564,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               >
                 <Marker
                   coordinate={{ latitude: post.latitude, longitude: post.longitude }}
-                  pinColor="#dc2626"
+                  pinColor={THEME_COLORS.errorStrong}
                 />
               </MapView>
               <View className="absolute top-4 right-4 bg-red-600 px-3 py-1 rounded-full">
@@ -615,12 +625,12 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                   className="p-2"
                   activeOpacity={0.8}
                 >
-                  <MoreVertical size={20} color="#9ca3af" />
+                  <MoreVertical size={20} color={THEME_COLORS.neutralTextSoft} />
                 </TouchableOpacity>
                 {activeMenuId === post.id && (
                   <View
                     className="absolute right-0 top-10 w-48 bg-white rounded-2xl border border-gray-100 py-2 z-50"
-                    style={{ shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 }}
+                    style={createShadow(THEME_COLORS.black, 0, 0, 0.1, 12, 8)}
                   >
                     {isOwner && (
                       <TouchableOpacity
@@ -631,7 +641,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         className="flex-row items-center gap-2 px-4 py-2"
                         activeOpacity={0.8}
                       >
-                        <Pencil size={16} color="#0d3d47" />
+                        <Pencil size={16} color={THEME_COLORS.primary} />
                         <Text className="text-primary text-sm font-bold">Edit Listing</Text>
                       </TouchableOpacity>
                     )}
@@ -644,7 +654,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         className="flex-row items-center gap-2 px-4 py-2"
                         activeOpacity={0.8}
                       >
-                        <AlertTriangle size={16} color="#dc2626" />
+                        <AlertTriangle size={16} color={THEME_COLORS.errorStrong} />
                         <Text className="text-red-600 text-sm font-bold">Delete Listing</Text>
                       </TouchableOpacity>
                     )}
@@ -658,7 +668,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         activeOpacity={0.8}
                         disabled={isMarkingSold}
                       >
-                        <CheckCircle2 size={16} color="#059669" />
+                        <CheckCircle2 size={16} color={THEME_COLORS.successStrongAlt} />
                         <Text className="text-green-600 text-sm font-bold">
                           {isMarkingSold ? 'Marking...' : 'Mark as Sold'}
                         </Text>
@@ -673,7 +683,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         className="flex-row items-center gap-2 px-4 py-2"
                         activeOpacity={0.8}
                       >
-                        <Share2 size={16} color="#6b7280" />
+                        <Share2 size={16} color={THEME_COLORS.neutralTextSubtle} />
                         <Text className="text-gray-500 text-sm font-bold">Share</Text>
                       </TouchableOpacity>
                     )}
@@ -718,7 +728,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                   {post.isPublic && post.charityId ? (
                     <View className="items-end">
                       <View className="flex-row items-center gap-1.5 bg-orange-50 px-2 py-1 rounded-lg mb-1">
-                        <Heart size={12} color="#fc7127" fill="#fc7127" />
+                        <Heart size={12} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
                         <Text className="text-[9px] font-black text-orange-500 uppercase tracking-wider">
                           {charity?.name || 'Charity Impact'}
                         </Text>
@@ -735,7 +745,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             {/* Location */}
             {post.locationName ? (
               <View className="flex-row items-center gap-2 bg-orange-50 self-start px-4 py-2 rounded-full border border-orange-100">
-                <MapPin size={14} color="#fc7127" />
+                <MapPin size={14} color={THEME_COLORS.secondaryContainer} />
                 <Text className="text-[11px] font-extrabold text-orange-500" numberOfLines={1}>
                   {post.locationName}
                 </Text>
@@ -759,7 +769,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 <View>
                   <Text className="text-sm font-bold text-primary">{post.authorName}</Text>
                   <View className="flex-row items-center gap-1.5">
-                    <Clock size={12} color="#9ca3af" />
+                    <Clock size={12} color={THEME_COLORS.neutralTextSoft} />
                     <Text className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
                       {new Date(post.timestamp).toLocaleDateString()}
                     </Text>
@@ -768,10 +778,10 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               </View>
               <View className="flex-row items-center gap-1">
                 <TouchableOpacity className="p-2" activeOpacity={0.8}>
-                  <Heart size={20} color="#9ca3af" />
+                  <Heart size={20} color={THEME_COLORS.neutralTextSoft} />
                 </TouchableOpacity>
                 <TouchableOpacity className="p-2" activeOpacity={0.8} onPress={() => handleOpenContextChat(post)}>
-                  <MessageSquare size={20} color="#9ca3af" />
+                  <MessageSquare size={20} color={THEME_COLORS.neutralTextSoft} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -869,7 +879,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         return (
           <View className="flex-row items-center justify-between px-2 mb-4 mt-2">
             <View className="flex-row items-center gap-2">
-              <Siren size={16} color="#dc2626" />
+              <Siren size={16} color={THEME_COLORS.errorStrong} />
               <Text className="text-sm font-black text-primary uppercase tracking-widest">
                 Community Notices
               </Text>
@@ -884,7 +894,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       case 'listingHeader':
         return (
           <View className="flex-row items-center gap-2 px-2 mb-4 mt-2">
-            <Tag size={16} color="#fc7127" />
+            <Tag size={16} color={THEME_COLORS.secondaryContainer} />
             <Text className="text-sm font-black text-primary uppercase tracking-widest">
               Community Listing
             </Text>
@@ -896,7 +906,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         return (
           <View className="items-center justify-center py-20 gap-4">
             <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center">
-              <Tag size={40} color="#d1d5db" />
+              <Tag size={40} color={THEME_COLORS.neutralBorderMuted} />
             </View>
             <Text className="text-lg font-bold text-primary">No listings found</Text>
             <Text className="text-sm text-gray-400 text-center max-w-[240px]">
@@ -922,17 +932,17 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       <View className="bg-white border-b border-gray-100 px-6 py-4 gap-4">
         {/* Search */}
         <View className="flex-row items-center bg-gray-100 rounded-2xl px-4 py-3 gap-3">
-          <Search size={16} color="#9ca3af" />
+          <Search size={16} color={THEME_COLORS.neutralTextSoft} />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search community listings..."
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={THEME_COLORS.neutralTextSoft}
             className="flex-1 text-sm font-medium text-gray-800"
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-              <X size={16} color="#9ca3af" />
+              <X size={16} color={THEME_COLORS.neutralTextSoft} />
             </TouchableOpacity>
           )}
         </View>
@@ -981,7 +991,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             });
           }, 120);
         }}
-        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 120 }}
+        contentContainerStyle={{ paddingHorizontal: SPACE.s24, paddingTop: SPACE.s24, paddingBottom: SPACE.s120 }}
         showsVerticalScrollIndicator={false}
       />
 
@@ -989,10 +999,10 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       <TouchableOpacity
         onPress={() => router.push('/create-post')}
         className="absolute bottom-28 right-6 w-16 h-16 bg-primary rounded-full items-center justify-center"
-        style={{ shadowColor: PRIMARY, shadowOpacity: 0.4, shadowRadius: 12, elevation: 8 }}
+        style={createShadow(PRIMARY, 0, 0, 0.4, 12, 8)}
         activeOpacity={0.85}
       >
-        <Plus size={32} color="#fff" />
+        <Plus size={32} color={THEME_COLORS.white} />
       </TouchableOpacity>
 
       {/* Full-screen map modal */}
@@ -1017,7 +1027,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               className="p-2 rounded-full bg-gray-100"
               activeOpacity={0.8}
             >
-              <X size={20} color="#374151" />
+              <X size={20} color={THEME_COLORS.neutralTextEmphasis} />
             </TouchableOpacity>
           </View>
           {mapPost?.latitude && mapPost?.longitude ? (
@@ -1036,8 +1046,8 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 description={mapPost.locationName}
                 pinColor={
                   mapPost.urgency === 'emergency' || mapPost.urgencyLevel === 'emergency'
-                    ? '#dc2626'
-                    : '#d97706'
+                    ? THEME_COLORS.errorStrong
+                    : THEME_COLORS.warning
                 }
               />
               <Circle
@@ -1045,13 +1055,13 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 radius={10000}
                 strokeColor={
                   mapPost.urgency === 'emergency' || mapPost.urgencyLevel === 'emergency'
-                    ? '#dc2626'
-                    : '#d97706'
+                    ? THEME_COLORS.errorStrong
+                    : THEME_COLORS.warning
                 }
                 fillColor={
                   mapPost.urgency === 'emergency' || mapPost.urgencyLevel === 'emergency'
-                    ? 'rgba(220,38,38,0.05)'
-                    : 'rgba(217,119,6,0.05)'
+                    ? THEME_COLORS.alias_rgba_220_38_38_0_05
+                    : THEME_COLORS.alias_rgba_217_119_6_0_05
                 }
                 strokeWidth={1}
               />

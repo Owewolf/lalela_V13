@@ -6,9 +6,52 @@ import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { isUserLicensed, isCommunityLicensed, isCommunityTrial } from '../../lib/licensing';
+import { THEME_COLORS } from '../../theme/colors';
 
 const APP_LOGO_PATH = require('../../../assets/lalela_logo.png');
-const PRIMARY = '#0d3d47';
+const PRIMARY = THEME_COLORS.primary;
+const TYPE_SCALE = {
+  xs: 8,
+  sm: 10,
+  md: 13,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xxs: 1,
+  xs: 2,
+  sm: 3,
+  md: 4,
+  lg: 6,
+  xl: 8,
+  xxl: 10,
+  s16: 16,
+  s18: 18,
+  s32: 32,
+  s40: 40,
+  s64: 64,
+};
+const RADIUS = {
+  sm: 8,
+  md: 9,
+  lg: 12,
+  pill: 20,
+  full: 99,
+  avatar: 18,
+};
+const LETTER_SPACING = {
+  tightNegative: -0.3,
+  compact: 0.8,
+};
+const LINE_HEIGHT = {
+  compact: 12,
+};
 
 interface HeaderProps {
   onBack?: () => void;
@@ -52,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
   // they are currently viewing being active. Uses the shared predicate so all
   // surfaces (Header, Sidebar, Settings) stay in sync with the new pricing model.
   const userIsLicensed = isUserLicensed(userProfile, currentCommunity);
-  const ringColor = userIsLicensed ? '#10b981' : '#dc2626';
+  const ringColor = userIsLicensed ? THEME_COLORS.success : THEME_COLORS.errorStrong;
   // Read-only only if the user's own license is expired AND the community itself is not active
   const isReadOnly = licenseStatus === 'EXPIRED' || ((!isActive && !isTrial) && !communityActive);
   // Warn when trial expires within 5 days
@@ -73,9 +116,9 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const roleColors: Record<string, { bg: string; text: string }> = {
-    Admin: { bg: '#fef2f2', text: '#dc2626' },
-    Moderator: { bg: '#f5f3ff', text: '#6750a4' },
-    Member: { bg: '#f0fdf4', text: PRIMARY },
+    Admin: { bg: THEME_COLORS.errorSurface, text: THEME_COLORS.errorStrong },
+    Moderator: { bg: THEME_COLORS.brandPurpleSurface, text: THEME_COLORS.md3Primary },
+    Member: { bg: THEME_COLORS.successSurface, text: PRIMARY },
   };
   const roleColor = roleColors[userRole] ?? roleColors.Member;
 
@@ -86,9 +129,9 @@ export const Header: React.FC<HeaderProps> = ({
   // `communityActive` so trial users keep their permissions.
   const communityLicensed = isCommunityLicensed(currentCommunity);
   const communityInTrial = isCommunityTrial(currentCommunity);
-  const typeBadgeBg = communityLicensed ? '#ecfdf5' : communityInTrial ? '#fffbeb' : '#fef2f2';
-  const typeBadgeText = communityLicensed ? '#1e5667' : communityInTrial ? '#b45309' : '#dc2626';
-  const typeBadgeBorder = communityLicensed ? '#ffddb9' : communityInTrial ? '#fde68a' : '#fecaca';
+  const typeBadgeBg = communityLicensed ? THEME_COLORS.successSurfaceSoft : communityInTrial ? THEME_COLORS.warningSurface : THEME_COLORS.errorSurface;
+  const typeBadgeText = communityLicensed ? THEME_COLORS.primaryContainer : communityInTrial ? THEME_COLORS.warningText : THEME_COLORS.errorStrong;
+  const typeBadgeBorder = communityLicensed ? THEME_COLORS.tertiaryFixed : communityInTrial ? THEME_COLORS.warningBorder : THEME_COLORS.errorBorder;
 
   const profileImageUri =
     userProfile?.profileImage ||
@@ -142,9 +185,9 @@ export const Header: React.FC<HeaderProps> = ({
               </View>
               {/* Read-only badge */}
               {isReadOnly && (
-                <View style={[styles.badge, { backgroundColor: '#fef2f2', borderColor: '#fecaca' }]}>
-                  <AlertCircle size={9} color="#dc2626" />
-                  <Text style={[styles.badgeText, { color: '#dc2626' }]}>Read-Only</Text>
+                <View style={[styles.badge, { backgroundColor: THEME_COLORS.errorSurface, borderColor: THEME_COLORS.errorBorder }]}>
+                  <AlertCircle size={9} color={THEME_COLORS.errorStrong} />
+                  <Text style={[styles.badgeText, { color: THEME_COLORS.errorStrong }]}>Read-Only</Text>
                 </View>
               )}
             </View>
@@ -174,10 +217,10 @@ export const Header: React.FC<HeaderProps> = ({
               <View
                 style={[
                   styles.shieldBadge,
-                  { backgroundColor: userIsLicensed ? '#fc7127' : '#dc2626' },
+                  { backgroundColor: userIsLicensed ? THEME_COLORS.secondaryContainer : THEME_COLORS.errorStrong },
                 ]}
               >
-                <Shield size={8} color="#fff" />
+                <Shield size={8} color={THEME_COLORS.white} />
               </View>
             </View>
           </View>
@@ -189,128 +232,128 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
+    backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_85,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: THEME_COLORS.neutralBorder,
     zIndex: 50,
   },
   inner: {
-    height: 64,
+    height: SPACE.s64,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACE.s16,
   },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 10,
+    gap: SPACE.xxl,
   },
   backBtn: {
-    padding: 8,
-    borderRadius: 20,
+    padding: SPACE.xl,
+    borderRadius: RADIUS.pill,
   },
   logoBtn: {
-    width: 40,
-    height: 40,
+    width: SPACE.s40,
+    height: SPACE.s40,
     backgroundColor: PRIMARY,
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
   logoImg: {
-    width: 32,
-    height: 32,
+    width: SPACE.s32,
+    height: SPACE.s32,
   },
   divider: {
-    width: 1,
-    height: 32,
-    backgroundColor: '#e2e8f0',
-    marginHorizontal: 4,
+    width: SPACE.xxs,
+    height: SPACE.s32,
+    backgroundColor: THEME_COLORS.neutralBorder,
+    marginHorizontal: SPACE.md,
   },
   communityInfo: {
     flex: 1,
   },
   communityName: {
-    fontSize: 13,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
-    letterSpacing: -0.3,
+    letterSpacing: LETTER_SPACING.tightNegative,
   },
   badgeRow: {
     flexDirection: 'row',
-    gap: 4,
-    marginTop: 2,
+    gap: SPACE.md,
+    marginTop: SPACE.xs,
     flexWrap: 'wrap',
   },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 99,
+    gap: SPACE.sm,
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.xs,
+    borderRadius: RADIUS.full,
     borderWidth: 1,
   },
   badgeText: {
-    fontSize: 8,
-    fontWeight: '900',
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.black,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: LETTER_SPACING.compact,
   },
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: SPACE.md,
   },
   bellBtn: {
     position: 'relative',
-    padding: 8,
-    borderRadius: 20,
+    padding: SPACE.xl,
+    borderRadius: RADIUS.pill,
   },
   bellBadge: {
     position: 'absolute',
-    top: 2,
-    right: 1,
+    top: SPACE.xs,
+    right: SPACE.xxs,
     minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#22c55e',
+    height: SPACE.s18,
+    borderRadius: RADIUS.md,
+    backgroundColor: THEME_COLORS.aliasHex_22c55e,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 4,
+    paddingHorizontal: SPACE.md,
     borderWidth: 2,
-    borderColor: '#ffffff',
+    borderColor: THEME_COLORS.white,
   },
   bellBadgeText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontWeight: '900',
-    lineHeight: 12,
+    color: THEME_COLORS.white,
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    lineHeight: LINE_HEIGHT.compact,
   },
   avatarWrapper: {
-    paddingLeft: 4,
+    paddingLeft: SPACE.md,
     borderLeftWidth: 1,
-    borderLeftColor: '#e2e8f0',
+    borderLeftColor: THEME_COLORS.neutralBorder,
   },
   avatarRing: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: SPACE.s40,
+    height: SPACE.s40,
+    borderRadius: RADIUS.pill,
     borderWidth: 2,
-    padding: 1,
+    padding: SPACE.xxs,
     position: 'relative',
   },
   avatarInner: {
     width: '100%',
     height: '100%',
-    borderRadius: 18,
+    borderRadius: RADIUS.avatar,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#fff',
-    backgroundColor: '#e2e8f0',
+    borderColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.neutralBorder,
   },
   avatarImg: {
     width: '100%',
@@ -320,9 +363,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -3,
     right: -3,
-    padding: 3,
-    borderRadius: 8,
+    padding: SPACE.sm,
+    borderRadius: RADIUS.sm,
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: THEME_COLORS.white,
   },
 });

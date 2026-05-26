@@ -23,6 +23,11 @@ type TimelineItem =
     };
 
 const CLUSTER_WINDOW_MS = 5 * 60 * 1000;
+const SPACE = {
+  xxs: 4,
+  md: 10,
+  lg: 18,
+};
 
 const isSameClusterMessage = (left?: Message, right?: Message) => {
   if (!left || !right) return false;
@@ -151,8 +156,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     if (item.type === 'date') {
       return (
         <View className="items-center my-3">
-          <View className="bg-[#e9edef] border border-[#d7dde0] rounded-full px-3 py-1">
-            <Text className="text-[11px] font-semibold text-[#54656f]">{item.label}</Text>
+          <View className="bg-slate-200 border border-slate-300 rounded-full px-3 py-1">
+            <Text className="text-[11px] font-semibold text-slate-600">{item.label}</Text>
           </View>
         </View>
       );
@@ -197,10 +202,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       ListEmptyComponent={ListEmptyComponent}
       ListFooterComponent={ListFooterComponent}
       contentContainerStyle={{
-        paddingLeft: 10,
-        paddingRight: 4,
-        paddingTop: 18,
-        paddingBottom: 10,
+        paddingLeft: SPACE.md,
+        paddingRight: SPACE.xxs,
+        paddingTop: SPACE.lg,
+        paddingBottom: SPACE.md,
         flexGrow: 1,
       }}
       showsVerticalScrollIndicator={false}

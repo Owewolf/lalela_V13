@@ -28,6 +28,8 @@ import { EmergencyMap } from './EmergencyMap';
 import { deriveEmergencyResponders } from './responderUtils';
 import { ChatWindow } from '../chat/ChatWindow';
 import { ChatComposer } from '../chat/ChatComposer';
+import { THEME_COLORS } from '../../theme/colors';
+import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
 
 interface EmergencyHubProps {
   emergencyId: string;
@@ -201,7 +203,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
   if (!emergencyPost) {
     return (
       <SafeAreaView className="flex-1 bg-white items-center justify-center">
-        <ActivityIndicator color="#0d3d47" size="large" />
+        <ActivityIndicator color={THEME_COLORS.primary} size="large" />
         <Text className="text-sm text-gray-500 mt-3">Loading emergency...</Text>
       </SafeAreaView>
     );
@@ -209,8 +211,8 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
 
   const authorInitial = emergencyPost.authorName?.trim()?.charAt(0)?.toUpperCase() || 'E';
   const isWarningIncident = isWarningPost(emergencyPost);
-  const accentColor = isWarningIncident ? '#d97706' : '#dc2626';
-  const accentBg = isWarningIncident ? '#fffbeb' : '#fef2f2';
+  const accentColor = isWarningIncident ? THEME_COLORS.warning : THEME_COLORS.errorStrong;
+  const accentBg = isWarningIncident ? THEME_COLORS.warningSurface : THEME_COLORS.errorSurface;
   const incidentLabel = isWarningIncident ? 'Warning' : 'Emergency';
 
   return (
@@ -249,10 +251,10 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
             }
           }}
           className="absolute top-4 left-4 bg-white/95 p-2 rounded-xl shadow"
-          style={{ zIndex: 30, elevation: 8 }}
+          style={{ zIndex: LAYER_Z_INDEX.emergencyBackButton, elevation: LAYER_ELEVATION.emergencyBackButton }}
           activeOpacity={0.8}
         >
-          <ArrowLeft color="#0d3d47" size={20} />
+          <ArrowLeft color={THEME_COLORS.primary} size={20} />
         </TouchableOpacity>
 
         {/* Map controls */}
@@ -263,9 +265,9 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
             activeOpacity={0.8}
           >
             {isMapExpanded ? (
-              <ChevronUp color="#0d3d47" size={20} />
+              <ChevronUp color={THEME_COLORS.primary} size={20} />
             ) : (
-              <ChevronDown color="#0d3d47" size={20} />
+              <ChevronDown color={THEME_COLORS.primary} size={20} />
             )}
           </TouchableOpacity>
           {isMapExpanded && (
@@ -274,7 +276,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
               className="bg-white/90 p-2 rounded-xl shadow"
               activeOpacity={0.8}
             >
-              <Navigation color="#0d3d47" size={20} />
+              <Navigation color={THEME_COLORS.primary} size={20} />
             </TouchableOpacity>
           )}
         </View>
@@ -310,7 +312,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
                 </View>
                 {!!emergencyPost.locationName && (
                   <View className="flex-row items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100">
-                    <MapPin size={10} color="#4b5563" />
+                    <MapPin size={10} color={THEME_COLORS.neutralTextDefault} />
                     <Text numberOfLines={1} className="text-[10px] text-gray-600 font-semibold max-w-[150px]">
                       {emergencyPost.locationName}
                     </Text>
@@ -333,15 +335,15 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
                   const emergency = incident.incidentType === 'emergency';
                   const chipBg = active
                     ? emergency
-                      ? '#dc2626'
-                      : '#fde047'
-                    : '#ffffff';
-                  const chipBorder = emergency ? '#dc2626' : '#f59e0b';
+                      ? THEME_COLORS.errorStrong
+                      : THEME_COLORS.aliasHex_fde047
+                    : THEME_COLORS.white;
+                  const chipBorder = emergency ? THEME_COLORS.errorStrong : THEME_COLORS.warningStrong;
                   const chipText = active
                     ? emergency
-                      ? '#ffffff'
-                      : '#713f12'
-                    : '#334155';
+                      ? THEME_COLORS.white
+                      : THEME_COLORS.aliasHex_713f12
+                    : THEME_COLORS.neutralTextHeading;
                   return (
                     <TouchableOpacity
                       key={incident.id}
@@ -371,7 +373,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
             />
           ) : (
             <View className="flex-1 items-center justify-center">
-              <ActivityIndicator color="#0d3d47" size="large" />
+              <ActivityIndicator color={THEME_COLORS.primary} size="large" />
             </View>
           )}
         </View>
@@ -379,7 +381,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
         {/* Active responders strip */}
         <View className="px-4 py-2 bg-white border-t border-gray-100">
           <View className="flex-row items-center gap-2 mb-1.5">
-            <Users color="#0d3d47" size={13} />
+            <Users color={THEME_COLORS.primary} size={13} />
             <Text className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
               Active Responders ({unifiedResponders.length})
             </Text>

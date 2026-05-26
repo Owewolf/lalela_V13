@@ -32,6 +32,53 @@ import { BUSINESS_CATEGORIES } from '../../constants';
 import { calculateDistance } from '../../lib/utils';
 import { resolveMediaUrl } from '../../lib/config';
 import type { UserBusiness } from '../../types';
+import { THEME_COLORS } from '../../theme/colors';
+
+const TYPE_SCALE = {
+  xs: 10,
+  sm: 11,
+  md: 12,
+  body: 14,
+  label: 13,
+  title: 18,
+  h3: 22,
+  price: 28,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const LINE_HEIGHT = {
+  title: 28,
+  body: 22,
+};
+const SPACE = {
+  zero: 0,
+  xs: 6,
+  sm: 8,
+  md: 10,
+  lg: 12,
+  xl: 14,
+  xxl: 16,
+  xxxl: 20,
+  s30: 30,
+  s36: 36,
+  s40: 40,
+  s120: 120,
+  imageHeight: 240,
+};
+const RADIUS = {
+  md: 16,
+  lg: 18,
+  full: 999,
+};
+const LETTER_SPACING = {
+  wide: 1,
+};
 
 interface MarketBusiness {
   id: string;
@@ -61,7 +108,7 @@ interface MarketBusiness {
   status: 'Open' | 'Closed';
 }
 
-const PRIMARY = '#0d3d47';
+const PRIMARY = THEME_COLORS.primary;
 
 interface MarketPageProps {
   initialListingId?: string;
@@ -397,7 +444,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
             {listing.isPublic && listing.charityId ? (
               <View className="bg-gray-100 p-3 rounded-2xl flex-row items-start gap-3 border border-gray-200">
                 <View className="bg-orange-50 p-2 rounded-full items-center justify-center">
-                  <Heart size={20} color="#fc7127" fill="#fc7127" />
+                  <Heart size={20} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
                 </View>
                 <View className="flex-1">
                   <View className="flex-row justify-between items-center mb-1">
@@ -418,7 +465,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
             {/* Location */}
             {listing.locationName ? (
               <View className="flex-row items-center gap-2 bg-orange-50 px-4 py-2 rounded-full border border-orange-100 self-start">
-                <MapPin size={14} color="#fc7127" />
+                <MapPin size={14} color={THEME_COLORS.secondaryContainer} />
                 <Text className="text-[11px] font-extrabold text-orange-500" numberOfLines={1}>
                   {listing.locationName}
                 </Text>
@@ -448,7 +495,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                     {listing.authorName || 'Artisan'}
                   </Text>
                   <View className="flex-row items-center gap-1">
-                    <Clock size={10} color="#9ca3af" />
+                    <Clock size={10} color={THEME_COLORS.neutralTextSoft} />
                     <Text className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
                       {new Date(listing.timestamp).toLocaleDateString()}
                     </Text>
@@ -467,7 +514,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   className="w-10 h-10 rounded-full bg-orange-50 items-center justify-center"
                   activeOpacity={0.8}
                 >
-                  <Heart size={20} color="#fc7127" />
+                  <Heart size={20} color={THEME_COLORS.secondaryContainer} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -524,69 +571,69 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
 
     return (
       <Modal visible={!!selectedListing} transparent animationType="fade" onRequestClose={() => setSelectedListing(null)}>
-        <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}>
+        <View className="flex-1 justify-end" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_45 }}>
           <View className="bg-white rounded-t-[32px] max-h-[88%] overflow-hidden">
-            <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: SPACE.s30 }}>
               {hasListingImage ? (
                 <Image
                   source={{ uri: resolveMediaUrl(selectedListing.postsImage) }}
-                  style={{ width: '100%', height: 240 }}
+                  style={{ width: '100%', height: SPACE.imageHeight }}
                   resizeMode="cover"
                 />
               ) : null}
 
-              <View style={{ padding: 20, gap: 16 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                  <View style={{ flex: 1, gap: 8 }}>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                      <View style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: '#eef2ff' }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#4f46e5', textTransform: 'uppercase', letterSpacing: 1 }}>
+              <View style={{ padding: SPACE.xxxl, gap: SPACE.xxl }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: SPACE.lg }}>
+                  <View style={{ flex: 1, gap: SPACE.sm }}>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm }}>
+                      <View style={{ paddingHorizontal: SPACE.md, paddingVertical: SPACE.xs, borderRadius: RADIUS.full, backgroundColor: THEME_COLORS.aliasHex_eef2ff }}>
+                        <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.indigo, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
                           {selectedListing.category}
                         </Text>
                       </View>
                       {selectedListing.locationName ? (
-                        <View style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: '#fff7ed', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                          <MapPin size={12} color="#fc7127" />
-                          <Text style={{ fontSize: 10, fontWeight: '700', color: '#fc7127' }}>{selectedListing.locationName}</Text>
+                        <View style={{ paddingHorizontal: SPACE.md, paddingVertical: SPACE.xs, borderRadius: RADIUS.full, backgroundColor: THEME_COLORS.aliasHex_fff7ed, flexDirection: 'row', alignItems: 'center', gap: SPACE.xs }}>
+                          <MapPin size={TYPE_SCALE.md} color={THEME_COLORS.secondaryContainer} />
+                          <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.secondaryContainer }}>{selectedListing.locationName}</Text>
                         </View>
                       ) : null}
                     </View>
-                    <Text style={{ fontSize: 22, fontWeight: '800', color: '#111827', lineHeight: 28 }}>{selectedListing.title}</Text>
+                    <Text style={{ fontSize: TYPE_SCALE.h3, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextStrong, lineHeight: LINE_HEIGHT.title }}>{selectedListing.title}</Text>
                   </View>
 
                   <TouchableOpacity
                     onPress={() => setSelectedListing(null)}
-                    style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ width: SPACE.s36, height: SPACE.s36, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#6b7280' }}>×</Text>
+                    <Text style={{ fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSubtle }}>×</Text>
                   </TouchableOpacity>
                 </View>
 
-                <View style={{ backgroundColor: '#f8fafc', borderRadius: 18, padding: 14, borderWidth: 1, borderColor: 'rgba(79,70,229,0.12)' }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1 }}>Community Price</Text>
-                  <Text style={{ fontSize: 28, fontWeight: '900', color: '#4f46e5', marginTop: 6 }}>
+                <View style={{ backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.lg, padding: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_79_70_229_0_12 }}>
+                  <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>Community Price</Text>
+                  <Text style={{ fontSize: TYPE_SCALE.price, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.indigo, marginTop: SPACE.xs }}>
                     R{(selectedListing.communityPrice || selectedListing.price || 0).toLocaleString()}
                   </Text>
                   {selectedListing.isPublic && selectedListing.publicPrice ? (
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 8 }}>
+                    <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.sm }}>
                       Public price: R{selectedListing.publicPrice.toLocaleString()}
                     </Text>
                   ) : null}
                 </View>
 
-                <Text style={{ fontSize: 14, lineHeight: 22, color: '#374151' }}>{selectedListing.description}</Text>
+                <Text style={{ fontSize: TYPE_SCALE.body, lineHeight: LINE_HEIGHT.body, color: THEME_COLORS.neutralTextEmphasis }}>{selectedListing.description}</Text>
 
                 {selectedListing.isPublic && charity ? (
-                  <View style={{ backgroundColor: '#fff7ed', borderRadius: 18, padding: 14, borderWidth: 1, borderColor: 'rgba(249,115,22,0.18)' }}>
-                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#9a3412' }}>Charity contribution</Text>
-                    <Text style={{ fontSize: 12, color: '#7c2d12', marginTop: 6 }}>
+                  <View style={{ backgroundColor: THEME_COLORS.aliasHex_fff7ed, borderRadius: RADIUS.lg, padding: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_249_115_22_0_18 }}>
+                    <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.aliasHex_9a3412 }}>Charity contribution</Text>
+                    <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.aliasHex_7c2d12, marginTop: SPACE.xs }}>
                       This listing supports {charity.name} with R{selectedListing.charityAmount?.toFixed(2) || '0.00'} per sale.
                     </Text>
                   </View>
                 ) : null}
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={{ width: 40, height: 40, borderRadius: 20, overflow: 'hidden', backgroundColor: '#e5e7eb' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
+                  <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: SPACE.xxxl, overflow: 'hidden', backgroundColor: THEME_COLORS.neutralBorderSoft }}>
                     {hasAuthorImage ? (
                       <Image
                         source={{ uri: selectedListing.authorImage }}
@@ -594,24 +641,24 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                         resizeMode="cover"
                       />
                     ) : (
-                      <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(13,61,71,0.08)' }}>
-                        <Text style={{ fontSize: 13, fontWeight: '800', color: '#0d3d47' }}>
+                      <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: THEME_COLORS.primaryTintSoft }}>
+                        <Text style={{ fontSize: TYPE_SCALE.label, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary }}>
                           {(selectedListing.authorName || '?').trim().charAt(0).toUpperCase() || '?'}
                         </Text>
                       </View>
                     )}
                   </View>
                   <View>
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#111827' }}>{selectedListing.authorName || 'Community Member'}</Text>
-                    <Text style={{ fontSize: 11, color: '#6b7280' }}>{new Date(selectedListing.timestamp).toLocaleDateString()}</Text>
+                    <Text style={{ fontSize: TYPE_SCALE.label, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong }}>{selectedListing.authorName || 'Community Member'}</Text>
+                    <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSubtle }}>{new Date(selectedListing.timestamp).toLocaleDateString()}</Text>
                   </View>
                 </View>
 
                 <TouchableOpacity
                   onPress={() => handleOpenListingChat(selectedListing)}
-                  style={{ backgroundColor: '#0d3d47', borderRadius: 16, paddingVertical: 14, alignItems: 'center' }}
+                  style={{ backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.md, paddingVertical: SPACE.xl, alignItems: 'center' }}
                 >
-                  <Text style={{ color: '#ffffff', fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
                     Open Chat
                   </Text>
                 </TouchableOpacity>
@@ -620,9 +667,9 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   <TouchableOpacity
                     onPress={() => handleMarkListingSold(selectedListing)}
                     disabled={markingSoldId === selectedListing.id}
-                    style={{ backgroundColor: '#f59e0b', borderRadius: 16, paddingVertical: 14, alignItems: 'center' }}
+                    style={{ backgroundColor: THEME_COLORS.warningStrong, borderRadius: RADIUS.md, paddingVertical: SPACE.xl, alignItems: 'center' }}
                   >
-                    <Text style={{ color: '#111827', fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>
+                    <Text style={{ color: THEME_COLORS.neutralTextStrong, fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
                       {markingSoldId === selectedListing.id ? 'Marking...' : 'Mark as Sold'}
                     </Text>
                   </TouchableOpacity>
@@ -666,17 +713,17 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       <View className="px-5 pt-4 pb-2 gap-4 bg-white border-b border-gray-100">
         {/* Search bar */}
         <View className="relative flex-row items-center bg-gray-100 rounded-2xl px-4 py-3 gap-3">
-          <Search size={16} color="#9ca3af" />
+          <Search size={16} color={THEME_COLORS.neutralTextSoft} />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search businesses..."
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={THEME_COLORS.neutralTextSoft}
             className="flex-1 text-sm font-medium text-gray-800"
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-              <X size={16} color="#9ca3af" />
+              <X size={16} color={THEME_COLORS.neutralTextSoft} />
             </TouchableOpacity>
           )}
         </View>
@@ -765,7 +812,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               ].join(' ')}
               activeOpacity={0.8}
             >
-              <ListIcon size={16} color={viewMode === 'list' ? '#fff' : '#9ca3af'} />
+              <ListIcon size={16} color={viewMode === 'list' ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setViewMode('map')}
@@ -775,7 +822,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               ].join(' ')}
               activeOpacity={0.8}
             >
-              <MapIcon size={16} color={viewMode === 'map' ? '#fff' : '#9ca3af'} />
+              <MapIcon size={16} color={viewMode === 'map' ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft} />
             </TouchableOpacity>
           </View>
         </View>
@@ -793,14 +840,14 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                 className="flex-row items-center gap-1 bg-orange-50 px-2 py-1 rounded-lg"
                 activeOpacity={0.8}
               >
-                <X size={12} color="#fc7127" />
+                <X size={12} color={THEME_COLORS.secondaryContainer} />
                 <Text className="text-orange-500 text-[10px] font-bold">
                   {enabledCategories.find(c => c.id === selectedCategory)?.label}
                 </Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity className="flex-row items-center gap-1" activeOpacity={0.8}>
-              <SlidersHorizontal size={16} color="#fc7127" />
+              <SlidersHorizontal size={16} color={THEME_COLORS.secondaryContainer} />
               <Text className="text-orange-500 text-xs font-bold uppercase tracking-wider">
                 Filter
               </Text>
@@ -831,7 +878,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                     coordinate={{ latitude: biz.latitude!, longitude: biz.longitude! }}
                     title={biz.name}
                     description={biz.category}
-                    pinColor={biz.isMemberBusiness ? '#9333ea' : PRIMARY}
+                    pinColor={biz.isMemberBusiness ? THEME_COLORS.aliasHex_9333ea : PRIMARY}
                   />
                 ))}
             </MapView>
@@ -846,12 +893,12 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
           data={filteredBusinesses}
           keyExtractor={item => item.id}
           renderItem={renderBusiness}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 }}
+          contentContainerStyle={{ paddingHorizontal: SPACE.xxxl, paddingTop: SPACE.sm, paddingBottom: SPACE.s120 }}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View className="items-center justify-center py-20 gap-4">
               <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center">
-                <SlidersHorizontal size={40} color="#d1d5db" />
+                <SlidersHorizontal size={40} color={THEME_COLORS.neutralBorderMuted} />
               </View>
               <Text className="text-primary font-bold text-lg">No businesses found</Text>
               <Text className="text-gray-400 text-sm text-center max-w-[240px]">
@@ -866,12 +913,12 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
           data={activeTab === 'sold' ? soldListings : activeListings}
           keyExtractor={item => item.id}
           renderItem={renderListing}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 }}
+          contentContainerStyle={{ paddingHorizontal: SPACE.xxxl, paddingTop: SPACE.sm, paddingBottom: SPACE.s120 }}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View className="items-center justify-center py-20 gap-4">
               <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center">
-                <MapPin size={40} color="#d1d5db" />
+                <MapPin size={40} color={THEME_COLORS.neutralBorderMuted} />
               </View>
               <Text className="text-primary font-bold text-lg">
                 {activeTab === 'sold' ? 'No sold items yet' : 'No listings yet'}

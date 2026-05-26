@@ -18,6 +18,7 @@ import { AuditLogsSection } from './AuditLogsSection';
 import { DangerZoneSection } from './DangerZoneSection';
 import ManageUserBusinesses from '../settings/ManageUserBusinesses';
 import { useCommunity } from '../../context/CommunityContext';
+import { THEME_COLORS } from '../../theme/colors';
 
 type Tab = 'profile' | 'businesses' | 'security' | 'sessions' | 'licensing' | 'activity' | 'danger';
 
@@ -30,6 +31,31 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'activity', label: 'Activity' },
   { key: 'danger', label: 'Account' },
 ];
+
+const TYPE_SCALE = {
+  title: 20,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  zero: 0,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  s44: 44,
+  s150: 150,
+};
+const RADIUS = {
+  md: 12,
+  full: 22,
+};
 
 const AccountSecurityPage: React.FC = () => {
   const router = useRouter();
@@ -106,18 +132,18 @@ const AccountSecurityPage: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: THEME_COLORS.neutralBg }}>
       {/* Header */}
       <View style={{
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: 16,
-        paddingBottom: 12,
-        backgroundColor: '#fff',
+        paddingHorizontal: SPACE.xl,
+        paddingTop: SPACE.lg,
+        paddingBottom: SPACE.md,
+        backgroundColor: THEME_COLORS.white,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.06)',
-        gap: 12,
+        borderBottomColor: THEME_COLORS.overlayBorderSoft,
+        gap: SPACE.md,
       }}>
         <TouchableOpacity
           onPress={() => {
@@ -127,22 +153,22 @@ const AccountSecurityPage: React.FC = () => {
               router.replace('/settings');
             }
           }}
-          style={{ padding: 8, borderRadius: 12, backgroundColor: '#f5f5f5' }}
+          style={{ padding: SPACE.sm, borderRadius: RADIUS.md, backgroundColor: THEME_COLORS.surfaceContainerLow }}
         >
-          <ArrowLeft size={20} color="#1a1a1a" />
+          <ArrowLeft size={20} color={THEME_COLORS.onSurface} />
         </TouchableOpacity>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <ShieldCheck size={22} color="#0d3d47" />
-          <Text style={{ fontSize: 20, fontWeight: '700', color: '#1a1a1a' }}>Account & Security</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm }}>
+          <ShieldCheck size={22} color={THEME_COLORS.primary} />
+          <Text style={{ fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Account & Security</Text>
         </View>
       </View>
 
       {/* Tab bar */}
-      <View style={{ backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' }}>
+      <View style={{ backgroundColor: THEME_COLORS.white, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft }}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 8, gap: 8, flexDirection: 'row', alignItems: 'center' }}
+          contentContainerStyle={{ paddingHorizontal: SPACE.md, paddingVertical: SPACE.sm, gap: SPACE.sm, flexDirection: 'row', alignItems: 'center' }}
         >
           {TABS.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -164,15 +190,15 @@ const AccountSecurityPage: React.FC = () => {
                 onPress={() => setActiveTab(tab.key)}
                 activeOpacity={0.7}
                 style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 22,
-                  backgroundColor: isActive ? '#0d3d47' : '#f8fafc',
+                  width: SPACE.s44,
+                  height: SPACE.s44,
+                  borderRadius: RADIUS.full,
+                  backgroundColor: isActive ? THEME_COLORS.primary : THEME_COLORS.neutralBg,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <IconComponent size={20} color={isActive ? '#fff' : '#64748b'} />
+                <IconComponent size={20} color={isActive ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
             );
           })}
@@ -186,7 +212,7 @@ const AccountSecurityPage: React.FC = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
         <ScrollView
-          contentContainerStyle={{ padding: 16, paddingBottom: 150 }}
+          contentContainerStyle={{ padding: SPACE.lg, paddingBottom: SPACE.s150 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >

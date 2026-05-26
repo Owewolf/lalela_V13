@@ -18,6 +18,7 @@ import { ChatComposer } from './ChatComposer';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCall } from '../../context/CallContext';
+import { THEME_COLORS } from '../../theme/colors';
 
 interface ChatDetailPageProps {
   conversationId: string;
@@ -194,9 +195,9 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
 
   const roleBadgeBg = (r: string) => {
     switch (r) {
-      case 'ADMIN': return '#0d3d47';
-      case 'MODERATOR': return '#8b5cf6';
-      default: return '#9ca3af';
+      case 'ADMIN': return THEME_COLORS.primary;
+      case 'MODERATOR': return THEME_COLORS.aliasHex_8b5cf6;
+      default: return THEME_COLORS.neutralTextSoft;
     }
   };
   const summaryParts: string[] = [];
@@ -213,7 +214,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
   const placeholder = chat?.type === 'emergency' ? 'Send emergency update...' : 'Type a message...';
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: '#f7f8fc' }}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: THEME_COLORS.aliasHex_f7f8fc }}>
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -234,7 +235,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
               activeOpacity={0.7}
               className="p-1.5 -ml-1.5 rounded-xl"
             >
-              <ArrowLeft size={20} color="#111827" />
+              <ArrowLeft size={20} color={THEME_COLORS.neutralTextStrong} />
             </TouchableOpacity>
 
             {isNoticeConversation ? (
@@ -248,7 +249,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                     />
                   ) : (
                     <View className="w-12 h-12 rounded-2xl bg-amber-100 items-center justify-center">
-                      <AlertTriangle size={18} color="#b45309" />
+                      <AlertTriangle size={18} color={THEME_COLORS.warningText} />
                     </View>
                   )}
                 </View>
@@ -260,9 +261,9 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                   <View className="flex-row items-center gap-1.5 mt-0.5 flex-wrap">
                     <View className={[urgencyBadge.bg, 'px-1.5 py-0.5 rounded flex-row items-center gap-1'].join(' ')}>
                       {urgencyBadge.label === 'Info' ? (
-                        <Info size={10} color="#1d4ed8" />
+                        <Info size={10} color={THEME_COLORS.brandBlueText} />
                       ) : (
-                        <AlertTriangle size={10} color={urgencyBadge.label === 'Emergency' ? '#b91c1c' : '#b45309'} />
+                        <AlertTriangle size={10} color={urgencyBadge.label === 'Emergency' ? THEME_COLORS.aliasHex_b91c1c : THEME_COLORS.warningText} />
                       )}
                       <Text className={[urgencyBadge.text, 'text-[10px] font-bold uppercase tracking-wider'].join(' ')}>
                         {urgencyBadge.label}
@@ -270,7 +271,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                     </View>
                     {!!noticeLocation && (
                       <View className="flex-row items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100">
-                        <MapPin size={10} color="#4b5563" />
+                        <MapPin size={10} color={THEME_COLORS.neutralTextDefault} />
                         <Text numberOfLines={1} className="text-[10px] text-gray-600 font-semibold max-w-[140px]">
                           {noticeLocation}
                         </Text>
@@ -367,7 +368,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                     </View>
                     {hasBusiness && (
                       <View className="flex-row items-center gap-0.5 bg-amber-100 px-1.5 py-0.5 rounded">
-                        <Store size={10} color="#d97706" />
+                        <Store size={10} color={THEME_COLORS.warning} />
                         <Text className="text-[10px] font-bold uppercase tracking-wider text-amber-600">
                           Biz
                         </Text>
@@ -383,26 +384,28 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
               <View className="flex-row items-center gap-2 pl-3">
                 <TouchableOpacity
                   onPress={handleVideoPress}
-                  className="w-11 h-11 rounded-full bg-[#f5f5f5] items-center justify-center"
+                  className="w-11 h-11 rounded-full items-center justify-center"
+                  style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                   activeOpacity={0.8}
                 >
-                  <Video size={21} color="#111827" />
+                  <Video size={21} color={THEME_COLORS.neutralTextStrong} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handlePhonePress}
-                  className="w-11 h-11 rounded-full bg-[#f5f5f5] items-center justify-center"
+                  className="w-11 h-11 rounded-full items-center justify-center"
+                  style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                   activeOpacity={0.8}
                 >
-                  <Phone size={20} color="#111827" />
+                  <Phone size={20} color={THEME_COLORS.neutralTextStrong} />
                 </TouchableOpacity>
               </View>
             ) : (
               <View className="flex-row items-center gap-3 pl-3">
                 <TouchableOpacity className="p-1 rounded-xl" activeOpacity={0.8}>
-                  <ChevronDown size={22} color="#0d3d47" />
+                  <ChevronDown size={22} color={THEME_COLORS.primary} />
                 </TouchableOpacity>
                 <TouchableOpacity className="p-1 rounded-xl" activeOpacity={0.8}>
-                  <Search size={21} color="#0d3d47" />
+                  <Search size={21} color={THEME_COLORS.primary} />
                 </TouchableOpacity>
               </View>
             )}
@@ -411,7 +414,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
           {/* Summary bar */}
           {!isNoticeConversation && !isDirectConversation && summaryParts.length > 0 && (
             <View className="flex-row items-center gap-1.5 px-4 pb-2">
-              <FileText size={12} color="#9ca3af" />
+              <FileText size={12} color={THEME_COLORS.neutralTextSoft} />
               <Text className="text-[11px] text-gray-400 font-medium">
                 {summaryParts.join(' · ')}
               </Text>
@@ -452,7 +455,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
         )}
 
         {/* Message list */}
-        <View className="flex-1 bg-[#f7f8fc]">
+        <View className="flex-1 bg-slate-50">
           <ChatWindow
             messages={messages}
             conversation={chat || { id: conversationId, participants: [], type: 'direct', lastMessage: '', lastMessageAt: '', priority: 'normal', unreadCount: 0 }}

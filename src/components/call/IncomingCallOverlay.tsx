@@ -17,6 +17,38 @@ import {
 } from 'react-native';
 import { Phone, PhoneOff, Video } from 'lucide-react-native';
 import { useCall } from '../../context/CallContext';
+import { THEME_COLORS } from '../../theme/colors';
+
+const TYPE_SCALE = {
+  xs: 11,
+  sm: 14,
+  lg: 22,
+  hero: 36,
+};
+
+const FONT_WEIGHT = {
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  extrabold: '800',
+  black: '900',
+} as const;
+const SPACE = {
+  xs: 4,
+  sm: 6,
+  md: 16,
+  lg: 20,
+  xl: 24,
+  xxl: 32,
+  xxxl: 48,
+  s72: 72,
+  s88: 88,
+};
+const RADIUS = {
+  panel: 24,
+  xl: 36,
+  full: 44,
+};
 
 // Pulse the device while ringing
 const VIBRATION_PATTERN = [0, 1000, 500];
@@ -77,7 +109,7 @@ export function IncomingCallOverlay() {
           <View style={styles.actions}>
             {/* Reject */}
             <TouchableOpacity style={[styles.btn, styles.btnReject]} onPress={rejectCall}>
-              <PhoneOff size={28} color="#fff" />
+              <PhoneOff size={28} color={THEME_COLORS.white} />
               <Text style={styles.btnLabel}>Decline</Text>
             </TouchableOpacity>
 
@@ -86,7 +118,7 @@ export function IncomingCallOverlay() {
               style={[styles.btn, styles.btnAccept]}
               onPress={() => acceptCall('audio')}
             >
-              <Phone size={28} color="#fff" />
+              <Phone size={28} color={THEME_COLORS.white} />
               <Text style={styles.btnLabel}>Audio</Text>
             </TouchableOpacity>
 
@@ -96,7 +128,7 @@ export function IncomingCallOverlay() {
                 style={[styles.btn, styles.btnVideo]}
                 onPress={() => acceptCall('video')}
               >
-                <Video size={28} color="#fff" />
+                <Video size={28} color={THEME_COLORS.white} />
                 <Text style={styles.btnLabel}>Video</Text>
               </TouchableOpacity>
             )}
@@ -110,71 +142,71 @@ export function IncomingCallOverlay() {
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.75)',
+    backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75,
     justifyContent: 'flex-end',
   },
   card: {
-    backgroundColor: '#0d3d47',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 48,
+    backgroundColor: THEME_COLORS.primary,
+    borderTopLeftRadius: RADIUS.panel,
+    borderTopRightRadius: RADIUS.panel,
+    paddingHorizontal: SPACE.xl,
+    paddingTop: SPACE.xxl,
+    paddingBottom: SPACE.xxxl,
     alignItems: 'center',
   },
   avatar: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    marginBottom: 16,
+    width: SPACE.s88,
+    height: SPACE.s88,
+    borderRadius: RADIUS.full,
+    marginBottom: SPACE.md,
     borderWidth: 3,
-    borderColor: '#fc7127',
+    borderColor: THEME_COLORS.secondaryContainer,
   },
   avatarPlaceholder: {
-    backgroundColor: '#1a5c6e',
+    backgroundColor: THEME_COLORS.aliasHex_1a5c6e,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarInitial: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: '#fff8f0',
+    fontSize: TYPE_SCALE.hero,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.surface,
   },
   callerName: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#fff8f0',
-    marginBottom: 6,
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.surface,
+    marginBottom: SPACE.sm,
   },
   callTypeLabel: {
-    fontSize: 14,
-    color: '#a8c4cb',
-    marginBottom: 32,
+    fontSize: TYPE_SCALE.sm,
+    color: THEME_COLORS.tealMuted,
+    marginBottom: SPACE.xxl,
   },
   actions: {
     flexDirection: 'row',
-    gap: 20,
+    gap: SPACE.lg,
   },
   btn: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    gap: 4,
+    width: SPACE.s72,
+    height: SPACE.s72,
+    borderRadius: RADIUS.xl,
+    gap: SPACE.xs,
   },
   btnReject: {
-    backgroundColor: '#ef4444',
+    backgroundColor: THEME_COLORS.errorStrong,
   },
   btnAccept: {
-    backgroundColor: '#22c55e',
+    backgroundColor: THEME_COLORS.aliasHex_22c55e,
   },
   btnVideo: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: THEME_COLORS.brandBlue,
   },
   btnLabel: {
-    fontSize: 11,
-    color: '#fff',
-    fontWeight: '600',
+    fontSize: TYPE_SCALE.xs,
+    color: THEME_COLORS.white,
+    fontWeight: FONT_WEIGHT.semibold,
   },
 });
