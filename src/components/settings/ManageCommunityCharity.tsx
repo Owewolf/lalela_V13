@@ -980,7 +980,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACE.xxl,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
     borderRadius: RADIUS.xl,
     borderWidth: 1,
     borderColor: THEME_COLORS.overlayBorderSoft,
@@ -1010,7 +1010,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalCard: {
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingHorizontal: SPACE.s18,
@@ -1106,7 +1106,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME_COLORS.overlayBorderSoft,
     padding: SPACE.xxl,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
   },
   catCycleCard: {
     flexDirection: 'row',
@@ -1124,7 +1124,7 @@ const styles = StyleSheet.create({
     borderColor: THEME_COLORS.overlayBorderSoft,
     padding: SPACE.xxl,
     gap: SPACE.sm,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
   },
   catHubTitle: {
     fontSize: TYPE_SCALE.body,
@@ -1170,7 +1170,7 @@ const styles = StyleSheet.create({
     borderColor: THEME_COLORS.overlayBorderSoft,
     padding: SPACE.xxl,
     gap: SPACE.md,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
   },
   suggestionBody: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.neutralTextDefault, lineHeight: LINE_HEIGHT.lg },
   suggestionReason: { fontSize: TYPE_SCALE.base, color: THEME_COLORS.primary, fontWeight: FONT_WEIGHT.semibold },
@@ -1183,7 +1183,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACE.xl,
     fontSize: TYPE_SCALE.body,
     color: THEME_COLORS.neutralTextStrong,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
   },
   textarea: {
     minHeight: 96,

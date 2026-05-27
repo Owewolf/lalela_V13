@@ -37,7 +37,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { GOOGLE_PLACES_API_KEY, BUSINESS_CATEGORIES } from '../../constants';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
 import { createShadow } from '../../theme/shadows';
 
@@ -112,15 +112,15 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   visible, title, message, confirmLabel, cancelLabel = 'No, cancel', onConfirm, onCancel,
 }) => (
   <Modal transparent visible={visible} animationType="fade" onRequestClose={() => {}}>
-    <View className="flex-1 bg-black/50 items-center justify-center px-6">
-      <View className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl">
+    <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_05 }}>
+      <View className="rounded-3xl p-8 w-full max-w-sm shadow-2xl" style={{ backgroundColor: THEME_COLORS.surface }}>
         <Text className="text-xl font-black text-primary mb-2">{title}</Text>
         <Text className="text-sm text-gray-500 mb-6 leading-relaxed">{message}</Text>
         <View className="gap-3">
           <TouchableOpacity onPress={onConfirm} className="py-4 rounded-2xl items-center" style={{ backgroundColor: THEME_COLORS.primary }}>
             <Text className="text-white font-bold">{confirmLabel}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={onCancel} className="py-4 rounded-2xl items-center bg-gray-100">
+          <TouchableOpacity onPress={onCancel} className="py-4 rounded-2xl items-center" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
             <Text className="text-gray-600 font-medium">{cancelLabel}</Text>
           </TouchableOpacity>
         </View>
@@ -527,7 +527,7 @@ const OnboardingCreate: React.FC = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-white items-center justify-center">
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
         <ActivityIndicator size="large" color={THEME_COLORS.primary} />
       </SafeAreaView>
     );
@@ -554,7 +554,8 @@ const OnboardingCreate: React.FC = () => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => router.push('/pricing' as any)}
-          className="w-full py-4 rounded-2xl items-center bg-orange-50 border border-orange-100"
+          className="w-full py-4 rounded-2xl items-center border border-orange-100"
+          style={{ backgroundColor: THEME_COLORS.warningSurface }}
         >
           <Text className="text-secondary-container font-bold text-base">View Licence Options</Text>
         </TouchableOpacity>
@@ -574,13 +575,16 @@ const OnboardingCreate: React.FC = () => {
   const currentStepIndex = step === 'profile' ? 0 : 1;
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
         <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: SPACE.s48 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEnabled={!mapDragging}>
 
           {/* Header */}
-          <View className="px-6 pt-6 pb-4 flex-row items-center justify-between border-b border-gray-100">
+          <View
+            className="px-6 pt-6 pb-4 flex-row items-center justify-between border-b"
+            style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
+          >
             <View className="flex-row items-center gap-2">
               <View className="w-9 h-9 bg-primary rounded-xl items-center justify-center overflow-hidden">
                 <Image source={require('../../../assets/lalela_logo.png')} style={{ width: SPACE.s36, height: SPACE.s36 }} resizeMode="cover" />
@@ -629,7 +633,7 @@ const OnboardingCreate: React.FC = () => {
             {step === 'profile' && (
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
-                  <View className="w-12 h-12 bg-orange-50 rounded-2xl items-center justify-center">
+                  <View className="w-12 h-12 rounded-2xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.warningSurface }}>
                     <UserIcon size={24} color={THEME_COLORS.secondaryContainer} />
                   </View>
                   <View className="flex-1">
@@ -641,19 +645,25 @@ const OnboardingCreate: React.FC = () => {
                 {/* Profile Image */}
                 <View className="items-center gap-2">
                   <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8}>
-                    <View className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200 items-center justify-center">
+                    <View
+                      className="w-24 h-24 rounded-full overflow-hidden border-2 items-center justify-center"
+                      style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderColor: THEME_COLORS.neutralBorderSoft }}
+                    >
                       {profileImage ? (
                         <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" />
                       ) : (
                         <UserIcon size={36} color={THEME_COLORS.neutralBorderMuted} />
                       )}
                       {isUploading && (
-                        <View className="absolute inset-0 bg-black/40 items-center justify-center">
+                        <View className="absolute inset-0 items-center justify-center" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_4 }}>
                           <ActivityIndicator color="white" />
                         </View>
                       )}
                     </View>
-                    <View className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full items-center justify-center border-2 border-white">
+                    <View
+                      className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full items-center justify-center border-2"
+                      style={{ borderColor: THEME_COLORS.surface }}
+                    >
                       <Camera size={12} color="white" />
                     </View>
                   </TouchableOpacity>
@@ -663,23 +673,23 @@ const OnboardingCreate: React.FC = () => {
                 {/* Full Name */}
                 <View className="gap-1">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Full Name <Text className="text-red-500">*</Text></Text>
-                  <TextInput value={fullName} onChangeText={(t) => { setFullName(t); if (!communityName || communityName.endsWith("'s Community")) setCommunityName(t ? `${t}'s Community` : ''); }} placeholder="Your full name" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor={THEME_COLORS.neutralTextSoft} />
+                  <TextInput value={fullName} onChangeText={(t) => { setFullName(t); if (!communityName || communityName.endsWith("'s Community")) setCommunityName(t ? `${t}'s Community` : ''); }} placeholder="Your full name" className="w-full px-5 py-4 rounded-2xl font-bold text-primary" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }} placeholderTextColor={THEME_COLORS.neutralTextSoft} />
                 </View>
 
                 {/* Email */}
                 <View className="gap-1">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email</Text>
-                  <TextInput value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor={THEME_COLORS.neutralTextSoft} />
+                  <TextInput value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" className="w-full px-5 py-4 rounded-2xl font-bold text-primary" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }} placeholderTextColor={THEME_COLORS.neutralTextSoft} />
                 </View>
 
                 {/* Phone */}
                 <View className="gap-1">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Phone</Text>
-                  <TextInput value={phone} onChangeText={setPhone} placeholder="+27..." keyboardType="phone-pad" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor={THEME_COLORS.neutralTextSoft} />
+                  <TextInput value={phone} onChangeText={setPhone} placeholder="+27..." keyboardType="phone-pad" className="w-full px-5 py-4 rounded-2xl font-bold text-primary" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }} placeholderTextColor={THEME_COLORS.neutralTextSoft} />
                 </View>
 
-                <View className="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-4 flex-row items-start gap-3">
-                  <View className="w-10 h-10 rounded-xl bg-white items-center justify-center">
+                <View className="border border-blue-100 rounded-2xl px-4 py-4 flex-row items-start gap-3" style={{ backgroundColor: THEME_COLORS.infoSurfaceSoft }}>
+                  <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.surface }}>
                     <MapPin size={18} color={THEME_COLORS.brandBlue} />
                   </View>
                   <View className="flex-1">
@@ -690,7 +700,7 @@ const OnboardingCreate: React.FC = () => {
                   </View>
                 </View>
 
-                {error && <View className="bg-red-50 border border-red-100 rounded-2xl p-4"><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
+                {error && <View className="border border-red-100 rounded-2xl p-4" style={{ backgroundColor: THEME_COLORS.errorSurface }}><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
 
                 <TouchableOpacity
                   onPress={() => {
@@ -713,7 +723,7 @@ const OnboardingCreate: React.FC = () => {
             {step === 'name' && (
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
-                  <View className="w-12 h-12 bg-orange-50 rounded-2xl items-center justify-center">
+                  <View className="w-12 h-12 rounded-2xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.warningSurface }}>
                     <Sparkles size={24} color={THEME_COLORS.secondaryContainer} />
                   </View>
                   <View className="flex-1">
@@ -723,8 +733,8 @@ const OnboardingCreate: React.FC = () => {
                 </View>
 
                 {/* Profile preview */}
-                <View className="flex-row items-center gap-3 p-4 bg-gray-50 rounded-2xl">
-                  <View className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 items-center justify-center">
+                <View className="flex-row items-center gap-3 p-4 rounded-2xl" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
+                  <View className="w-10 h-10 rounded-full overflow-hidden items-center justify-center" style={{ backgroundColor: THEME_COLORS.surfaceContainer }}>
                     {profileImage ? <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" /> : <UserIcon size={20} color={THEME_COLORS.neutralTextSoft} />}
                   </View>
                   <View className="flex-1 min-w-0">
@@ -742,11 +752,11 @@ const OnboardingCreate: React.FC = () => {
                 {/* Community Name */}
                 <View className="gap-1">
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Community Name <Text className="text-red-500">*</Text></Text>
-                  <TextInput value={communityName} onChangeText={setCommunityName} placeholder="e.g. Parkwood Heights" className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary" placeholderTextColor={THEME_COLORS.neutralTextSoft} />
+                  <TextInput value={communityName} onChangeText={setCommunityName} placeholder="e.g. Parkwood Heights" className="w-full px-5 py-4 rounded-2xl font-bold text-primary" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }} placeholderTextColor={THEME_COLORS.neutralTextSoft} />
                 </View>
 
                 {draftCommunityId ? (
-                  <View className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex-row items-center gap-3">
+                  <View className="border border-emerald-100 p-4 rounded-2xl flex-row items-center gap-3" style={{ backgroundColor: THEME_COLORS.successSurfaceSoft }}>
                     <CheckCircle2 size={18} color={THEME_COLORS.success} />
                     <View className="flex-1">
                       <Text className="text-sm font-bold text-emerald-800">Community name saved</Text>
@@ -756,8 +766,8 @@ const OnboardingCreate: React.FC = () => {
                 ) : null}
 
                 {/* Trial banner */}
-                <View className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl flex-row items-start gap-3">
-                  <View className="w-10 h-10 rounded-xl bg-emerald-500 items-center justify-center">
+                <View className="border border-emerald-100 p-5 rounded-2xl flex-row items-start gap-3" style={{ backgroundColor: THEME_COLORS.successSurfaceSoft }}>
+                  <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.successStrong }}>
                     <CheckCircle2 size={22} color="white" />
                   </View>
                   <View className="flex-1">
@@ -766,11 +776,11 @@ const OnboardingCreate: React.FC = () => {
                   </View>
                 </View>
 
-                {error && <View className="bg-red-50 border border-red-100 rounded-2xl p-4"><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
+                {error && <View className="border border-red-100 rounded-2xl p-4" style={{ backgroundColor: THEME_COLORS.errorSurface }}><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
 
                 <View className="flex-row gap-3">
                   {!userProfile?.profileCompleted && (
-                    <TouchableOpacity onPress={() => { setStep('profile'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
+                    <TouchableOpacity onPress={() => { setStep('profile'); setError(null); }} className="py-4 px-5 rounded-2xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                       <ArrowLeft size={20} color={THEME_COLORS.neutralTextEmphasis} />
                     </TouchableOpacity>
                   )}
@@ -802,7 +812,7 @@ const OnboardingCreate: React.FC = () => {
             {step === 'coverage' && (
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
-                  <View className="w-12 h-12 bg-blue-50 rounded-2xl items-center justify-center">
+                  <View className="w-12 h-12 rounded-2xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.infoSurfaceSoft }}>
                     <MapPin size={24} color={THEME_COLORS.brandBlue} />
                   </View>
                   <View className="flex-1">
@@ -835,7 +845,7 @@ const OnboardingCreate: React.FC = () => {
                       styles={{
                         container: { flex: 0 },
                         textInput: { backgroundColor: THEME_COLORS.neutralBgSofter, borderRadius: RADIUS.xxl, paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.md, fontWeight: 'bold', color: THEME_COLORS.primary, height: SPACE.s52, margin: SPACE.zero },
-                        listView: { position: 'absolute', top: SPACE.s56, left: SPACE.zero, right: SPACE.zero, zIndex: 9999, ...createShadow(THEME_COLORS.black, 0, 0, 0.1, SPACE.sm, 9999), backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xl, marginTop: SPACE.xxs },
+                        listView: { position: 'absolute', top: SPACE.s56, left: SPACE.zero, right: SPACE.zero, zIndex: 9999, ...createShadow(THEME_COLORS.black, 0, 0, 0.1, SPACE.sm, 9999), backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.xl, marginTop: SPACE.xxs },
                         row: { paddingVertical: SPACE.md, paddingHorizontal: SPACE.xl },
                         description: { fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextEmphasis },
                       }}
@@ -934,10 +944,10 @@ const OnboardingCreate: React.FC = () => {
                   </View>
                 </View>
 
-                {error && <View className="bg-red-50 border border-red-100 rounded-2xl p-4"><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
+                {error && <View className="border border-red-100 rounded-2xl p-4" style={{ backgroundColor: THEME_COLORS.errorSurface }}><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
 
                 <View className="flex-row gap-3">
-                  <TouchableOpacity onPress={() => { setStep('name'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
+                  <TouchableOpacity onPress={() => { setStep('name'); setError(null); }} className="py-4 px-5 rounded-2xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                     <ArrowLeft size={20} color={THEME_COLORS.neutralTextEmphasis} />
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => { setError(null); setStep('categories'); }} className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2" style={{ backgroundColor: THEME_COLORS.primary }}>
@@ -1118,7 +1128,7 @@ const OnboardingCreate: React.FC = () => {
                 )}
 
                 {discoverError && (
-                  <View className="bg-red-50 border border-red-100 rounded-2xl p-3">
+                  <View className="border border-red-100 rounded-2xl p-3" style={{ backgroundColor: THEME_COLORS.errorSurface }}>
                     <Text className="text-xs text-red-600">{discoverError}</Text>
                   </View>
                 )}
@@ -1189,7 +1199,8 @@ const OnboardingCreate: React.FC = () => {
                     <View className="flex-row gap-2">
                       <TouchableOpacity
                         onPress={() => { setDiscoveredBusinesses([]); setSelectedDiscovered(new Set()); }}
-                        className="py-3 px-4 rounded-2xl bg-gray-100 items-center justify-center"
+                        className="py-3 px-4 rounded-2xl items-center justify-center"
+                        style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                       >
                         <Text className="text-gray-500 text-xs font-bold">Clear</Text>
                       </TouchableOpacity>
@@ -1212,7 +1223,7 @@ const OnboardingCreate: React.FC = () => {
                   <View className="gap-2">
                     <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Added</Text>
                     {pendingBusinesses.map((biz, i) => (
-                      <View key={i} className="flex-row items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                      <View key={i} className="flex-row items-center gap-3 p-3 rounded-xl border" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderColor: THEME_COLORS.neutralBorderSoft }}>
                         <Text className="flex-1 text-sm font-bold text-primary">{biz.name}</Text>
                         <Text className="text-[10px] text-gray-400">{BUSINESS_CATEGORIES.find(c => c.id === biz.category)?.label ?? biz.category}</Text>
                         <TouchableOpacity onPress={() => setPendingBusinesses(prev => prev.filter((_, idx) => idx !== i))}>
@@ -1231,7 +1242,8 @@ const OnboardingCreate: React.FC = () => {
                       value={newBizName}
                       onChangeText={setNewBizName}
                       placeholder="Business name (e.g. Cape Coffee)"
-                      className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl font-bold text-primary text-sm"
+                      className="flex-1 px-4 py-3 rounded-2xl font-bold text-primary text-sm"
+                      style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                       placeholderTextColor={THEME_COLORS.neutralTextSoft}
                     />
                     <TouchableOpacity
@@ -1251,7 +1263,7 @@ const OnboardingCreate: React.FC = () => {
                 </View>
 
                 <View className="flex-row gap-3">
-                  <TouchableOpacity onPress={() => { setStep('categories'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
+                  <TouchableOpacity onPress={() => { setStep('categories'); setError(null); }} className="py-4 px-5 rounded-2xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                     <ArrowLeft size={20} color={THEME_COLORS.neutralTextEmphasis} />
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => { setError(null); setStep('rules'); }} className="flex-1 py-4 rounded-2xl flex-row items-center justify-center gap-2" style={{ backgroundColor: THEME_COLORS.primary }}>
@@ -1266,7 +1278,7 @@ const OnboardingCreate: React.FC = () => {
             {step === 'rules' && (
               <View className="gap-5">
                 <View className="flex-row items-center gap-3">
-                  <View className="w-12 h-12 bg-red-50 rounded-2xl items-center justify-center">
+                  <View className="w-12 h-12 rounded-2xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.errorSurface }}>
                     <Text style={{ fontSize: TYPE_SCALE.xl }}>📋</Text>
                   </View>
                   <View className="flex-1">
@@ -1275,27 +1287,27 @@ const OnboardingCreate: React.FC = () => {
                   </View>
                 </View>
 
-                <View className="gap-4 p-4 bg-gray-50 rounded-2xl">
+                <View className="gap-4 p-4 rounded-2xl" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400">POSTING LIMITS</Text>
                   <View className="flex-row items-center justify-between">
                     <Text className="text-sm font-medium text-primary">Max posts per user / day</Text>
                     <View className="flex-row items-center gap-2">
-                      <TouchableOpacity onPress={() => setMaxPostsPerDay(v => String(Math.max(1, Number(v) - 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-primary">−</Text></TouchableOpacity>
+                      <TouchableOpacity onPress={() => setMaxPostsPerDay(v => String(Math.max(1, Number(v) - 1)))} className="w-8 h-8 rounded-lg items-center justify-center" style={{ backgroundColor: THEME_COLORS.neutralBgSofter }}><Text className="font-bold text-primary">−</Text></TouchableOpacity>
                       <Text className="text-base font-black text-primary w-6 text-center">{maxPostsPerDay}</Text>
-                      <TouchableOpacity onPress={() => setMaxPostsPerDay(v => String(Math.min(20, Number(v) + 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-primary">+</Text></TouchableOpacity>
+                      <TouchableOpacity onPress={() => setMaxPostsPerDay(v => String(Math.min(20, Number(v) + 1)))} className="w-8 h-8 rounded-lg items-center justify-center" style={{ backgroundColor: THEME_COLORS.neutralBgSofter }}><Text className="font-bold text-primary">+</Text></TouchableOpacity>
                     </View>
                   </View>
                   <View className="flex-row items-center justify-between">
                     <Text className="text-sm font-medium text-primary">Max listings per week</Text>
                     <View className="flex-row items-center gap-2">
-                      <TouchableOpacity onPress={() => setMaxListingsPerWeek(v => String(Math.max(1, Number(v) - 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-primary">−</Text></TouchableOpacity>
+                      <TouchableOpacity onPress={() => setMaxListingsPerWeek(v => String(Math.max(1, Number(v) - 1)))} className="w-8 h-8 rounded-lg items-center justify-center" style={{ backgroundColor: THEME_COLORS.neutralBgSofter }}><Text className="font-bold text-primary">−</Text></TouchableOpacity>
                       <Text className="text-base font-black text-primary w-6 text-center">{maxListingsPerWeek}</Text>
-                      <TouchableOpacity onPress={() => setMaxListingsPerWeek(v => String(Math.min(20, Number(v) + 1)))} className="w-8 h-8 rounded-lg bg-gray-200 items-center justify-center"><Text className="font-bold text-primary">+</Text></TouchableOpacity>
+                      <TouchableOpacity onPress={() => setMaxListingsPerWeek(v => String(Math.min(20, Number(v) + 1)))} className="w-8 h-8 rounded-lg items-center justify-center" style={{ backgroundColor: THEME_COLORS.neutralBgSofter }}><Text className="font-bold text-primary">+</Text></TouchableOpacity>
                     </View>
                   </View>
                 </View>
 
-                <View className="gap-3 p-4 bg-gray-50 rounded-2xl">
+                <View className="gap-3 p-4 rounded-2xl" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                   <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400">ACCESS CONTROL</Text>
                   <View className="flex-row items-center justify-between">
                     <Text className="text-sm font-medium text-primary flex-1 pr-4">Require business verification</Text>
@@ -1304,7 +1316,7 @@ const OnboardingCreate: React.FC = () => {
                       className="w-12 h-7 rounded-full items-center justify-center"
                       style={{ backgroundColor: requireVerification ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft }}
                     >
-                      <View className="w-5 h-5 rounded-full bg-white" style={{ alignSelf: requireVerification ? 'flex-end' : 'flex-start', margin: SPACE.xxxs }} />
+                      <View className="w-5 h-5 rounded-full" style={{ alignSelf: requireVerification ? 'flex-end' : 'flex-start', margin: SPACE.xxxs, backgroundColor: THEME_COLORS.surface }} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -1318,10 +1330,10 @@ const OnboardingCreate: React.FC = () => {
                   {pendingBusinesses.length > 0 ? <Text className="text-xs text-gray-600">🏪 {pendingBusinesses.length} business{pendingBusinesses.length > 1 ? 'es' : ''} added</Text> : null}
                 </View>
 
-                {error && <View className="bg-red-50 border border-red-100 rounded-2xl p-4"><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
+                {error && <View className="border border-red-100 rounded-2xl p-4" style={{ backgroundColor: THEME_COLORS.errorSurface }}><Text className="text-xs text-red-600 font-medium">{error}</Text></View>}
 
                 <View className="flex-row gap-3">
-                  <TouchableOpacity onPress={() => { setStep('businesses'); setError(null); }} className="py-4 px-5 bg-gray-100 rounded-2xl items-center justify-center">
+                  <TouchableOpacity onPress={() => { setStep('businesses'); setError(null); }} className="py-4 px-5 rounded-2xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                     <ArrowLeft size={20} color={THEME_COLORS.neutralTextEmphasis} />
                   </TouchableOpacity>
                   <TouchableOpacity

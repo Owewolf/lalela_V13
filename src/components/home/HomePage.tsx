@@ -36,7 +36,8 @@ import { resolveMediaUrl } from '../../lib/config';
 import { InteractiveCoverageMap } from './InteractiveCoverageMap';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
 import { CommunityNotice } from '../../types';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
+import { createShadow } from '../../theme/shadows';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -88,6 +89,10 @@ const SPACE = {
   s36: 36,
   s40: 40,
 };
+
+const CARD_DEPTH_HERO = createShadow(THEME_COLORS.black, 0, 10, 0.16, 18, 8);
+const CARD_DEPTH = createShadow(THEME_COLORS.black, 0, 7, 0.12, 14, 5);
+const CARD_DEPTH_SOFT = createShadow(THEME_COLORS.black, 0, 5, 0.09, 10, 3);
 
 // ─── Notice card helpers ─────────────────────────────────────────────────────
 
@@ -579,15 +584,19 @@ export const HomePage: React.FC<HomePageProps> = ({
     return (
       <View
         key={notice.id}
-        style={{ borderColor, backgroundColor: bgColor }}
         className={cn(
-          'rounded-3xl border shadow-sm overflow-hidden mb-4',
+          'rounded-3xl border overflow-hidden mb-4',
           !isEmergencyOrWarning && 'flex-1'
         )}
+        style={{
+          borderColor,
+          backgroundColor: bgColor,
+          ...(isEmergencyOrWarning ? CARD_DEPTH_HERO : CARD_DEPTH),
+        }}
       >
         {/* Mini map for emergency/warning with location */}
         {isEmergencyOrWarning && notice.latitude && notice.longitude && (
-          <View className="w-full overflow-hidden border-b border-gray-200/30">
+          <View className="w-full overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
             <InteractiveCoverageMap
               center={{ latitude: notice.latitude, longitude: notice.longitude }}
               height={160}
@@ -624,7 +633,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
         {/* Attached image (non-emergency) layout at top */}
         {notice.postsImage && !isEmergencyOrWarning && (
-          <View className="w-full h-24 border-b border-gray-200/30 overflow-hidden">
+          <View className="w-full h-24 border-b overflow-hidden" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
             <Image
               source={{ uri: resolveMediaUrl(notice.postsImage) }}
               className="w-full h-full"
@@ -649,14 +658,14 @@ export const HomePage: React.FC<HomePageProps> = ({
                     activeMenuId === notice.id ? null : notice.id
                   )
                 }
-                className="p-2 rounded-full bg-gray-100"
+                className="p-2 rounded-full bg-surface-container"
               >
                 <MoreVertical size={16} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
               {activeMenuId === notice.id && (
                 <View
-                  className="absolute right-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
-                  style={{ top: SPACE.s36 }}
+                  className="absolute right-0 mt-1 w-48 bg-surface-container-low rounded-2xl shadow-xl border z-50 py-2 overflow-hidden"
+                  style={{ top: SPACE.s36, borderColor: THEME_COLORS.neutralBorderSoft }}
                 >
                   {(notice.authorId === userProfile?.id ||
                     currentCommunity?.userRole === 'ADMIN') && (
@@ -760,7 +769,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           {/* Footer row */}
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
-              <View className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden">
+              <View className="w-9 h-9 rounded-full bg-surface-container overflow-hidden">
                 {notice.authorImage ? (
                   <Image
                     source={{ uri: notice.authorImage }}
@@ -819,14 +828,14 @@ export const HomePage: React.FC<HomePageProps> = ({
                 onPress={() =>
                   setActiveMenuId(activeMenuId === notice.id ? null : notice.id)
                 }
-                className="w-7 h-7 rounded-full bg-gray-100 items-center justify-center"
+                className="w-7 h-7 rounded-full bg-surface-container items-center justify-center"
               >
                 <MoreVertical size={14} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
               {activeMenuId === notice.id && (
                 <View
-                  className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
-                  style={{ top: SPACE.s32 }}
+                  className="absolute right-0 mt-1 w-44 bg-surface-container-low rounded-2xl shadow-xl border z-50 py-2 overflow-hidden"
+                  style={{ top: SPACE.s32, borderColor: THEME_COLORS.neutralBorderSoft }}
                 >
                   {(notice.authorId === userProfile?.id ||
                     currentCommunity?.userRole === 'ADMIN') && (
@@ -928,8 +937,8 @@ export const HomePage: React.FC<HomePageProps> = ({
           </Text>
 
           {/* Footer: author + chat */}
-          <View className="flex-row items-center gap-2 pt-1 mt-1 border-t border-gray-50">
-            <View className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
+          <View className="flex-row items-center gap-2 pt-1 mt-1 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
+            <View className="w-6 h-6 rounded-full bg-surface-container overflow-hidden">
               {notice.authorImage ? (
                 <Image
                   source={{ uri: notice.authorImage }}
@@ -988,12 +997,13 @@ export const HomePage: React.FC<HomePageProps> = ({
         activeOpacity={0.9}
         onPress={() => router.push(`/market?listingId=${listing.id}`)}
         key={listing.id}
-        className="flex-1 mx-0.5 mb-3 bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden"
+        className="flex-1 mx-0.5 mb-3 bg-surface-container-low rounded-3xl border overflow-hidden"
+        style={{ ...CARD_DEPTH, borderColor: THEME_COLORS.neutralBorderSoft }}
       >
         {typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0 && (
           <Image 
             source={{ uri: resolveMediaUrl(listing.postsImage) }} 
-            className="w-full h-24 bg-gray-100" 
+            className="w-full h-24 bg-surface-container" 
             resizeMode="cover" 
           />
         )}
@@ -1014,14 +1024,14 @@ export const HomePage: React.FC<HomePageProps> = ({
                     activeMenuId === listing.id ? null : listing.id
                   )
                 }
-                className="w-7 h-7 rounded-full bg-gray-100 items-center justify-center"
+                className="w-7 h-7 rounded-full bg-surface-container items-center justify-center"
               >
                 <MoreVertical size={14} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
               {activeMenuId === listing.id && (
                 <View
-                  className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 py-2 overflow-hidden"
-                  style={{ top: SPACE.s32 }}
+                  className="absolute right-0 mt-1 w-44 bg-surface-container-low rounded-2xl shadow-xl border z-50 py-2 overflow-hidden"
+                  style={{ top: SPACE.s32, borderColor: THEME_COLORS.neutralBorderSoft }}
                 >
                   {isOwner && (
                     <TouchableOpacity
@@ -1132,8 +1142,8 @@ export const HomePage: React.FC<HomePageProps> = ({
             )}
           </View>
 
-          <View className="flex-row items-center gap-2 pt-1 mt-1 border-t border-gray-50">
-            <View className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
+          <View className="flex-row items-center gap-2 pt-1 mt-1 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
+            <View className="w-6 h-6 rounded-full bg-surface-container overflow-hidden">
               {listing.authorImage ? (
                 <Image
                   source={{ uri: listing.authorImage }}
@@ -1181,7 +1191,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         className="flex-1 items-center justify-center px-6"
         style={{ backgroundColor: THEME_COLORS.blackOverlay60 }}
       >
-        <View className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl">
+        <View className="bg-surface-container-low rounded-3xl p-8 w-full max-w-sm shadow-2xl">
           <View className="bg-red-50 w-16 h-16 rounded-full items-center justify-center mx-auto mb-4">
             <AlertTriangle size={28} color={THEME_COLORS.error} />
           </View>
@@ -1228,9 +1238,9 @@ export const HomePage: React.FC<HomePageProps> = ({
         onPress={() => setShowIncidentMenu(false)}
       >
         <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-          <View className="bg-white rounded-t-3xl pb-8">
-            <View className="p-5 border-b border-gray-100">
-              <View className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4" />
+          <View className="bg-surface-container-low rounded-t-3xl pb-8">
+            <View className="p-5 border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
+              <View className="w-10 h-1 bg-surface-container rounded-full mx-auto mb-4" />
               <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">
                 Select Notice Type
               </Text>
@@ -1245,7 +1255,8 @@ export const HomePage: React.FC<HomePageProps> = ({
                   setShowIncidentMenu(false);
                   setTimeout(() => startIncidentReport(item.level), 350);
                 }}
-                className="flex-row items-center gap-4 px-6 py-4 border-b border-gray-50"
+                className="flex-row items-center gap-4 px-6 py-4 border-b"
+                style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
               >
                 <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: `${item.color}18` }}>
                   <UrgencyIcon level={item.level} urgency={undefined} size={20} />
@@ -1274,7 +1285,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         className="flex-1 items-center justify-center px-6"
         style={{ backgroundColor: THEME_COLORS.blackOverlay60 }}
       >
-        <View className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl gap-6">
+        <View className="bg-surface-container-low rounded-3xl p-8 w-full max-w-sm shadow-2xl gap-6">
           <View className="bg-red-50 w-16 h-16 rounded-full items-center justify-center mx-auto">
             <Siren size={32} color={THEME_COLORS.error} />
           </View>
@@ -1306,7 +1317,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.8}
-              className="bg-gray-100 py-4 rounded-full items-center"
+              className="bg-surface-container py-4 rounded-full items-center"
               onPress={() => {
                 startEmergencyPost();
                 setShowEmergencyDialog(false);
@@ -1336,7 +1347,8 @@ export const HomePage: React.FC<HomePageProps> = ({
   return (
     <ScrollView
       ref={scrollViewRef}
-      className="flex-1 bg-gray-50"
+      className="flex-1"
+      style={{ backgroundColor: APP_SHELL_COLORS.body }}
       contentContainerStyle={{ paddingBottom: SPACE.s40 }}
       showsVerticalScrollIndicator={false}
       onScrollBeginDrag={() => {
@@ -1359,10 +1371,10 @@ export const HomePage: React.FC<HomePageProps> = ({
             }}
             disabled={currentCommunity?.status === 'READ-ONLY'}
             className={cn(
-              'flex-1 flex-col items-center justify-center py-3 rounded-2xl gap-1.5 shadow-md',
+              'flex-1 flex-col items-center justify-center py-3 rounded-2xl gap-1.5',
               currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
             )}
-            style={{ backgroundColor: THEME_COLORS.secondaryContainer }}
+            style={{ backgroundColor: THEME_COLORS.secondaryContainer, ...CARD_DEPTH }}
           >
             <Siren
               size={20}
@@ -1373,7 +1385,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               {isEmergencyActive ? 'ACTIVE EMERGENCY' : 'Emergency Help'}
             </Text>
             {isEmergencyActive && (
-              <View className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full" />
+              <View className="absolute top-2 right-2 w-2 h-2 bg-surface-container-low rounded-full" />
             )}
           </TouchableOpacity>
 
@@ -1384,10 +1396,10 @@ export const HomePage: React.FC<HomePageProps> = ({
               onPress={() => setShowIncidentMenu(true)}
               disabled={currentCommunity?.status === 'READ-ONLY'}
               className={cn(
-                'flex-col items-center justify-center py-3 rounded-2xl gap-1.5 shadow-md',
+                'flex-col items-center justify-center py-3 rounded-2xl gap-1.5',
                 currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
               )}
-              style={{ backgroundColor: THEME_COLORS.primaryContainer }}
+              style={{ backgroundColor: THEME_COLORS.primaryContainer, ...CARD_DEPTH }}
             >
               <Plus size={20} color={THEME_COLORS.white} />
               <Text className="text-white font-bold text-base">
@@ -1399,9 +1411,9 @@ export const HomePage: React.FC<HomePageProps> = ({
 
         {/* ── Emergency Alert Banner ───────────────────────────────────── */}
         {alert && (
-          <View className="relative overflow-hidden bg-red-600 rounded-3xl p-6 shadow-xl">
+          <View className="relative overflow-hidden bg-red-600 rounded-3xl p-6" style={CARD_DEPTH_HERO}>
             <View className="flex-row items-start justify-between mb-4">
-              <View className="flex-row items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
+              <View className="flex-row items-center gap-2 bg-surface-container-low/20 px-3 py-1 rounded-full">
                 <AlertTriangle size={14} color={THEME_COLORS.white} fill={THEME_COLORS.white} />
                 <Text className="text-white text-[10px] font-bold tracking-widest uppercase">
                   {alert.priority} Priority Alert
@@ -1422,7 +1434,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             <View className="flex-row gap-3">
               <TouchableOpacity
                 activeOpacity={0.85}
-                className="bg-white px-6 py-3 rounded-full"
+                className="bg-surface-container-low px-6 py-3 rounded-full"
               >
                 <Text className="text-red-600 font-bold text-sm">
                   Acknowledge
@@ -1430,7 +1442,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}
-                className="bg-white/10 px-6 py-3 rounded-full"
+                className="bg-surface-container-low/10 px-6 py-3 rounded-full"
               >
                 <Text className="text-white font-medium text-sm">
                   View Details
@@ -1443,9 +1455,10 @@ export const HomePage: React.FC<HomePageProps> = ({
         {/* ── Community Pulse Map ──────────────────────────────────────── */}
         <View
           className={cn(
-            'bg-white rounded-3xl p-5 shadow-sm gap-5',
+            'bg-surface-container-low rounded-3xl p-5 gap-5',
             isEmergencyActive && 'border-2 border-red-300 bg-red-50/30'
           )}
+          style={CARD_DEPTH_HERO}
         >
           <InteractiveCoverageMap
             center={mapCenter}
@@ -1495,7 +1508,10 @@ export const HomePage: React.FC<HomePageProps> = ({
           </View>
 
           {notices.length === 0 ? (
-            <View className="items-center justify-center gap-3 py-10 px-6 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <View
+              className="items-center justify-center gap-3 py-10 px-6 bg-surface-container-low rounded-3xl border"
+              style={{ ...CARD_DEPTH_SOFT, borderColor: THEME_COLORS.neutralBorderSoft }}
+            >
               <View className="w-14 h-14 rounded-full bg-surface-container-low items-center justify-center">
                 <Shield size={28} color={THEME_COLORS.success} />
               </View>
@@ -1511,7 +1527,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <TouchableOpacity
                   activeOpacity={0.8}
                   onPress={() => startIncidentReport('general')}
-                  className="mt-2 bg-gray-100 px-5 py-2 rounded-full"
+                  className="mt-2 bg-surface-container px-5 py-2 rounded-full"
                 >
                   <Text className="text-primary text-xs font-bold">
                     Post a Notice
@@ -1558,9 +1574,10 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           <View
             className={cn(
-              'relative overflow-hidden rounded-3xl border bg-white p-4 shadow-sm',
-              hasNoNotices ? 'border-outline-variant' : 'border-gray-200'
+              'relative overflow-hidden rounded-3xl border bg-surface-container-low p-4',
+              hasNoNotices ? 'border-outline-variant' : ''
             )}
+            style={{ ...CARD_DEPTH_HERO, ...(hasNoNotices ? null : { borderColor: THEME_COLORS.neutralBorderSoft }) }}
           >
             {/* Background image */}
             {selectedCharity && charityImage && (
@@ -1575,7 +1592,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             {selectedCharity ? (
               <View className="flex-row items-start gap-4">
                 {/* Logo */}
-                <View className="w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
+                <View className="w-16 h-16 rounded-2xl overflow-hidden bg-surface-container border shrink-0" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
                   {charityImage ? (
                     <Image
                       source={{ uri: charityImage }}

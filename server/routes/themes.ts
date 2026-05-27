@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import prisma from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
+import {
+  FOUNDATION_THEMES,
+  getFoundationTheme,
+  isFoundationThemePresetId,
+  type FoundationThemePresetId,
+} from '../lib/foundationThemes.js';
 
 const router = Router();
 
@@ -8,25 +14,24 @@ router.use(requireAuth);
 
 const HEX_COLOR_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 
-const DEFAULT_THEME = {
-  name: 'Lalela Default',
-  primaryColor: '#0d3d47',
-  secondaryColor: '#9c4421',
-  backgroundColor: '#fff8f0',
-  surfaceColor: '#efeeeb',
-  textPrimary: '#0f172a',
-  textSecondary: '#64748b',
-  borderRadius: '16px',
-  fontFamily: 'System',
-  iconUrl: null as string | null,
-};
+const DEFAULT_THEME = getFoundationTheme('lalela-light');
+
+function isUnknownPrismaArgument(error: unknown, argument: string): boolean {
+  const message = (error as any)?.message;
+  return typeof message === 'string' && message.includes(`Unknown argument \`${argument}\``);
+}
 
 type ThemePayload = {
+  presetId?: FoundationThemePresetId;
+  mode?: 'light' | 'dark';
   name?: string;
   primaryColor?: string;
   secondaryColor?: string;
   backgroundColor?: string;
   surfaceColor?: string;
+  cardSurfaceColor?: string;
+  cardSurfaceMutedColor?: string;
+  cardBorderColor?: string;
   textPrimary?: string;
   textSecondary?: string;
   borderRadius?: string;
@@ -40,6 +45,19 @@ function isValidColor(value: unknown): value is string {
 
 function isValidShortString(value: unknown, max = 120): value is string {
   return typeof value === 'string' && value.trim().length > 0 && value.trim().length <= max;
+}
+
+function normalizeThemeName(value: unknown): string {
+  if (typeof value !== 'string') return DEFAULT_THEME.name;
+  const trimmed = value.trim();
+  if (!trimmed) return DEFAULT_THEME.name;
+
+  const lower = trimmed.toLowerCase();
+  if (lower === 'lalela light' || lower === 'lalela (baseline)') {
+    return DEFAULT_THEME.name;
+  }
+
+  return trimmed;
 }
 
 function normalizeIconUrl(value: unknown): string | null {
@@ -68,14 +86,26 @@ function isAdminRole(role?: string | null): boolean {
 }
 
 function toClientTheme(theme: any) {
+  const presetId = (theme.presetId ?? 'lalela-light') as FoundationThemePresetId;
+  const preset = getFoundationTheme(presetId);
+  const mode = 'light';
+  const fallbackCardSurface = preset.cardSurfaceColor;
+  const fallbackCardSurfaceMuted = preset.cardSurfaceMutedColor;
+  const fallbackCardBorder = preset.cardBorderColor;
+
   return {
     id: theme.id,
     communityId: theme.communityId ?? null,
-    name: theme.name,
+    presetId,
+    mode,
+    name: normalizeThemeName(theme.name),
     primaryColor: theme.primaryColor,
     secondaryColor: theme.secondaryColor,
     backgroundColor: theme.backgroundColor,
     surfaceColor: theme.surfaceColor,
+    cardSurfaceColor: theme.cardSurfaceColor ?? fallbackCardSurface,
+    cardSurfaceMutedColor: theme.cardSurfaceMutedColor ?? fallbackCardSurfaceMuted,
+    cardBorderColor: theme.cardBorderColor ?? fallbackCardBorder,
     textPrimary: theme.textPrimary,
     textSecondary: theme.textSecondary,
     borderRadius: theme.borderRadius,
@@ -88,10 +118,23 @@ function toClientTheme(theme: any) {
 }
 
 async function getFallbackTheme() {
-  const dbDefault = await prisma.theme.findFirst({
-    where: { isDefault: true },
-    orderBy: { updatedAt: 'desc' },
-  });
+  let dbDefault: any = null;
+
+  try {
+    dbDefault = await prisma.theme.findFirst({
+      where: { isDefault: true, presetId: 'lalela-light' } as any,
+      orderBy: { updatedAt: 'desc' },
+    } as any);
+  } catch (error) {
+    if (!isUnknownPrismaArgument(error, 'presetId')) throw error;
+
+    // Backward compatibility for deployments where Theme model has not been
+    // regenerated yet and preset_id is unavailable in Prisma Client.
+    dbDefault = await prisma.theme.findFirst({
+      where: { isDefault: true },
+      orderBy: { updatedAt: 'desc' },
+    });
+  }
 
   if (dbDefault) return dbDefault;
 
@@ -99,6 +142,8 @@ async function getFallbackTheme() {
     id: 'system-default-theme',
     communityId: null,
     ...DEFAULT_THEME,
+    presetId: DEFAULT_THEME.presetId,
+    mode: DEFAULT_THEME.mode,
     isDefault: true,
     createdAt: new Date(0),
     updatedAt: new Date(0),
@@ -116,11 +161,19 @@ router.get('/community/:communityId', async (req, res) => {
 
   const theme = await prisma.theme.findUnique({ where: { communityId } });
   if (theme) {
-    return res.json({ source: 'community', theme: toClientTheme(theme) });
+    return res.json({
+      source: 'community',
+      theme: toClientTheme(theme),
+      presets: Object.values(FOUNDATION_THEMES),
+    });
   }
 
   const fallback = await getFallbackTheme();
-  return res.json({ source: 'fallback', theme: toClientTheme(fallback) });
+  return res.json({
+    source: 'fallback',
+    theme: toClientTheme(fallback),
+    presets: Object.values(FOUNDATION_THEMES),
+  });
 });
 
 router.put('/community/:communityId', async (req, res) => {
@@ -133,7 +186,7 @@ router.put('/community/:communityId', async (req, res) => {
     return res.status(403).json({ error: 'Only community admins can edit themes' });
   }
 
-  const community = await prisma.community.findUnique({ where: { id: communityId }, select: { id: true } });
+  const community = await prisma.community.findUnique({ where: { id: communityId }, select: { id: true, name: true } });
   if (!community) {
     return res.status(404).json({ error: 'Community not found' });
   }
@@ -141,17 +194,53 @@ router.put('/community/:communityId', async (req, res) => {
   const existing = await prisma.theme.findUnique({ where: { communityId } });
   const fallback = await getFallbackTheme();
 
+  let presetId: FoundationThemePresetId = (existing?.presetId as FoundationThemePresetId) || 'lalela-light';
+  if (body.presetId !== undefined) {
+    if (!isFoundationThemePresetId(body.presetId)) {
+      return res.status(400).json({ error: 'Invalid presetId; expected lalela-light' });
+    }
+    presetId = body.presetId;
+  }
+
+  const preset = getFoundationTheme(presetId);
+  const baseTheme = existing ?? fallback;
+  const derivedMode: 'light' = 'light';
+
+  const initialName = normalizeThemeName(body.name?.trim() ?? baseTheme.name ?? preset.name);
+  const isCustomizedFromBaseline = (
+    (body.primaryColor?.trim() ?? baseTheme.primaryColor ?? preset.primaryColor) !== preset.primaryColor ||
+    (body.secondaryColor?.trim() ?? baseTheme.secondaryColor ?? preset.secondaryColor) !== preset.secondaryColor ||
+    (body.backgroundColor?.trim() ?? baseTheme.backgroundColor ?? preset.backgroundColor) !== preset.backgroundColor ||
+    (body.surfaceColor?.trim() ?? baseTheme.surfaceColor ?? preset.surfaceColor) !== preset.surfaceColor ||
+    (body.textPrimary?.trim() ?? baseTheme.textPrimary ?? preset.textPrimary) !== preset.textPrimary ||
+    (body.textSecondary?.trim() ?? baseTheme.textSecondary ?? preset.textSecondary) !== preset.textSecondary ||
+    (body.borderRadius?.trim() ?? baseTheme.borderRadius ?? preset.borderRadius) !== preset.borderRadius ||
+    (body.fontFamily?.trim() ?? baseTheme.fontFamily ?? preset.fontFamily) !== preset.fontFamily ||
+    (body.iconUrl !== undefined ? normalizeIconUrl(body.iconUrl) : (baseTheme.iconUrl ?? preset.iconUrl)) !== (preset.iconUrl ?? null)
+  );
+
+  const shouldAutoName =
+    isCustomizedFromBaseline &&
+    (!body.name?.trim() || normalizeThemeName(initialName).toLowerCase() === preset.name.trim().toLowerCase());
+
+  const autoName = `${community.name} Theme`.slice(0, 80);
+
   const candidate = {
-    name: body.name?.trim() ?? existing?.name ?? fallback.name,
-    primaryColor: body.primaryColor?.trim() ?? existing?.primaryColor ?? fallback.primaryColor,
-    secondaryColor: body.secondaryColor?.trim() ?? existing?.secondaryColor ?? fallback.secondaryColor,
-    backgroundColor: body.backgroundColor?.trim() ?? existing?.backgroundColor ?? fallback.backgroundColor,
-    surfaceColor: body.surfaceColor?.trim() ?? existing?.surfaceColor ?? fallback.surfaceColor,
-    textPrimary: body.textPrimary?.trim() ?? existing?.textPrimary ?? fallback.textPrimary,
-    textSecondary: body.textSecondary?.trim() ?? existing?.textSecondary ?? fallback.textSecondary,
-    borderRadius: body.borderRadius?.trim() ?? existing?.borderRadius ?? fallback.borderRadius,
-    fontFamily: body.fontFamily?.trim() ?? existing?.fontFamily ?? fallback.fontFamily,
-    iconUrl: body.iconUrl !== undefined ? normalizeIconUrl(body.iconUrl) : (existing?.iconUrl ?? fallback.iconUrl),
+    presetId,
+    mode: derivedMode,
+    name: shouldAutoName ? autoName : normalizeThemeName(initialName),
+    primaryColor: body.primaryColor?.trim() ?? baseTheme.primaryColor ?? preset.primaryColor,
+    secondaryColor: body.secondaryColor?.trim() ?? baseTheme.secondaryColor ?? preset.secondaryColor,
+    backgroundColor: body.backgroundColor?.trim() ?? baseTheme.backgroundColor ?? preset.backgroundColor,
+    surfaceColor: body.surfaceColor?.trim() ?? baseTheme.surfaceColor ?? preset.surfaceColor,
+    cardSurfaceColor: body.cardSurfaceColor?.trim() ?? baseTheme.cardSurfaceColor ?? preset.cardSurfaceColor,
+    cardSurfaceMutedColor: body.cardSurfaceMutedColor?.trim() ?? baseTheme.cardSurfaceMutedColor ?? preset.cardSurfaceMutedColor,
+    cardBorderColor: body.cardBorderColor?.trim() ?? baseTheme.cardBorderColor ?? preset.cardBorderColor,
+    textPrimary: body.textPrimary?.trim() ?? baseTheme.textPrimary ?? preset.textPrimary,
+    textSecondary: body.textSecondary?.trim() ?? baseTheme.textSecondary ?? preset.textSecondary,
+    borderRadius: body.borderRadius?.trim() ?? baseTheme.borderRadius ?? preset.borderRadius,
+    fontFamily: body.fontFamily?.trim() ?? baseTheme.fontFamily ?? preset.fontFamily,
+    iconUrl: body.iconUrl !== undefined ? normalizeIconUrl(body.iconUrl) : (baseTheme.iconUrl ?? preset.iconUrl),
   };
 
   if (!isValidShortString(candidate.name, 80)) {
@@ -161,6 +250,9 @@ router.put('/community/:communityId', async (req, res) => {
   if (!isValidColor(candidate.secondaryColor)) return res.status(400).json({ error: 'Invalid secondaryColor format' });
   if (!isValidColor(candidate.backgroundColor)) return res.status(400).json({ error: 'Invalid backgroundColor format' });
   if (!isValidColor(candidate.surfaceColor)) return res.status(400).json({ error: 'Invalid surfaceColor format' });
+  if (!isValidColor(candidate.cardSurfaceColor)) return res.status(400).json({ error: 'Invalid cardSurfaceColor format' });
+  if (!isValidColor(candidate.cardSurfaceMutedColor)) return res.status(400).json({ error: 'Invalid cardSurfaceMutedColor format' });
+  if (!isValidColor(candidate.cardBorderColor)) return res.status(400).json({ error: 'Invalid cardBorderColor format' });
   if (!isValidColor(candidate.textPrimary)) return res.status(400).json({ error: 'Invalid textPrimary format' });
   if (!isValidColor(candidate.textSecondary)) return res.status(400).json({ error: 'Invalid textSecondary format' });
   if (!isValidShortString(candidate.borderRadius, 24)) return res.status(400).json({ error: 'Invalid borderRadius value' });
@@ -169,19 +261,81 @@ router.put('/community/:communityId', async (req, res) => {
     return res.status(400).json({ error: 'iconUrl must be a valid http/https URL' });
   }
 
-  const theme = await prisma.theme.upsert({
-    where: { communityId },
-    create: {
-      communityId,
-      isDefault: false,
-      ...candidate,
-    },
-    update: {
-      ...candidate,
-    },
-  });
+  const baseCreate = {
+    community: { connect: { id: communityId } },
+    isDefault: false,
+    name: candidate.name,
+    primaryColor: candidate.primaryColor,
+    secondaryColor: candidate.secondaryColor,
+    backgroundColor: candidate.backgroundColor,
+    surfaceColor: candidate.surfaceColor,
+    textPrimary: candidate.textPrimary,
+    textSecondary: candidate.textSecondary,
+    borderRadius: candidate.borderRadius,
+    fontFamily: candidate.fontFamily,
+    iconUrl: candidate.iconUrl,
+  };
+  const baseUpdate = {
+    name: candidate.name,
+    primaryColor: candidate.primaryColor,
+    secondaryColor: candidate.secondaryColor,
+    backgroundColor: candidate.backgroundColor,
+    surfaceColor: candidate.surfaceColor,
+    textPrimary: candidate.textPrimary,
+    textSecondary: candidate.textSecondary,
+    borderRadius: candidate.borderRadius,
+    fontFamily: candidate.fontFamily,
+    iconUrl: candidate.iconUrl,
+  };
 
-  return res.json({ source: 'community', theme: toClientTheme(theme) });
+  const extendedCreate = {
+    ...baseCreate,
+    presetId: candidate.presetId,
+    mode: candidate.mode,
+    cardSurfaceColor: candidate.cardSurfaceColor,
+    cardSurfaceMutedColor: candidate.cardSurfaceMutedColor,
+    cardBorderColor: candidate.cardBorderColor,
+  };
+  const extendedUpdate = {
+    ...baseUpdate,
+    presetId: candidate.presetId,
+    mode: candidate.mode,
+    cardSurfaceColor: candidate.cardSurfaceColor,
+    cardSurfaceMutedColor: candidate.cardSurfaceMutedColor,
+    cardBorderColor: candidate.cardBorderColor,
+  };
+
+  let theme: any;
+  try {
+    theme = await prisma.theme.upsert({
+      where: { communityId },
+      create: extendedCreate as any,
+      update: extendedUpdate as any,
+    });
+  } catch (error) {
+    if (
+      !isUnknownPrismaArgument(error, 'presetId') &&
+      !isUnknownPrismaArgument(error, 'mode') &&
+      !isUnknownPrismaArgument(error, 'cardSurfaceColor') &&
+      !isUnknownPrismaArgument(error, 'cardSurfaceMutedColor') &&
+      !isUnknownPrismaArgument(error, 'cardBorderColor')
+    ) {
+      throw error;
+    }
+
+    // Backward compatibility fallback for old Prisma Client schema.
+    theme = await prisma.theme.upsert({
+      where: { communityId },
+      create: baseCreate,
+      update: baseUpdate,
+    });
+  }
+
+  return res.json({
+    source: 'community',
+    theme: toClientTheme(theme),
+    presets: Object.values(FOUNDATION_THEMES),
+  });
 });
 
 export default router;

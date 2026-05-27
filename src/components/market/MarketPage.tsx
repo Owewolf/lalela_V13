@@ -32,7 +32,7 @@ import { BUSINESS_CATEGORIES } from '../../constants';
 import { calculateDistance } from '../../lib/utils';
 import { resolveMediaUrl } from '../../lib/config';
 import type { UserBusiness } from '../../types';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
 const TYPE_SCALE = {
   xs: 10,
@@ -78,6 +78,10 @@ const RADIUS = {
 };
 const LETTER_SPACING = {
   wide: 1,
+};
+
+const SURFACE_BORDER_STYLE = {
+  borderColor: THEME_COLORS.neutralBorderSoft,
 };
 
 interface MarketBusiness {
@@ -361,7 +365,12 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       const hasListingImage = typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0;
       const hasAuthorImage = typeof listing.authorImage === 'string' && listing.authorImage.trim().length > 0;
       return (
-        <TouchableOpacity activeOpacity={0.92} onPress={() => setSelectedListing(listing)} className="mb-4 bg-gray-50 rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm">
+        <TouchableOpacity
+          activeOpacity={0.92}
+          onPress={() => setSelectedListing(listing)}
+          className="mb-4 bg-surface-container-low rounded-[2rem] overflow-hidden border shadow-sm"
+          style={SURFACE_BORDER_STYLE}
+        >
           {hasListingImage ? (
             <View className="w-full aspect-[4/3] overflow-hidden">
               <Image
@@ -371,7 +380,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               />
               {listing.isCommunityPick && (
                 <View className="absolute top-4 left-4 bg-orange-500 px-3 py-1 rounded-full flex-row items-center gap-1">
-                  <View className="w-2 h-2 bg-white rounded-full" />
+                  <View className="w-2 h-2 bg-surface-container-low rounded-full" />
                   <Text className="text-white text-[10px] font-bold uppercase tracking-widest">
                     Community Pick
                   </Text>
@@ -397,7 +406,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               <View className="gap-2">
                 {listing.isCommunityPick ? (
                   <View className="self-start bg-orange-500 px-3 py-1 rounded-full flex-row items-center gap-1">
-                    <View className="w-2 h-2 bg-white rounded-full" />
+                    <View className="w-2 h-2 bg-surface-container-low rounded-full" />
                     <Text className="text-white text-[10px] font-bold uppercase tracking-widest">
                       Community Pick
                     </Text>
@@ -435,14 +444,14 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
             </View>
 
             {isSold ? (
-              <View className="self-start bg-gray-200 px-3 py-1 rounded-full">
+              <View className="self-start bg-surface-container px-3 py-1 rounded-full">
                 <Text className="text-[10px] font-bold uppercase tracking-widest text-gray-700">Sold</Text>
               </View>
             ) : null}
 
             {/* Charity */}
             {listing.isPublic && listing.charityId ? (
-              <View className="bg-gray-100 p-3 rounded-2xl flex-row items-start gap-3 border border-gray-200">
+              <View className="bg-surface-container p-3 rounded-2xl flex-row items-start gap-3 border" style={SURFACE_BORDER_STYLE}>
                 <View className="bg-orange-50 p-2 rounded-full items-center justify-center">
                   <Heart size={20} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
                 </View>
@@ -473,9 +482,9 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
             ) : null}
 
             {/* Author row */}
-            <View className="flex-row items-center justify-between pt-2 border-t border-gray-100">
+            <View className="flex-row items-center justify-between pt-2 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
               <View className="flex-row items-center gap-3">
-                <View className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
+                <View className="w-8 h-8 rounded-full bg-surface-container overflow-hidden border" style={SURFACE_BORDER_STYLE}>
                   {hasAuthorImage ? (
                     <Image
                       source={{ uri: listing.authorImage }}
@@ -504,7 +513,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               </View>
               <View className="flex-row gap-2">
                 <TouchableOpacity
-                  className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-surface-container items-center justify-center"
                   activeOpacity={0.8}
                   onPress={() => handleOpenListingChat(listing)}
                 >
@@ -572,7 +581,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
     return (
       <Modal visible={!!selectedListing} transparent animationType="fade" onRequestClose={() => setSelectedListing(null)}>
         <View className="flex-1 justify-end" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_45 }}>
-          <View className="bg-white rounded-t-[32px] max-h-[88%] overflow-hidden">
+          <View className="bg-surface-container-low rounded-t-[32px] max-h-[88%] overflow-hidden">
             <ScrollView contentContainerStyle={{ paddingBottom: SPACE.s30 }}>
               {hasListingImage ? (
                 <Image
@@ -706,13 +715,16 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       : `Showing ${activeListings.length} listings in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`;
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Search + filters header */}
-      <View className="px-5 pt-4 pb-2 gap-4 bg-white border-b border-gray-100">
+      <View
+        className="px-5 pt-4 pb-2 gap-4 border-b"
+        style={{ backgroundColor: APP_SHELL_COLORS.body, borderBottomColor: THEME_COLORS.neutralBorderSoft }}
+      >
         {/* Search bar */}
-        <View className="relative flex-row items-center bg-gray-100 rounded-2xl px-4 py-3 gap-3">
+        <View className="relative flex-row items-center bg-surface-container rounded-2xl px-4 py-3 gap-3">
           <Search size={16} color={THEME_COLORS.neutralTextSoft} />
           <TextInput
             value={searchQuery}
@@ -736,8 +748,9 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               'px-4 py-2 rounded-2xl border mr-2',
               !selectedCategory
                 ? 'bg-primary border-primary'
-                : 'bg-gray-50 border-gray-200',
+                : 'bg-surface-container-low',
             ].join(' ')}
+            style={!selectedCategory ? undefined : SURFACE_BORDER_STYLE}
             activeOpacity={0.8}
           >
             <Text
@@ -757,8 +770,9 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                 'px-4 py-2 rounded-2xl border flex-row items-center gap-2 mr-2',
                 selectedCategory === cat.id
                   ? 'bg-primary border-primary'
-                  : 'bg-gray-50 border-gray-200',
+                  : 'bg-surface-container-low',
               ].join(' ')}
+              style={selectedCategory === cat.id ? undefined : SURFACE_BORDER_STYLE}
               activeOpacity={0.8}
             >
               <Text className="text-sm">{cat.icon}</Text>
@@ -776,10 +790,10 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       </View>
 
       {/* Tabs + view toggle */}
-      <View className="px-5 pt-4 pb-3 gap-4 bg-white">
+      <View className="px-5 pt-4 pb-3 gap-4 bg-surface-container-low">
         <View className="flex-row items-center justify-between">
           {/* Tabs */}
-          <View className="flex-row bg-gray-100 p-1 rounded-full border border-gray-200">
+          <View className="flex-row bg-surface-container p-1 rounded-full border" style={SURFACE_BORDER_STYLE}>
             {tabs.map(tab => (
               <TouchableOpacity
                 key={tab.id}
@@ -803,7 +817,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
           </View>
 
           {/* View toggle */}
-          <View className="flex-row bg-gray-100 p-1 rounded-full border border-gray-200">
+          <View className="flex-row bg-surface-container p-1 rounded-full border" style={SURFACE_BORDER_STYLE}>
             <TouchableOpacity
               onPress={() => setViewMode('list')}
               className={[
@@ -858,7 +872,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
 
       {/* Content */}
       {viewMode === 'map' ? (
-        <View className="flex-1 m-4 rounded-3xl overflow-hidden border border-gray-200">
+        <View className="flex-1 m-4 rounded-3xl overflow-hidden border" style={SURFACE_BORDER_STYLE}>
           {coverageArea ? (
             <MapView
               {...defaultMapViewProps}
@@ -883,7 +897,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                 ))}
             </MapView>
           ) : (
-            <View className="flex-1 items-center justify-center bg-gray-50">
+            <View className="flex-1 items-center justify-center bg-surface-container-low">
               <Text className="text-gray-400 text-sm">No coverage area configured</Text>
             </View>
           )}
@@ -897,7 +911,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View className="items-center justify-center py-20 gap-4">
-              <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center">
+              <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center">
                 <SlidersHorizontal size={40} color={THEME_COLORS.neutralBorderMuted} />
               </View>
               <Text className="text-primary font-bold text-lg">No businesses found</Text>
@@ -917,7 +931,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View className="items-center justify-center py-20 gap-4">
-              <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center">
+              <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center">
                 <MapPin size={40} color={THEME_COLORS.neutralBorderMuted} />
               </View>
               <Text className="text-primary font-bold text-lg">

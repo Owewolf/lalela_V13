@@ -91,7 +91,7 @@ export const DangerZoneSection: React.FC = () => {
 
       <View style={{ gap: SPACE.lg }}>
         {/* Logout Card */}
-        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xl, padding: SPACE.xl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+        <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.xl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
           <View style={{ gap: SPACE.xxs }}>
             <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Logout Account</Text>
             <Text style={{ fontSize: TYPE_SCALE.xs, color: THEME_COLORS.neutralTextSoft, lineHeight: LINE_HEIGHT.compact }}>
@@ -121,7 +121,7 @@ export const DangerZoneSection: React.FC = () => {
           <TouchableOpacity
             onPress={() => setShowConfirmDelete(true)}
             style={{
-              paddingVertical: SPACE.lg, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.whiteOverlay20,
+              paddingVertical: SPACE.lg, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLowOverlay20,
               flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.xs,
             }}
           >
@@ -146,7 +146,7 @@ export const DangerZoneSection: React.FC = () => {
           padding: SPACE.xxl,
         }}>
           <View style={{
-            backgroundColor: THEME_COLORS.white,
+            backgroundColor: THEME_COLORS.surfaceContainerLow,
             borderRadius: RADIUS.xxl,
             padding: SPACE.s28,
             width: '100%',

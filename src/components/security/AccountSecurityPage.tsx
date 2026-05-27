@@ -140,7 +140,7 @@ const AccountSecurityPage: React.FC = () => {
         paddingHorizontal: SPACE.xl,
         paddingTop: SPACE.lg,
         paddingBottom: SPACE.md,
-        backgroundColor: THEME_COLORS.white,
+        backgroundColor: THEME_COLORS.surface,
         borderBottomWidth: 1,
         borderBottomColor: THEME_COLORS.overlayBorderSoft,
         gap: SPACE.md,
@@ -153,7 +153,7 @@ const AccountSecurityPage: React.FC = () => {
               router.replace('/settings');
             }
           }}
-          style={{ padding: SPACE.sm, borderRadius: RADIUS.md, backgroundColor: THEME_COLORS.surfaceContainerLow }}
+          style={{ padding: SPACE.sm, borderRadius: RADIUS.md, backgroundColor: THEME_COLORS.surfaceContainer }}
         >
           <ArrowLeft size={20} color={THEME_COLORS.onSurface} />
         </TouchableOpacity>
@@ -164,7 +164,7 @@ const AccountSecurityPage: React.FC = () => {
       </View>
 
       {/* Tab bar */}
-      <View style={{ backgroundColor: THEME_COLORS.white, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft }}>
+      <View style={{ backgroundColor: THEME_COLORS.surface, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft }}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}

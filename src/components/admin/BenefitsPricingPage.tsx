@@ -369,9 +369,9 @@ const BenefitsPricingPage: React.FC<BenefitsPricingPageProps> = ({ onBack, onUpg
 export default BenefitsPricingPage;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: THEME_COLORS.white },
+  container: { flex: 1, backgroundColor: THEME_COLORS.surfaceContainerLow },
   stickyHeader: {
-    backgroundColor: THEME_COLORS.whiteOverlay90,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
     borderBottomWidth: 1,
     borderBottomColor: THEME_COLORS.overlayBorderSoft,
     paddingHorizontal: SPACE.s16,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   rulesSectionHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xl },
   rulesSectionTitle: { fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
   ruleCard: {
-    backgroundColor: THEME_COLORS.whiteOverlay80,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
     borderRadius: RADIUS.md,
     padding: SPACE.s16,
     gap: SPACE.sm,
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
   ruleGridRow: { flexDirection: 'row', gap: SPACE.xl },
   ruleGridCard: {
     flex: 1,
-    backgroundColor: THEME_COLORS.whiteOverlay80,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
     borderRadius: RADIUS.md,
     padding: SPACE.s16,
     gap: SPACE.sm,
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
   benefitCard: {
     flexDirection: 'row',
     gap: SPACE.s20,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     borderRadius: RADIUS.lg,
     padding: SPACE.s20,
     borderWidth: 1,
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME_COLORS.overlayBorderSoft,
     overflow: 'hidden',
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     ...createShadow(THEME_COLORS.black, SPACE.zero, SPACE.xxs, 0.04, 8, 2),
   },
   tableHeader: {
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
     lineHeight: LINE_HEIGHT.body,
   },
   finalCtaBtn: {
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     borderRadius: RADIUS.md,
     paddingVertical: SPACE.s16,
     paddingHorizontal: SPACE.s28,

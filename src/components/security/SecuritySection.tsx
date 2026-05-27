@@ -288,7 +288,7 @@ export const SecuritySection: React.FC = () => {
   };
 
   return (
-    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.xxl, gap: SPACE.xl }}>
+    <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.xxl, gap: SPACE.xl }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
         <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
@@ -300,7 +300,7 @@ export const SecuritySection: React.FC = () => {
       {/* Password Card */}
       <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
-          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Key size={22} color={THEME_COLORS.primary} />
           </View>
           <View>
@@ -382,7 +382,7 @@ export const SecuritySection: React.FC = () => {
       {/* Email Address Card */}
       <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, flex: 1 }}>
-          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Mail size={22} color={THEME_COLORS.primary} />
           </View>
           <View style={{ flex: 1 }}>
@@ -488,7 +488,7 @@ export const SecuritySection: React.FC = () => {
       {/* Phone Number Card */}
       <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, flex: 1 }}>
-          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Phone size={22} color={THEME_COLORS.primary} />
           </View>
           <View style={{ flex: 1 }}>
@@ -583,7 +583,7 @@ export const SecuritySection: React.FC = () => {
       {/* 2FA Card */}
       <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
-          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Smartphone size={22} color={THEME_COLORS.brandBlueText} />
           </View>
           <View>
@@ -605,7 +605,7 @@ export const SecuritySection: React.FC = () => {
             <ActivityIndicator size="small" color={THEME_COLORS.white} style={{ alignSelf: 'center' }} />
           ) : (
             <View style={{
-              width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.white,
+              width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.surfaceContainerLow,
               position: 'absolute',
               left: userProfile?.twoFactorEnabled ? undefined : SPACE.xxs,
               right: userProfile?.twoFactorEnabled ? SPACE.xxs : undefined,
@@ -626,7 +626,7 @@ export const SecuritySection: React.FC = () => {
 
           {/* QR Code */}
           <View style={{ alignItems: 'center', gap: SPACE.sm }}>
-            <View style={{ padding: SPACE.lg, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+            <View style={{ padding: SPACE.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
               {twoFASetupData.qrCode ? (
                 <QRCode value={twoFASetupData.qrCode} size={160} />
               ) : (
@@ -642,7 +642,7 @@ export const SecuritySection: React.FC = () => {
           {twoFASetupData.secret && (
             <View style={{ gap: SPACE.md }}>
               <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: SPACE.xs }}>Step 2: Manual Entry Key</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, padding: SPACE.s14, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, padding: SPACE.s14, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder }}>
                 <Text style={{ flex: 1, fontFamily: 'monospace', fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary, letterSpacing: SPACE.xs }} selectable>
                   {twoFASetupData.secret}
                 </Text>
@@ -667,7 +667,7 @@ export const SecuritySection: React.FC = () => {
               keyboardType="numeric"
               maxLength={6}
               style={{
-                backgroundColor: THEME_COLORS.white,
+                backgroundColor: THEME_COLORS.surfaceContainerLow,
                 borderRadius: RADIUS.xl,
                 paddingHorizontal: SPACE.xxl,
                 paddingVertical: SPACE.s18,

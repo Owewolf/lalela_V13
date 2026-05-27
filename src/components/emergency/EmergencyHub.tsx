@@ -202,7 +202,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
 
   if (!emergencyPost) {
     return (
-      <SafeAreaView className="flex-1 bg-white items-center justify-center">
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: THEME_COLORS.surface }}>
         <ActivityIndicator color={THEME_COLORS.primary} size="large" />
         <Text className="text-sm text-gray-500 mt-3">Loading emergency...</Text>
       </SafeAreaView>
@@ -220,9 +220,9 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: THEME_COLORS.surface }}>
       {/* Map section */}
-      <Animated.View style={{ height: mapHeightAnim }} className="relative bg-gray-100 border-b border-gray-200">
+      <Animated.View style={{ height: mapHeightAnim, backgroundColor: THEME_COLORS.surfaceContainerLow, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.neutralBorderSoft }} className="relative">
         {isMapExpanded ? (
           <EmergencyMap
             emergencyPost={emergencyPost}
@@ -230,7 +230,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
             mapRef={mapRef}
           />
         ) : (
-          <View className="absolute inset-0 flex-row items-center px-5 bg-white/80">
+          <View className="absolute inset-0 flex-row items-center px-5" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
             <View className="p-2 rounded-full mr-3" style={{ backgroundColor: accentBg }}>
               <MapPin color={accentColor} size={16} />
             </View>
@@ -250,8 +250,8 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
               router.replace('/');
             }
           }}
-          className="absolute top-4 left-4 bg-white/95 p-2 rounded-xl shadow"
-          style={{ zIndex: LAYER_Z_INDEX.emergencyBackButton, elevation: LAYER_ELEVATION.emergencyBackButton }}
+          className="absolute top-4 left-4 p-2 rounded-xl shadow"
+          style={{ zIndex: LAYER_Z_INDEX.emergencyBackButton, elevation: LAYER_ELEVATION.emergencyBackButton, backgroundColor: THEME_COLORS.surfaceContainerLow }}
           activeOpacity={0.8}
         >
           <ArrowLeft color={THEME_COLORS.primary} size={20} />
@@ -261,7 +261,8 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
         <View className="absolute top-4 right-4 gap-2">
           <TouchableOpacity
             onPress={() => setIsMapExpanded((prev) => !prev)}
-            className="bg-white/90 p-2 rounded-xl shadow"
+            className="p-2 rounded-xl shadow"
+            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
             activeOpacity={0.8}
           >
             {isMapExpanded ? (
@@ -273,7 +274,8 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
           {isMapExpanded && (
             <TouchableOpacity
               onPress={() => setResetTrigger((t) => t + 1)}
-              className="bg-white/90 p-2 rounded-xl shadow"
+              className="p-2 rounded-xl shadow"
+              style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
               activeOpacity={0.8}
             >
               <Navigation color={THEME_COLORS.primary} size={20} />
@@ -283,9 +285,9 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
       </Animated.View>
 
       {/* Chat section */}
-      <View className="flex-1 bg-white overflow-hidden">
+      <View className="flex-1 overflow-hidden" style={{ backgroundColor: THEME_COLORS.surface }}>
         {/* Emergency header */}
-        <View className="px-4 py-3 bg-white border-b border-gray-100">
+        <View className="px-4 py-3 border-b" style={{ backgroundColor: THEME_COLORS.surface, borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
           <View className="flex-row items-center gap-3">
             {emergencyPost.authorImage ? (
               <Image
@@ -311,7 +313,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
                   </Text>
                 </View>
                 {!!emergencyPost.locationName && (
-                  <View className="flex-row items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100">
+                  <View className="flex-row items-center gap-1 px-1.5 py-0.5 rounded" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                     <MapPin size={10} color={THEME_COLORS.neutralTextDefault} />
                     <Text numberOfLines={1} className="text-[10px] text-gray-600 font-semibold max-w-[150px]">
                       {emergencyPost.locationName}
@@ -327,7 +329,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
         </View>
 
         {activeIncidentPosts.length > 1 && (
-          <View className="px-4 py-2 bg-white border-b border-gray-100">
+          <View className="px-4 py-2 border-b" style={{ backgroundColor: THEME_COLORS.surface, borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View className="flex-row gap-2">
                 {activeIncidentPosts.map((incident: any) => {
@@ -337,7 +339,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
                     ? emergency
                       ? THEME_COLORS.errorStrong
                       : THEME_COLORS.aliasHex_fde047
-                    : THEME_COLORS.white;
+                    : THEME_COLORS.surface;
                   const chipBorder = emergency ? THEME_COLORS.errorStrong : THEME_COLORS.warningStrong;
                   const chipText = active
                     ? emergency
@@ -379,7 +381,7 @@ export const EmergencyHub: React.FC<EmergencyHubProps> = ({ emergencyId }) => {
         </View>
 
         {/* Active responders strip */}
-        <View className="px-4 py-2 bg-white border-t border-gray-100">
+        <View className="px-4 py-2 border-t" style={{ backgroundColor: THEME_COLORS.surface, borderTopColor: THEME_COLORS.neutralBorderSoft }}>
           <View className="flex-row items-center gap-2 mb-1.5">
             <Users color={THEME_COLORS.primary} size={13} />
             <Text className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">

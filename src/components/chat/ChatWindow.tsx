@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useMemo } from 'react';
 import { View, Text, FlatList, Animated, Platform } from 'react-native';
 import { Message, Conversation } from '../../types';
 import { MessageBubble } from './MessageBubble';
+import { THEME_COLORS } from '../../theme/colors';
 
 interface ChatWindowProps {
   messages: Message[];
@@ -82,7 +83,10 @@ function TypingIndicator() {
 
   return (
     <View className="flex-row items-center gap-2 ml-1 mt-4 mb-2">
-      <View className="flex-row items-center gap-1 bg-gray-100 px-3 py-2 rounded-full rounded-tl-none border border-gray-200">
+      <View
+        className="flex-row items-center gap-1 bg-surface-container px-3 py-2 rounded-full rounded-tl-none border"
+        style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+      >
         {[dot1, dot2, dot3].map((dot, i) => (
           <Animated.View
             key={i}
@@ -156,8 +160,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     if (item.type === 'date') {
       return (
         <View className="items-center my-3">
-          <View className="bg-slate-200 border border-slate-300 rounded-full px-3 py-1">
-            <Text className="text-[11px] font-semibold text-slate-600">{item.label}</Text>
+          <View
+            className="bg-surface-container border rounded-full px-3 py-1"
+            style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+          >
+            <Text className="text-[11px] font-semibold text-neutralTextMuted">{item.label}</Text>
           </View>
         </View>
       );
@@ -177,7 +184,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const ListEmptyComponent = () => (
     <View className="flex-1 items-center justify-center py-20 opacity-50">
-      <View className="w-16 h-16 bg-gray-100 rounded-full items-center justify-center mb-4">
+      <View className="w-16 h-16 bg-surface-container rounded-full items-center justify-center mb-4">
         <Text className="text-2xl">👋</Text>
       </View>
       <Text className="text-sm font-medium text-gray-500 text-center">

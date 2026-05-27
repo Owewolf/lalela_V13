@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACE.s16,
     gap: SPACE.xl,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     borderBottomWidth: 1,
     borderBottomColor: THEME_COLORS.neutralBorderSoft,
   },
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACE.xl,
     paddingVertical: SPACE.lg,
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   customRow: { flexDirection: 'row', gap: SPACE.md },
   customInput: {
     flex: 1,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACE.xxl,
     paddingVertical: SPACE.s11,
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   bizCard: {
     flexDirection: 'row',
     gap: SPACE.xl,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     borderRadius: RADIUS.pill,
     padding: SPACE.xl,
     borderWidth: 1,

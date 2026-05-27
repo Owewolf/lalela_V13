@@ -11,6 +11,7 @@ import { useCommunity } from '../../context/CommunityContext';
 import { CommunityNotice } from '../../types';
 import { deriveEmergencyResponders } from './responderUtils';
 import { THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 import { createShadow } from '../../theme/shadows';
 
 interface EmergencyMapProps {
@@ -147,7 +148,7 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
           pinColor={THEME_COLORS.md3Error}
         >
           <Callout tooltip>
-            <View className="bg-white rounded-2xl p-3 min-w-[180px] max-w-[260px] shadow-lg">
+                <View className="rounded-2xl p-3 min-w-[180px] max-w-[260px]" style={{ backgroundColor: getCardSurfaceColor('default'), ...getCardShadow('soft') }}>
               <View className="flex-row items-center gap-2 mb-2">
                 <Siren color={THEME_COLORS.md3Error} size={14} />
                 <Text className="text-xs font-black text-red-600 uppercase tracking-widest">Active Emergency</Text>
@@ -200,13 +201,13 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
               }
             >
               <View
-                className="bg-teal-700 p-1.5 rounded-full border-2 border-white"
-                    style={createShadow(THEME_COLORS.black, 0, 0, 0.3, 4, 0)}
+                className="bg-teal-700 p-1.5 rounded-full border-2"
+                    style={{ ...createShadow(THEME_COLORS.black, 0, 0, 0.3, 4, 0), borderColor: getCardSurfaceColor('default') }}
               >
                 <Shield color="white" size={14} />
               </View>
               <Callout tooltip>
-                <View className="bg-white rounded-2xl p-3 min-w-[180px] shadow-lg">
+                <View className="rounded-2xl p-3 min-w-[180px]" style={{ backgroundColor: getCardSurfaceColor('default'), ...getCardShadow('soft') }}>
                   <View className="flex-row items-center gap-2 mb-2">
                     <Shield color={THEME_COLORS.aliasHex_0d9488} size={14} />
                     <Text className="text-xs font-black text-teal-700 uppercase tracking-widest">Responder</Text>
@@ -256,11 +257,11 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
               }
             >
               <View
-                className="bg-emerald-500 rounded-full border-2 border-white"
-                    style={{ width: 14, height: 14, ...createShadow(THEME_COLORS.black, 0, 0, 0.2, 3, 0) }}
+                className="bg-emerald-500 rounded-full border-2"
+                    style={{ width: 14, height: 14, borderColor: getCardSurfaceColor('default'), ...createShadow(THEME_COLORS.black, 0, 0, 0.2, 3, 0) }}
               />
               <Callout tooltip>
-                <View className="bg-white rounded-2xl p-3 min-w-[180px] shadow-lg">
+                <View className="rounded-2xl p-3 min-w-[180px]" style={{ backgroundColor: getCardSurfaceColor('default'), ...getCardShadow('soft') }}>
                   <View className="flex-row items-center gap-2 mb-2">
                     <Users color={THEME_COLORS.success} size={14} />
                     <Text className="text-xs font-black text-emerald-600 uppercase tracking-widest">Community Member</Text>
@@ -275,7 +276,10 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
       </MapView>
 
       {focusedPerson && (
-        <View className="absolute bottom-4 left-4 right-4 bg-white/95 border border-gray-200 rounded-2xl px-4 py-3 shadow">
+        <View
+          className="absolute bottom-4 left-4 right-4 border rounded-2xl px-4 py-3 shadow"
+          style={{ backgroundColor: getCardSurfaceColor('subtle'), borderColor: getCardBorderColor('default'), ...getCardShadow('soft') }}
+        >
           <Text className="text-sm font-black text-primary" numberOfLines={1}>
             {focusedPerson.name}
           </Text>

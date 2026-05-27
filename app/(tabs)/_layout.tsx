@@ -6,7 +6,7 @@ import { useCommunity } from '../../src/context/CommunityContext';
 import { Header } from '../../src/components/shared/Header';
 import { MobileSidebar } from '../../src/components/shared/MobileSidebar';
 import { NotificationCenter } from '../../src/components/shared/NotificationCenter';
-import { THEME_COLORS } from '../../src/theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../src/theme/colors';
 
 const SPACE = {
   sm: 8,
@@ -48,7 +48,7 @@ export default function TabLayout() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: APP_SHELL_COLORS.body }}>
       {/* Single shared header across all tabs */}
       <Header
         onToggleNotifications={() => setShowNotifications(v => !v)}
@@ -62,8 +62,8 @@ export default function TabLayout() {
           tabBarActiveTintColor: THEME_COLORS.primary,
           tabBarInactiveTintColor: THEME_COLORS.neutralTextSoft,
           tabBarStyle: {
-            backgroundColor: THEME_COLORS.white,
-            borderTopColor: THEME_COLORS.neutralBorderSoft,
+            backgroundColor: APP_SHELL_COLORS.chrome,
+            borderTopColor: THEME_COLORS.neutralBorder,
             height: 60,
             paddingBottom: SPACE.sm,
           },

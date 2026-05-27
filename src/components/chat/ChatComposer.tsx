@@ -124,8 +124,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
 
   return (
     <View
-      className="bg-white/95 px-3 pt-2 border-t border-gray-200"
-      style={{ paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 12 }}
+      className="bg-surface-container-low/95 px-3 pt-2 border-t"
+      style={{
+        paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 12,
+        borderTopColor: THEME_COLORS.neutralBorderSoft,
+      }}
     >
       {/* Upload error */}
       {uploadError ? (
@@ -133,7 +136,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
       ) : null}
 
       <View className="flex-row items-center gap-2">
-        <View className="flex-1 flex-row items-center gap-2 bg-white border border-gray-200 rounded-[26px] px-3 py-2 min-h-[48px]">
+        <View
+          className="flex-1 flex-row items-center gap-2 bg-surface-container-low border rounded-[26px] px-3 py-2 min-h-[48px]"
+          style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+        >
           <TouchableOpacity
             onPress={handlePickPhoto}
             activeOpacity={0.7}
@@ -178,7 +184,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             'w-12 h-12 rounded-full items-center justify-center',
             text.trim() && !uploading
               ? 'bg-green-500'
-              : 'bg-gray-200',
+              : 'bg-surface-container',
           ].join(' ')}
         >
           {uploading ? (

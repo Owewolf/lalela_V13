@@ -9,6 +9,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Modal,
   ScrollView,
   TextInput,
   FlatList,
@@ -28,6 +29,7 @@ import {
   ArrowLeft,
   Search,
   Filter,
+  ChevronDown,
   CheckCircle2,
   XCircle,
   AlertTriangle,
@@ -59,6 +61,7 @@ import {
   MessageSquare,
   Sparkles,
   Heart,
+  Bookmark,
 } from 'lucide-react-native';
 import MapView, { Circle, Marker } from 'react-native-maps';
 import { useCommunity } from '../../context/CommunityContext';
@@ -74,9 +77,11 @@ import ManageCommunityCharity from '../settings/ManageCommunityCharity';
 import { GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from 'react-native-google-places-autocomplete';
 import Slider from '@react-native-community/slider';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
 import { createShadow } from '../../theme/shadows';
+import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
+import { LALELA_LIGHT_THEME, type FoundationThemePresetId } from '../../theme/foundationThemes';
 
 const PRIMARY = THEME_COLORS.primary;
 const SECONDARY = THEME_COLORS.secondary;
@@ -157,6 +162,8 @@ type ModTab = 'members' | 'content' | 'businesses' | 'rules' | 'logs' | 'categor
 type MemberSubView = 'list' | 'invite' | 'details';
 
 type ThemeDraft = {
+  presetId: FoundationThemePresetId;
+  mode: 'light' | 'dark';
   name: string;
   primaryColor: string;
   secondaryColor: string;
@@ -168,6 +175,32 @@ type ThemeDraft = {
   fontFamily: string;
   iconUrl: string;
 };
+
+function normalizeThemeNameValue(value?: string | null): string {
+  const trimmed = (value || '').trim();
+  if (!trimmed) return LALELA_LIGHT_THEME.name;
+
+  const lower = trimmed.toLowerCase();
+  if (lower === 'lalela light' || lower === 'lalela (baseline)') {
+    return LALELA_LIGHT_THEME.name;
+  }
+
+  return trimmed;
+}
+
+type ThemeColorField =
+  | 'primaryColor'
+  | 'secondaryColor'
+  | 'backgroundColor'
+  | 'surfaceColor'
+  | 'textPrimary'
+  | 'textSecondary';
+
+const COLOR_SWATCH_PRESETS = [
+  '#2D4B32', '#BD5D38', '#FAFAFA', '#E8DDC8', '#1A1C18', '#4A4F45',
+  '#0F4E55', '#D86F41', '#F0E6D9', '#FAF6EF', '#16363C', '#5A655D',
+  '#10B981', '#075985', '#DC2626', '#F59E0B', '#FFFFFF', '#000000',
+];
 
 type MemberInsightsSnapshot = {
   totalListings?: number;
@@ -264,6 +297,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     >('all');
     const [logs, setLogs] = useState<any[]>([]);
     const [themeDraft, setThemeDraft] = useState<ThemeDraft>({
+      presetId: 'lalela-light',
+      mode: 'light',
       name: '',
       primaryColor: '',
       secondaryColor: '',
@@ -277,6 +312,13 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     });
     const [isSavingTheme, setIsSavingTheme] = useState(false);
     const [themeSaveStatus, setThemeSaveStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [themeNameOptions, setThemeNameOptions] = useState<string[]>([LALELA_LIGHT_THEME.name]);
+    const [showThemeNameMenu, setShowThemeNameMenu] = useState(false);
+    const [showCreateThemeNameModal, setShowCreateThemeNameModal] = useState(false);
+    const [newThemeName, setNewThemeName] = useState('');
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const [activeColorField, setActiveColorField] = useState<ThemeColorField | null>(null);
+    const [pickerColorValue, setPickerColorValue] = useState('');
     const [urgencyChangePost, setUrgencyChangePost] = useState<any>(null);
     const [pendingRemoveMember, setPendingRemoveMember] = useState<{ id: string; name: string } | null>(null);
     const [pendingDeleteMember, setPendingDeleteMember] = useState<{ id: string; name: string } | null>(null);
@@ -302,8 +344,11 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     }, [initialTab]);
 
     useEffect(() => {
+      const normalizedThemeName = normalizeThemeNameValue(theme.name);
       setThemeDraft({
-        name: theme.name ?? '',
+        presetId: (theme.presetId as FoundationThemePresetId) || 'lalela-light',
+        mode: theme.mode === 'dark' ? 'dark' : 'light',
+        name: normalizedThemeName,
         primaryColor: theme.primaryColor ?? '',
         secondaryColor: theme.secondaryColor ?? '',
         backgroundColor: theme.backgroundColor ?? '',
@@ -314,7 +359,31 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         fontFamily: theme.fontFamily ?? '',
         iconUrl: theme.iconUrl ?? '',
       });
+      const nextOptions = [LALELA_LIGHT_THEME.name, normalizedThemeName]
+        .map((v) => normalizeThemeNameValue(v))
+        .filter(Boolean);
+      setThemeNameOptions(Array.from(new Set(nextOptions)));
     }, [theme]);
+
+    const applyFoundationPreset = () => {
+      const preset = LALELA_LIGHT_THEME;
+      setThemeSaveStatus(null);
+      setThemeDraft((prev) => ({
+        ...prev,
+        presetId: preset.presetId,
+        mode: preset.mode,
+        name: preset.name,
+        primaryColor: preset.primaryColor,
+        secondaryColor: preset.secondaryColor,
+        backgroundColor: preset.backgroundColor,
+        surfaceColor: preset.surfaceColor,
+        textPrimary: preset.textPrimary,
+        textSecondary: preset.textSecondary,
+        borderRadius: preset.borderRadius,
+        fontFamily: preset.fontFamily,
+        iconUrl: preset.iconUrl ?? '',
+      }));
+    };
 
     const handleSendInviteEmail = async (email: string, link: string) => {
       try {
@@ -621,6 +690,67 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       setThemeDraft((prev) => ({ ...prev, [field]: value }));
     };
 
+    const handleCreateThemeName = () => {
+      const nextName = newThemeName.trim();
+      if (!nextName) {
+        setThemeSaveStatus({ type: 'error', message: 'Please enter a theme name' });
+        return;
+      }
+
+      setThemeNameOptions((prev) => Array.from(new Set([
+        LALELA_LIGHT_THEME.name,
+        ...prev,
+        nextName,
+      ].map((v) => normalizeThemeNameValue(v)).filter(Boolean))));
+      handleThemeDraftChange('name', normalizeThemeNameValue(nextName));
+      setShowCreateThemeNameModal(false);
+      setShowThemeNameMenu(false);
+      setNewThemeName('');
+    };
+
+    const normalizeHexColor = (value: string): string => {
+      const raw = value.trim().replace(/^#/, '');
+      if (raw.length === 3 || raw.length === 6 || raw.length === 8) {
+        return `#${raw.toUpperCase()}`;
+      }
+      return value.trim();
+    };
+
+    const openColorPicker = (field: ThemeColorField) => {
+      const current = normalizeHexColor((themeDraft[field] || '').trim());
+      setActiveColorField(field);
+      setPickerColorValue(current || '#000000');
+      setShowColorPicker(true);
+    };
+
+    const applyPickerColor = () => {
+      if (!activeColorField) return;
+      const normalized = normalizeHexColor(pickerColorValue);
+      handleThemeDraftChange(activeColorField, normalized);
+      setShowColorPicker(false);
+      setActiveColorField(null);
+    };
+
+    const renderThemeColorField = (label: string, field: ThemeColorField) => (
+      <View style={{ flex: 1 }}>
+        <Text style={styles.fieldLabel}>{label}</Text>
+        <View style={styles.colorInputRow}>
+          <TouchableOpacity
+            onPress={() => openColorPicker(field)}
+            style={[styles.colorSwatchBtn, { backgroundColor: normalizeHexColor(themeDraft[field] || '#000000') || '#000000' }]}
+            activeOpacity={0.8}
+          />
+          <TextInput
+            style={styles.colorHexInput}
+            value={themeDraft[field]}
+            onChangeText={(v) => handleThemeDraftChange(field, v)}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+        </View>
+      </View>
+    );
+
     const handleSaveTheme = async () => {
       const colorFields: Array<keyof ThemeDraft> = [
         'primaryColor',
@@ -639,11 +769,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         }
       }
 
-      if (!themeDraft.name.trim()) {
-        setThemeSaveStatus({ type: 'error', message: 'Theme name is required' });
-        return;
-      }
-
       if (!themeDraft.borderRadius.trim()) {
         setThemeSaveStatus({ type: 'error', message: 'Border radius is required' });
         return;
@@ -656,8 +781,28 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
       setIsSavingTheme(true);
       try {
-        await updateTheme({
-          name: themeDraft.name.trim(),
+        const baselineName = LALELA_LIGHT_THEME.name.toLowerCase();
+        const draftName = normalizeThemeNameValue(themeDraft.name);
+        const hasCustomization =
+          themeDraft.primaryColor.trim() !== LALELA_LIGHT_THEME.primaryColor ||
+          themeDraft.secondaryColor.trim() !== LALELA_LIGHT_THEME.secondaryColor ||
+          themeDraft.backgroundColor.trim() !== LALELA_LIGHT_THEME.backgroundColor ||
+          themeDraft.surfaceColor.trim() !== LALELA_LIGHT_THEME.surfaceColor ||
+          themeDraft.textPrimary.trim() !== LALELA_LIGHT_THEME.textPrimary ||
+          themeDraft.textSecondary.trim() !== LALELA_LIGHT_THEME.textSecondary ||
+          themeDraft.borderRadius.trim() !== LALELA_LIGHT_THEME.borderRadius ||
+          themeDraft.fontFamily.trim() !== LALELA_LIGHT_THEME.fontFamily ||
+          (themeDraft.iconUrl.trim() || '') !== (LALELA_LIGHT_THEME.iconUrl || '');
+
+        const resolvedName =
+          hasCustomization && (!draftName || draftName.toLowerCase() === baselineName)
+            ? `${currentCommunity?.name || 'Community'} Theme`
+            : normalizeThemeNameValue(draftName || LALELA_LIGHT_THEME.name);
+
+        const savedTheme = await updateTheme({
+          presetId: themeDraft.presetId,
+          mode: themeDraft.mode,
+          name: resolvedName,
           primaryColor: themeDraft.primaryColor.trim(),
           secondaryColor: themeDraft.secondaryColor.trim(),
           backgroundColor: themeDraft.backgroundColor.trim(),
@@ -668,11 +813,60 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           fontFamily: themeDraft.fontFamily.trim(),
           iconUrl: themeDraft.iconUrl.trim() || null,
         });
-        setThemeSaveStatus({ type: 'success', message: 'Theme updated successfully' });
+
+        setThemeDraft((prev) => ({
+          ...prev,
+          name: normalizeThemeNameValue(savedTheme.name || resolvedName),
+        }));
+        setThemeNameOptions((prev) => Array.from(new Set([
+          LALELA_LIGHT_THEME.name,
+          ...prev,
+          savedTheme.name || resolvedName,
+        ].map((v) => normalizeThemeNameValue(v)).filter(Boolean))));
+        await refreshTheme();
+        setThemeSaveStatus({ type: 'success', message: `Saved as community theme: ${savedTheme.name || resolvedName}. Applied immediately in this app.` });
       } catch (error: any) {
         setThemeSaveStatus({
           type: 'error',
           message: error?.response?.data?.error || error?.message || 'Failed to save theme',
+        });
+      } finally {
+        setIsSavingTheme(false);
+      }
+    };
+
+    const handleResetThemeToBaseline = async () => {
+      const baseline = LALELA_LIGHT_THEME;
+      setThemeSaveStatus(null);
+      setIsSavingTheme(true);
+      try {
+        const resetPayload = {
+          presetId: baseline.presetId,
+          mode: baseline.mode,
+          name: baseline.name,
+          primaryColor: baseline.primaryColor,
+          secondaryColor: baseline.secondaryColor,
+          backgroundColor: baseline.backgroundColor,
+          surfaceColor: baseline.surfaceColor,
+          textPrimary: baseline.textPrimary,
+          textSecondary: baseline.textSecondary,
+          borderRadius: baseline.borderRadius,
+          fontFamily: baseline.fontFamily,
+          iconUrl: baseline.iconUrl ?? null,
+        };
+
+        await updateTheme(resetPayload);
+        setThemeDraft({
+          ...resetPayload,
+          iconUrl: resetPayload.iconUrl ?? '',
+        });
+        setThemeNameOptions([LALELA_LIGHT_THEME.name]);
+        await refreshTheme();
+        setThemeSaveStatus({ type: 'success', message: 'Theme reset to Lalela baseline' });
+      } catch (error: any) {
+        setThemeSaveStatus({
+          type: 'error',
+          message: error?.response?.data?.error || error?.message || 'Failed to reset theme',
         });
       } finally {
         setIsSavingTheme(false);
@@ -763,7 +957,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 position: 'absolute', 
                 width: '100%', 
                 top: SPACE.s60,
-                backgroundColor: THEME_COLORS.white, 
+                backgroundColor: THEME_COLORS.surface, 
                 borderRadius: RADIUS.md, 
                 marginTop: SPACE.xxs,
                 ...createShadow(THEME_COLORS.black, 0, 0, 0.1, 6, 4),
@@ -1133,8 +1327,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 <Text style={[styles.memberName, { color: THEME_COLORS.white, flex: 1, marginLeft: SPACE.lg }]} numberOfLines={1}>
                   {inv.invited_user_id?.slice(0, 20)}...
                 </Text>
-                <View style={[styles.roleBadge, { backgroundColor: THEME_COLORS.whiteOverlay20 }]}>
-                  <Text style={[styles.roleBadgeText, { color: THEME_COLORS.white }]}>{inv.role}</Text>
+                <View style={[styles.roleBadge, { backgroundColor: THEME_COLORS.surface }]}>
+                  <Text style={[styles.roleBadgeText, { color: THEME_COLORS.neutralTextStrong }]}>{inv.role}</Text>
                 </View>
               </View>
             ))}
@@ -1420,13 +1614,13 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   ) : notice.type === 'listing' ? (
                     <Tag size={18} color={SECONDARY} />
                   ) : (
-                    <Pin size={18} color={PRIMARY} />
+                    <AlertTriangle size={18} color={PRIMARY} />
                   )}
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.contentTitle} numberOfLines={1}>{notice.title}</Text>
                   <Text style={styles.contentSub}>
-                    {notice.authorName} • {notice.type} • {notice.urgencyLevel || ''}
+                    {notice.authorName} • {notice.type}{notice.urgencyLevel ? ` • ${notice.urgencyLevel}` : ''}
                   </Text>
                 </View>
                 <View style={styles.contentActions}>
@@ -1445,7 +1639,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                         style={styles.iconBtn}
                         onPress={() => handleTogglePin(notice)}
                       >
-                        <Pin size={16} color={notice.status === 'Pinned' ? PRIMARY : THEME_COLORS.neutralTextMuted} />
+                        <Bookmark size={18} color={notice.status === 'Pinned' ? PRIMARY : THEME_COLORS.neutralTextMuted} />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconBtn}
@@ -1693,57 +1887,39 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
         <View style={styles.card}>
           <Text style={styles.fieldLabel}>Theme Name</Text>
-          <TextInput
-            style={styles.input}
-            value={themeDraft.name}
-            onChangeText={(v) => handleThemeDraftChange('name', v)}
-            placeholder="Community Theme"
-            placeholderTextColor={THEME_COLORS.neutralTextMuted}
-          />
-
-          <View style={styles.fieldRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>Primary</Text>
-              <TextInput style={styles.input} value={themeDraft.primaryColor} onChangeText={(v) => handleThemeDraftChange('primaryColor', v)} autoCapitalize="none" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>Secondary</Text>
-              <TextInput style={styles.input} value={themeDraft.secondaryColor} onChangeText={(v) => handleThemeDraftChange('secondaryColor', v)} autoCapitalize="none" />
-            </View>
+          <View style={styles.themeNameSelectorRow}>
+            <TouchableOpacity
+              style={[styles.input, styles.themeNameSelectorBtn]}
+              onPress={() => setShowThemeNameMenu(true)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.themeNameInput}>
+                {normalizeThemeNameValue(themeDraft.name)}
+              </Text>
+              <ChevronDown size={16} color={THEME_COLORS.neutralTextSubtle} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.themeNameAddBtn}
+              onPress={() => setShowCreateThemeNameModal(true)}
+              activeOpacity={0.85}
+            >
+              <Plus size={16} color={PRIMARY} />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.fieldRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>Background</Text>
-              <TextInput style={styles.input} value={themeDraft.backgroundColor} onChangeText={(v) => handleThemeDraftChange('backgroundColor', v)} autoCapitalize="none" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>Surface</Text>
-              <TextInput style={styles.input} value={themeDraft.surfaceColor} onChangeText={(v) => handleThemeDraftChange('surfaceColor', v)} autoCapitalize="none" />
-            </View>
+            {renderThemeColorField('Primary', 'primaryColor')}
+            {renderThemeColorField('Secondary', 'secondaryColor')}
           </View>
 
           <View style={styles.fieldRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>Text Primary</Text>
-              <TextInput style={styles.input} value={themeDraft.textPrimary} onChangeText={(v) => handleThemeDraftChange('textPrimary', v)} autoCapitalize="none" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>Text Secondary</Text>
-              <TextInput style={styles.input} value={themeDraft.textSecondary} onChangeText={(v) => handleThemeDraftChange('textSecondary', v)} autoCapitalize="none" />
-            </View>
+            {renderThemeColorField('Background', 'backgroundColor')}
+            {renderThemeColorField('Surface', 'surfaceColor')}
           </View>
 
-          <View style={{ gap: SPACE.xl, marginTop: SPACE.sm }}>
-            <Text style={styles.fieldLabel}>Preview</Text>
-            <View style={{ flexDirection: 'row', gap: SPACE.lg, flexWrap: 'wrap' }}>
-              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.primaryColor || THEME_COLORS.primary }]} />
-              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.secondaryColor || THEME_COLORS.secondary }]} />
-              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.backgroundColor || THEME_COLORS.surface }]} />
-              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.surfaceColor || THEME_COLORS.surfaceContainer }]} />
-              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.textPrimary || THEME_COLORS.neutralTextStrong }]} />
-              <View style={[styles.previewSwatch, { backgroundColor: themeDraft.textSecondary || THEME_COLORS.neutralTextSubtle }]} />
-            </View>
+          <View style={styles.fieldRow}>
+            {renderThemeColorField('Text Primary', 'textPrimary')}
+            {renderThemeColorField('Text Secondary', 'textSecondary')}
           </View>
 
           <View style={styles.fieldRow}>
@@ -1773,10 +1949,25 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             </Text>
           )}
 
-          <TouchableOpacity style={[styles.actionBtn, { marginTop: SPACE.lg }]} onPress={handleSaveTheme} disabled={isSavingTheme}>
-            {isSavingTheme ? <Loader2 size={16} color={THEME_COLORS.white} /> : <Save size={16} color={THEME_COLORS.white} />}
-            <Text style={styles.actionBtnText}>{isSavingTheme ? 'Saving...' : 'Save Theme'}</Text>
-          </TouchableOpacity>
+          <Text style={styles.themeApplyHint}>
+            Theme changes apply immediately in this app for this community. Other members may need to refresh to fetch the latest community theme.
+          </Text>
+
+          <View style={{ flexDirection: 'row', gap: SPACE.lg, marginTop: SPACE.lg }}>
+            <TouchableOpacity
+              style={[styles.secondaryActionBtn, { flex: 1 }]}
+              onPress={handleResetThemeToBaseline}
+              disabled={isSavingTheme}
+            >
+              <RefreshCw size={16} color={PRIMARY} />
+              <Text style={styles.secondaryActionBtnText}>Reset Baseline</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.actionBtn, { flex: 1 }]} onPress={handleSaveTheme} disabled={isSavingTheme}>
+              {isSavingTheme ? <Loader2 size={16} color={THEME_COLORS.white} /> : <Save size={16} color={THEME_COLORS.white} />}
+              <Text style={styles.actionBtnText}>{isSavingTheme ? 'Saving...' : 'Save Theme'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <Text style={[styles.sectionTitle, { fontSize: TYPE_SCALE.h1, marginTop: SPACE.lg }]}>Moderation Activity</Text>
@@ -1812,6 +2003,99 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             <Text style={styles.emptyStateText}>No moderation activity yet</Text>
           </View>
         )}
+
+        <Modal visible={showThemeNameMenu} transparent animationType="fade" onRequestClose={() => setShowThemeNameMenu(false)}>
+          <View style={styles.colorPickerOverlay}>
+            <View style={styles.colorPickerCard}>
+              <Text style={styles.fieldLabel}>Select Theme Name</Text>
+              <View style={styles.themeNameMenuList}>
+                {themeNameOptions.map((name) => {
+                  const normalizedOption = normalizeThemeNameValue(name);
+                  const selected = normalizeThemeNameValue(themeDraft.name).toLowerCase() === normalizedOption.toLowerCase();
+                  return (
+                    <TouchableOpacity
+                      key={name}
+                      style={[styles.themeNameMenuItem, selected && styles.themeNameMenuItemSelected]}
+                      onPress={() => {
+                        handleThemeDraftChange('name', normalizedOption);
+                        setShowThemeNameMenu(false);
+                      }}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={[styles.themeNameMenuText, selected && styles.themeNameMenuTextSelected]}>
+                        {normalizedOption}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              <TouchableOpacity style={styles.secondaryActionBtn} onPress={() => setShowThemeNameMenu(false)}>
+                <X size={14} color={PRIMARY} />
+                <Text style={styles.secondaryActionBtnText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={showCreateThemeNameModal} transparent animationType="fade" onRequestClose={() => setShowCreateThemeNameModal(false)}>
+          <View style={styles.colorPickerOverlay}>
+            <View style={styles.colorPickerCard}>
+              <Text style={styles.fieldLabel}>Create New Theme Name</Text>
+              <TextInput
+                style={styles.input}
+                value={newThemeName}
+                onChangeText={setNewThemeName}
+                placeholder="e.g. Sunset Garden"
+                placeholderTextColor={THEME_COLORS.neutralTextMuted}
+              />
+              <View style={{ flexDirection: 'row', gap: SPACE.lg }}>
+                <TouchableOpacity style={[styles.secondaryActionBtn, { flex: 1 }]} onPress={() => setShowCreateThemeNameModal(false)}>
+                  <X size={14} color={PRIMARY} />
+                  <Text style={styles.secondaryActionBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.actionBtn, { flex: 1 }]} onPress={handleCreateThemeName}>
+                  <Plus size={14} color={THEME_COLORS.white} />
+                  <Text style={styles.actionBtnText}>Create</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={showColorPicker} transparent animationType="fade" onRequestClose={() => setShowColorPicker(false)}>
+          <View style={styles.colorPickerOverlay}>
+            <View style={styles.colorPickerCard}>
+              <Text style={styles.fieldLabel}>Choose Color</Text>
+              <TextInput
+                style={styles.input}
+                value={pickerColorValue}
+                onChangeText={setPickerColorValue}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <View style={styles.colorPresetGrid}>
+                {COLOR_SWATCH_PRESETS.map((hex) => (
+                  <TouchableOpacity
+                    key={hex}
+                    onPress={() => setPickerColorValue(hex)}
+                    style={[styles.colorPresetSwatch, { backgroundColor: hex }]}
+                    activeOpacity={0.85}
+                  />
+                ))}
+              </View>
+              <View style={{ flexDirection: 'row', gap: SPACE.lg, marginTop: SPACE.lg }}>
+                <TouchableOpacity style={[styles.secondaryActionBtn, { flex: 1 }]} onPress={() => setShowColorPicker(false)}>
+                  <X size={14} color={PRIMARY} />
+                  <Text style={styles.secondaryActionBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.actionBtn, { flex: 1 }]} onPress={applyPickerColor}>
+                  <CheckCircle2 size={14} color={THEME_COLORS.white} />
+                  <Text style={styles.actionBtnText}>Apply</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     );
 
@@ -1944,36 +2228,40 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 export default ModerationCenter;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: THEME_COLORS.white },
+  container: { flex: 1, backgroundColor: APP_SHELL_COLORS.body },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACE.xxl,
     paddingHorizontal: SPACE.s16,
     paddingVertical: SPACE.xxxl,
+    backgroundColor: APP_SHELL_COLORS.chrome,
     borderBottomWidth: 1,
     borderBottomColor: THEME_COLORS.neutralBgSoft,
   },
   headerTitle: { fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
   backBtn: { padding: SPACE.md },
-  tabBar: { borderBottomWidth: 1, borderBottomColor: THEME_COLORS.neutralBgSoft, flexGrow: 0, minHeight: 50 },
-  tabBarContent: { paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.lg, gap: SPACE.lg, flexDirection: 'row', alignItems: 'center' },
+  tabBar: { backgroundColor: APP_SHELL_COLORS.body, flexGrow: 0, minHeight: 74 },
+  tabBarContent: { paddingHorizontal: SPACE.s16, paddingTop: SPACE.s16, paddingBottom: SPACE.xl, gap: SPACE.xxl, flexDirection: 'row', alignItems: 'center' },
   tabBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: RADIUS.tab,
-    backgroundColor: THEME_COLORS.neutralBg,
+    width: 56,
+    height: 56,
+    borderRadius: RADIUS.card,
+    backgroundColor: getCardSurfaceColor('default'),
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
+    borderWidth: 1,
+    borderColor: getCardBorderColor('default'),
+    ...getCardShadow('soft'),
   },
   tabBtnActive: { backgroundColor: PRIMARY },
   tabBtnText: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSubtle },
   tabBtnTextActive: { color: THEME_COLORS.white },
-  tabContent: { flex: 1, paddingHorizontal: SPACE.s16, paddingTop: SPACE.s16 },
+  tabContent: { flex: 1, paddingHorizontal: SPACE.s16, paddingTop: SPACE.xl },
 
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.xxl },
-  sectionTitle: { fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.black, color: PRIMARY, flex: 1 },
+  sectionTitle: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, color: PRIMARY, flex: 1, lineHeight: 30 },
 
   saveBtn: {
     flexDirection: 'row',
@@ -1996,6 +2284,23 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.pill,
   },
   actionBtnText: { color: THEME_COLORS.white, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold },
+  secondaryActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACE.md,
+    backgroundColor: THEME_COLORS.surface,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.neutralBorder,
+    paddingHorizontal: SPACE.xxxl,
+    paddingVertical: SPACE.lg,
+    borderRadius: RADIUS.pill,
+  },
+  secondaryActionBtnText: {
+    color: PRIMARY,
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.bold,
+  },
 
   fieldGroup: { gap: SPACE.md },
   fieldLabel: {
@@ -2033,9 +2338,9 @@ const styles = StyleSheet.create({
   infoBannerDesc: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextDefault, lineHeight: LINE_HEIGHT.compact, flex: 1 },
 
   card: {
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, padding: SPACE.s16, gap: SPACE.xxl,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
-    ...createShadow(THEME_COLORS.black, 0, 1, 0.04, 4, 1),
+    backgroundColor: getCardSurfaceColor('muted'), borderRadius: RADIUS.card, padding: SPACE.s16, gap: SPACE.xxl,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
+    ...getCardShadow('soft'),
   },
   cardLabel: {
     fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted,
@@ -2079,7 +2384,113 @@ const styles = StyleSheet.create({
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   inlineLoader: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
   infoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.xl },
-  previewSwatch: { width: 28, height: 28, borderRadius: RADIUS.md, borderWidth: 1, borderColor: THEME_COLORS.neutralBorderStrong },
+  colorInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: THEME_COLORS.neutralBg,
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.neutralBgSoft,
+    paddingHorizontal: SPACE.xl,
+    paddingVertical: SPACE.sm,
+    gap: SPACE.lg,
+  },
+  colorSwatchBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.neutralBorder,
+  },
+  colorHexInput: {
+    flex: 1,
+    fontSize: TYPE_SCALE.xxl,
+    color: THEME_COLORS.neutralTextStrong,
+    paddingVertical: SPACE.sm,
+  },
+  colorPickerOverlay: {
+    flex: 1,
+    backgroundColor: THEME_COLORS.blackOverlay50,
+    justifyContent: 'center',
+    paddingHorizontal: SPACE.s16,
+  },
+  colorPickerCard: {
+    backgroundColor: getCardSurfaceColor('default'),
+    borderRadius: RADIUS.round,
+    borderWidth: 1,
+    borderColor: getCardBorderColor('default'),
+    padding: SPACE.s16,
+    gap: SPACE.xl,
+    ...getCardShadow('hero'),
+  },
+  colorPresetGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACE.lg,
+  },
+  colorPresetSwatch: {
+    width: 28,
+    height: 28,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.neutralBorder,
+  },
+  themeNameInput: {
+    flex: 1,
+    fontSize: TYPE_SCALE.h1,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextHeading,
+  },
+  themeNameSelectorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACE.xl,
+    marginTop: SPACE.sm,
+  },
+  themeNameSelectorBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  themeNameAddBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: RADIUS.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: THEME_COLORS.neutralBorder,
+    backgroundColor: THEME_COLORS.surface,
+  },
+  themeNameMenuList: {
+    gap: SPACE.md,
+  },
+  themeNameMenuItem: {
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.neutralBorder,
+    backgroundColor: THEME_COLORS.surface,
+    paddingHorizontal: SPACE.xxl,
+    paddingVertical: SPACE.xl,
+  },
+  themeNameMenuItemSelected: {
+    borderColor: PRIMARY,
+    backgroundColor: THEME_COLORS.primaryTintSoft,
+  },
+  themeNameMenuText: {
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.semibold,
+    color: THEME_COLORS.neutralTextSubtle,
+  },
+  themeNameMenuTextSelected: {
+    color: PRIMARY,
+  },
+  themeApplyHint: {
+    fontSize: TYPE_SCALE.md,
+    color: THEME_COLORS.neutralTextSubtle,
+    lineHeight: 18,
+  },
   infoLabel: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, fontWeight: FONT_WEIGHT.bold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },
   infoValue: { flex: 1, textAlign: 'right', fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextStrong, fontWeight: FONT_WEIGHT.semibold },
   activityRow: {
@@ -2109,30 +2520,32 @@ const styles = StyleSheet.create({
   dangerBtnText: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold },
 
   filterTab: {
-    paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: RADIUS.pill,
-    backgroundColor: THEME_COLORS.neutralBg,
+    paddingHorizontal: SPACE.s16, paddingVertical: SPACE.xl, borderRadius: RADIUS.pill,
+    backgroundColor: getCardSurfaceColor('default'),
+    borderWidth: 1,
+    borderColor: getCardBorderColor('default'),
   },
   filterTabActive: { backgroundColor: PRIMARY },
-  filterTabText: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSubtle },
+  filterTabText: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.medium, color: THEME_COLORS.neutralTextHeading },
   filterTabTextActive: { color: THEME_COLORS.white },
 
   contentItem: {
-    flexDirection: 'row', alignItems: 'center', gap: SPACE.xl,
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xxl, padding: SPACE.xxl,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
-    ...createShadow(THEME_COLORS.black, 0, 1, 0.03, 4, 1),
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.xxxl,
+    backgroundColor: getCardSurfaceColor('default'), borderRadius: 28, paddingVertical: SPACE.s16, paddingHorizontal: SPACE.s16,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
+    ...getCardShadow('soft'),
   },
-  contentIcon: { width: 40, height: 40, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
-  contentTitle: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
-  contentSub: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs },
-  contentActions: { flexDirection: 'row', gap: SPACE.xxs },
+  contentIcon: { width: 54, height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  contentTitle: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  contentSub: { fontSize: TYPE_SCALE.h2, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs, lineHeight: 22 },
+  contentActions: { alignItems: 'center', gap: SPACE.md },
   statusChip: { paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill },
   statusChipText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },
 
   bizCard: {
-    flexDirection: 'row', gap: SPACE.xxl, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.round, padding: SPACE.xxxl,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
-    ...createShadow(THEME_COLORS.black, 0, 2, 0.04, 8, 2),
+    flexDirection: 'row', gap: SPACE.xxl, backgroundColor: getCardSurfaceColor('default'), borderRadius: RADIUS.round, padding: SPACE.xxxl,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
+    ...getCardShadow('soft'),
   },
   bizImg: { width: 64, height: 64, borderRadius: RADIUS.xxl },
   bizName: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
@@ -2157,7 +2570,7 @@ const styles = StyleSheet.create({
 
   categoryItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.xxxl,
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.round, padding: SPACE.xxxl,
+    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.round, padding: SPACE.xxxl,
     borderWidth: 2, borderColor: THEME_COLORS.neutralBgSoft, opacity: 0.7,
   },
   categoryItemActive: { backgroundColor: THEME_COLORS.successSurface, borderColor: PRIMARY, opacity: 1 },
@@ -2176,19 +2589,19 @@ const styles = StyleSheet.create({
   },
   ruleText: { fontSize: TYPE_SCALE.xxl, color: THEME_COLORS.neutralTextHeading, fontWeight: FONT_WEIGHT.medium, flex: 1 },
   ruleInput: {
-    width: 56, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.md, textAlign: 'center',
+    width: 56, backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.md, textAlign: 'center',
     fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY,
     borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft, paddingVertical: SPACE.md,
   },
   toggle: { width: 40, height: 20, borderRadius: RADIUS.lg, position: 'relative', justifyContent: 'center' },
   toggleThumb: {
-    position: 'absolute', width: SPACE.xxxl, height: SPACE.xxxl, borderRadius: RADIUS.dot, backgroundColor: THEME_COLORS.white,
+    position: 'absolute', width: SPACE.xxxl, height: SPACE.xxxl, borderRadius: RADIUS.dot, backgroundColor: THEME_COLORS.surface,
     ...createShadow(THEME_COLORS.black, 0, 1, 0.15, 2, 2),
   },
 
   logItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl,
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xxl, padding: SPACE.xxl,
+    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.xxl, padding: SPACE.xxl,
     borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
     ...createShadow(THEME_COLORS.black, 0, 1, 0.03, 4, 1),
   },

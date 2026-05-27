@@ -205,7 +205,7 @@ const NotificationSettingsPage: React.FC = () => {
         </View>
 
         {/* Global toggle */}
-        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, padding: SPACE.s18, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, padding: SPACE.s18, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
             <View style={{ width: 40, height: 40, borderRadius: RADIUS.round, backgroundColor: prefs.globalEnabled ? THEME_COLORS.successTintSoft : THEME_COLORS.neutralTintSoft, alignItems: 'center', justifyContent: 'center' }}>
               <Bell size={20} color={prefs.globalEnabled ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft} />
@@ -226,7 +226,7 @@ const NotificationSettingsPage: React.FC = () => {
         </View>
 
         {/* Notification Types */}
-        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, padding: SPACE.s20, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, gap: SPACE.s16, opacity: prefs.globalEnabled ? 1 : 0.5 }}>
+        <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, padding: SPACE.s20, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, gap: SPACE.s16, opacity: prefs.globalEnabled ? 1 : 0.5 }}>
           <View>
             <Text style={{ fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Notification Types</Text>
             <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSoft, marginTop: SPACE.xs }}>Default settings applied to all communities unless overridden below</Text>
@@ -271,7 +271,7 @@ const NotificationSettingsPage: React.FC = () => {
 
         {/* Community overrides */}
         {communities.length > 1 && (
-          <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, padding: SPACE.s20, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, gap: SPACE.xxl, opacity: prefs.globalEnabled ? 1 : 0.5 }}>
+          <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, padding: SPACE.s20, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, gap: SPACE.xxl, opacity: prefs.globalEnabled ? 1 : 0.5 }}>
             <View>
               <Text style={{ fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Community Settings</Text>
               <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSoft, marginTop: SPACE.xs, lineHeight: LINE_HEIGHT.body }}>

@@ -41,7 +41,7 @@ export const CommunityAccessSection: React.FC = () => {
   const { communities, setCurrentCommunity } = useCommunity();
 
   return (
-    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.xl }}>
+    <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.xl }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg }}>
         <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>

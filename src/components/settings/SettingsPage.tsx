@@ -28,7 +28,8 @@ import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { isCommunityActive, isCommunityTrial, isCommunityLicensed, isUserLicensed } from '../../lib/licensing';
 import { NotificationPreferences } from '../../types';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 
 const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
   globalEnabled: true,
@@ -102,6 +103,14 @@ const LETTER_SPACING = {
 };
 const LINE_HEIGHT = {
   compact: 17,
+};
+
+const CARD_DEPTH_HERO = getCardShadow('hero');
+const CARD_DEPTH_SOFT = getCardShadow('soft');
+const SETTINGS_CARD_SURFACE = {
+  backgroundColor: getCardSurfaceColor('default'),
+  borderWidth: 1,
+  borderColor: getCardBorderColor('default'),
 };
 
 const SettingsPage: React.FC = () => {
@@ -180,7 +189,7 @@ const SettingsPage: React.FC = () => {
   const ringColor = isLicensed ? THEME_COLORS.success : THEME_COLORS.error;
 
   return (
-    <View style={{ flex: 1, backgroundColor: THEME_COLORS.neutralBg }}>
+    <View style={{ flex: 1, backgroundColor: APP_SHELL_COLORS.body }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -190,11 +199,11 @@ const SettingsPage: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* ── Profile Identity Card ── */}
-        <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.hero, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s20, gap: SPACE.s16 }}>
+        <View style={{ ...SETTINGS_CARD_SURFACE, borderRadius: 34, padding: SPACE.s20, gap: SPACE.s20, ...CARD_DEPTH_SOFT }}>
           {/* Avatar + Name row */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s16 }}>
             <View style={{ position: 'relative' }}>
-              <View style={{ width: SPACE.s80, height: SPACE.s80, borderRadius: RADIUS.avatar, overflow: 'hidden', borderWidth: 3, borderColor: ringColor }}>
+              <View style={{ width: 92, height: 92, borderRadius: 46, overflow: 'hidden', borderWidth: 4, borderColor: ringColor }}>
                 <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
               </View>
             </View>
@@ -208,8 +217,8 @@ const SettingsPage: React.FC = () => {
               {/* Community + license badge */}
               <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: SPACE.xl, marginTop: SPACE.lg }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xs }}>
-                  <MapPin size={14} color={THEME_COLORS.primary} />
-                  <Text style={{ fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextDefault }}>{currentCommunity?.name}</Text>
+                  <MapPin size={14} color={THEME_COLORS.neutralTextSubtle} />
+                  <Text style={{ fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextDefault }}>{currentCommunity?.name}</Text>
                 </View>
                 {(() => {
                   // Profile pill is binary: ACTIVE (paid) vs UNLICENSED (trial /
@@ -239,14 +248,14 @@ const SettingsPage: React.FC = () => {
 
               {/* Role badges */}
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.lg, marginTop: SPACE.xl }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: RADIUS.panel, backgroundColor: rc.bg }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: 18, backgroundColor: rc.bg }}>
                   <View style={{ width: SPACE.lg, height: SPACE.lg, borderRadius: RADIUS.sm, backgroundColor: rc.dot }} />
                   <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: rc.text, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                     {currentCommunity?.userRole || 'MEMBER'}
                   </Text>
                 </View>
                 {currentCommunity?.isSecurityMember && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
                     <Shield size={11} color={THEME_COLORS.brandBlueText} />
                     <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.brandBlueText, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>Security Responder</Text>
                   </View>
@@ -256,7 +265,7 @@ const SettingsPage: React.FC = () => {
           </View>
 
           {/* Community Switcher */}
-          <View style={{ borderTopWidth: 1, borderTopColor: THEME_COLORS.overlayBorderSoft, paddingTop: SPACE.s16, gap: SPACE.xxl }}>
+          <View style={{ borderTopWidth: 1, borderTopColor: THEME_COLORS.overlayBorderSoft, paddingTop: SPACE.s20, gap: SPACE.xxl }}>
             <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
               Community Switcher
             </Text>
@@ -265,8 +274,9 @@ const SettingsPage: React.FC = () => {
               onPress={() => setShowCommunitySwitcher(!showCommunitySwitcher)}
               style={{
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-                padding: SPACE.s14, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, borderWidth: 1,
-                borderColor: showCommunitySwitcher ? THEME_COLORS.alias_rgba_22_163_74_0_3 : THEME_COLORS.overlayBorderSoft,
+                padding: SPACE.s14, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1,
+                borderColor: showCommunitySwitcher ? THEME_COLORS.alias_rgba_22_163_74_0_3 : getCardBorderColor('default'),
+                ...CARD_DEPTH_SOFT,
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xxxl }}>
@@ -282,7 +292,7 @@ const SettingsPage: React.FC = () => {
                 {currentCommunity && (
                   <TouchableOpacity
                     onPress={() => router.push('/admin')}
-                    style={{ paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.md, backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.lg }}
+                    style={{ paddingHorizontal: SPACE.s16, paddingVertical: SPACE.lg, backgroundColor: THEME_COLORS.primary, borderRadius: 18 }}
                   >
                     <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                       Dashboard
@@ -296,7 +306,7 @@ const SettingsPage: React.FC = () => {
             </TouchableOpacity>
 
             {showCommunitySwitcher && (
-              <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, overflow: 'hidden' }}>
+              <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1, borderColor: getCardBorderColor('default'), overflow: 'hidden', ...CARD_DEPTH_SOFT }}>
                 {(communities || []).map((c, idx) => {
                   const isActive = c.id === currentCommunity?.id;
                   const isAdminOrMod = c.ownerId === userProfile?.id || c.userRole === 'ADMIN' || c.userRole === 'MODERATOR';
@@ -307,7 +317,7 @@ const SettingsPage: React.FC = () => {
                       style={{
                         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
                         padding: SPACE.s14, borderBottomWidth: idx < (communities?.length || 1) - 1 ? 1 : 0, borderBottomColor: THEME_COLORS.alias_rgba_0_0_0_0_05,
-                        backgroundColor: isActive ? THEME_COLORS.successTintSofter : THEME_COLORS.white,
+                        backgroundColor: isActive ? THEME_COLORS.successTintSofter : THEME_COLORS.surfaceContainerLow,
                       }}
                     >
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl, flex: 1 }}>
@@ -352,11 +362,12 @@ const SettingsPage: React.FC = () => {
             onPress={() => router.push('/security')}
             style={{
               flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-              padding: SPACE.s16, borderRadius: RADIUS.card, backgroundColor: THEME_COLORS.white, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft,
+              padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
+              ...CARD_DEPTH_SOFT,
             }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s14 }}>
-              <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
                 <Lock size={20} color={THEME_COLORS.primary} />
               </View>
               <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.onSurface }}>My Profile & Account</Text>
@@ -367,13 +378,14 @@ const SettingsPage: React.FC = () => {
           {/* Notifications */}
           <View style={{
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-            padding: SPACE.s16, borderRadius: RADIUS.card, backgroundColor: THEME_COLORS.white, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft,
+            padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
+            ...CARD_DEPTH_SOFT,
           }}>
             <TouchableOpacity
               onPress={() => globalNotificationsEnabled && router.push('/notifications-settings')}
               style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s14, flex: 1 }}
             >
-              <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
                 <BellRing size={20} color={globalNotificationsEnabled ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft} />
               </View>
               <View>
@@ -404,11 +416,12 @@ const SettingsPage: React.FC = () => {
               onPress={() => router.push({ pathname: '/admin', params: { view: 'moderation', tab: 'logs' } })}
               style={{
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-                padding: SPACE.s16, borderRadius: RADIUS.card, backgroundColor: THEME_COLORS.white, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft,
+                padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
+                ...CARD_DEPTH_SOFT,
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s14 }}>
-                <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
                   <Sparkles size={20} color={THEME_COLORS.primary} />
                 </View>
                 <View>
@@ -433,7 +446,7 @@ const SettingsPage: React.FC = () => {
 
         {/* ── Community License Card (Only for Trial) ── */}
         {currentCommunity?.type === 'TRIAL' && (currentCommunity.ownerId === userProfile?.id) && (
-          <View style={{ backgroundColor: THEME_COLORS.primaryContainer, borderRadius: RADIUS.hero, padding: SPACE.s20, gap: SPACE.s16 }}>
+          <View style={{ backgroundColor: THEME_COLORS.primaryContainer, borderRadius: RADIUS.hero, padding: SPACE.s20, gap: SPACE.s16, ...CARD_DEPTH_HERO }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, flex: 1 }} numberOfLines={1}>
                 {currentCommunity?.name || 'Community'}
@@ -452,7 +465,7 @@ const SettingsPage: React.FC = () => {
               </View>
             </View>
 
-            <View style={{ backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_1, borderRadius: RADIUS.card, padding: SPACE.s16, borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20, gap: SPACE.xl }}>
+            <View style={{ backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_1, borderRadius: RADIUS.card, padding: SPACE.s16, borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20, gap: SPACE.xl, ...CARD_DEPTH_SOFT }}>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.xxl }}>
                 <Sparkles size={18} color={THEME_COLORS.warningBorderStrong} />
                 <View style={{ flex: 1 }}>
@@ -464,7 +477,7 @@ const SettingsPage: React.FC = () => {
               </View>
               <TouchableOpacity
                 onPress={() => router.push({ pathname: '/checkout', params: { type: 'community', targetId: currentCommunity.id } })}
-                style={{ backgroundColor: THEME_COLORS.white, paddingVertical: SPACE.xxxl, borderRadius: RADIUS.s14, alignItems: 'center' }}
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, paddingVertical: SPACE.xxxl, borderRadius: RADIUS.s14, alignItems: 'center' }}
               >
                 <Text style={{ fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primaryContainer, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                   License Community (R999)
@@ -491,6 +504,7 @@ const SettingsPage: React.FC = () => {
               borderStyle: 'dashed',
               backgroundColor: THEME_COLORS.alias_rgba_16_185_129_0_05,
               gap: SPACE.xl,
+              ...CARD_DEPTH_SOFT,
             }}
             onPress={() => router.push('/onboarding-create')}
             activeOpacity={0.7}

@@ -37,7 +37,8 @@ import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import type { CommunityNotice } from '../../types';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardShadow } from '../../theme/cardStyles';
 import { createShadow } from '../../theme/shadows';
 
 const PRIMARY = THEME_COLORS.primary;
@@ -45,6 +46,10 @@ const SPACE = {
   s24: 24,
   s120: 120,
 };
+const CARD_DEPTH_HERO = getCardShadow('hero');
+const CARD_DEPTH = getCardShadow('default');
+const CARD_DEPTH_SOFT = getCardShadow('soft');
+const SURFACE_BORDER_STYLE = { borderColor: getCardBorderColor('default') };
 
 interface PostsPageProps {
   initialNoticeId?: string;
@@ -329,18 +334,13 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
 
       return (
         <View
-          className="rounded-2xl bg-white overflow-hidden mb-3"
+          className="rounded-2xl bg-surface-container-low overflow-hidden mb-3"
           style={{
             borderWidth: 1,
             borderColor: highlightedNoticeId === notice.id ? PRIMARY : borderColor,
-            ...createShadow(
-              highlightedNoticeId === notice.id ? PRIMARY : borderColor,
-              0,
-              0,
-              highlightedNoticeId === notice.id ? 0.35 : 0.2,
-              highlightedNoticeId === notice.id ? 10 : 4,
-              highlightedNoticeId === notice.id ? 5 : 2,
-            ),
+            ...(highlightedNoticeId === notice.id
+              ? createShadow(THEME_COLORS.black, 0, 12, 0.22, 20, 9)
+              : CARD_DEPTH),
           }}
         >
           {/* Inline map for emergency/warning */}
@@ -390,7 +390,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
 
           {/* Image (non-emergency) edge-to-edge layout at top */}
           {notice.postsImage && !showMap ? (
-            <View className="w-full aspect-video border-b border-gray-100 overflow-hidden">
+            <View className="w-full aspect-video border-b overflow-hidden" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
               <Image
                 source={{ uri: resolveMediaUrl(notice.postsImage) }}
                 className="w-full h-full"
@@ -407,15 +407,15 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               <View className="relative shrink-0">
                 <TouchableOpacity
                   onPress={() => setActiveMenuId(activeMenuId === notice.id ? null : notice.id)}
-                  className="p-2 rounded-full bg-gray-100"
+                  className="p-2 rounded-full bg-surface-container"
                   activeOpacity={0.8}
                 >
                   <MoreVertical size={16} color={THEME_COLORS.neutralTextSoft} />
                 </TouchableOpacity>
                 {activeMenuId === notice.id && (
                   <View
-                    className="absolute right-0 top-10 w-48 bg-white rounded-2xl border border-gray-100 py-2 z-50"
-                    style={createShadow(THEME_COLORS.black, 0, 0, 0.1, 12, 8)}
+                    className="absolute right-0 top-10 w-48 bg-surface-container-low rounded-2xl border py-2 z-50"
+                    style={{ ...createShadow(THEME_COLORS.black, 0, 0, 0.1, 12, 8), ...SURFACE_BORDER_STYLE }}
                   >
                     {isOwner && (
                       <TouchableOpacity
@@ -491,9 +491,9 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             </Text>
 
             {/* Author row */}
-            <View className="flex-row items-center justify-between pt-2 border-t border-gray-100">
+            <View className="flex-row items-center justify-between pt-2 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
               <View className="flex-row items-center gap-3">
-                <View className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                <View className="w-10 h-10 rounded-full bg-surface-container overflow-hidden border" style={SURFACE_BORDER_STYLE}>
                   <Image
                     source={{
                       uri:
@@ -547,10 +547,10 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       const isMarkingSold = markingSoldId === post.id;
 
       return (
-        <View className="bg-gray-50 rounded-[2rem] overflow-hidden border border-gray-100 mb-6 shadow-sm">
+        <View className="bg-surface-container-low rounded-[2rem] overflow-hidden border mb-6" style={{ ...CARD_DEPTH_HERO, ...SURFACE_BORDER_STYLE }}>
           {/* Map (emergency) or image */}
           {isEmergency && post.latitude && post.longitude ? (
-            <View className="w-full aspect-video overflow-hidden border-b border-gray-100">
+            <View className="w-full aspect-video overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
               <MapView {...defaultMapViewProps}
                 style={{ flex: 1 }}
                 initialRegion={{
@@ -574,7 +574,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               </View>
             </View>
           ) : post.postsImage ? (
-            <View className="w-full aspect-video overflow-hidden border-b border-gray-100">
+            <View className="w-full aspect-video overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
               <Image
                 source={{ uri: resolveMediaUrl(post.postsImage) }}
                 className="w-full h-full"
@@ -607,7 +607,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                   ) : null}
                   {post.isCommunityPick ? (
                     <View className="bg-orange-500 px-3 py-1 rounded-full flex-row items-center gap-1">
-                      <View className="w-1.5 h-1.5 bg-white rounded-full" />
+                      <View className="w-1.5 h-1.5 bg-surface-container-low rounded-full" />
                       <Text className="text-white text-[10px] font-bold uppercase tracking-widest">
                         Pick
                       </Text>
@@ -629,8 +629,8 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 </TouchableOpacity>
                 {activeMenuId === post.id && (
                   <View
-                    className="absolute right-0 top-10 w-48 bg-white rounded-2xl border border-gray-100 py-2 z-50"
-                    style={createShadow(THEME_COLORS.black, 0, 0, 0.1, 12, 8)}
+                    className="absolute right-0 top-10 w-48 bg-surface-container-low rounded-2xl border py-2 z-50"
+                    style={{ ...createShadow(THEME_COLORS.black, 0, 0, 0.1, 12, 8), ...SURFACE_BORDER_STYLE }}
                   >
                     {isOwner && (
                       <TouchableOpacity
@@ -698,7 +698,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
 
             {/* Price block */}
             {post.type === 'listing' && post.price !== undefined ? (
-              <View className="bg-white p-5 rounded-2xl border border-gray-100 gap-4">
+              <View className="bg-surface-container p-5 rounded-2xl border gap-4" style={{ ...CARD_DEPTH_SOFT, ...SURFACE_BORDER_STYLE }}>
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center gap-6">
                     <View>
@@ -753,9 +753,9 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             ) : null}
 
             {/* Author row */}
-            <View className="flex-row items-center justify-between pt-4 border-t border-gray-100">
+            <View className="flex-row items-center justify-between pt-4 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
               <View className="flex-row items-center gap-3">
-                <View className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
+                <View className="w-10 h-10 rounded-full bg-surface-container overflow-hidden border" style={SURFACE_BORDER_STYLE}>
                   <Image
                     source={{
                       uri:
@@ -890,7 +890,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       case 'notice':
         return renderNotice({ item: item.item });
       case 'divider':
-        return <View className="h-px bg-gray-100 my-6" />;
+        return <View className="h-px bg-surface-container my-6" />;
       case 'listingHeader':
         return (
           <View className="flex-row items-center gap-2 px-2 mb-4 mt-2">
@@ -905,7 +905,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       case 'emptyListings':
         return (
           <View className="items-center justify-center py-20 gap-4">
-            <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center">
+            <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center" style={CARD_DEPTH_SOFT}>
               <Tag size={40} color={THEME_COLORS.neutralBorderMuted} />
             </View>
             <Text className="text-lg font-bold text-primary">No listings found</Text>
@@ -925,13 +925,16 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Sub-header */}
-      <View className="bg-white border-b border-gray-100 px-6 py-4 gap-4">
+      <View
+        className="border-b px-6 py-4 gap-4"
+        style={{ backgroundColor: APP_SHELL_COLORS.body, borderBottomColor: THEME_COLORS.neutralBorderSoft }}
+      >
         {/* Search */}
-        <View className="flex-row items-center bg-gray-100 rounded-2xl px-4 py-3 gap-3">
+        <View className="flex-row items-center bg-surface-container rounded-2xl px-4 py-3 gap-3" style={CARD_DEPTH_SOFT}>
           <Search size={16} color={THEME_COLORS.neutralTextSoft} />
           <TextInput
             value={searchQuery}
@@ -957,8 +960,9 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 'px-4 py-1.5 rounded-full border mr-2',
                 filter === tab.id
                   ? 'bg-primary border-primary'
-                  : 'bg-gray-100 border-gray-200',
+                  : 'bg-surface-container',
               ].join(' ')}
+              style={filter === tab.id ? undefined : SURFACE_BORDER_STYLE}
               activeOpacity={0.8}
             >
               <Text
@@ -1012,8 +1016,8 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         presentationStyle="pageSheet"
         onRequestClose={() => setMapPost(null)}
       >
-        <SafeAreaView className="flex-1 bg-white">
-          <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-100">
+        <SafeAreaView className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
+          <View className="flex-row items-center justify-between px-6 py-4 border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
             <View>
               <Text className="font-bold text-gray-800 text-base" numberOfLines={1}>
                 {mapPost?.title}
@@ -1024,7 +1028,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             </View>
             <TouchableOpacity
               onPress={() => setMapPost(null)}
-              className="p-2 rounded-full bg-gray-100"
+              className="p-2 rounded-full bg-surface-container"
               activeOpacity={0.8}
             >
               <X size={20} color={THEME_COLORS.neutralTextEmphasis} />

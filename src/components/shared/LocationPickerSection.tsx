@@ -64,7 +64,7 @@ const inputStyle = {
   borderRadius: RADIUS.lg,
   paddingHorizontal: SPACE.xl,
   paddingVertical: SPACE.lg,
-  backgroundColor: THEME_COLORS.white,
+  backgroundColor: THEME_COLORS.surface,
   fontSize: TYPE_SCALE.md,
   color: THEME_COLORS.onSurface,
 } as const;
@@ -216,7 +216,7 @@ const LocationPickerSection: React.FC<LocationPickerSectionProps> = ({
             styles={{
               container: { flex: 1 },
               textInput: {
-                backgroundColor: THEME_COLORS.white,
+                backgroundColor: THEME_COLORS.surface,
                 borderRadius: RADIUS.lg,
                 borderWidth: 1,
                 borderColor: THEME_COLORS.overlayBorder,
@@ -230,7 +230,7 @@ const LocationPickerSection: React.FC<LocationPickerSectionProps> = ({
                 position: 'absolute',
                 top: SPACE.placesTop,
                 width: '100%',
-                backgroundColor: THEME_COLORS.white,
+                backgroundColor: THEME_COLORS.surface,
                 borderRadius: RADIUS.md,
                 ...createShadow(THEME_COLORS.black, 0, 0, 0.1, 5, 5),
                 zIndex: 9999,

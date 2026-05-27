@@ -76,7 +76,7 @@ const inputStyle = {
   borderRadius: RADIUS.lg,
   paddingHorizontal: SPACE.xl,
   paddingVertical: SPACE.lg,
-  backgroundColor: THEME_COLORS.white,
+  backgroundColor: THEME_COLORS.surfaceContainerLow,
   fontSize: TYPE_SCALE.xl,
   color: THEME_COLORS.onSurface,
 } as const;
@@ -278,7 +278,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                   Add a business profile to your communities.
                 </Text>
               </View>
-              <TouchableOpacity onPress={onClose} style={{ width: SPACE.s36, height: SPACE.s36, borderRadius: RADIUS.xxl, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+              <TouchableOpacity onPress={onClose} style={{ width: SPACE.s36, height: SPACE.s36, borderRadius: RADIUS.xxl, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
                 <X size={18} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
             </View>
@@ -286,7 +286,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
             <ScrollView contentContainerStyle={{ padding: SPACE.s20, gap: SPACE.s18, paddingBottom: SPACE.s36 }} keyboardShouldPersistTaps="handled">
               <View style={{ gap: SPACE.lg }}>
                 <Text style={labelStyle}>Business Image</Text>
-                <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8} style={{ borderRadius: RADIUS.pill, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, padding: SPACE.xl, flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
+                <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8} style={{ borderRadius: RADIUS.pill, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.surfaceContainerLow, padding: SPACE.xl, flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
                   <View style={{ width: SPACE.s72, height: SPACE.s72, borderRadius: RADIUS.xxl, backgroundColor: THEME_COLORS.infoSurfaceAlt, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
                     {image ? (
                       <Image source={{ uri: image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
@@ -371,11 +371,11 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
               <View style={{ gap: SPACE.lg }}>
                 <Text style={labelStyle}>Contact Details</Text>
                 <View style={{ gap: SPACE.lg }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, paddingHorizontal: SPACE.xl }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.surfaceContainerLow, paddingHorizontal: SPACE.xl }}>
                     <Phone size={16} color={THEME_COLORS.neutralTextSubtle} />
                     <TextInput value={contactPhone} onChangeText={setContactPhone} placeholder="Phone number" placeholderTextColor={THEME_COLORS.neutralTextSoft} style={{ flex: 1, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }} keyboardType="phone-pad" />
                   </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.white, paddingHorizontal: SPACE.xl }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.surfaceContainerLow, paddingHorizontal: SPACE.xl }}>
                     <Mail size={16} color={THEME_COLORS.neutralTextSubtle} />
                     <TextInput value={contactEmail} onChangeText={setContactEmail} placeholder="Email address" placeholderTextColor={THEME_COLORS.neutralTextSoft} style={{ flex: 1, paddingVertical: SPACE.lg, fontSize: TYPE_SCALE.xl, color: THEME_COLORS.onSurface }} keyboardType="email-address" autoCapitalize="none" />
                   </View>
@@ -409,7 +409,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                 </View>
               </View>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: SPACE.s16, borderRadius: RADIUS.xl, backgroundColor: THEME_COLORS.white, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: SPACE.s16, borderRadius: RADIUS.xl, backgroundColor: THEME_COLORS.surfaceContainerLow, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
                 <View>
                   <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Business is active</Text>
                   <Text style={{ fontSize: TYPE_SCALE.body, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs }}>

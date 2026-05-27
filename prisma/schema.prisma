@@ -232,11 +232,16 @@ model Community {
 model Theme {
   id              String   @id @default(cuid())
   communityId     String?  @unique @map("community_id")
+  presetId        String?  @map("preset_id")
+  mode            String   @default("light")
   name            String
   primaryColor    String   @map("primary_color")
   secondaryColor  String   @map("secondary_color")
   backgroundColor String   @map("background_color")
   surfaceColor    String   @map("surface_color")
+  cardSurfaceColor      String   @map("card_surface_color")
+  cardSurfaceMutedColor String   @map("card_surface_muted_color")
+  cardBorderColor       String   @map("card_border_color")
   textPrimary     String   @map("text_primary")
   textSecondary   String   @map("text_secondary")
   borderRadius    String   @map("border_radius")

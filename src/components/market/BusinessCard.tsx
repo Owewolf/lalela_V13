@@ -10,6 +10,7 @@ import {
 import { ArrowRight, Phone, Star, Clock, MessageSquare, Globe, MapPin } from 'lucide-react-native';
 import { showMapOptions } from '../../lib/maps';
 import { THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 import { createShadow } from '../../theme/shadows';
 
 interface BusinessCardProps {
@@ -99,16 +100,18 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
   return (
     <View
       className={[
-        'bg-white rounded-3xl p-4 flex-row gap-4 shadow-sm',
+        'rounded-3xl p-4 flex-row gap-4',
         isMemberBusiness
           ? 'border-2 border-purple-400/60'
-          : 'border border-gray-100',
+          : 'border',
       ].join(' ')}
-      style={
-        isMemberBusiness
+      style={{
+        backgroundColor: getCardSurfaceColor('subtle'),
+        ...(isMemberBusiness
           ? createShadow(THEME_COLORS.aliasHex_a855f7, 0, 0, 0.12, 8, 3)
-          : createShadow(THEME_COLORS.black, 0, 0, 0.06, 6, 2)
-      }
+          : getCardShadow('soft')),
+        ...(isMemberBusiness ? null : { borderColor: getCardBorderColor('default') }),
+      }}
     >
       {/* Image / Icon area */}
       <View
@@ -150,8 +153,8 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
             >
               {name}
             </Text>
-            <View className="bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">
-              <Text className="text-[10px] font-bold text-gray-500">{distance}</Text>
+            <View className="bg-surface-container px-2 py-0.5 rounded-full flex-shrink-0">
+              <Text className="text-[10px] font-bold text-neutralTextMuted">{distance}</Text>
             </View>
           </View>
 
@@ -204,7 +207,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
           <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
             {isMemberBusiness && ownerName ? (
               <View className="flex-row items-center gap-2 flex-1 min-w-0">
-                <View className="w-7 h-7 rounded-full overflow-hidden bg-gray-200 items-center justify-center flex-shrink-0">
+                <View className="w-7 h-7 rounded-full overflow-hidden bg-surface-container items-center justify-center flex-shrink-0">
                   {ownerImage && !ownerImgError ? (
                     <Image
                       source={{ uri: ownerImage }}
@@ -230,7 +233,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
                   {[1, 2].map((i) => (
                     <View
                       key={i}
-                      className="w-5 h-5 rounded-full border-2 border-white bg-gray-200"
+                      className="w-5 h-5 rounded-full border-2 border-surface-container-low bg-surface-container"
                       style={{ marginLeft: i > 1 ? -8 : 0 }}
                     />
                   ))}

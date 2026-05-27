@@ -161,7 +161,7 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
           onPress={openCreate}
           activeOpacity={0.8}
           style={{
-            backgroundColor: THEME_COLORS.white,
+            backgroundColor: THEME_COLORS.surfaceContainerLow,
             borderRadius: RADIUS.panel,
             borderWidth: 1,
             borderColor: THEME_COLORS.alias_rgba_13_61_71_0_12,
@@ -194,7 +194,7 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
             const isBusy = busyBusinessId === business.id;
 
             return (
-              <View key={business.id} style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s16, gap: SPACE.xxxl }}>
+              <View key={business.id} style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s16, gap: SPACE.xxxl }}>
                 <View style={{ flexDirection: 'row', gap: SPACE.xxxl }}>
                   <View style={{ width: SPACE.s78, height: SPACE.s78, borderRadius: RADIUS.xl, overflow: 'hidden', backgroundColor: THEME_COLORS.primaryTintSoft, alignItems: 'center', justifyContent: 'center' }}>
                     {business.image ? (

@@ -82,8 +82,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   if (message.messageType === 'system') {
     return (
       <View className="flex-row justify-center my-3">
-        <View className="bg-slate-200 px-4 py-1.5 rounded-full border border-slate-300">
-          <Text className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+        <View
+          className="bg-surface-container px-4 py-1.5 rounded-full border"
+          style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+        >
+          <Text className="text-[10px] font-bold text-neutralTextMuted uppercase tracking-widest">
             {message.content}
           </Text>
         </View>
@@ -104,7 +107,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         maxWidth: isDirectConversation ? '92%' as const : '87%' as const,
       }
     : {
-        backgroundColor: THEME_COLORS.white,
+        backgroundColor: THEME_COLORS.surfaceContainerLow,
         borderWidth: 1,
         borderColor: THEME_COLORS.neutralBorderSoft,
         maxWidth: isDirectConversation ? '90%' as const : '82%' as const,
@@ -130,9 +133,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                   marginRight: SPACE.sm,
                   borderRadius: AVATAR_SIZE / 2,
                 }}
-                className="bg-slate-200 items-center justify-center"
+                className="bg-surface-container items-center justify-center"
               >
-                <Text className="text-[11px] font-bold text-slate-600">{senderInitial}</Text>
+                <Text className="text-[11px] font-bold text-neutralTextMuted">{senderInitial}</Text>
               </View>
             )
           ) : (

@@ -47,8 +47,9 @@ import { CommunityInsightPanels } from './CommunityInsightPanels';
 import { InteractiveCoverageMap } from '../home/InteractiveCoverageMap';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
 import type { CatHubSummary } from '../../types';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
+import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 
 const PRIMARY = THEME_COLORS.primary;
 const ERROR = THEME_COLORS.error;
@@ -227,6 +228,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const hasEmergencies = activeEmergencyPosts.length > 0 || isEmergencyActive;
   const hasWarnings = activeWarningPosts.length > 0;
   const hasAnyIncidents = hasEmergencies || hasWarnings;
+  const adminAvatarLabel = (userProfile?.name || userProfile?.email || 'A')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join('') || 'A';
 
   const formatInsightTime = React.useCallback((value?: string) => {
     if (!value) return 'No time';
@@ -1103,6 +1110,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <LayoutDashboard size={18} color={PRIMARY} />
           </TouchableOpacity>
         )}
+
+        {activeView === 'moderation' && (
+          <View style={styles.adminAvatar}>
+            <Text style={styles.adminAvatarText}>{adminAvatarLabel}</Text>
+          </View>
+        )}
       </View>
 
       {/* Content */}
@@ -1178,29 +1191,46 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 export default AdminDashboard;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: THEME_COLORS.white },
+  container: { flex: 1, backgroundColor: APP_SHELL_COLORS.body },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SPACE.xxxl,
-    paddingVertical: SPACE.xxl,
-    borderBottomWidth: 1,
-    borderBottomColor: THEME_COLORS.neutralBgSoft,
+    paddingVertical: SPACE.s16,
+    backgroundColor: APP_SHELL_COLORS.chrome,
     gap: SPACE.xl,
   },
-  backBtn: { padding: SPACE.md },
+  backBtn: { padding: SPACE.md, marginRight: SPACE.xs },
   logoBox: {
-    width: 34, height: 34, borderRadius: RADIUS.xl, backgroundColor: PRIMARY,
+    width: 42, height: 42, borderRadius: RADIUS.xl, backgroundColor: PRIMARY,
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
   },
-  logoImg: { width: 26, height: 26 },
-  topBarTitle: { fontSize: TYPE_SCALE.h3, fontWeight: FONT_WEIGHT.black, color: PRIMARY, flex: 1 },
+  logoImg: { width: 30, height: 30 },
+  topBarTitle: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, color: PRIMARY, flex: 1 },
   viewSwitcher: { flexDirection: 'row', gap: SPACE.sm },
   viewSwitcherBtn: {
-    width: 36, height: 36, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: THEME_COLORS.neutralBg,
+    width: 42, height: 42, borderRadius: RADIUS.xxl, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: getCardSurfaceColor('default'),
+    borderWidth: 1,
+    borderColor: getCardBorderColor('default'),
   },
   viewSwitcherBtnActive: { backgroundColor: THEME_COLORS.successSurface },
+  adminAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: RADIUS.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: THEME_COLORS.secondaryContainer,
+    borderWidth: 2,
+    borderColor: THEME_COLORS.surface,
+    ...createShadow(THEME_COLORS.black, 0, 2, 0.08, 6, 2),
+  },
+  adminAvatarText: {
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.white,
+  },
 
   dashScroll: { flex: 1 },
   dashContent: { paddingHorizontal: SPACE.s16, paddingTop: SPACE.s16, gap: SPACE.s16 },
@@ -1211,9 +1241,9 @@ const styles = StyleSheet.create({
 
   statsRow: { flexDirection: 'row', gap: SPACE.xl },
   statCard: {
-    flex: 1, backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, paddingVertical: SPACE.xl, paddingHorizontal: SPACE.xxl,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
-    ...createShadow(THEME_COLORS.black, 0, 1, 0.04, 4, 1),
+    flex: 1, backgroundColor: getCardSurfaceColor('default'), borderRadius: RADIUS.card, paddingVertical: SPACE.xl, paddingHorizontal: SPACE.xxl,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
+    ...getCardShadow('soft'),
     gap: SPACE.xs,
     alignItems: 'center',
   },
@@ -1240,9 +1270,9 @@ const styles = StyleSheet.create({
   },
 
   bentoCard: {
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.panel, padding: SPACE.s18, gap: SPACE.lg,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
-    ...createShadow(THEME_COLORS.black, 0, 2, 0.05, 8, 2),
+    backgroundColor: getCardSurfaceColor('default'), borderRadius: RADIUS.panel, padding: SPACE.s18, gap: SPACE.lg,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
+    ...getCardShadow('soft'),
   },
   bentoCardClickable: {},
   bentoHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -1250,8 +1280,8 @@ const styles = StyleSheet.create({
   bentoTitle: { fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.black, color: PRIMARY, marginTop: SPACE.xs },
   bentoDesc: { fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextSubtle, lineHeight: LINE_HEIGHT.compact },
   alertBox: {
-    backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.xxl, padding: SPACE.xxl, marginTop: SPACE.xs,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    backgroundColor: getCardSurfaceColor('subtle'), borderRadius: RADIUS.xxl, padding: SPACE.xxl, marginTop: SPACE.xs,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
   },
   alertBoxLabel: { fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.neutralTextMuted, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.widest },
   alertBoxValue: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, marginTop: SPACE.xxs },
@@ -1293,7 +1323,7 @@ const styles = StyleSheet.create({
   progressFill: { height: '100%', backgroundColor: THEME_COLORS.secondaryContainer, borderRadius: RADIUS.sm },
   completeBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg,
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xxl, paddingVertical: SPACE.xl, marginTop: SPACE.lg,
+    backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.xxl, paddingVertical: SPACE.xl, marginTop: SPACE.lg,
   },
   completeBtnText: { color: PRIMARY, fontWeight: FONT_WEIGHT.bold, fontSize: TYPE_SCALE.xxl },
   noCharity: {
@@ -1427,7 +1457,7 @@ const styles = StyleSheet.create({
 
   activityItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl,
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, padding: SPACE.xxl,
+    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.card, padding: SPACE.xxl,
     borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
     ...createShadow(THEME_COLORS.black, 0, 1, 0.03, 4, 1),
   },
@@ -1439,7 +1469,7 @@ const styles = StyleSheet.create({
   // Setup bar
   setupBar: {
     position: 'absolute', bottom: SPACE.zero, left: SPACE.zero, right: SPACE.zero,
-    backgroundColor: THEME_COLORS.white, borderTopWidth: 1, borderTopColor: THEME_COLORS.neutralBgSoft,
+    backgroundColor: THEME_COLORS.surfaceContainer, borderTopWidth: 1, borderTopColor: THEME_COLORS.neutralBorderSoft,
     ...createShadow(THEME_COLORS.black, 0, -4, 0.08, 12, 8),
   },
   setupProgress: { height: 3, backgroundColor: THEME_COLORS.neutralBgSoft },
@@ -1467,7 +1497,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', padding: SPACE.s16,
   },
   setupCompleteCard: {
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.modal, padding: SPACE.s32,
+    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.modal, padding: SPACE.s32,
     width: '100%', maxWidth: 400, alignItems: 'center', gap: SPACE.xxxl,
     borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
     ...createShadow(THEME_COLORS.black, 0, 12, 0.15, 32, 10),
@@ -1487,7 +1517,7 @@ const styles = StyleSheet.create({
   setupCompleteBtnText: { color: THEME_COLORS.white, fontWeight: FONT_WEIGHT.black, fontSize: TYPE_SCALE.h3 },
 
   suggestCard: {
-    backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.modal, padding: SPACE.s24,
+    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.modal, padding: SPACE.s24,
     width: '100%', maxWidth: 480,
     ...createShadow(THEME_COLORS.black, 0, 12, 0.15, 32, 10),
     maxHeight: '90%',

@@ -49,7 +49,7 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
   }, [locationName, latitude, longitude, isEditing]);
 
   return (
-    <View className="pt-4 border-t border-gray-100 gap-y-4">
+    <View className="pt-4 border-t gap-y-4" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
       {/* Header with sharing toggle */}
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
@@ -96,7 +96,7 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
       ) : (
         <View className="gap-y-1">
           <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Address</Text>
-          <View className="p-3 bg-gray-50 rounded-xl">
+          <View className="p-3 rounded-xl" style={{ backgroundColor: THEME_COLORS.surface }}>
             <Text className="text-sm font-bold text-gray-900">
               {userProfile?.address || userProfile?.defaultLocation?.name || 'Not set'}
             </Text>

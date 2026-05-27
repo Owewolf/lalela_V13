@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '../../lib/api';
 import { Users } from 'lucide-react-native';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
 const TYPE_SCALE = {
   h2Web: 36,
@@ -228,7 +228,7 @@ const LandingPage: React.FC = () => {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
       <StatusBar barStyle="dark-content" />
       <ScrollView
         ref={scrollRef}
@@ -240,7 +240,10 @@ const LandingPage: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* ── Header / Nav ── */}
-        <View className="px-6 py-4 flex-row items-center justify-between border-b border-gray-100">
+        <View
+          className="px-6 py-4 flex-row items-center justify-between border-b"
+          style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
+        >
           <View className="flex-row items-center gap-2">
             <Image 
               source={require('../../../assets/lalela_logo.png')} 
@@ -297,7 +300,7 @@ const LandingPage: React.FC = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           className="mx-6 mb-6"
         >
-          <View className="bg-white rounded-[2.5rem] p-6 shadow-2xl border border-gray-100">
+          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
             {/* CTA */}
             <View className="mb-6 gap-4">
               <Text className="text-3xl font-black text-primary leading-tight">
@@ -359,7 +362,7 @@ const LandingPage: React.FC = () => {
             ) : (
               <>
                 {/* Tab switcher */}
-                <View className="flex-row p-1.5 bg-gray-100 rounded-3xl mb-6">
+                <View className="flex-row p-1.5 rounded-3xl mb-6" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                   {(['start', 'login'] as JoinMode[]).map((m) => (
                     <TouchableOpacity
                       key={m}
@@ -438,7 +441,8 @@ const LandingPage: React.FC = () => {
                         textContentType="oneTimeCode"
                         autoComplete="sms-otp"
                         importantForAutofill="yes"
-                        className="w-full px-6 py-4 bg-gray-100 rounded-2xl font-bold text-center tracking-widest text-2xl text-primary"
+                        className="w-full px-6 py-4 rounded-2xl font-bold text-center tracking-widest text-2xl text-primary"
+                        style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                         placeholderTextColor={THEME_COLORS.neutralTextSoft}
                       />
                     </View>
@@ -473,7 +477,8 @@ const LandingPage: React.FC = () => {
                             value={name}
                             onChangeText={setName}
                             placeholder="e.g. Sipho"
-                            className="px-4 py-3 bg-gray-100 rounded-2xl font-bold text-primary"
+                            className="px-4 py-3 rounded-2xl font-bold text-primary"
+                            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                             placeholderTextColor={THEME_COLORS.neutralTextSoft}
                           />
                         </View>
@@ -483,7 +488,8 @@ const LandingPage: React.FC = () => {
                             value={lastName}
                             onChangeText={setLastName}
                             placeholder="e.g. Ndlovu"
-                            className="px-4 py-3 bg-gray-100 rounded-2xl font-bold text-primary"
+                            className="px-4 py-3 rounded-2xl font-bold text-primary"
+                            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                             placeholderTextColor={THEME_COLORS.neutralTextSoft}
                           />
                         </View>
@@ -502,7 +508,8 @@ const LandingPage: React.FC = () => {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         editable={mobileNumber.length === 0}
-                        className="px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                        className="px-5 py-4 rounded-2xl font-bold text-primary"
+                        style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                         placeholderTextColor={THEME_COLORS.neutralTextSoft}
                         style={{ opacity: mobileNumber.length > 0 ? 0.4 : 1 }}
                       />
@@ -510,9 +517,9 @@ const LandingPage: React.FC = () => {
 
                     {/* OR divider */}
                     <View className="flex-row items-center gap-2">
-                      <View className="flex-1 h-px bg-gray-200" />
+                      <View className="flex-1 h-px" style={{ backgroundColor: THEME_COLORS.neutralBorderSoft }} />
                       <Text className="text-[10px] font-black uppercase tracking-widest text-gray-300">or</Text>
-                      <View className="flex-1 h-px bg-gray-200" />
+                      <View className="flex-1 h-px" style={{ backgroundColor: THEME_COLORS.neutralBorderSoft }} />
                     </View>
 
                     {/* Phone */}
@@ -523,7 +530,8 @@ const LandingPage: React.FC = () => {
                       <View className="flex-row gap-2" style={{ opacity: email.length > 0 ? 0.4 : 1 }}>
                         <TouchableOpacity
                           onPress={() => email.length === 0 && setShowCountryPicker(true)}
-                          className="px-3 py-4 bg-gray-100 rounded-2xl items-center justify-center min-w-[72px]"
+                          className="px-3 py-4 rounded-2xl items-center justify-center min-w-[72px]"
+                          style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                         >
                           <Text className="font-bold text-primary">{countryCode}</Text>
                         </TouchableOpacity>
@@ -533,7 +541,8 @@ const LandingPage: React.FC = () => {
                           placeholder="082 123 4567"
                           keyboardType="phone-pad"
                           editable={email.length === 0}
-                          className="flex-1 px-4 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                          className="flex-1 px-4 py-4 rounded-2xl font-bold text-primary"
+                          style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                           placeholderTextColor={THEME_COLORS.neutralTextSoft}
                         />
                       </View>
@@ -551,7 +560,8 @@ const LandingPage: React.FC = () => {
                             onChangeText={setPassword}
                             placeholder="Enter your password"
                             secureTextEntry={!showPassword}
-                            className="flex-1 px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary pr-12"
+                            className="flex-1 px-5 py-4 rounded-2xl font-bold text-primary pr-12"
+                            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                             placeholderTextColor={THEME_COLORS.neutralTextSoft}
                           />
                           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="absolute right-4">
@@ -581,7 +591,8 @@ const LandingPage: React.FC = () => {
                             onChangeText={setConfirmPassword}
                             placeholder="Re-enter your password"
                             secureTextEntry={!showConfirmPassword}
-                            className="flex-1 px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary pr-12"
+                            className="flex-1 px-5 py-4 rounded-2xl font-bold text-primary pr-12"
+                            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                             placeholderTextColor={THEME_COLORS.neutralTextSoft}
                           />
                           <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4">
@@ -654,16 +665,18 @@ const LandingPage: React.FC = () => {
       {/* ── Country code picker ── */}
       <Modal transparent visible={showCountryPicker} animationType="slide" onRequestClose={() => setShowCountryPicker(false)}>
         <TouchableOpacity
-          className="flex-1 bg-black/40"
+          className="flex-1"
+          style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_4 }}
           onPress={() => setShowCountryPicker(false)}
         >
-          <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 pb-10">
+          <View className="absolute bottom-0 left-0 right-0 rounded-t-3xl p-6 pb-10" style={{ backgroundColor: THEME_COLORS.surface }}>
             <Text className="text-lg font-black text-primary mb-4 text-center">Select Country Code</Text>
             {countryCodes.map((code) => (
               <TouchableOpacity
                 key={code}
                 onPress={() => { setCountryCode(code); setShowCountryPicker(false); }}
-                className="py-3 border-b border-gray-100 items-center"
+                className="py-3 border-b items-center"
+                style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
               >
                 <Text className="font-bold text-base" style={{ color: countryCode === code ? THEME_COLORS.primary : THEME_COLORS.neutralTextEmphasis }}>
                   {code}
@@ -677,14 +690,16 @@ const LandingPage: React.FC = () => {
       {/* ── Forgot password bottom sheet ── */}
       <Modal transparent visible={showForgotPassword} animationType="slide" onRequestClose={() => setShowForgotPassword(false)}>
         <TouchableOpacity
-          className="flex-1 bg-black/50 items-end justify-end"
+          className="flex-1 items-end justify-end"
+          style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_5 }}
           activeOpacity={1}
           onPress={() => setShowForgotPassword(false)}
         >
           <TouchableOpacity
             activeOpacity={1}
             onPress={(e) => e.stopPropagation()}
-            className="w-full bg-white rounded-t-3xl p-8"
+            className="w-full rounded-t-3xl p-8"
+            style={{ backgroundColor: THEME_COLORS.surface }}
             style={{ paddingBottom: SPACE.xl }}
           >
             {forgotSent ? (
@@ -724,7 +739,8 @@ const LandingPage: React.FC = () => {
                       placeholder="your@email.com"
                       keyboardType="email-address"
                       autoCapitalize="none"
-                      className="px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                      className="px-5 py-4 rounded-2xl font-bold text-primary"
+                      style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                       placeholderTextColor={THEME_COLORS.neutralTextSoft}
                     />
                   </View>

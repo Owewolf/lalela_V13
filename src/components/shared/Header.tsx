@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { isUserLicensed, isCommunityLicensed, isCommunityTrial } from '../../lib/licensing';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
 const APP_LOGO_PATH = require('../../../assets/lalela_logo.png');
 const PRIMARY = THEME_COLORS.primary;
@@ -72,6 +72,9 @@ export const Header: React.FC<HeaderProps> = ({
   const router = useRouter();
   const { currentCommunity, notifications } = useCommunity();
   const { userProfile } = useAuth();
+  const primaryColor = THEME_COLORS.primary;
+  const headerChromeColor = APP_SHELL_COLORS.chrome;
+  const headerBorderColor = THEME_COLORS.neutralBorder;
 
   const userRole = currentCommunity?.userRole || 'Member';
   const now = new Date();
@@ -118,7 +121,7 @@ export const Header: React.FC<HeaderProps> = ({
   const roleColors: Record<string, { bg: string; text: string }> = {
     Admin: { bg: THEME_COLORS.errorSurface, text: THEME_COLORS.errorStrong },
     Moderator: { bg: THEME_COLORS.brandPurpleSurface, text: THEME_COLORS.md3Primary },
-    Member: { bg: THEME_COLORS.successSurface, text: PRIMARY },
+    Member: { bg: THEME_COLORS.successSurface, text: primaryColor },
   };
   const roleColor = roleColors[userRole] ?? roleColors.Member;
 
@@ -138,17 +141,17 @@ export const Header: React.FC<HeaderProps> = ({
     `https://picsum.photos/seed/${userProfile?.id ?? 'user'}/100/100`;
 
   return (
-    <View style={[styles.header, { paddingTop: insets.top }]}>
+    <View style={[styles.header, { paddingTop: insets.top, backgroundColor: headerChromeColor, borderBottomColor: headerBorderColor }]}> 
       <View style={styles.inner}>
         {/* Left: back or logo */}
         <View style={styles.leftSection}>
           {showBack ? (
             <TouchableOpacity style={styles.backBtn} onPress={handleBack} activeOpacity={0.7}>
-              <ArrowLeft size={24} color={PRIMARY} />
+              <ArrowLeft size={24} color={primaryColor} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={styles.logoBtn}
+              style={[styles.logoBtn, { backgroundColor: primaryColor }]}
               onPress={onOpenSidebar}
               activeOpacity={0.85}
             >
@@ -156,10 +159,10 @@ export const Header: React.FC<HeaderProps> = ({
             </TouchableOpacity>
           )}
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: headerBorderColor }]} />
 
           <View style={styles.communityInfo}>
-            <Text style={styles.communityName} numberOfLines={1}>
+            <Text style={[styles.communityName, { color: primaryColor }]} numberOfLines={1}>
               {title || currentCommunity?.name || 'Select Community'}
             </Text>
             <View style={styles.badgeRow}>
@@ -197,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right: bell + avatar */}
         <View style={styles.rightSection}>
           <TouchableOpacity style={styles.bellBtn} onPress={onToggleNotifications} activeOpacity={0.7}>
-            <Bell size={24} color={PRIMARY} />
+            <Bell size={24} color={primaryColor} />
             {unreadCount > 0 && (
               <View style={styles.bellBadge}>
                 <Text style={styles.bellBadgeText}>{unreadLabel}</Text>
@@ -232,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_85,
+    backgroundColor: APP_SHELL_COLORS.chrome,
     borderBottomWidth: 1,
     borderBottomColor: THEME_COLORS.neutralBorder,
     zIndex: 50,
@@ -352,7 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.avatar,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: THEME_COLORS.white,
+    borderColor: THEME_COLORS.surfaceContainerLow,
     backgroundColor: THEME_COLORS.neutralBorder,
   },
   avatarImg: {
@@ -366,6 +369,6 @@ const styles = StyleSheet.create({
     padding: SPACE.sm,
     borderRadius: RADIUS.sm,
     borderWidth: 2,
-    borderColor: THEME_COLORS.white,
+    borderColor: THEME_COLORS.surfaceContainerLow,
   },
 });

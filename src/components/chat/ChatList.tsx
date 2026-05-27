@@ -27,7 +27,7 @@ export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, act
   if (conversations.length === 0) {
     return (
       <View className="flex-1 items-center justify-center py-20 px-4">
-        <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center mb-4">
+        <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center mb-4">
           <Text className="text-4xl">💬</Text>
         </View>
         <Text className="text-lg font-bold text-gray-900 mb-2 text-center">
@@ -61,9 +61,10 @@ export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, act
         onPress={() => onSelect(conv)}
         activeOpacity={0.75}
         className={[
-          'flex-row items-center gap-4 px-4 py-4 border-b border-gray-100',
-          isActive ? 'bg-surface-container-low' : unreadCount > 0 ? 'bg-gray-50/50' : 'bg-white',
+          'flex-row items-center gap-4 px-4 py-4 border-b',
+          isActive ? 'bg-surface-container-low' : unreadCount > 0 ? 'bg-surface-container' : 'bg-surface-container-low',
         ].join(' ')}
+        style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
       >
         {/* Active indicator bar */}
         {isActive && (
@@ -81,7 +82,10 @@ export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, act
             resizeMode="cover"
           />
           {conv.otherParticipant && (
-            <View className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary border-2 border-white rounded-full" />
+            <View
+              className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary border-2 rounded-full"
+              style={{ borderColor: THEME_COLORS.surface }}
+            />
           )}
         </View>
 

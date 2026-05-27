@@ -37,6 +37,7 @@ import { resolveCreatePostLocationDefaults } from '../../lib/postLocationDefault
 import LocationPickerSection from '../shared/LocationPickerSection';
 import type { CommunityNotice } from '../../types';
 import { THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
 
 type NoticeSubtype = 'warning' | 'normal' | 'information';
 
@@ -69,6 +70,16 @@ const NOTICE_CTA: Record<NoticeSubtype, { ctaLabel: string; buttonBg: string }> 
 };
 const SPACE = {
   s120: 120,
+};
+
+const CARD_SURFACE_STYLE = {
+  backgroundColor: getCardSurfaceColor('subtle'),
+  borderColor: getCardBorderColor('default'),
+};
+
+const INPUT_SURFACE_STYLE = {
+  backgroundColor: getCardSurfaceColor('default'),
+  borderBottomColor: getCardBorderColor('default'),
 };
 
 const SUBTYPE_THEME: Record<NoticeSubtype, {
@@ -278,7 +289,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-white"
+      className="flex-1 bg-surface-container-low"
     >
       <ScrollView
         className="flex-1"
@@ -288,7 +299,8 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
         <View className="px-5 pt-6 space-y-6">
           <TouchableOpacity
             onPress={handleBack}
-            className="self-start flex-row items-center gap-2 rounded-full bg-slate-100 px-4 py-2"
+            className="self-start flex-row items-center gap-2 rounded-full px-4 py-2"
+            style={{ backgroundColor: THEME_COLORS.surface }}
             activeOpacity={0.8}
           >
             <ArrowLeft size={18} color={THEME_COLORS.primary} />
@@ -399,7 +411,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
                 </MapView>
 
                 <View className="absolute top-3 left-3 right-3">
-                  <View className="bg-white/90 px-3 py-2 rounded-2xl border border-amber-200 flex-row items-center justify-between">
+                  <View className="bg-surface-container-low/90 px-3 py-2 rounded-2xl border border-amber-200 flex-row items-center justify-between">
                     <Text className="text-xs font-bold text-amber-700 uppercase tracking-wider">
                       {locationSource === 'profile_default' ? 'Community Default' :
                        locationSource === 'current_location' ? 'Your Location' : 'Custom Location'}
@@ -417,8 +429,8 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               <Text className="text-sm font-semibold mb-3 ml-1 text-gray-500">Add Photo (up to 10MB)</Text>
               <TouchableOpacity
                 onPress={handlePickImage}
-                className="w-full rounded-3xl overflow-hidden border-2 border-dashed border-gray-300 items-center justify-center"
-                style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg }}
+                className="w-full rounded-3xl overflow-hidden border-2 border-dashed items-center justify-center"
+                style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg, borderColor: THEME_COLORS.neutralBorderSoft }}
                 activeOpacity={0.8}
               >
                 {postsImage ? (
@@ -454,7 +466,8 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               onChangeText={setTitle}
               placeholder="What is this notice about?"
               placeholderTextColor={THEME_COLORS.neutralTextSoft}
-              className="bg-gray-50 border-b-2 border-gray-200 px-4 py-4 rounded-t-2xl text-lg text-gray-800"
+              className="px-4 py-4 rounded-t-2xl text-lg text-gray-800"
+              style={INPUT_SURFACE_STYLE}
             />
           </View>
 
@@ -469,8 +482,8 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               multiline
               numberOfLines={4}
               textAlignVertical="top"
-              className="bg-gray-50 border-b-2 border-gray-200 px-4 py-4 rounded-t-2xl text-gray-800"
-              style={{ minHeight: 100 }}
+              className="px-4 py-4 rounded-t-2xl text-gray-800"
+              style={[INPUT_SURFACE_STYLE, { minHeight: 100 }]}
             />
           </View>
 
@@ -479,7 +492,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
             <View className="space-y-2">
               <Text className="text-sm font-semibold ml-1 text-gray-500">Location</Text>
               <View className="relative">
-                <View className="flex-row items-center bg-gray-50 border-b-2 border-gray-200 rounded-t-2xl px-4">
+                <View className="flex-row items-center rounded-t-2xl px-4" style={INPUT_SURFACE_STYLE}>
                   <MapPin size={16} color={THEME_COLORS.neutralTextSubtle} />
                   <TextInput
                     value={locationName}
@@ -512,7 +525,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
           {postSubtype !== 'warning' && (
             <View className="space-y-2">
               <Text className="text-sm font-semibold ml-1 text-gray-500">Expiration Date</Text>
-              <View className="flex-row items-center bg-gray-50 border-b-2 border-gray-200 rounded-t-2xl px-4">
+              <View className="flex-row items-center rounded-t-2xl px-4" style={INPUT_SURFACE_STYLE}>
                 <Calendar size={16} color={THEME_COLORS.neutralTextSubtle} />
                 <TextInput
                   value={expiresAt}
@@ -530,7 +543,10 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
       </ScrollView>
 
       {/* Footer CTA */}
-      <View className="absolute bottom-0 left-0 right-0 bg-white/90 px-5 pb-8 pt-4 border-t border-gray-100">
+      <View
+        className="absolute bottom-0 left-0 right-0 bg-surface-container-low/90 px-5 pb-8 pt-4 border-t"
+        style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}
+      >
         <TouchableOpacity
           onPress={() => setShowConfirmModal(true)}
           disabled={!canSubmit}
@@ -555,7 +571,7 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
         onRequestClose={() => setShowConfirmModal(false)}
       >
         <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
+          <View className="bg-surface-container-low rounded-t-3xl px-6 pt-6 pb-10">
             <Text className="text-lg font-bold text-gray-800 mb-2 text-center">
               {postToEdit ? 'Update Notice' : NOTICE_CTA[postSubtype].ctaLabel}
             </Text>
@@ -583,7 +599,8 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setShowConfirmModal(false)}
-                className="py-4 rounded-full items-center bg-gray-100"
+                className="py-4 rounded-full items-center"
+                style={{ backgroundColor: THEME_COLORS.surface }}
                 activeOpacity={0.8}
               >
                 <Text className="text-gray-600 font-semibold">Cancel</Text>

@@ -56,14 +56,15 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onCancel,
 }) => (
   <Modal transparent visible={visible} animationType="fade" onRequestClose={() => {}}>
-    <View className="flex-1 bg-black/50 items-center justify-center px-6">
-      <View className="bg-white rounded-3xl p-8 w-full max-w-sm">
+    <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_5 }}>
+      <View className="rounded-3xl p-8 w-full max-w-sm" style={{ backgroundColor: THEME_COLORS.surface }}>
         <Text className="text-xl font-bold text-primary mb-2">{title}</Text>
         <Text className="text-sm text-gray-500 mb-6">{message}</Text>
         <View className="flex-row gap-3">
           <TouchableOpacity
             onPress={onCancel}
-            className="flex-1 py-3 rounded-2xl bg-gray-100 items-center"
+            className="flex-1 py-3 rounded-2xl items-center"
+            style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
           >
             <Text className="font-bold text-gray-600">Cancel</Text>
           </TouchableOpacity>
@@ -213,7 +214,8 @@ export const PhoneAuth: React.FC<PhoneAuthProps> = ({ onSuccess, onError }) => {
                   autoComplete="sms-otp"
                   importantForAutofill="yes"
                   maxLength={6}
-                  className="w-full pl-12 pr-6 py-4 bg-gray-100 rounded-2xl font-bold text-primary text-center text-xl tracking-widest"
+                  className="w-full pl-12 pr-6 py-4 rounded-2xl font-bold text-primary text-center text-xl tracking-widest"
+                  style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                   placeholderTextColor={THEME_COLORS.neutralTextSoft}
                 />
               </View>

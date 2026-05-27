@@ -62,6 +62,7 @@ const DELTA = 0.04;
 const FALLBACK_CENTER = { latitude: -26.2041, longitude: 28.0473 };
 const SINGLE_EMERGENCY_DELTA = 0.02;
 const EMERGENCY_RADIUS_METERS = 10000;
+const SURFACE_BORDER_STYLE = { borderColor: THEME_COLORS.neutralBorderSoft };
 
 const classifyEmergencyType = (
   title?: string,
@@ -286,8 +287,8 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
     <View className={cn('space-y-3', className)}>
       {/* Map Container */}
       <View
-        className="relative rounded-2xl overflow-hidden bg-gray-100 border border-gray-200"
-        style={{ height }}
+        className="relative rounded-2xl overflow-hidden bg-surface-container border"
+        style={{ height, ...SURFACE_BORDER_STYLE }}
       >
         <MapView
           {...defaultMapViewProps}
@@ -378,8 +379,8 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 }}
               >
                 <View
-                  className="p-2 rounded-full border-2 border-white shadow-xl"
-                  style={{ backgroundColor: visual.bgColor }}
+                  className="p-2 rounded-full border-2 shadow-xl"
+                  style={{ backgroundColor: visual.bgColor, borderColor: THEME_COLORS.surface }}
                 >
                   <EmergencyIcon size={18} color={THEME_COLORS.white} />
                 </View>
@@ -389,7 +390,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                     onOpenEmergencyHub?.(incident.id);
                   }}
                 >
-                  <View className="bg-white rounded-lg p-3 min-w-[200px] shadow-sm border border-red-100">
+                  <View className="bg-surface-container-low rounded-lg p-3 min-w-[200px] shadow-sm border border-red-100">
                     <View className="flex-row items-center justify-between mb-1">
                       <View className="flex-row items-center gap-2">
                         <EmergencyIcon size={14} color={THEME_COLORS.md3Error} />
@@ -437,11 +438,12 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                     }}
                   >
                     <View
-                      className="p-1.5 rounded-full border-2 border-white"
+                      className="p-1.5 rounded-full border-2"
                       style={{
                         backgroundColor: isSecurityActive
                           ? THEME_COLORS.aliasHex_6366f1
                           : THEME_COLORS.success,
+                        borderColor: THEME_COLORS.surface,
                       }}
                     >
                       {isSecurityActive ? (
@@ -480,7 +482,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                     if (isLocked) onUnlock?.();
                   }}
                 >
-                  <View className="bg-blue-500 p-1.5 rounded-full border-2 border-white">
+                  <View className="bg-blue-500 p-1.5 rounded-full border-2" style={{ borderColor: THEME_COLORS.surface }}>
                     <Store size={14} color={THEME_COLORS.white} />
                   </View>
                   <Callout>
@@ -526,11 +528,12 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                     }}
                   >
                     <View
-                      className="p-1.5 rounded-full border-2 border-white"
+                      className="p-1.5 rounded-full border-2"
                       style={{
                         backgroundColor: isEmergencyNotice
                           ? THEME_COLORS.errorStrong
                           : THEME_COLORS.warningStrong,
+                        borderColor: THEME_COLORS.surface,
                       }}
                     >
                       <AlertTriangle size={14} color={THEME_COLORS.white} />
@@ -566,7 +569,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                   if (isLocked) onUnlock?.();
                 }}
               >
-                <View className="bg-purple-500 p-1.5 rounded-full border-2 border-white">
+                <View className="bg-purple-500 p-1.5 rounded-full border-2" style={{ borderColor: THEME_COLORS.surface }}>
                   <Store size={14} color={THEME_COLORS.white} />
                 </View>
                 <Callout>
@@ -594,7 +597,7 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 anchor={{ x: 0.5, y: 0.5 }}
                 zIndex={800}
               >
-                <View className="bg-indigo-600 p-1.5 rounded-full border-2 border-white">
+                <View className="bg-indigo-600 p-1.5 rounded-full border-2" style={{ borderColor: THEME_COLORS.surface }}>
                   <Shield size={14} color={THEME_COLORS.white} />
                 </View>
                 <Callout>
@@ -624,7 +627,8 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={onResetMap}
-            className="absolute top-3 left-3 z-10 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full shadow-md flex-row items-center gap-2 border border-gray-200"
+            className="absolute top-3 left-3 z-10 bg-surface-container-low/90 backdrop-blur px-3 py-1.5 rounded-full shadow-md flex-row items-center gap-2 border"
+            style={SURFACE_BORDER_STYLE}
           >
             <View
               className="w-2 h-2 rounded-full"
@@ -680,8 +684,9 @@ export const InteractiveCoverageMap: React.FC<InteractiveCoverageMapProps> = ({
                 'flex-1 flex-row items-center justify-center gap-1 py-1.5 mx-0.5 rounded-full border',
                 mapFilter === item.id
                   ? 'bg-primary border-primary'
-                  : 'bg-white border-gray-200'
+                  : 'bg-surface-container-low'
               )}
+              style={mapFilter === item.id ? undefined : SURFACE_BORDER_STYLE}
             >
               <View
                 className="w-2 h-2 rounded-full"

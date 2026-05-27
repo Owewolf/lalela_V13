@@ -19,7 +19,7 @@ import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { calculateDistance } from '../../lib/utils';
 import { CommunityMember, Conversation } from '../../types';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
 const RADIUS = {
   pill: 999,
@@ -275,7 +275,7 @@ export const ChatPage: React.FC = () => {
           activeOpacity={0.6}
           className={[
             'flex-row items-center gap-3 px-4 py-3',
-            isEmergencyAuthor ? 'bg-red-50' : 'bg-white',
+            isEmergencyAuthor ? 'bg-red-50' : 'bg-surface-container-low',
           ].join(' ')}
         >
           {/* Avatar */}
@@ -297,7 +297,7 @@ export const ChatPage: React.FC = () => {
                 resizeMode="cover"
               />
             ) : (
-              <View className="w-14 h-14 rounded-full bg-gray-100 items-center justify-center">
+              <View className="w-14 h-14 rounded-full bg-surface-container items-center justify-center">
                 <Text className="text-primary font-bold text-base">
                   {(member.name || '?')[0].toUpperCase()}
                 </Text>
@@ -429,7 +429,7 @@ export const ChatPage: React.FC = () => {
         </TouchableOpacity>
 
         {/* Line separator */}
-        <View className="h-px bg-gray-100 ml-14" />
+        <View className="h-px bg-surface-container ml-14" />
       </View>
     );
   };
@@ -439,16 +439,16 @@ export const ChatPage: React.FC = () => {
       {/* Title row */}
       <View className="flex-row items-center justify-between mb-4 mt-2">
         <Text className="text-2xl font-black text-gray-900 tracking-tight">Community</Text>
-        <View className="bg-gray-100 px-3 py-1 rounded-full">
-          <Text className="text-xs font-bold text-gray-500">{members.length} members</Text>
+        <View className="bg-surface-container px-3 py-1 rounded-full">
+          <Text className="text-xs font-bold text-neutralTextMuted">{members.length} members</Text>
         </View>
       </View>
 
       {/* Search bar */}
-      <View className="flex-row items-center bg-gray-100 rounded-2xl px-4 py-3 border border-gray-200">
+      <View className="flex-row items-center bg-surface-container rounded-2xl px-4 py-3 border border-outlineVariant">
         <Search size={18} color={THEME_COLORS.neutralTextSoft} />
         <TextInput
-          className="flex-1 ml-3 text-sm text-gray-900"
+          className="flex-1 ml-3 text-sm text-neutralTextStrong"
           placeholder="Search members..."
           placeholderTextColor={THEME_COLORS.neutralTextSoft}
           value={searchQuery}
@@ -475,8 +475,9 @@ export const ChatPage: React.FC = () => {
                 'px-3 py-1.5 rounded-full border',
                 isActive
                   ? 'bg-primary border-primary'
-                  : 'bg-white border-gray-200',
+                  : 'bg-surface-container-low',
               ].join(' ')}
+              style={isActive ? undefined : { borderColor: THEME_COLORS.neutralBorderSoft }}
             >
               <Text
                 className={[
@@ -502,13 +503,13 @@ export const ChatPage: React.FC = () => {
       ) : null}
 
       {/* Top divider */}
-      <View className="h-px bg-gray-100 mt-3" />
+      <View className="h-px bg-surface-container mt-3" />
     </View>
   );
 
   const ListEmptyComponent = () => (
     <View className="items-center justify-center py-20 px-4">
-      <View className="w-16 h-16 bg-gray-100 rounded-full items-center justify-center mb-4">
+      <View className="w-16 h-16 bg-surface-container rounded-full items-center justify-center mb-4">
         <Search size={28} color={THEME_COLORS.neutralTextSoft} />
       </View>
       <Text className="text-lg font-bold text-gray-900 mb-1 text-center">
@@ -525,7 +526,7 @@ export const ChatPage: React.FC = () => {
   );
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
       <FlatList
         data={sorted}
         keyExtractor={(item) => item.member.userId}

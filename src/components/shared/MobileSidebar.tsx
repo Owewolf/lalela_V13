@@ -31,7 +31,7 @@ import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { isCommunityActive, isCommunityTrial, isCommunityLicensed, isUserLicensed } from '../../lib/licensing';
 import { THEME_COLORS } from '../../theme/colors';
-import { createShadow } from '../../theme/shadows';
+import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 
 const PRIMARY = THEME_COLORS.primary;
 const APP_LOGO = require('../../../assets/icon.png');
@@ -503,9 +503,9 @@ const styles = StyleSheet.create({
     bottom: SPACE.zero,
     left: SPACE.zero,
     width: PANEL_WIDTH,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: getCardSurfaceColor('subtle'),
     zIndex: 110,
-    ...createShadow(THEME_COLORS.black, SPACE.xs, SPACE.zero, 0.2, 16, 12),
+    ...getCardShadow('hero'),
     flexDirection: 'column',
   },
   panelHeader: {
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     paddingTop: SPACE.s52,
     paddingBottom: SPACE.s20,
     borderBottomWidth: 1,
-    borderBottomColor: THEME_COLORS.neutralBgSoft,
+    borderBottomColor: getCardBorderColor('default'),
   },
   panelHeaderLeft: {
     flexDirection: 'row',
@@ -796,7 +796,7 @@ const styles = StyleSheet.create({
     padding: SPACE.s24,
   },
   dialog: {
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surfaceContainer,
     borderRadius: RADIUS.pill,
     padding: SPACE.s24,
     width: '100%',

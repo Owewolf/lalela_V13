@@ -31,7 +31,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LocationPickerSection from '../shared/LocationPickerSection';
 
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
 
 const SPACE = {
@@ -61,8 +61,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   visible, title, message, confirmLabel, cancelLabel = 'No, cancel', onConfirm, onCancel,
 }) => (
   <Modal transparent visible={visible} animationType="fade" onRequestClose={() => {}}>
-    <View className="flex-1 bg-black/50 items-center justify-center px-6">
-      <View className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl">
+    <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_5 }}>
+      <View className="rounded-3xl p-8 w-full max-w-sm shadow-2xl" style={{ backgroundColor: THEME_COLORS.surface }}>
         <Text className="text-xl font-black text-primary mb-2">{title}</Text>
         <Text className="text-sm text-gray-500 mb-6 leading-relaxed">{message}</Text>
         <View className="gap-3">
@@ -73,7 +73,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           >
             <Text className="text-white font-bold">{confirmLabel}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={onCancel} className="py-4 rounded-2xl items-center bg-gray-100">
+          <TouchableOpacity onPress={onCancel} className="py-4 rounded-2xl items-center" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
             <Text className="text-gray-600 font-medium">{cancelLabel}</Text>
           </TouchableOpacity>
         </View>
@@ -297,20 +297,23 @@ const OnboardingInvite: React.FC = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-white items-center justify-center">
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
         <ActivityIndicator size="large" color={THEME_COLORS.primary} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
         <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: SPACE.s48 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
           {/* Header */}
-          <View className="px-6 pt-6 pb-4 flex-row items-center justify-between border-b border-gray-100">
+          <View
+            className="px-6 pt-6 pb-4 flex-row items-center justify-between border-b"
+            style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
+          >
             <View className="flex-row items-center gap-2">
               <View className="w-9 h-9 bg-primary rounded-xl items-center justify-center">
                 <Text className="text-white font-black text-base">L</Text>
@@ -347,19 +350,25 @@ const OnboardingInvite: React.FC = () => {
             {/* Profile Image */}
             <View className="items-center gap-2">
               <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8}>
-                <View className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200 items-center justify-center">
+                <View
+                  className="w-24 h-24 rounded-full overflow-hidden border-2 items-center justify-center"
+                  style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderColor: THEME_COLORS.neutralBorderSoft }}
+                >
                   {profileImage ? (
                     <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" />
                   ) : (
                     <UserIcon size={36} color={THEME_COLORS.neutralBorderMuted} />
                   )}
                   {isUploading && (
-                    <View className="absolute inset-0 bg-black/40 items-center justify-center">
+                    <View className="absolute inset-0 items-center justify-center" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_4 }}>
                       <ActivityIndicator color="white" />
                     </View>
                   )}
                 </View>
-                <View className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full items-center justify-center border-2 border-white">
+                <View
+                  className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full items-center justify-center border-2"
+                  style={{ borderColor: THEME_COLORS.surface }}
+                >
                   <Camera size={12} color="white" />
                 </View>
               </TouchableOpacity>
@@ -375,7 +384,8 @@ const OnboardingInvite: React.FC = () => {
                 value={fullName}
                 onChangeText={setFullName}
                 placeholder="Your full name"
-                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                className="w-full px-5 py-4 rounded-2xl font-bold text-primary"
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                 placeholderTextColor={THEME_COLORS.neutralTextSoft}
               />
             </View>
@@ -389,7 +399,8 @@ const OnboardingInvite: React.FC = () => {
                 placeholder="you@example.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                className="w-full px-5 py-4 rounded-2xl font-bold text-primary"
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                 placeholderTextColor={THEME_COLORS.neutralTextSoft}
               />
             </View>
@@ -402,7 +413,8 @@ const OnboardingInvite: React.FC = () => {
                 onChangeText={setPhone}
                 placeholder="+27..."
                 keyboardType="phone-pad"
-                className="w-full px-5 py-4 bg-gray-100 rounded-2xl font-bold text-primary"
+                className="w-full px-5 py-4 rounded-2xl font-bold text-primary"
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}
                 placeholderTextColor={THEME_COLORS.neutralTextSoft}
               />
             </View>
@@ -415,9 +427,9 @@ const OnboardingInvite: React.FC = () => {
               <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
                 Default Location <Text className="text-red-500">*</Text>
               </Text>
-              <View className="bg-gray-100 rounded-2xl px-4 py-4">
+              <View className="rounded-2xl px-4 py-4" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                 <View className="flex-row items-start gap-3">
-                  <View className="w-9 h-9 rounded-xl bg-white items-center justify-center">
+                  <View className="w-9 h-9 rounded-xl items-center justify-center" style={{ backgroundColor: THEME_COLORS.surface }}>
                     <MapPin size={16} color={THEME_COLORS.primary} />
                   </View>
                   <View className="flex-1">

@@ -157,11 +157,14 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
     : `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.id}`;
 
   return (
-    <View className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 gap-y-5">
+    <View
+      className="bg-surface-container-low rounded-3xl border shadow-sm p-6 gap-y-5"
+      style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+    >
       {/* Header */}
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
-          <View className="w-10 h-10 rounded-2xl bg-blue-50 items-center justify-center">
+          <View className="w-10 h-10 rounded-2xl bg-surface-container items-center justify-center">
             <User size={22} color={THEME_COLORS.brandBlueText} />
           </View>
           <Text className="text-lg font-bold text-primary">Account Information</Text>
@@ -169,7 +172,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
         {!isEditing ? (
           <TouchableOpacity
             onPress={() => { setStatus(null); setIsEditing(true); }}
-            className="px-4 py-2 bg-blue-50 rounded-lg"
+            className="px-4 py-2 bg-surface-container rounded-lg"
           >
             <Text className="text-xs font-bold text-blue-600">Edit Profile</Text>
           </TouchableOpacity>
@@ -185,7 +188,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
         <View className="relative">
           <View className="w-24 h-24 rounded-full overflow-hidden border-4 border-outline-variant">
             {isUploading ? (
-              <View className="w-full h-full bg-gray-200 items-center justify-center">
+              <View className="w-full h-full bg-surface-container items-center justify-center">
                 <ActivityIndicator color={THEME_COLORS.primary} />
               </View>
             ) : (
@@ -195,7 +198,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
           {isEditing && (
             <TouchableOpacity
               onPress={handleImagePick}
-              className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full items-center justify-center border-2 border-white"
+              className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full items-center justify-center border-2"
+              style={{ borderColor: THEME_COLORS.surface }}
             >
               <Camera size={14} color={THEME_COLORS.white} />
             </TouchableOpacity>
@@ -209,7 +213,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
               <TextInput
                 value={formData.name}
                 onChangeText={(v) => setFormData({ ...formData, name: v })}
-                className="bg-gray-100 rounded-xl px-4 py-2 text-sm font-bold text-gray-900"
+                className="bg-surface-container rounded-xl px-4 py-2 text-sm font-bold text-gray-900"
                 placeholder="Enter your name"
               />
             </View>
@@ -228,11 +232,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
               value={formData.phone}
               onChangeText={(v) => setFormData({ ...formData, phone: v })}
               keyboardType="phone-pad"
-              className="bg-gray-100 rounded-xl px-4 py-2 text-sm text-gray-900"
+              className="bg-surface-container rounded-xl px-4 py-2 text-sm text-gray-900"
               placeholder="+27 82 123 4567"
             />
           ) : (
-            <View className="flex-row items-center gap-2 p-3 bg-gray-50 rounded-xl">
+            <View className="flex-row items-center gap-2 p-3 bg-surface rounded-xl">
               <Smartphone size={16} color={THEME_COLORS.neutralTextSubtle} />
               <Text className="text-sm font-bold text-gray-900">{userProfile?.phone || 'Not set'}</Text>
             </View>
@@ -250,7 +254,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={userProfile?.hasPassword !== false}
-                className={`rounded-xl px-4 py-2 text-sm ${userProfile?.hasPassword === false ? 'bg-gray-100 text-gray-400' : 'bg-gray-100 text-gray-900'}`}
+                className={`rounded-xl px-4 py-2 text-sm ${userProfile?.hasPassword === false ? 'bg-surface-container text-gray-400' : 'bg-surface-container text-gray-900'}`}
                 placeholder="you@example.com"
               />
               {userProfile?.hasPassword === false ? (
@@ -260,7 +264,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
                   </Text>
                   <TouchableOpacity
                     onPress={() => router.push('/security?tab=security' as any)}
-                    className="self-start bg-blue-50 px-3 py-1.5 rounded-lg"
+                    className="self-start bg-surface-container px-3 py-1.5 rounded-lg"
                   >
                     <Text className="text-[11px] font-bold text-blue-600">Go to Login & Authentication</Text>
                   </TouchableOpacity>
@@ -276,7 +280,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
               ) : null}
             </View>
           ) : (
-            <View className="flex-row items-center gap-2 p-3 bg-gray-50 rounded-xl">
+            <View className="flex-row items-center gap-2 p-3 bg-surface rounded-xl">
               <Mail size={16} color={THEME_COLORS.neutralTextSubtle} />
               <Text className="text-sm font-bold text-gray-900 flex-1" numberOfLines={1}>
                 {userProfile?.email || 'Not set'}
@@ -299,7 +303,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
       </View>
 
       {/* Emergency Responder */}
-      <View className="pt-4 border-t border-gray-100 gap-y-3">
+      <View className="pt-4 border-t gap-y-3" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-3">
             <View className="w-10 h-10 rounded-full items-center justify-center bg-red-50">
@@ -312,7 +316,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
           </View>
           <TouchableOpacity
             onPress={() => setShowResponderSelector(!showResponderSelector)}
-            className={`px-3 py-1.5 rounded-xl ${showResponderSelector ? 'bg-primary' : 'bg-gray-100'}`}
+            className={`px-3 py-1.5 rounded-xl ${showResponderSelector ? 'bg-primary' : 'bg-surface-container'}`}
           >
             <Text className={`text-[10px] font-black uppercase tracking-widest ${showResponderSelector ? 'text-white' : 'text-gray-500'}`}>
               Manage
@@ -321,7 +325,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
         </View>
 
         {showResponderSelector && (
-          <View className="bg-gray-50 rounded-2xl p-4 gap-y-2">
+          <View className="bg-surface rounded-2xl p-4 gap-y-2">
             <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Select Communities</Text>
             <Text className="text-[10px] text-gray-500 mb-2">
               Enabling a community makes your emergency location visible in that community during emergencies. Disable to hide your location and opt out there.
@@ -329,7 +333,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
             {communities.map((community) => (
               <View
                 key={community.id}
-                className="flex-row items-center justify-between p-3 bg-white rounded-xl border border-gray-100"
+                className="flex-row items-center justify-between p-3 bg-surface-container-low rounded-xl border"
+                style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
               >
                 <View className="flex-row items-center gap-3 flex-1">
                   <View className="w-8 h-8 rounded-lg bg-surface-container-low items-center justify-center">
@@ -373,11 +378,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
 
       {/* Save / Cancel bar */}
       {isEditing && (
-        <View className="pt-4 border-t border-gray-100 flex-row gap-3">
+        <View className="pt-4 border-t flex-row gap-3" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
           <TouchableOpacity
             onPress={handleCancelEdit}
             disabled={isSaving}
-            className="flex-1 py-3 rounded-xl bg-gray-100 items-center"
+            className="flex-1 py-3 rounded-xl bg-surface-container items-center"
           >
             <Text className="text-sm font-bold text-gray-700">Cancel</Text>
           </TouchableOpacity>

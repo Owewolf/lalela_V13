@@ -84,7 +84,7 @@ export const AuditLogsSection: React.FC = () => {
   }, [userProfile]);
 
   return (
-    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.xxxl }}>
+    <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.xxxl }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
@@ -151,7 +151,7 @@ export const AuditLogsSection: React.FC = () => {
         </View>
       ) : (
         <View style={{ paddingVertical: SPACE.s32, alignItems: 'center', gap: SPACE.xl, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, borderWidth: SPACE.xxs, borderColor: THEME_COLORS.alias_rgba_0_0_0_0_04, borderStyle: 'dashed' }}>
-          <View style={{ width: SPACE.s56, height: SPACE.s56, borderRadius: RADIUS.full, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: SPACE.s56, height: SPACE.s56, borderRadius: RADIUS.full, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <History size={28} color={THEME_COLORS.alias_rgba_0_0_0_0_15} />
           </View>
           <View style={{ alignItems: 'center', gap: SPACE.sm }}>

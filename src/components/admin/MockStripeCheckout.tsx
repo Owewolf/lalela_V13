@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     padding: SPACE.xl,
   },
   card: {
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     borderRadius: RADIUS.xl,
     overflow: 'hidden',
     ...createShadow(THEME_COLORS.black, 0, 8, 0.12, 24, 8),
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   },
   successContainer: {
     flex: 1,
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: THEME_COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
     padding: SPACE.xl,

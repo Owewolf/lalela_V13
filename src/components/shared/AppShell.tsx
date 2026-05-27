@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Header } from './Header';
 import { MobileSidebar } from './MobileSidebar';
 import { NotificationCenter } from './NotificationCenter';
+import { APP_SHELL_COLORS } from '../../theme/colors';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -26,7 +27,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, activeTab }) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: APP_SHELL_COLORS.body }}>
       <Header
         onToggleNotifications={() => setShowNotifications(v => !v)}
         onOpenSidebar={() => setShowSidebar(true)}

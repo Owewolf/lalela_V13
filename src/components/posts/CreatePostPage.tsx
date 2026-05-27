@@ -39,6 +39,7 @@ import CreateGeneralNotice from './CreateGeneralNotice';
 import LocationPickerSection from '../shared/LocationPickerSection';
 import type { CommunityNotice } from '../../types';
 import { THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
 
 type PostType = 'listing' | 'notice';
 type Urgency = 'emergency' | 'warning' | 'info' | 'general';
@@ -65,6 +66,16 @@ const urgencyColors: Record<Urgency, { bg: string; text: string }> = {
 const SPACE = {
   xxs: 2,
   s120: 120,
+};
+
+const CARD_SURFACE_STYLE = {
+  backgroundColor: getCardSurfaceColor('subtle'),
+  borderColor: getCardBorderColor('default'),
+};
+
+const INPUT_SURFACE_STYLE = {
+  backgroundColor: getCardSurfaceColor('default'),
+  borderBottomColor: getCardBorderColor('default'),
 };
 
 const getCtaLabel = (postType: PostType, urgency: Urgency, isEditing: boolean): string => {
@@ -342,21 +353,21 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   if (postType === 'notice') {
     if (urgency === 'warning') {
       return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-surface-container-low">
           <CreateWarningNotice onBack={() => { if (router.canGoBack()) router.back(); else router.replace('/posts'); }} postToEdit={postToEdit} />
         </SafeAreaView>
       );
     }
     if (urgency === 'info') {
       return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-surface-container-low">
           <CreateInfoNotice onBack={() => { if (router.canGoBack()) router.back(); else router.replace('/posts'); }} postToEdit={postToEdit} />
         </SafeAreaView>
       );
     }
     if (urgency === 'general') {
       return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-surface-container-low">
           <CreateGeneralNotice onBack={() => { if (router.canGoBack()) router.back(); else router.replace('/posts'); }} postToEdit={postToEdit} />
         </SafeAreaView>
       );
@@ -365,7 +376,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
 
   if (isReadOnly) {
     return (
-      <SafeAreaView className="flex-1 bg-white items-center justify-center p-8">
+      <SafeAreaView className="flex-1 bg-surface-container-low items-center justify-center p-8">
         <View className="w-16 h-16 rounded-full bg-red-100 items-center justify-center mb-4">
           <Text className="text-3xl">🔒</Text>
         </View>
@@ -384,11 +395,12 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-surface-container-low">
       <View className="px-5 pt-3 pb-1">
         <TouchableOpacity
           onPress={handleBack}
-          className="self-start flex-row items-center gap-2 rounded-full bg-slate-100 px-4 py-2"
+          className="self-start flex-row items-center gap-2 rounded-full px-4 py-2"
+          style={{ backgroundColor: THEME_COLORS.surface }}
           activeOpacity={0.8}
         >
           <ArrowLeft size={18} color={THEME_COLORS.primary} />
@@ -545,7 +557,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     </MapView>
 
                     <View className="absolute top-3 left-3 right-3">
-                      <View className="bg-white/90 px-3 py-2 rounded-2xl border border-amber-200 flex-row items-center justify-between">
+                      <View className="bg-surface-container-low/90 px-3 py-2 rounded-2xl border border-amber-200 flex-row items-center justify-between">
                         <Text className="text-xs font-bold text-amber-700 uppercase tracking-wider">
                           {locationSource === 'profile_default'
                             ? 'Community Default'
@@ -605,7 +617,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     multiline
                     numberOfLines={3}
                     textAlignVertical="top"
-                    className="bg-white border-2 border-slate-200 px-4 py-4 rounded-2xl text-slate-700"
+                    className="bg-surface-container-low border-2 border-slate-200 px-4 py-4 rounded-2xl text-slate-700"
                     style={{ minHeight: 80 }}
                   />
                 </View>
@@ -616,13 +628,13 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
             {postType === 'listing' && (
               <View className="gap-5">
                 {/* Photo */}
-                <View className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm gap-3">
+                <View className="rounded-3xl p-5 border shadow-sm gap-3" style={CARD_SURFACE_STYLE}>
                   <Text className="font-bold text-primary text-base">Photos</Text>
                   <TouchableOpacity
                     onPress={handlePickImage}
                     activeOpacity={0.8}
-                    className="rounded-2xl overflow-hidden border-2 border-dashed border-gray-300 items-center justify-center"
-                    style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg }}
+                    className="rounded-2xl overflow-hidden border-2 border-dashed items-center justify-center"
+                    style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg, borderColor: THEME_COLORS.neutralBorderSoft }}
                   >
                     {postsImage ? (
                       <>
@@ -654,7 +666,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                 </View>
 
                 {/* Details */}
-                <View className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm gap-5">
+                <View className="rounded-3xl p-5 border shadow-sm gap-5" style={CARD_SURFACE_STYLE}>
                   {/* Title */}
                   <View className="gap-1">
                     <Text className="text-sm font-semibold text-primary ml-1">Title</Text>
@@ -663,7 +675,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       onChangeText={setTitle}
                       placeholder="e.g. Handmade Pottery"
                       placeholderTextColor={THEME_COLORS.neutralTextSoft}
-                      className="bg-gray-50 border-b-2 border-gray-200 px-4 py-3 rounded-t-xl text-gray-800"
+                      className="px-4 py-3 rounded-t-xl text-gray-800"
+                      style={INPUT_SURFACE_STYLE}
                     />
                   </View>
 
@@ -678,8 +691,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       multiline
                       numberOfLines={4}
                       textAlignVertical="top"
-                      className="bg-gray-50 border-b-2 border-gray-200 px-4 py-3 rounded-t-xl text-gray-800"
-                      style={{ minHeight: 100 }}
+                      className="px-4 py-3 rounded-t-xl text-gray-800"
+                      style={[INPUT_SURFACE_STYLE, { minHeight: 100 }]}
                     />
                   </View>
 
@@ -694,8 +707,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         placeholderTextColor={THEME_COLORS.neutralTextSoft}
                         keyboardType="decimal-pad"
                         editable={!isFree}
-                        className="bg-gray-50 border-b-2 border-gray-200 px-4 py-3 rounded-t-xl text-gray-800"
-                        style={isFree ? { opacity: 0.5 } : undefined}
+                        className="px-4 py-3 rounded-t-xl text-gray-800"
+                        style={[INPUT_SURFACE_STYLE, isFree ? { opacity: 0.5 } : undefined]}
                       />
                     </View>
                     <View className="flex-row items-center justify-between px-2">
@@ -716,7 +729,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         activeOpacity={0.8}
                       >
                         <View
-                          className="w-5 h-5 bg-white rounded-full shadow-sm"
+                          className="w-5 h-5 bg-surface-container-low rounded-full shadow-sm"
                           style={{
                             alignSelf: isFree ? 'flex-end' : 'flex-start',
                           }}
@@ -729,13 +742,14 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                   <View className="gap-1">
                     <Text className="text-sm font-semibold text-primary ml-1">Post Visibility</Text>
                     <View
-                      className="flex-row bg-gray-100 p-1 rounded-full border border-gray-200"
+                      className="flex-row p-1 rounded-full border"
+                      style={CARD_SURFACE_STYLE}
                     >
                       <TouchableOpacity
                         onPress={() => setIsPublic(false)}
                         className="flex-1 py-2 rounded-full items-center"
                         style={{
-                          backgroundColor: !isPublic ? THEME_COLORS.white : 'transparent',
+                          backgroundColor: !isPublic ? THEME_COLORS.surface : 'transparent',
                         }}
                         activeOpacity={0.8}
                       >
@@ -750,7 +764,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         onPress={() => setIsPublic(true)}
                         className="flex-1 py-2 rounded-full items-center"
                         style={{
-                          backgroundColor: isPublic ? THEME_COLORS.white : 'transparent',
+                          backgroundColor: isPublic ? THEME_COLORS.surface : 'transparent',
                         }}
                         activeOpacity={0.8}
                       >
@@ -784,7 +798,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                             <Text className="text-xs font-bold uppercase tracking-widest text-primary ml-1">
                               Active Charity
                             </Text>
-                            <View className="bg-white border-b-2 border-outline-variant px-4 py-3 rounded-t-xl flex-row items-center justify-between">
+                            <View className="bg-surface-container-low border-b-2 border-outline-variant px-4 py-3 rounded-t-xl flex-row items-center justify-between">
                               <Text className="font-semibold text-gray-800 flex-1">{selectedCharity.name}</Text>
                               <Text className="text-xs font-bold text-primary">
                                 {basePercentage}% min
@@ -801,7 +815,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                               placeholder={basePercentage.toString()}
                               placeholderTextColor={THEME_COLORS.neutralTextSoft}
                               keyboardType="decimal-pad"
-                              className="bg-white border-b-2 border-outline-variant px-4 py-3 rounded-t-xl text-gray-800 text-sm"
+                              className="bg-surface-container-low border-b-2 border-outline-variant px-4 py-3 rounded-t-xl text-gray-800 text-sm"
                               onBlur={() => {
                                 const val = parseFloat(customCharityPercentage) || 0;
                                 if (val < basePercentage) {
@@ -820,7 +834,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       )}
 
                       {/* Price breakdown */}
-                      <View className="bg-white/60 rounded-2xl p-4 gap-2">
+                      <View className="bg-surface-container-low/60 rounded-2xl p-4 gap-2">
                         <View className="flex-row justify-between">
                           <Text className="text-xs font-bold text-gray-500">Charity</Text>
                           <Text className="text-xs text-gray-600 max-w-[60%]" numberOfLines={1}>
@@ -839,7 +853,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                             + R {charityAmount.toFixed(2)}
                           </Text>
                         </View>
-                        <View className="h-px bg-gray-200 my-1" />
+                        <View className="h-px my-1" style={{ backgroundColor: THEME_COLORS.neutralBorderSoft }} />
                         <View className="flex-row justify-between">
                           <Text className="text-sm font-bold text-primary">Public Price</Text>
                           <Text className="text-sm font-bold text-primary">
@@ -855,7 +869,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     <Text className="text-sm font-semibold text-primary ml-1">Category</Text>
                     <TouchableOpacity
                       onPress={() => setCategoryPickerVisible(true)}
-                      className="bg-gray-50 border-b-2 border-gray-200 px-4 py-3 rounded-t-xl flex-row items-center justify-between"
+                      className="px-4 py-3 rounded-t-xl flex-row items-center justify-between"
+                      style={INPUT_SURFACE_STYLE}
                       activeOpacity={0.8}
                     >
                       <Text className="text-gray-800 text-sm">{category}</Text>
@@ -897,7 +912,10 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
         </ScrollView>
 
         {/* Footer CTA */}
-        <View className="absolute bottom-0 left-0 right-0 bg-white/90 px-5 pb-8 pt-4 border-t border-gray-100">
+        <View
+          className="absolute bottom-0 left-0 right-0 bg-surface-container-low/90 px-5 pb-8 pt-4 border-t"
+          style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}
+        >
           <TouchableOpacity
             onPress={() => setShowConfirmModal(true)}
             disabled={!canSubmit}
@@ -932,7 +950,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
           onRequestClose={() => setShowConfirmModal(false)}
         >
           <View className="flex-1 bg-black/50 justify-end">
-            <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
+            <View className="bg-surface-container-low rounded-t-3xl px-6 pt-6 pb-10">
               <Text className="text-lg font-bold text-gray-800 mb-2 text-center">{ctaLabel}</Text>
               <Text className="text-sm text-gray-500 text-center mb-6">
                 {isEmergency && emergencyCategory
@@ -965,7 +983,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => setShowConfirmModal(false)}
-                  className="py-4 rounded-full items-center bg-gray-100"
+                  className="py-4 rounded-full items-center"
+                  style={{ backgroundColor: THEME_COLORS.surface }}
                   activeOpacity={0.8}
                 >
                   <Text className="text-gray-600 font-semibold">Cancel</Text>
@@ -983,7 +1002,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
           onRequestClose={() => setCategoryPickerVisible(false)}
         >
           <View className="flex-1 bg-black/50 justify-end">
-            <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '70%' }}>
+            <View className="bg-surface-container-low rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '70%' }}>
               <Text className="text-lg font-bold text-gray-800 mb-4 text-center">Choose Category</Text>
               <ScrollView showsVerticalScrollIndicator={false}>
                 {['All', ...enabledListingCategories].map((cat) => (
@@ -993,7 +1012,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       setCategory(cat);
                       setCategoryPickerVisible(false);
                     }}
-                    className="py-3.5 border-b border-gray-100"
+                    className="py-3.5 border-b"
+                    style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
                     activeOpacity={0.8}
                   >
                     <Text

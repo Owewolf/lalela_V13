@@ -97,7 +97,7 @@ export const LicensingSection: React.FC = () => {
   };
 
   return (
-    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.s20 }}>
+    <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.s20 }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>

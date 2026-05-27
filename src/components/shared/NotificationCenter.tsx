@@ -26,6 +26,7 @@ import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { PostConfirmationModal } from './PostConfirmationModal';
 import { THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 import { createShadow } from '../../theme/shadows';
 
 const PRIMARY = THEME_COLORS.primary;
@@ -458,8 +459,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: SPACE.s360,
     maxWidth: '90%',
-    backgroundColor: THEME_COLORS.white,
-    ...createShadow(THEME_COLORS.black, -SPACE.xs, SPACE.zero, 0.15, 24, 12),
+    backgroundColor: getCardSurfaceColor('subtle'),
+    ...getCardShadow('hero'),
     flexDirection: 'column',
   },
   panelHeader: {
@@ -468,8 +469,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: SPACE.s20,
     borderBottomWidth: 1,
-    borderBottomColor: THEME_COLORS.neutralBgSoft,
-    backgroundColor: THEME_COLORS.whiteOverlay90,
+    borderBottomColor: getCardBorderColor('strong'),
+    backgroundColor: getCardSurfaceColor('muted'),
   },
   panelTitleRow: {
     flexDirection: 'row',
@@ -515,12 +516,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACE.md,
   },
   notifCardRead: {
-    backgroundColor: THEME_COLORS.neutralBg,
-    borderColor: THEME_COLORS.neutralBgSoft,
+    backgroundColor: getCardSurfaceColor('default'),
+    borderColor: getCardBorderColor('default'),
     opacity: 0.8,
   },
   notifCardUnread: {
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: getCardSurfaceColor('muted'),
     borderColor: THEME_COLORS.successTintBorderAlt,
     ...createShadow(THEME_COLORS.primary, SPACE.zero, SPACE.xxs, 0.05, 8, 2),
   },
@@ -622,7 +623,7 @@ const styles = StyleSheet.create({
     width: SPACE.s64,
     height: SPACE.s64,
     borderRadius: RADIUS.circle,
-    backgroundColor: THEME_COLORS.neutralBg,
+    backgroundColor: THEME_COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -639,8 +640,8 @@ const styles = StyleSheet.create({
   footer: {
     padding: SPACE.s16,
     borderTopWidth: 1,
-    borderTopColor: THEME_COLORS.neutralBgSoft,
-    backgroundColor: THEME_COLORS.neutralBg,
+    borderTopColor: THEME_COLORS.neutralBorderSoft,
+    backgroundColor: THEME_COLORS.surface,
     alignItems: 'center',
   },
   markAllText: {

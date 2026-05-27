@@ -10,6 +10,7 @@ import {
 import { handlePaymentSuccess } from '../billing/paymentService.js';
 import { getOrCreateCommunityInviteLink } from '../billing/inviteService.js';
 import { notifyCommunityMembers } from '../services/notificationService.js';
+import { getFoundationTheme } from '../lib/foundationThemes.js';
 // UserRole is a string enum in Prisma schema; reference it as a string literal type
 type UserRole = 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER';
 
@@ -135,18 +136,21 @@ router.post('/', async (req, res) => {
       } as any,
     });
 
+    const lalelaLightTheme = getFoundationTheme('lalela-light');
     const defaultCommunityTheme = {
       communityId: community.id,
-      name: `${community.name} Theme`,
-      primaryColor: '#0d3d47',
-      secondaryColor: '#9c4421',
-      backgroundColor: '#fff8f0',
-      surfaceColor: '#efeeeb',
-      textPrimary: '#0f172a',
-      textSecondary: '#64748b',
-      borderRadius: '16px',
-      fontFamily: 'System',
-      iconUrl: null,
+      presetId: lalelaLightTheme.presetId,
+      mode: lalelaLightTheme.mode,
+      name: lalelaLightTheme.name,
+      primaryColor: lalelaLightTheme.primaryColor,
+      secondaryColor: lalelaLightTheme.secondaryColor,
+      backgroundColor: lalelaLightTheme.backgroundColor,
+      surfaceColor: lalelaLightTheme.surfaceColor,
+      textPrimary: lalelaLightTheme.textPrimary,
+      textSecondary: lalelaLightTheme.textSecondary,
+      borderRadius: lalelaLightTheme.borderRadius,
+      fontFamily: lalelaLightTheme.fontFamily,
+      iconUrl: lalelaLightTheme.iconUrl,
       isDefault: false,
     };
 

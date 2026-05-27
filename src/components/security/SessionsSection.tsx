@@ -105,7 +105,7 @@ export const SessionsSection: React.FC = () => {
   };
 
   return (
-    <View style={{ backgroundColor: THEME_COLORS.white, borderRadius: RADIUS.xxl, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.xxl }}>
+    <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xxl, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.xxl }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
@@ -150,7 +150,7 @@ export const SessionsSection: React.FC = () => {
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl, flex: 1 }}>
-                  <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+                  <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
                     {isMobile ? <Smartphone size={22} color={THEME_COLORS.neutralTextSubtle} /> : <Laptop size={22} color={THEME_COLORS.neutralTextSubtle} />}
                   </View>
                   <View style={{ flex: 1 }}>
@@ -193,7 +193,7 @@ export const SessionsSection: React.FC = () => {
         </View>
       ) : (
         <View style={{ paddingVertical: SPACE.s32, alignItems: 'center', gap: SPACE.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl }}>
-          <View style={{ width: SPACE.s56, height: SPACE.s56, borderRadius: RADIUS.full, backgroundColor: THEME_COLORS.white, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: SPACE.s56, height: SPACE.s56, borderRadius: RADIUS.full, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Laptop size={28} color={THEME_COLORS.alias_rgba_0_0_0_0_15} />
           </View>
           <Text style={{ fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft }}>No active sessions found</Text>

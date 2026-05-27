@@ -18,7 +18,7 @@ import { ChatComposer } from './ChatComposer';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCall } from '../../context/CallContext';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
 interface ChatDetailPageProps {
   conversationId: string;
@@ -154,8 +154,8 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
       };
     }
     return {
-      bg: 'bg-gray-100',
-      text: 'text-gray-700',
+      bg: 'bg-surface-container',
+      text: 'text-neutralTextEmphasis',
       label: 'General',
     };
   };
@@ -214,14 +214,14 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
   const placeholder = chat?.type === 'emergency' ? 'Send emergency update...' : 'Type a message...';
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: THEME_COLORS.aliasHex_f7f8fc }}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
         {/* Header */}
-        <View className="bg-white border-b border-gray-100">
+        <View style={{ backgroundColor: APP_SHELL_COLORS.chrome, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft }}>
           <View className="flex-row items-center justify-between px-4 py-2.5 min-h-[70px]">
             <View className="flex-row items-center gap-3 flex-1 min-w-0">
             <TouchableOpacity
@@ -270,9 +270,9 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                       </Text>
                     </View>
                     {!!noticeLocation && (
-                      <View className="flex-row items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100">
+                      <View className="flex-row items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container">
                         <MapPin size={10} color={THEME_COLORS.neutralTextDefault} />
-                        <Text numberOfLines={1} className="text-[10px] text-gray-600 font-semibold max-w-[140px]">
+                        <Text numberOfLines={1} className="text-[10px] text-neutralTextMuted font-semibold max-w-[140px]">
                           {noticeLocation}
                         </Text>
                       </View>
@@ -283,8 +283,8 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                       {noticeAuthorImage ? (
                         <Image source={{ uri: noticeAuthorImage }} className="w-4 h-4 rounded-full" resizeMode="cover" />
                       ) : (
-                        <View className="w-4 h-4 rounded-full bg-gray-200 items-center justify-center">
-                          <Text className="text-[9px] font-bold text-gray-600">{noticeAuthor.charAt(0).toUpperCase()}</Text>
+                        <View className="w-4 h-4 rounded-full bg-surface-container items-center justify-center">
+                          <Text className="text-[9px] font-bold text-neutralTextMuted">{noticeAuthor.charAt(0).toUpperCase()}</Text>
                         </View>
                       )}
                       <Text className="text-[10px] text-gray-500 font-semibold" numberOfLines={1}>
@@ -424,7 +424,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
 
         {/* Contextual item header (non one-on-one context) */}
         {chat?.metadata?.title && !isNoticeConversation && !isDirectConversation && (
-          <View className="px-4 py-3 bg-white border-b border-gray-100 flex-row gap-3 items-center">
+          <View className="px-4 py-3 flex-row gap-3 items-center" style={{ backgroundColor: APP_SHELL_COLORS.body, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft }}>
             {chat.metadata.image ? (
               <Image
                 source={{ uri: chat.metadata.image }}
@@ -432,7 +432,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                 resizeMode="cover"
               />
             ) : (
-              <View className="w-12 h-12 rounded-lg bg-gray-100 items-center justify-center">
+              <View className="w-12 h-12 rounded-lg bg-surface-container items-center justify-center">
                 <Text className="text-gray-400 text-lg font-bold">
                   {chat.metadata.title?.charAt(0)?.toUpperCase() || 'C'}
                 </Text>
@@ -455,7 +455,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
         )}
 
         {/* Message list */}
-        <View className="flex-1 bg-slate-50">
+        <View className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
           <ChatWindow
             messages={messages}
             conversation={chat || { id: conversationId, participants: [], type: 'direct', lastMessage: '', lastMessageAt: '', priority: 'normal', unreadCount: 0 }}

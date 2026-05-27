@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { AlertCircle, Send } from 'lucide-react-native';
 import { THEME_COLORS } from '../../theme/colors';
-import { createShadow } from '../../theme/shadows';
+import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 
 interface PostConfirmationModalProps {
   isOpen: boolean;
@@ -154,14 +154,14 @@ const styles = StyleSheet.create({
     padding: SPACE.s24,
   },
   card: {
-    backgroundColor: THEME_COLORS.white,
+    backgroundColor: getCardSurfaceColor('default'),
     borderRadius: RADIUS.lg,
     padding: SPACE.s32,
     width: '100%',
     maxWidth: 380,
-    ...createShadow(THEME_COLORS.black, 0, 8, 0.18, 24, 8),
+    ...getCardShadow('hero'),
     borderWidth: 1,
-    borderColor: THEME_COLORS.neutralBorder,
+    borderColor: getCardBorderColor('strong'),
     gap: SPACE.xxl,
   },
   iconContainer: {
