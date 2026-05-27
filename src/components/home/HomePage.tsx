@@ -33,6 +33,7 @@ import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
 import { resolveMediaUrl } from '../../lib/config';
+import { resolveActiveCharity } from '../../lib/activeCharity';
 import { InteractiveCoverageMap } from './InteractiveCoverageMap';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
 import { CommunityNotice } from '../../types';
@@ -337,10 +338,12 @@ export const HomePage: React.FC<HomePageProps> = ({
       ? communityData.selected_charity
       : undefined;
 
+  const { active: resolvedCharity, cat: catCharity, featured: configuredFeaturedCharity } =
+    resolveActiveCharity(charities, currentCommunity ?? null);
+
   const selectedCharity =
-    charities.find((c) => c.id === selectedCharityId) ??
-    charities.find((c) => c.isFeatured) ??
-    (charities.length === 1 ? charities[0] : undefined);
+    resolvedCharity ??
+    charities.find((c) => c.id === selectedCharityId);
 
   const approvedPublicCharityListings = useMemo(() => {
     if (!selectedCharity) return [] as CommunityNotice[];

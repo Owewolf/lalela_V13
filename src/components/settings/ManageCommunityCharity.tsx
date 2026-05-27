@@ -23,6 +23,7 @@ import {
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import type { Charity, CharitySuggestion, CatHubSummary } from '../../types';
+import { resolveActiveCharity, isCatCharity as isCatCharityShared } from '../../lib/activeCharity';
 import { THEME_COLORS } from '../../theme/colors';
 
 type CharityEntryMode = 'manage' | 'suggest' | null;
@@ -198,12 +199,16 @@ export default function ManageCommunityCharity({
     [charities]
   );
 
-  const featuredCharity = useMemo(
-    () =>
-      availableCharities.find((charity) => charity.isFeatured) ??
-      (availableCharities.length === 1 ? availableCharities[0] : null),
-    [availableCharities]
+  const isCatCharity = (charity: any) => isCatCharityShared(charity);
+
+  const resolution = useMemo(
+    () => resolveActiveCharity(availableCharities, currentCommunity ?? null),
+    [availableCharities, currentCommunity?.catCycleActive, currentCommunity?.catFeaturedCharityId]
   );
+
+  const catCharity = resolution.cat;
+  const featuredCharity = resolution.featured;
+  const effectiveFeaturedCharity = resolution.active;
 
   const pendingSuggestions = useMemo(
     () => charitySuggestions.filter((suggestion) => suggestion.status === 'pending'),
@@ -220,13 +225,16 @@ export default function ManageCommunityCharity({
   }, [initialMode, canManageCharity]);
 
   useEffect(() => {
-    if (!showManager || !canManageCharity || !hasCommunity) return;
+    if (!hasCommunity) {
+      setCatHubSummary(null);
+      return;
+    }
     setCatHubLoading(true);
     getCatHub()
       .then((data) => setCatHubSummary(data))
       .catch(() => setCatHubSummary(null))
       .finally(() => setCatHubLoading(false));
-  }, [showManager, canManageCharity, hasCommunity, getCatHub]);
+  }, [hasCommunity, getCatHub]);
 
   const closeManager = () => {
     setShowManager(false);
@@ -461,7 +469,7 @@ export default function ManageCommunityCharity({
         nextActive ? 'Charity cycle activated' : 'Charity cycle paused',
         nextActive
           ? 'Public listing CAT earnings now pool into the featured charity when sold.'
-          : 'Public listing CAT earnings now remain seller earnings when sold.'
+          : 'Public listing CAT earnings now route to CAT baseline charity when sold.'
       );
     } catch (error) {
       Alert.alert(
@@ -477,155 +485,109 @@ export default function ManageCommunityCharity({
     <>
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Community Charity</Text>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={styles.card}
-          onPress={() => {
-            if (canManageCharity) {
-              setShowManager(true);
-              setAdminView('list');
-            } else {
-              setShowSuggestModal(true);
-            }
-          }}
-        >
-          <View style={styles.cardIconWrap}>
-            <HeartHandshake size={20} color={THEME_COLORS.primary} />
-          </View>
-          <View style={{ flex: 1, gap: SPACE.s3 }}>
-            <Text style={styles.cardTitle}>
-              {featuredCharity?.name || 'Support a local cause'}
-            </Text>
-            <Text style={styles.cardDescription}>
-              {canManageCharity
-                ? `${pendingSuggestions.length} pending suggestions and ${availableCharities.length} active charities.`
-                : 'Suggest a charity for your community to support.'}
-            </Text>
-          </View>
-          <View style={styles.cardAction}>
-            <Text style={styles.cardActionText}>
-              {canManageCharity ? 'Manage' : 'Suggest'}
-            </Text>
-            <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} />
-          </View>
-        </TouchableOpacity>
-      </View>
 
-      <Modal visible={showManager} animationType="slide" transparent onRequestClose={closeManager}>
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <View style={styles.modalHeader}>
-              <View>
-                <Text style={styles.modalTitle}>Charity Management</Text>
-                <Text style={styles.modalSubtitle}>
-                  Manage featured causes and review community suggestions.
+        {canManageCharity ? (
+          <View style={{ gap: SPACE.xl }}>
+            <View style={styles.catCycleCard}>
+              <View style={{ flex: 1, gap: SPACE.xs }}>
+                <Text style={styles.listItemTitle}>CAT Charity Cycle</Text>
+                <Text style={styles.listItemMeta}>
+                  {currentCommunity?.catCycleActive
+                    ? `Active${effectiveFeaturedCharity?.name ? ` • Pooling to ${effectiveFeaturedCharity.name}` : ''}`
+                    : 'Switch off • CAT is the default community charity'}
                 </Text>
               </View>
-              <TouchableOpacity onPress={closeManager} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+              <Switch
+                value={Boolean(currentCommunity?.catCycleActive)}
+                disabled={updatingCatCycle}
+                onValueChange={handleToggleCatCycle}
+                trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
+                thumbColor={THEME_COLORS.white}
+              />
             </View>
 
-            <View style={styles.tabRow}>
-              <TouchableOpacity
-                style={[styles.tabButton, adminView === 'list' && styles.tabButtonActive]}
-                onPress={() => setAdminView('list')}
-              >
-                <Text style={[styles.tabButtonText, adminView === 'list' && styles.tabButtonTextActive]}>
-                  Charities
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.tabButton,
-                  adminView === 'suggestions' && styles.tabButtonActive,
-                ]}
-                onPress={() => setAdminView('suggestions')}
-              >
-                <Text
-                  style={[
-                    styles.tabButtonText,
-                    adminView === 'suggestions' && styles.tabButtonTextActive,
-                  ]}
-                >
-                  Suggestions ({pendingSuggestions.length})
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView contentContainerStyle={{ gap: SPACE.xl, paddingBottom: SPACE.s20 }}>
-              {adminView === 'list' && (
+            <View style={styles.catHubCard}>
+              <Text style={styles.catHubTitle}>Charity Hub</Text>
+              {catHubLoading ? (
+                <ActivityIndicator color={THEME_COLORS.primary} />
+              ) : (
                 <>
-                  <View style={styles.catCycleCard}>
-                    <View style={{ flex: 1, gap: SPACE.xs }}>
-                      <Text style={styles.listItemTitle}>CAT Charity Cycle</Text>
-                      <Text style={styles.listItemMeta}>
-                        {currentCommunity?.catCycleActive
-                          ? `Active${featuredCharity?.name ? ` • Pooling to ${featuredCharity.name}` : ''}`
-                          : 'Inactive • Public CAT remains seller earnings'}
-                      </Text>
+                  <Text style={styles.catHubMetric}>
+                    Total CAT Generated: R{Number(catHubSummary?.totalCATGenerated ?? 0).toLocaleString()}
+                  </Text>
+                  <Text style={styles.catHubMetric}>
+                    Total Raised For Charity: R{Number(catHubSummary?.totalRaisedForCharity ?? 0).toLocaleString()}
+                  </Text>
+                  <Text style={styles.listItemMeta}>
+                    Active charity: {effectiveFeaturedCharity?.name || 'CAT (default)'}
+                  </Text>
+                  <Text style={styles.listItemMeta}>
+                    Recent transactions: {catHubSummary?.recentTransactions?.length ?? 0}
+                  </Text>
+                </>
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={() => openAdminForm(null, null)}
+              activeOpacity={0.85}
+            >
+              <Plus size={16} color={THEME_COLORS.white} />
+              <Text style={styles.primaryButtonText}>Add Charity</Text>
+            </TouchableOpacity>
+
+            {availableCharities.length === 0 && pendingSuggestions.length === 0 ? (
+              <View style={styles.listItem}>
+                <View style={{ flex: 1, gap: SPACE.xs }}>
+                  <View style={styles.inlineRow}>
+                    <Text style={styles.listItemTitle}>CAT Charity Cycle</Text>
+                    <View style={styles.badge}>
+                      <Sparkles size={11} color={THEME_COLORS.primary} />
+                      <Text style={styles.badgeText}>Default</Text>
                     </View>
-                    <Switch
-                      value={Boolean(currentCommunity?.catCycleActive)}
-                      disabled={updatingCatCycle}
-                      onValueChange={handleToggleCatCycle}
-                      trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
-                      thumbColor={THEME_COLORS.white}
-                    />
                   </View>
-
-                  <View style={styles.catHubCard}>
-                    <Text style={styles.catHubTitle}>Charity Hub</Text>
-                    {catHubLoading ? (
-                      <ActivityIndicator color={THEME_COLORS.primary} />
-                    ) : (
-                      <>
-                        <Text style={styles.catHubMetric}>
-                          Total CAT Generated: R{Number(catHubSummary?.totalCATGenerated ?? 0).toLocaleString()}
-                        </Text>
-                        <Text style={styles.catHubMetric}>
-                          Total Raised For Charity: R{Number(catHubSummary?.totalRaisedForCharity ?? 0).toLocaleString()}
-                        </Text>
-                        <Text style={styles.listItemMeta}>
-                          Recent transactions: {catHubSummary?.recentTransactions?.length ?? 0}
-                        </Text>
-                      </>
-                    )}
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.primaryButton}
-                    onPress={() => openAdminForm(null, null)}
-                    activeOpacity={0.85}
-                  >
-                    <Plus size={16} color={THEME_COLORS.white} />
-                    <Text style={styles.primaryButtonText}>Add Charity</Text>
-                  </TouchableOpacity>
-
-                  {availableCharities.length === 0 ? (
-                    <View style={styles.emptyState}>
-                      <Sparkles size={18} color={THEME_COLORS.neutralTextMuted} />
-                      <Text style={styles.emptyStateTitle}>No charities yet</Text>
-                      <Text style={styles.emptyStateBody}>
-                        Create the first charity for this community or approve a member suggestion.
-                      </Text>
-                    </View>
-                  ) : (
-                    availableCharities.map((charity) => (
-                      <View key={charity.id} style={styles.listItem}>
+                  <Text style={styles.listItemMeta}>
+                    CAT remains active by default. Add charities to route CAT funds to a featured cause.
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <>
+                {[...availableCharities]
+                  .sort((a, b) => {
+                    const aCat = isCatCharity(a) ? 0 : 1;
+                    const bCat = isCatCharity(b) ? 0 : 1;
+                    if (aCat !== bCat) return aCat - bCat;
+                    return (a.name || '').localeCompare(b.name || '');
+                  })
+                  .map((charity) => {
+                    const isActive = charity.id === effectiveFeaturedCharity?.id;
+                    const isFeaturedCandidate = Boolean(charity.isFeatured) && !isCatCharity(charity);
+                    return (
+                      <View
+                        key={charity.id}
+                        style={[styles.listItem, isActive && styles.listItemFeatured]}
+                      >
                         <View style={{ flex: 1, gap: SPACE.xs }}>
                           <View style={styles.inlineRow}>
                             <Text style={styles.listItemTitle}>{charity.name}</Text>
-                            {charity.isCATCharity && (
+                            {isCatCharity(charity) && (
                               <View style={styles.badge}>
                                 <CheckCircle2 size={11} color={THEME_COLORS.primary} />
                                 <Text style={styles.badgeText}>CAT</Text>
                               </View>
                             )}
-                            {charity.isFeatured && (
+                            {isFeaturedCandidate && (
                               <View style={styles.badge}>
                                 <ShieldCheck size={11} color={THEME_COLORS.primary} />
                                 <Text style={styles.badgeText}>Featured</Text>
+                              </View>
+                            )}
+                            {isActive && (
+                              <View style={styles.badge}>
+                                <Sparkles size={11} color={THEME_COLORS.primary} />
+                                <Text style={styles.badgeText}>Active</Text>
                               </View>
                             )}
                           </View>
@@ -642,80 +604,141 @@ export default function ManageCommunityCharity({
                         >
                           <Text style={styles.inlineButtonText}>Edit</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => handleArchiveCharity(charity)}
-                          style={styles.iconButton}
-                        >
-                          <Trash2 size={15} color={THEME_COLORS.errorStrong} />
-                        </TouchableOpacity>
+                        {!isCatCharity(charity) && (
+                          <TouchableOpacity
+                            onPress={() => handleArchiveCharity(charity)}
+                            style={styles.iconButton}
+                          >
+                            <Trash2 size={15} color={THEME_COLORS.errorStrong} />
+                          </TouchableOpacity>
+                        )}
                       </View>
-                    ))
-                  )}
-                </>
-              )}
+                    );
+                  })}
 
-              {adminView === 'suggestions' && (
-                <>
-                  {pendingSuggestions.length === 0 ? (
-                    <View style={styles.emptyState}>
-                      <Sparkles size={18} color={THEME_COLORS.neutralTextMuted} />
-                      <Text style={styles.emptyStateTitle}>No pending suggestions</Text>
-                      <Text style={styles.emptyStateBody}>
-                        Member charity suggestions will appear here for moderator or admin review.
-                      </Text>
-                    </View>
-                  ) : (
-                    pendingSuggestions.map((suggestion) => (
-                      <View key={suggestion.id} style={styles.suggestionItem}>
+                {pendingSuggestions.map((suggestion) => (
+                  <View key={`suggestion-${suggestion.id}`} style={styles.listItem}>
+                    <View style={{ flex: 1, gap: SPACE.xs }}>
+                      <View style={styles.inlineRow}>
                         <Text style={styles.listItemTitle}>{suggestion.name}</Text>
-                        <Text style={styles.listItemMeta}>
-                          Suggested by {suggestion.suggestedByName} at{' '}
-                          {suggestion.suggestedDonationAmount ?? 0}%
-                        </Text>
-                        <Text style={styles.suggestionBody}>{suggestion.description}</Text>
-                        <Text style={styles.suggestionReason}>{suggestion.reason}</Text>
-                        <TextInput
-                          style={[styles.input, styles.textarea]}
-                          value={suggestionFeedbacks[suggestion.id] ?? ''}
-                          onChangeText={(value) =>
-                            setSuggestionFeedbacks((current) => ({
-                              ...current,
-                              [suggestion.id]: value,
-                            }))
-                          }
-                          placeholder="Optional feedback for the member"
-                          placeholderTextColor={THEME_COLORS.neutralTextMuted}
-                          multiline
-                        />
-                        <View style={styles.inlineRow}>
-                          <TouchableOpacity
-                            style={styles.secondaryButton}
-                            onPress={() => openAdminForm(null, suggestion)}
-                          >
-                            <Text style={styles.secondaryButtonText}>Approve</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={styles.destructiveButton}
-                            onPress={() => handleRejectSuggestion(suggestion)}
-                          >
-                            <Text style={styles.destructiveButtonText}>Reject</Text>
-                          </TouchableOpacity>
+                        <View style={styles.badge}>
+                          <Sparkles size={11} color={THEME_COLORS.primary} />
+                          <Text style={styles.badgeText}>Suggested</Text>
                         </View>
                       </View>
-                    ))
+                      <Text style={styles.listItemMeta}>
+                        Suggested by {suggestion.suggestedByName} at{' '}
+                        {suggestion.suggestedDonationAmount ?? 0}%
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => openAdminForm(null, suggestion)}
+                      style={styles.inlineButton}
+                    >
+                      <Text style={styles.inlineButtonText}>Approve</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleRejectSuggestion(suggestion)}
+                      style={styles.iconButton}
+                    >
+                      <Trash2 size={15} color={THEME_COLORS.errorStrong} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </>
+            )}
+          </View>
+        ) : (
+          <>
+            <View style={styles.overviewStack}>
+              <View style={styles.catOverviewCard}>
+                <View style={styles.cardIconWrap}>
+                  <Sparkles size={20} color={THEME_COLORS.primary} />
+                </View>
+                <View style={{ flex: 1, gap: SPACE.s3 }}>
+                  <Text style={styles.cardTitle}>CAT Charity Cycle</Text>
+                  <Text style={styles.cardDescription}>
+                    {currentCommunity?.catCycleActive
+                      ? `Active${effectiveFeaturedCharity?.name ? ` • Pooling to ${effectiveFeaturedCharity.name}` : ''}`
+                      : 'Switch off • CAT is the default community charity'}
+                  </Text>
+                  {catHubLoading ? (
+                    <Text style={styles.cardDescription}>Loading CAT totals...</Text>
+                  ) : (
+                    <Text style={styles.cardDescription}>
+                      Total CAT: R{Number(catHubSummary?.totalCATGenerated ?? 0).toLocaleString()} • Raised: R{Number(catHubSummary?.totalRaisedForCharity ?? 0).toLocaleString()}
+                    </Text>
                   )}
-                </>
-              )}
+                </View>
+              </View>
 
+              <View
+                style={[
+                  styles.featuredOverviewCard,
+                  effectiveFeaturedCharity ? styles.featuredOverviewCardActive : styles.featuredOverviewCardDefault,
+                ]}
+              >
+                <View style={styles.cardIconWrap}>
+                  <HeartHandshake size={20} color={THEME_COLORS.primary} />
+                </View>
+                <View style={{ flex: 1, gap: SPACE.s3 }}>
+                  <Text style={styles.cardTitle}>
+                    {effectiveFeaturedCharity?.name || 'CAT (Default Charity)'}
+                  </Text>
+                  <Text style={styles.cardDescription}>
+                    {effectiveFeaturedCharity
+                      ? `${effectiveFeaturedCharity.percentage}% impact${typeof effectiveFeaturedCharity.raisedAmount === 'number' ? ` • R${effectiveFeaturedCharity.raisedAmount.toLocaleString()} raised` : ''}`
+                      : 'No featured charity selected yet. CAT is shown by default.'}
+                  </Text>
+                </View>
+                {effectiveFeaturedCharity ? (
+                  <View style={styles.badge}>
+                    <ShieldCheck size={11} color={THEME_COLORS.primary} />
+                    <Text style={styles.badgeText}>Featured</Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
+
+            <View style={styles.overviewActionRow}>
+              <TouchableOpacity
+                activeOpacity={0.85}
+                style={[styles.primaryButton, { flex: 1 }]}
+                onPress={() => setShowSuggestModal(true)}
+              >
+                <Text style={styles.primaryButtonText}>Suggest Charity</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </View>
+
+      <Modal visible={showManager && adminView === 'form'} animationType="slide" transparent onRequestClose={closeManager}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <View>
+                <Text style={styles.modalTitle}>
+                  {selectedSuggestion
+                    ? `Approve ${selectedSuggestion.name}`
+                    : selectedCharity
+                    ? 'Edit Charity'
+                    : 'Add Charity'}
+                </Text>
+                <Text style={styles.modalSubtitle}>
+                  {selectedSuggestion
+                    ? 'Review the suggestion and approve it as a community charity.'
+                    : 'Update charity details and featured selection.'}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={closeManager} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView contentContainerStyle={{ gap: SPACE.xl, paddingBottom: SPACE.s20 }}>
               {adminView === 'form' && (
                 <View style={{ gap: SPACE.xl }}>
-                  <Text style={styles.formTitle}>
-                    {selectedSuggestion
-                      ? `Approve ${selectedSuggestion.name}`
-                      : selectedCharity
-                      ? 'Edit Charity'
-                      : 'Add Charity'}
-                  </Text>
                   <TextInput
                     style={styles.input}
                     value={charityForm.name}
@@ -817,7 +840,13 @@ export default function ManageCommunityCharity({
                     placeholderTextColor={THEME_COLORS.neutralTextMuted}
                   />
                   <View style={styles.switchRow}>
-                    <Text style={styles.switchLabel}>Featured charity</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.switchLabel}>Featured charity</Text>
+                      <Text style={styles.listItemMeta}>
+                        Marks this charity as the candidate. It only becomes the community's
+                        active charity once the CAT Charity Cycle switch is turned on.
+                      </Text>
+                    </View>
                     <Switch
                       value={charityForm.isFeatured}
                       onValueChange={(value) =>
@@ -840,15 +869,9 @@ export default function ManageCommunityCharity({
                   <View style={styles.inlineRow}>
                     <TouchableOpacity
                       style={styles.cancelButton}
-                      onPress={() => {
-                        setAdminView(selectedSuggestion ? 'suggestions' : 'list');
-                        setSelectedCharity(null);
-                        setSelectedSuggestion(null);
-                        setCharityForm(EMPTY_CHARITY_FORM);
-                        setReviewFeedback('');
-                      }}
+                      onPress={closeManager}
                     >
-                      <Text style={styles.cancelButtonText}>Back</Text>
+                      <Text style={styles.cancelButtonText}>Cancel</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.primaryButton}
@@ -975,6 +998,39 @@ const styles = StyleSheet.create({
     letterSpacing: LETTER_SPACING.lg,
     paddingHorizontal: SPACE.xs,
     paddingBottom: SPACE.sm,
+  },
+  overviewStack: {
+    gap: SPACE.md,
+  },
+  overviewActionRow: {
+    flexDirection: 'row',
+    gap: SPACE.md,
+  },
+  catOverviewCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACE.xxl,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    padding: SPACE.s16,
+  },
+  featuredOverviewCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACE.xxl,
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
+    padding: SPACE.s16,
+  },
+  featuredOverviewCardActive: {
+    backgroundColor: THEME_COLORS.successSurface,
+    borderColor: THEME_COLORS.tertiaryFixed,
+  },
+  featuredOverviewCardDefault: {
+    backgroundColor: THEME_COLORS.neutralBg,
+    borderColor: THEME_COLORS.overlayBorderSoft,
   },
   card: {
     flexDirection: 'row',
@@ -1107,6 +1163,10 @@ const styles = StyleSheet.create({
     borderColor: THEME_COLORS.overlayBorderSoft,
     padding: SPACE.xxl,
     backgroundColor: THEME_COLORS.surfaceContainerLow,
+  },
+  listItemFeatured: {
+    backgroundColor: THEME_COLORS.successSurface,
+    borderColor: THEME_COLORS.tertiaryFixed,
   },
   catCycleCard: {
     flexDirection: 'row',

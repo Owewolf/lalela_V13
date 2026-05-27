@@ -14374,11 +14374,16 @@ export namespace Prisma {
   export type ThemeMinAggregateOutputType = {
     id: string | null
     communityId: string | null
+    presetId: string | null
+    mode: string | null
     name: string | null
     primaryColor: string | null
     secondaryColor: string | null
     backgroundColor: string | null
     surfaceColor: string | null
+    cardSurfaceColor: string | null
+    cardSurfaceMutedColor: string | null
+    cardBorderColor: string | null
     textPrimary: string | null
     textSecondary: string | null
     borderRadius: string | null
@@ -14392,11 +14397,16 @@ export namespace Prisma {
   export type ThemeMaxAggregateOutputType = {
     id: string | null
     communityId: string | null
+    presetId: string | null
+    mode: string | null
     name: string | null
     primaryColor: string | null
     secondaryColor: string | null
     backgroundColor: string | null
     surfaceColor: string | null
+    cardSurfaceColor: string | null
+    cardSurfaceMutedColor: string | null
+    cardBorderColor: string | null
     textPrimary: string | null
     textSecondary: string | null
     borderRadius: string | null
@@ -14410,11 +14420,16 @@ export namespace Prisma {
   export type ThemeCountAggregateOutputType = {
     id: number
     communityId: number
+    presetId: number
+    mode: number
     name: number
     primaryColor: number
     secondaryColor: number
     backgroundColor: number
     surfaceColor: number
+    cardSurfaceColor: number
+    cardSurfaceMutedColor: number
+    cardBorderColor: number
     textPrimary: number
     textSecondary: number
     borderRadius: number
@@ -14430,11 +14445,16 @@ export namespace Prisma {
   export type ThemeMinAggregateInputType = {
     id?: true
     communityId?: true
+    presetId?: true
+    mode?: true
     name?: true
     primaryColor?: true
     secondaryColor?: true
     backgroundColor?: true
     surfaceColor?: true
+    cardSurfaceColor?: true
+    cardSurfaceMutedColor?: true
+    cardBorderColor?: true
     textPrimary?: true
     textSecondary?: true
     borderRadius?: true
@@ -14448,11 +14468,16 @@ export namespace Prisma {
   export type ThemeMaxAggregateInputType = {
     id?: true
     communityId?: true
+    presetId?: true
+    mode?: true
     name?: true
     primaryColor?: true
     secondaryColor?: true
     backgroundColor?: true
     surfaceColor?: true
+    cardSurfaceColor?: true
+    cardSurfaceMutedColor?: true
+    cardBorderColor?: true
     textPrimary?: true
     textSecondary?: true
     borderRadius?: true
@@ -14466,11 +14491,16 @@ export namespace Prisma {
   export type ThemeCountAggregateInputType = {
     id?: true
     communityId?: true
+    presetId?: true
+    mode?: true
     name?: true
     primaryColor?: true
     secondaryColor?: true
     backgroundColor?: true
     surfaceColor?: true
+    cardSurfaceColor?: true
+    cardSurfaceMutedColor?: true
+    cardBorderColor?: true
     textPrimary?: true
     textSecondary?: true
     borderRadius?: true
@@ -14557,11 +14587,16 @@ export namespace Prisma {
   export type ThemeGroupByOutputType = {
     id: string
     communityId: string | null
+    presetId: string | null
+    mode: string
     name: string
     primaryColor: string
     secondaryColor: string
     backgroundColor: string
     surfaceColor: string
+    cardSurfaceColor: string
+    cardSurfaceMutedColor: string
+    cardBorderColor: string
     textPrimary: string
     textSecondary: string
     borderRadius: string
@@ -14592,11 +14627,16 @@ export namespace Prisma {
   export type ThemeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     communityId?: boolean
+    presetId?: boolean
+    mode?: boolean
     name?: boolean
     primaryColor?: boolean
     secondaryColor?: boolean
     backgroundColor?: boolean
     surfaceColor?: boolean
+    cardSurfaceColor?: boolean
+    cardSurfaceMutedColor?: boolean
+    cardBorderColor?: boolean
     textPrimary?: boolean
     textSecondary?: boolean
     borderRadius?: boolean
@@ -14611,11 +14651,16 @@ export namespace Prisma {
   export type ThemeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     communityId?: boolean
+    presetId?: boolean
+    mode?: boolean
     name?: boolean
     primaryColor?: boolean
     secondaryColor?: boolean
     backgroundColor?: boolean
     surfaceColor?: boolean
+    cardSurfaceColor?: boolean
+    cardSurfaceMutedColor?: boolean
+    cardBorderColor?: boolean
     textPrimary?: boolean
     textSecondary?: boolean
     borderRadius?: boolean
@@ -14630,11 +14675,16 @@ export namespace Prisma {
   export type ThemeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     communityId?: boolean
+    presetId?: boolean
+    mode?: boolean
     name?: boolean
     primaryColor?: boolean
     secondaryColor?: boolean
     backgroundColor?: boolean
     surfaceColor?: boolean
+    cardSurfaceColor?: boolean
+    cardSurfaceMutedColor?: boolean
+    cardBorderColor?: boolean
     textPrimary?: boolean
     textSecondary?: boolean
     borderRadius?: boolean
@@ -14649,11 +14699,16 @@ export namespace Prisma {
   export type ThemeSelectScalar = {
     id?: boolean
     communityId?: boolean
+    presetId?: boolean
+    mode?: boolean
     name?: boolean
     primaryColor?: boolean
     secondaryColor?: boolean
     backgroundColor?: boolean
     surfaceColor?: boolean
+    cardSurfaceColor?: boolean
+    cardSurfaceMutedColor?: boolean
+    cardBorderColor?: boolean
     textPrimary?: boolean
     textSecondary?: boolean
     borderRadius?: boolean
@@ -14664,7 +14719,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ThemeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "name" | "primaryColor" | "secondaryColor" | "backgroundColor" | "surfaceColor" | "textPrimary" | "textSecondary" | "borderRadius" | "fontFamily" | "iconUrl" | "isDefault" | "createdAt" | "updatedAt", ExtArgs["result"]["theme"]>
+  export type ThemeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "presetId" | "mode" | "name" | "primaryColor" | "secondaryColor" | "backgroundColor" | "surfaceColor" | "cardSurfaceColor" | "cardSurfaceMutedColor" | "cardBorderColor" | "textPrimary" | "textSecondary" | "borderRadius" | "fontFamily" | "iconUrl" | "isDefault" | "createdAt" | "updatedAt", ExtArgs["result"]["theme"]>
   export type ThemeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | Theme$communityArgs<ExtArgs>
   }
@@ -14683,11 +14738,16 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       communityId: string | null
+      presetId: string | null
+      mode: string
       name: string
       primaryColor: string
       secondaryColor: string
       backgroundColor: string
       surfaceColor: string
+      cardSurfaceColor: string
+      cardSurfaceMutedColor: string
+      cardBorderColor: string
       textPrimary: string
       textSecondary: string
       borderRadius: string
@@ -15122,11 +15182,16 @@ export namespace Prisma {
   interface ThemeFieldRefs {
     readonly id: FieldRef<"Theme", 'String'>
     readonly communityId: FieldRef<"Theme", 'String'>
+    readonly presetId: FieldRef<"Theme", 'String'>
+    readonly mode: FieldRef<"Theme", 'String'>
     readonly name: FieldRef<"Theme", 'String'>
     readonly primaryColor: FieldRef<"Theme", 'String'>
     readonly secondaryColor: FieldRef<"Theme", 'String'>
     readonly backgroundColor: FieldRef<"Theme", 'String'>
     readonly surfaceColor: FieldRef<"Theme", 'String'>
+    readonly cardSurfaceColor: FieldRef<"Theme", 'String'>
+    readonly cardSurfaceMutedColor: FieldRef<"Theme", 'String'>
+    readonly cardBorderColor: FieldRef<"Theme", 'String'>
     readonly textPrimary: FieldRef<"Theme", 'String'>
     readonly textSecondary: FieldRef<"Theme", 'String'>
     readonly borderRadius: FieldRef<"Theme", 'String'>
@@ -39632,11 +39697,16 @@ export namespace Prisma {
   export const ThemeScalarFieldEnum: {
     id: 'id',
     communityId: 'communityId',
+    presetId: 'presetId',
+    mode: 'mode',
     name: 'name',
     primaryColor: 'primaryColor',
     secondaryColor: 'secondaryColor',
     backgroundColor: 'backgroundColor',
     surfaceColor: 'surfaceColor',
+    cardSurfaceColor: 'cardSurfaceColor',
+    cardSurfaceMutedColor: 'cardSurfaceMutedColor',
+    cardBorderColor: 'cardBorderColor',
     textPrimary: 'textPrimary',
     textSecondary: 'textSecondary',
     borderRadius: 'borderRadius',
@@ -41030,11 +41100,16 @@ export namespace Prisma {
     NOT?: ThemeWhereInput | ThemeWhereInput[]
     id?: StringFilter<"Theme"> | string
     communityId?: StringNullableFilter<"Theme"> | string | null
+    presetId?: StringNullableFilter<"Theme"> | string | null
+    mode?: StringFilter<"Theme"> | string
     name?: StringFilter<"Theme"> | string
     primaryColor?: StringFilter<"Theme"> | string
     secondaryColor?: StringFilter<"Theme"> | string
     backgroundColor?: StringFilter<"Theme"> | string
     surfaceColor?: StringFilter<"Theme"> | string
+    cardSurfaceColor?: StringFilter<"Theme"> | string
+    cardSurfaceMutedColor?: StringFilter<"Theme"> | string
+    cardBorderColor?: StringFilter<"Theme"> | string
     textPrimary?: StringFilter<"Theme"> | string
     textSecondary?: StringFilter<"Theme"> | string
     borderRadius?: StringFilter<"Theme"> | string
@@ -41049,11 +41124,16 @@ export namespace Prisma {
   export type ThemeOrderByWithRelationInput = {
     id?: SortOrder
     communityId?: SortOrderInput | SortOrder
+    presetId?: SortOrderInput | SortOrder
+    mode?: SortOrder
     name?: SortOrder
     primaryColor?: SortOrder
     secondaryColor?: SortOrder
     backgroundColor?: SortOrder
     surfaceColor?: SortOrder
+    cardSurfaceColor?: SortOrder
+    cardSurfaceMutedColor?: SortOrder
+    cardBorderColor?: SortOrder
     textPrimary?: SortOrder
     textSecondary?: SortOrder
     borderRadius?: SortOrder
@@ -41071,11 +41151,16 @@ export namespace Prisma {
     AND?: ThemeWhereInput | ThemeWhereInput[]
     OR?: ThemeWhereInput[]
     NOT?: ThemeWhereInput | ThemeWhereInput[]
+    presetId?: StringNullableFilter<"Theme"> | string | null
+    mode?: StringFilter<"Theme"> | string
     name?: StringFilter<"Theme"> | string
     primaryColor?: StringFilter<"Theme"> | string
     secondaryColor?: StringFilter<"Theme"> | string
     backgroundColor?: StringFilter<"Theme"> | string
     surfaceColor?: StringFilter<"Theme"> | string
+    cardSurfaceColor?: StringFilter<"Theme"> | string
+    cardSurfaceMutedColor?: StringFilter<"Theme"> | string
+    cardBorderColor?: StringFilter<"Theme"> | string
     textPrimary?: StringFilter<"Theme"> | string
     textSecondary?: StringFilter<"Theme"> | string
     borderRadius?: StringFilter<"Theme"> | string
@@ -41090,11 +41175,16 @@ export namespace Prisma {
   export type ThemeOrderByWithAggregationInput = {
     id?: SortOrder
     communityId?: SortOrderInput | SortOrder
+    presetId?: SortOrderInput | SortOrder
+    mode?: SortOrder
     name?: SortOrder
     primaryColor?: SortOrder
     secondaryColor?: SortOrder
     backgroundColor?: SortOrder
     surfaceColor?: SortOrder
+    cardSurfaceColor?: SortOrder
+    cardSurfaceMutedColor?: SortOrder
+    cardBorderColor?: SortOrder
     textPrimary?: SortOrder
     textSecondary?: SortOrder
     borderRadius?: SortOrder
@@ -41114,11 +41204,16 @@ export namespace Prisma {
     NOT?: ThemeScalarWhereWithAggregatesInput | ThemeScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Theme"> | string
     communityId?: StringNullableWithAggregatesFilter<"Theme"> | string | null
+    presetId?: StringNullableWithAggregatesFilter<"Theme"> | string | null
+    mode?: StringWithAggregatesFilter<"Theme"> | string
     name?: StringWithAggregatesFilter<"Theme"> | string
     primaryColor?: StringWithAggregatesFilter<"Theme"> | string
     secondaryColor?: StringWithAggregatesFilter<"Theme"> | string
     backgroundColor?: StringWithAggregatesFilter<"Theme"> | string
     surfaceColor?: StringWithAggregatesFilter<"Theme"> | string
+    cardSurfaceColor?: StringWithAggregatesFilter<"Theme"> | string
+    cardSurfaceMutedColor?: StringWithAggregatesFilter<"Theme"> | string
+    cardBorderColor?: StringWithAggregatesFilter<"Theme"> | string
     textPrimary?: StringWithAggregatesFilter<"Theme"> | string
     textSecondary?: StringWithAggregatesFilter<"Theme"> | string
     borderRadius?: StringWithAggregatesFilter<"Theme"> | string
@@ -44066,11 +44161,16 @@ export namespace Prisma {
 
   export type ThemeCreateInput = {
     id?: string
+    presetId?: string | null
+    mode?: string
     name: string
     primaryColor: string
     secondaryColor: string
     backgroundColor: string
     surfaceColor: string
+    cardSurfaceColor: string
+    cardSurfaceMutedColor: string
+    cardBorderColor: string
     textPrimary: string
     textSecondary: string
     borderRadius: string
@@ -44085,11 +44185,16 @@ export namespace Prisma {
   export type ThemeUncheckedCreateInput = {
     id?: string
     communityId?: string | null
+    presetId?: string | null
+    mode?: string
     name: string
     primaryColor: string
     secondaryColor: string
     backgroundColor: string
     surfaceColor: string
+    cardSurfaceColor: string
+    cardSurfaceMutedColor: string
+    cardBorderColor: string
     textPrimary: string
     textSecondary: string
     borderRadius: string
@@ -44102,11 +44207,16 @@ export namespace Prisma {
 
   export type ThemeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    presetId?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     primaryColor?: StringFieldUpdateOperationsInput | string
     secondaryColor?: StringFieldUpdateOperationsInput | string
     backgroundColor?: StringFieldUpdateOperationsInput | string
     surfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceMutedColor?: StringFieldUpdateOperationsInput | string
+    cardBorderColor?: StringFieldUpdateOperationsInput | string
     textPrimary?: StringFieldUpdateOperationsInput | string
     textSecondary?: StringFieldUpdateOperationsInput | string
     borderRadius?: StringFieldUpdateOperationsInput | string
@@ -44121,11 +44231,16 @@ export namespace Prisma {
   export type ThemeUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    presetId?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     primaryColor?: StringFieldUpdateOperationsInput | string
     secondaryColor?: StringFieldUpdateOperationsInput | string
     backgroundColor?: StringFieldUpdateOperationsInput | string
     surfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceMutedColor?: StringFieldUpdateOperationsInput | string
+    cardBorderColor?: StringFieldUpdateOperationsInput | string
     textPrimary?: StringFieldUpdateOperationsInput | string
     textSecondary?: StringFieldUpdateOperationsInput | string
     borderRadius?: StringFieldUpdateOperationsInput | string
@@ -44139,11 +44254,16 @@ export namespace Prisma {
   export type ThemeCreateManyInput = {
     id?: string
     communityId?: string | null
+    presetId?: string | null
+    mode?: string
     name: string
     primaryColor: string
     secondaryColor: string
     backgroundColor: string
     surfaceColor: string
+    cardSurfaceColor: string
+    cardSurfaceMutedColor: string
+    cardBorderColor: string
     textPrimary: string
     textSecondary: string
     borderRadius: string
@@ -44156,11 +44276,16 @@ export namespace Prisma {
 
   export type ThemeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    presetId?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     primaryColor?: StringFieldUpdateOperationsInput | string
     secondaryColor?: StringFieldUpdateOperationsInput | string
     backgroundColor?: StringFieldUpdateOperationsInput | string
     surfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceMutedColor?: StringFieldUpdateOperationsInput | string
+    cardBorderColor?: StringFieldUpdateOperationsInput | string
     textPrimary?: StringFieldUpdateOperationsInput | string
     textSecondary?: StringFieldUpdateOperationsInput | string
     borderRadius?: StringFieldUpdateOperationsInput | string
@@ -44174,11 +44299,16 @@ export namespace Prisma {
   export type ThemeUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    presetId?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     primaryColor?: StringFieldUpdateOperationsInput | string
     secondaryColor?: StringFieldUpdateOperationsInput | string
     backgroundColor?: StringFieldUpdateOperationsInput | string
     surfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceMutedColor?: StringFieldUpdateOperationsInput | string
+    cardBorderColor?: StringFieldUpdateOperationsInput | string
     textPrimary?: StringFieldUpdateOperationsInput | string
     textSecondary?: StringFieldUpdateOperationsInput | string
     borderRadius?: StringFieldUpdateOperationsInput | string
@@ -47139,11 +47269,16 @@ export namespace Prisma {
   export type ThemeCountOrderByAggregateInput = {
     id?: SortOrder
     communityId?: SortOrder
+    presetId?: SortOrder
+    mode?: SortOrder
     name?: SortOrder
     primaryColor?: SortOrder
     secondaryColor?: SortOrder
     backgroundColor?: SortOrder
     surfaceColor?: SortOrder
+    cardSurfaceColor?: SortOrder
+    cardSurfaceMutedColor?: SortOrder
+    cardBorderColor?: SortOrder
     textPrimary?: SortOrder
     textSecondary?: SortOrder
     borderRadius?: SortOrder
@@ -47157,11 +47292,16 @@ export namespace Prisma {
   export type ThemeMaxOrderByAggregateInput = {
     id?: SortOrder
     communityId?: SortOrder
+    presetId?: SortOrder
+    mode?: SortOrder
     name?: SortOrder
     primaryColor?: SortOrder
     secondaryColor?: SortOrder
     backgroundColor?: SortOrder
     surfaceColor?: SortOrder
+    cardSurfaceColor?: SortOrder
+    cardSurfaceMutedColor?: SortOrder
+    cardBorderColor?: SortOrder
     textPrimary?: SortOrder
     textSecondary?: SortOrder
     borderRadius?: SortOrder
@@ -47175,11 +47315,16 @@ export namespace Prisma {
   export type ThemeMinOrderByAggregateInput = {
     id?: SortOrder
     communityId?: SortOrder
+    presetId?: SortOrder
+    mode?: SortOrder
     name?: SortOrder
     primaryColor?: SortOrder
     secondaryColor?: SortOrder
     backgroundColor?: SortOrder
     surfaceColor?: SortOrder
+    cardSurfaceColor?: SortOrder
+    cardSurfaceMutedColor?: SortOrder
+    cardBorderColor?: SortOrder
     textPrimary?: SortOrder
     textSecondary?: SortOrder
     borderRadius?: SortOrder
@@ -54679,11 +54824,16 @@ export namespace Prisma {
 
   export type ThemeCreateWithoutCommunityInput = {
     id?: string
+    presetId?: string | null
+    mode?: string
     name: string
     primaryColor: string
     secondaryColor: string
     backgroundColor: string
     surfaceColor: string
+    cardSurfaceColor: string
+    cardSurfaceMutedColor: string
+    cardBorderColor: string
     textPrimary: string
     textSecondary: string
     borderRadius: string
@@ -54696,11 +54846,16 @@ export namespace Prisma {
 
   export type ThemeUncheckedCreateWithoutCommunityInput = {
     id?: string
+    presetId?: string | null
+    mode?: string
     name: string
     primaryColor: string
     secondaryColor: string
     backgroundColor: string
     surfaceColor: string
+    cardSurfaceColor: string
+    cardSurfaceMutedColor: string
+    cardBorderColor: string
     textPrimary: string
     textSecondary: string
     borderRadius: string
@@ -55246,11 +55401,16 @@ export namespace Prisma {
 
   export type ThemeUpdateWithoutCommunityInput = {
     id?: StringFieldUpdateOperationsInput | string
+    presetId?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     primaryColor?: StringFieldUpdateOperationsInput | string
     secondaryColor?: StringFieldUpdateOperationsInput | string
     backgroundColor?: StringFieldUpdateOperationsInput | string
     surfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceMutedColor?: StringFieldUpdateOperationsInput | string
+    cardBorderColor?: StringFieldUpdateOperationsInput | string
     textPrimary?: StringFieldUpdateOperationsInput | string
     textSecondary?: StringFieldUpdateOperationsInput | string
     borderRadius?: StringFieldUpdateOperationsInput | string
@@ -55263,11 +55423,16 @@ export namespace Prisma {
 
   export type ThemeUncheckedUpdateWithoutCommunityInput = {
     id?: StringFieldUpdateOperationsInput | string
+    presetId?: NullableStringFieldUpdateOperationsInput | string | null
+    mode?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     primaryColor?: StringFieldUpdateOperationsInput | string
     secondaryColor?: StringFieldUpdateOperationsInput | string
     backgroundColor?: StringFieldUpdateOperationsInput | string
     surfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceColor?: StringFieldUpdateOperationsInput | string
+    cardSurfaceMutedColor?: StringFieldUpdateOperationsInput | string
+    cardBorderColor?: StringFieldUpdateOperationsInput | string
     textPrimary?: StringFieldUpdateOperationsInput | string
     textSecondary?: StringFieldUpdateOperationsInput | string
     borderRadius?: StringFieldUpdateOperationsInput | string

@@ -4,7 +4,6 @@ import {
   Alert,
   Image,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   Switch,
@@ -13,8 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import { Camera, ImagePlus, Mail, Phone, X } from 'lucide-react-native';
+import { ArrowLeft, Camera, ImagePlus, Mail, Phone } from 'lucide-react-native';
 import { BUSINESS_CATEGORIES } from '../../constants';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
@@ -63,7 +63,6 @@ const LETTER_SPACING = {
 };
 
 interface CreateBusinessFormProps {
-  visible: boolean;
   business?: UserBusiness | null;
   communities: Community[];
   currentCommunity?: Community | null;
@@ -91,7 +90,6 @@ const labelStyle = {
 } as const;
 
 const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
-  visible,
   business,
   communities,
   currentCommunity,
@@ -99,6 +97,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
 }) => {
   const { userProfile } = useAuth();
   const { addUserBusiness, updateUserBusiness } = useCommunity();
+  const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
@@ -146,8 +145,6 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
   }, [business, currentCommunity?.coverageArea, userProfile?.defaultLocation, userProfile?.locationSharing]);
 
   useEffect(() => {
-    if (!visible) return;
-
     setName(business?.name ?? '');
     setCategory(business?.category ?? '');
     setDescription(business?.description ?? '');
@@ -167,7 +164,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
             : []
     );
     setIsActive((business?.status ?? 'ACTIVE') === 'ACTIVE');
-  }, [business, communities, currentCommunity?.id, defaultLocation, visible]);
+  }, [business, communities, currentCommunity?.id, defaultLocation]);
 
   const toggleCommunity = (communityId: string) => {
     setCommunityIds((currentIds) =>
@@ -265,25 +262,70 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: THEME_COLORS.alias_rgba_15_23_42_0_38, justifyContent: 'flex-end' }}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <View style={{ maxHeight: '92%', backgroundColor: THEME_COLORS.neutralBg, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-            <View style={{ paddingHorizontal: SPACE.s20, paddingTop: SPACE.s16, paddingBottom: SPACE.lg, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <View>
-                <Text style={{ fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary }}>
-                  {business ? 'Edit Business' : 'Create Business'}
+    <View style={{ flex: 1, backgroundColor: THEME_COLORS.neutralBg }}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}>
+        <View style={{
+          flex: 1,
+          backgroundColor: THEME_COLORS.neutralBg,
+        }}>
+          <View style={{ paddingHorizontal: SPACE.s20, paddingTop: insets.top + SPACE.s16, paddingBottom: SPACE.lg, borderBottomWidth: 1, borderBottomColor: THEME_COLORS.overlayBorderSoft, gap: SPACE.md }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <TouchableOpacity
+                onPress={onClose}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingVertical: SPACE.sm, paddingHorizontal: SPACE.md, borderRadius: RADIUS.pill }}
+                activeOpacity={0.8}
+              >
+                <ArrowLeft size={18} color={THEME_COLORS.primary} />
+                <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary }}>
+                  Back
                 </Text>
-                <Text style={{ fontSize: TYPE_SCALE.body, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs }}>
-                  Add a business profile to your communities.
-                </Text>
-              </View>
-              <TouchableOpacity onPress={onClose} style={{ width: SPACE.s36, height: SPACE.s36, borderRadius: RADIUS.xxl, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
-                <X size={18} color={THEME_COLORS.neutralTextSubtle} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleSubmit}
+                disabled={isSubmitting || isUploadingImage}
+                style={{
+                  minWidth: 86,
+                  paddingHorizontal: SPACE.xl,
+                  paddingVertical: SPACE.md,
+                  borderRadius: RADIUS.xl,
+                  backgroundColor: isSubmitting || isUploadingImage ? THEME_COLORS.neutralTextSoft : THEME_COLORS.primary,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                activeOpacity={0.85}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator color={THEME_COLORS.white} />
+                ) : (
+                  <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                    Save
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={{ padding: SPACE.s20, gap: SPACE.s18, paddingBottom: SPACE.s36 }} keyboardShouldPersistTaps="handled">
+            <View>
+              <Text style={{ fontSize: TYPE_SCALE.title, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary }}>
+                {business ? 'Edit Business' : 'Create Business'}
+              </Text>
+              <Text style={{ fontSize: TYPE_SCALE.body, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs }}>
+                Add a business profile to your communities.
+              </Text>
+            </View>
+          </View>
+
+          <ScrollView
+            contentContainerStyle={{
+              padding: SPACE.s20,
+              gap: SPACE.s18,
+              paddingBottom: insets.bottom + SPACE.s20,
+              flexGrow: 1,
+            }}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            showsVerticalScrollIndicator
+          >
               <View style={{ gap: SPACE.lg }}>
                 <Text style={labelStyle}>Business Image</Text>
                 <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8} style={{ borderRadius: RADIUS.pill, borderWidth: 1, borderColor: THEME_COLORS.overlayBorder, backgroundColor: THEME_COLORS.surfaceContainerLow, padding: SPACE.xl, flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
@@ -419,29 +461,10 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
                 <Switch value={isActive} onValueChange={setIsActive} trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }} thumbColor={THEME_COLORS.white} />
               </View>
 
-              <TouchableOpacity
-                onPress={handleSubmit}
-                disabled={isSubmitting || isUploadingImage}
-                style={{
-                  backgroundColor: isSubmitting || isUploadingImage ? THEME_COLORS.neutralTextSoft : THEME_COLORS.primary,
-                  paddingVertical: SPACE.s15,
-                  borderRadius: RADIUS.xl,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'row',
-                  gap: SPACE.lg,
-                }}
-              >
-                {isSubmitting ? <ActivityIndicator color={THEME_COLORS.white} /> : null}
-                <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
-                  {business ? 'Save Changes' : 'Create Business'}
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 

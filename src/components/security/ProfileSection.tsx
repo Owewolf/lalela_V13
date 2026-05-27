@@ -21,7 +21,7 @@ interface ProfileSectionProps {
   initialEdit?: boolean;
 }
 
-export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = false }) => {
+export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = true }) => {
   const { userProfile, updateUserProfile, linkEmail, resendVerification } = useAuth();
   const router = useRouter();
   const { communities, toggleCommunityResponder } = useCommunity();
@@ -53,6 +53,21 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
     }
   }, [userProfile, isEditing]);
 
+  const normalizeText = (value?: string | null) => (value || '').trim();
+  const baselineLocation = userProfile?.defaultLocation || { name: '', latitude: 0, longitude: 0 };
+  const isLocationDirty =
+    normalizeText(formData.defaultLocation.name) !== normalizeText(baselineLocation.name) ||
+    Math.abs((formData.defaultLocation.latitude || 0) - (baselineLocation.latitude || 0)) > 0.000001 ||
+    Math.abs((formData.defaultLocation.longitude || 0) - (baselineLocation.longitude || 0)) > 0.000001;
+
+  const hasUnsavedChanges =
+    normalizeText(formData.name) !== normalizeText(userProfile?.name) ||
+    normalizeText(formData.email).toLowerCase() !== normalizeText(userProfile?.email).toLowerCase() ||
+    normalizeText(formData.phone) !== normalizeText(userProfile?.phone) ||
+    normalizeText(formData.address) !== normalizeText(userProfile?.address || userProfile?.defaultLocation?.name) ||
+    normalizeText(formData.profileImage) !== normalizeText(userProfile?.profileImage) ||
+    isLocationDirty;
+
   const handleImagePick = async () => {
     const { status: perm } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (perm !== 'granted') {
@@ -78,7 +93,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
   };
 
   const handleCancelEdit = () => {
-    setIsEditing(false);
     setStatus(null);
     setFormData({
       name: userProfile?.name || '',
@@ -124,7 +138,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
         await linkEmail(trimmedEmail);
         emailLinked = true;
       }
-      setIsEditing(false);
       setStatus({
         type: 'success',
         message: emailLinked
@@ -169,19 +182,18 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
           </View>
           <Text className="text-lg font-bold text-primary">Account Information</Text>
         </View>
-        {!isEditing ? (
-          <TouchableOpacity
-            onPress={() => { setStatus(null); setIsEditing(true); }}
-            className="px-4 py-2 bg-surface-container rounded-lg"
-          >
-            <Text className="text-xs font-bold text-blue-600">Edit Profile</Text>
-          </TouchableOpacity>
-        ) : (
-          <View className="px-3 py-1.5 rounded-full bg-blue-100">
-            <Text className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Editing</Text>
-          </View>
-        )}
       </View>
+
+      {isEditing && hasUnsavedChanges && (
+        <View className="flex-row items-center gap-2 rounded-2xl px-3 py-2 border" style={{ backgroundColor: THEME_COLORS.warningTintSoft, borderColor: THEME_COLORS.warningTintStrong }}>
+          <Text className="text-xs font-black uppercase tracking-widest" style={{ color: THEME_COLORS.warningStrong }}>
+            Reminder
+          </Text>
+          <Text className="text-xs font-bold" style={{ color: THEME_COLORS.warningStrong }}>
+            You have unsaved changes. Tap Save Changes.
+          </Text>
+        </View>
+      )}
 
       {/* Avatar + Name */}
       <View className="flex-row items-center gap-5">
@@ -388,8 +400,9 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = fa
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleUpdateProfile}
-            disabled={isSaving || isUploading}
+            disabled={isSaving || isUploading || !hasUnsavedChanges}
             className="flex-1 py-3 rounded-xl bg-blue-600 items-center"
+            style={{ opacity: isSaving || isUploading || !hasUnsavedChanges ? 0.6 : 1 }}
           >
             {isSaving ? (
               <ActivityIndicator size="small" color={THEME_COLORS.white} />

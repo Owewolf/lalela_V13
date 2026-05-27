@@ -141,7 +141,9 @@ export const SessionsSection: React.FC = () => {
               <View
                 key={session.id}
                 style={{
-                  backgroundColor: THEME_COLORS.surfaceContainerLow,
+                  backgroundColor: THEME_COLORS.neutralBg,
+                  borderWidth: 1,
+                  borderColor: THEME_COLORS.overlayBorderSoft,
                   borderRadius: RADIUS.xl,
                   padding: SPACE.xxl,
                   flexDirection: 'row',

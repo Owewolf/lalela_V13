@@ -415,13 +415,45 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const addCharity = useCallback(async (charity: Omit<Charity, 'id' | 'createdAt'>) => {
     if (!currentCommunityId) return;
     const { data } = await api.post(`/communities/${currentCommunityId}/charities`, charity);
-    setCharities((prev) => [...prev, data]);
+    if (Array.isArray(data?.charities)) {
+      setCharities(data.charities);
+    } else {
+      const created = data?.charity ?? data;
+      if (created) setCharities((prev) => [...prev, created]);
+    }
+    if (data?.community) {
+      setCommunities((prev) => prev.map((community) =>
+        community.id === currentCommunityId
+          ? {
+              ...community,
+              catCycleActive: Boolean(data.community?.catCycleActive),
+              catFeaturedCharityId: data.community?.catFeaturedCharityId ?? null,
+            }
+          : community,
+      ));
+    }
   }, [currentCommunityId]);
 
   const updateCharity = useCallback(async (charity: Charity) => {
     if (!currentCommunityId) return;
     const { data } = await api.put(`/communities/${currentCommunityId}/charities/${charity.id}`, charity);
-    setCharities((prev) => prev.map((c) => c.id === charity.id ? data : c));
+    if (Array.isArray(data?.charities)) {
+      setCharities(data.charities);
+    } else {
+      const updated = data?.charity ?? data;
+      setCharities((prev) => prev.map((c) => c.id === charity.id ? updated : c));
+    }
+    if (data?.community) {
+      setCommunities((prev) => prev.map((community) =>
+        community.id === currentCommunityId
+          ? {
+              ...community,
+              catCycleActive: Boolean(data.community?.catCycleActive),
+              catFeaturedCharityId: data.community?.catFeaturedCharityId ?? null,
+            }
+          : community,
+      ));
+    }
   }, [currentCommunityId]);
 
   const removeCharity = useCallback(async (id: string) => {
@@ -444,11 +476,24 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       feedback,
       charityData,
     });
-    if (data?.charity?.id) {
+    if (Array.isArray(data?.charities)) {
+      setCharities(data.charities);
+    } else if (data?.charity?.id) {
       setCharities((prev) => {
         if (prev.some((charity) => charity.id === data.charity.id)) return prev;
         return [...prev, data.charity];
       });
+    }
+    if (data?.community) {
+      setCommunities((prev) => prev.map((community) =>
+        community.id === currentCommunityId
+          ? {
+              ...community,
+              catCycleActive: Boolean(data.community?.catCycleActive),
+              catFeaturedCharityId: data.community?.catFeaturedCharityId ?? null,
+            }
+          : community,
+      ));
     }
     setCharitySuggestions((prev) => prev.map((s) => s.id === suggestionId ? { ...s, status: 'approved', adminFeedback: feedback } : s));
   }, [currentCommunityId]);
@@ -465,6 +510,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     const payload: { active: boolean; featuredCharityId?: string } = { active };
     if (featuredCharityId) payload.featuredCharityId = featuredCharityId;
     const { data } = await api.post(`/communities/${currentCommunityId}/cat-cycle`, payload);
+    if (Array.isArray(data?.charities)) {
+      setCharities(data.charities);
+    }
     setCommunities((prev) => prev.map((community) =>
       community.id === currentCommunityId
         ? {

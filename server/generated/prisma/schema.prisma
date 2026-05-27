@@ -230,26 +230,26 @@ model Community {
 }
 
 model Theme {
-  id              String   @id @default(cuid())
-  communityId     String?  @unique @map("community_id")
-  presetId        String?  @map("preset_id")
-  mode            String   @default("light")
-  name            String
-  primaryColor    String   @map("primary_color")
-  secondaryColor  String   @map("secondary_color")
-  backgroundColor String   @map("background_color")
-  surfaceColor    String   @map("surface_color")
+  id                    String   @id @default(cuid())
+  communityId           String?  @unique @map("community_id")
+  presetId              String?  @map("preset_id")
+  mode                  String   @default("light")
+  name                  String
+  primaryColor          String   @map("primary_color")
+  secondaryColor        String   @map("secondary_color")
+  backgroundColor       String   @map("background_color")
+  surfaceColor          String   @map("surface_color")
   cardSurfaceColor      String   @map("card_surface_color")
   cardSurfaceMutedColor String   @map("card_surface_muted_color")
   cardBorderColor       String   @map("card_border_color")
-  textPrimary     String   @map("text_primary")
-  textSecondary   String   @map("text_secondary")
-  borderRadius    String   @map("border_radius")
-  fontFamily      String   @map("font_family")
-  iconUrl         String?  @map("icon_url")
-  isDefault       Boolean  @default(false) @map("is_default")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  textPrimary           String   @map("text_primary")
+  textSecondary         String   @map("text_secondary")
+  borderRadius          String   @map("border_radius")
+  fontFamily            String   @map("font_family")
+  iconUrl               String?  @map("icon_url")
+  isDefault             Boolean  @default(false) @map("is_default")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
 
   community Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
 

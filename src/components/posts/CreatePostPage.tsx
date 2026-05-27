@@ -40,6 +40,7 @@ import LocationPickerSection from '../shared/LocationPickerSection';
 import type { CommunityNotice } from '../../types';
 import { THEME_COLORS } from '../../theme/colors';
 import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
+import { resolveActiveCharity } from '../../lib/activeCharity';
 
 type PostType = 'listing' | 'notice';
 type Urgency = 'emergency' | 'warning' | 'info' | 'general';
@@ -154,9 +155,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
 
   // ── Derived values ──────────────────────────────────────────────────────────
   const availableCharities = charities.filter((c) => c.status !== 'Archived');
-  const featuredCharity =
-    availableCharities.find((c) => c.isFeatured) ??
-    (availableCharities.length === 1 ? availableCharities[0] : undefined);
+  const { active: featuredCharity, cat: catCharity, featured: configuredFeaturedCharity } =
+    resolveActiveCharity(availableCharities, currentCommunity ?? null);
   const selectedCharity = featuredCharity ?? availableCharities.find((c) => c.id === selectedCharityId);
 
   useEffect(() => {

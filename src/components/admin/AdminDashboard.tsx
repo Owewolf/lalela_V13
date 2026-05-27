@@ -39,6 +39,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import api from '../../lib/api';
+import { resolveActiveCharity, isCatCharity as isCatCharityShared } from '../../lib/activeCharity';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { ModerationCenter, ModerationCenterHandle } from './ModerationCenter';
@@ -514,8 +515,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Track donation deltas from featured charity (no donor identity) → ephemeral ticker chips
   React.useEffect(() => {
-    const featured = charities.find((c: any) => c.isFeatured);
-    const raised = featured?.raisedAmount ?? 0;
+    const activeCharity = resolveActiveCharity(charities, currentCommunity ?? null).active;
+    const raised = activeCharity?.raisedAmount ?? 0;
     const prev = previousRaisedRef.current;
     if (prev !== null && raised > prev) {
       const delta = raised - prev;
@@ -525,7 +526,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       ].slice(0, 3));
     }
     previousRaisedRef.current = raised;
-  }, [charities]);
+  }, [charities, currentCommunity?.catCycleActive, currentCommunity?.catFeaturedCharityId]);
 
   // Also derive ticker from polled live-insights donationsTotal deltas
   React.useEffect(() => {
@@ -660,7 +661,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     onSetupComplete?.();
   };
 
-  const featuredForStats = charities.find((c: any) => c.isFeatured);
+  const isCatCharity = (charity: any) => isCatCharityShared(charity);
+  const featuredForStats = resolveActiveCharity(charities, currentCommunity ?? null).active;
   const featuredRaisedTotal = Number(featuredForStats?.raisedAmount ?? 0);
   const catGeneratedTotal = Number(catHubSummary?.totalCATGenerated ?? 0);
 
@@ -683,7 +685,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   ];
 
   const availableCharities = charities.filter((c: any) => c.status !== 'Archived');
-  const featuredCharity = availableCharities.find((c: any) => c.isFeatured) || (availableCharities.length === 1 ? availableCharities[0] : undefined);
+  const featuredCharity = resolveActiveCharity(availableCharities, currentCommunity ?? null).active;
   const otherCharities = charities.filter((c: any) => c !== featuredCharity && ((c.raisedAmount || c.totalRaised || 0) > 0));
 
   // Potential CAT running total across all approved Public listings, shown
@@ -719,7 +721,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     >
       {/* Hero */}
       <View style={styles.heroSection}>
-        <Text style={styles.heroTitle}>{currentCommunity?.name || 'Community'} Dashboard</Text>
+        <Text style={styles.heroTitle}>Dashboard</Text>
         <Text style={styles.heroSubtitle}>
           Real-time activity overview for the {currentCommunity?.name || 'Community'} platform.
         </Text>
@@ -1094,7 +1096,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <View style={styles.logoBox}>
           <Image source={APP_LOGO} style={styles.logoImg as any} resizeMode="contain" />
         </View>
-        <Text style={styles.topBarTitle}>Admin Dashboard</Text>
+        <Text style={styles.topBarTitle}>{currentCommunity?.name || 'Community'}</Text>
 
         {/* Admin-only moderation shortcut */}
         {currentCommunity?.userRole === 'ADMIN' && activeView === 'dashboard' && !readOnly && (

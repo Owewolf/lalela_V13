@@ -11,7 +11,6 @@ import {
   Platform,
 } from 'react-native';
 import {
-  Lock,
   BellRing,
   ChevronRight,
   ShieldCheck,
@@ -19,6 +18,7 @@ import {
   AlertCircle,
   Shield,
   Sparkles,
+  Scale,
   ChevronDown,
   CheckCircle2,
   Plus,
@@ -178,10 +178,7 @@ const SettingsPage: React.FC = () => {
     (c: any) => c.ownerId === userProfile?.id && isCommunityTrial(c)
   );
   const canCreateNewCommunity = !hasTrialCommunity;
-  const canManageCommunityTheme =
-    currentCommunity?.ownerId === userProfile?.id ||
-    currentCommunity?.userRole === 'ADMIN' ||
-    currentCommunity?.userRole === 'MODERATOR';
+  const canAccessModerationCenter = currentCommunity?.userRole === 'ADMIN';
 
   const rc = roleColor();
 
@@ -200,8 +197,12 @@ const SettingsPage: React.FC = () => {
       >
         {/* ── Profile Identity Card ── */}
         <View style={{ ...SETTINGS_CARD_SURFACE, borderRadius: 34, padding: SPACE.s20, gap: SPACE.s20, ...CARD_DEPTH_SOFT }}>
-          {/* Avatar + Name row */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s16 }}>
+          {/* Avatar + Name row (primary account entry point) */}
+          <TouchableOpacity
+            onPress={() => router.push('/security')}
+            activeOpacity={0.85}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s16 }}
+          >
             <View style={{ position: 'relative' }}>
               <View style={{ width: 92, height: 92, borderRadius: 46, overflow: 'hidden', borderWidth: 4, borderColor: ringColor }}>
                 <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
@@ -262,7 +263,7 @@ const SettingsPage: React.FC = () => {
                 )}
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
           {/* Community Switcher */}
           <View style={{ borderTopWidth: 1, borderTopColor: THEME_COLORS.overlayBorderSoft, paddingTop: SPACE.s20, gap: SPACE.xxl }}>
@@ -357,24 +358,6 @@ const SettingsPage: React.FC = () => {
             General Settings
           </Text>
 
-          {/* Account & Security */}
-          <TouchableOpacity
-            onPress={() => router.push('/security')}
-            style={{
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-              padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
-              ...CARD_DEPTH_SOFT,
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s14 }}>
-              <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
-                <Lock size={20} color={THEME_COLORS.primary} />
-              </View>
-              <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.onSurface }}>My Profile & Account</Text>
-            </View>
-            <ChevronRight size={20} color={THEME_COLORS.neutralTextSoft} />
-          </TouchableOpacity>
-
           {/* Notifications */}
           <View style={{
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -410,10 +393,10 @@ const SettingsPage: React.FC = () => {
             </View>
           </View>
 
-          {/* Theme & Branding (Admin/Moderator) */}
-          {canManageCommunityTheme && (
+          {/* Moderation Center (Admin only) */}
+          {canAccessModerationCenter && (
             <TouchableOpacity
-              onPress={() => router.push({ pathname: '/admin', params: { view: 'moderation', tab: 'logs' } })}
+              onPress={() => router.push({ pathname: '/admin', params: { view: 'moderation', tab: 'members' } })}
               style={{
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
                 padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
@@ -422,11 +405,11 @@ const SettingsPage: React.FC = () => {
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s14 }}>
                 <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
-                  <Sparkles size={20} color={THEME_COLORS.primary} />
+                  <Scale size={20} color={THEME_COLORS.primary} />
                 </View>
                 <View>
-                  <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.onSurface }}>Theme & Branding</Text>
-                  <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSoft }}>Open community management theme controls</Text>
+                  <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.onSurface }}>Moderation Center</Text>
+                  <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSoft }}>Open member management and moderation controls</Text>
                 </View>
               </View>
               <ChevronRight size={20} color={THEME_COLORS.neutralTextSoft} />

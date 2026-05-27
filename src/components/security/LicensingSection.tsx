@@ -1,10 +1,11 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { CreditCard, ShieldAlert, Star, Calendar, CheckCircle2 } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { CreditCard, ShieldAlert, Calendar, CheckCircle2, LogOut, Trash2 } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 import { useRouter } from 'expo-router';
 import { THEME_COLORS } from '../../theme/colors';
+import api from '../../lib/api';
 
 const PRIMARY = THEME_COLORS.primary;
 const TYPE_SCALE = {
@@ -51,9 +52,11 @@ const LINE_HEIGHT = {
 };
 
 export const LicensingSection: React.FC = () => {
-  const { userProfile } = useAuth();
-  const { communities, setCurrentCommunity } = useCommunity();
+  const { userProfile, signOut, deleteAccount } = useAuth();
+  const { communities, currentCommunity, setCurrentCommunity, refreshCommunities } = useCommunity();
   const router = useRouter();
+  const [busyCommunityId, setBusyCommunityId] = useState<string | null>(null);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const now = new Date();
   const licenseStatus = userProfile?.licenseStatus ?? 'TRIAL';
@@ -68,7 +71,7 @@ export const LicensingSection: React.FC = () => {
     ? Math.max(0, Math.ceil((trialExpiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
     : null;
 
-  const overallStatus = isActive ? 'Active Subscription' : isTrial ? 'Free Trial' : 'Expired';
+  const overallStatus = isActive ? 'Active' : isTrial ? 'Trial' : 'Expired';
   const statusColor = isActive ? THEME_COLORS.successStrongAlt : isTrial ? THEME_COLORS.warning : THEME_COLORS.errorStrong;
   const statusBg = isActive ? THEME_COLORS.successTintSoftAlt : isTrial ? THEME_COLORS.warningTintSoft : THEME_COLORS.errorTintSoft;
   const statusBorder = isActive ? THEME_COLORS.successTintStrongAlt : isTrial ? THEME_COLORS.alias_rgba_245_158_11_0_2 : THEME_COLORS.alias_rgba_239_68_68_0_2;
@@ -96,6 +99,105 @@ export const LicensingSection: React.FC = () => {
     return date.toLocaleDateString();
   };
 
+  const performCommunityRemoval = async (community: any, isOwner: boolean) => {
+    try {
+      setBusyCommunityId(community.id);
+      if (isOwner) {
+        await api.delete(`/communities/${community.id}`);
+      } else {
+        await api.post(`/communities/${community.id}/leave`);
+      }
+
+      const fallbackId = communities.find((c) => c.id !== community.id)?.id;
+      await refreshCommunities();
+      if (currentCommunity?.id === community.id && fallbackId) {
+        await setCurrentCommunity(fallbackId);
+      }
+    } catch (error: any) {
+      const msg = error?.response?.data?.error || 'Unable to remove community. Please try again.';
+      Alert.alert('Action failed', msg);
+    } finally {
+      setBusyCommunityId(null);
+    }
+  };
+
+  const handleRemoveCommunity = (community: any) => {
+    const isOwner = community.ownerId === userProfile?.id;
+    if (!isOwner) {
+      Alert.alert(
+        'Leave community?',
+        `You are about to leave ${community.name}. You will lose access to this community until an admin adds you again.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Leave Community',
+            style: 'destructive',
+            onPress: () => {
+              performCommunityRemoval(community, false);
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    Alert.alert(
+      'Delete community permanently?',
+      `Deleting ${community.name} will remove all members, posts, chats, and community-linked records. This cannot be undone.\n\nLicensing impact:\n- The community license tied to this community ends on deletion.\n- Your personal platform membership (R99/year) remains on your account.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Continue',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Final confirmation',
+              `This is permanent. Delete ${community.name} now?`,
+              [
+                { text: 'Keep Community', style: 'cancel' },
+                {
+                  text: 'Delete Permanently',
+                  style: 'destructive',
+                  onPress: () => {
+                    performCommunityRemoval(community, true);
+                  },
+                },
+              ],
+            );
+          },
+        },
+      ],
+    );
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete account permanently?',
+      'This permanently removes your account and associated data. This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Permanently',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsDeletingAccount(true);
+              await deleteAccount();
+            } catch (err: any) {
+              const code = err?.code;
+              const msg = code === 'auth/requires-recent-login'
+                ? 'Please sign out and sign back in before deleting your account.'
+                : 'Failed to delete account. Please try again.';
+              Alert.alert('Delete failed', msg);
+            } finally {
+              setIsDeletingAccount(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.s20 }}>
       {/* Header */}
@@ -106,7 +208,7 @@ export const LicensingSection: React.FC = () => {
           </View>
           <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY }}>Licensing & Access</Text>
         </View>
-        <View style={{ paddingHorizontal: SPACE.xl, paddingVertical: SPACE.sm, borderRadius: RADIUS.panel, borderWidth: 1, backgroundColor: statusBg, borderColor: statusBorder }}>
+        <View style={{ paddingHorizontal: SPACE.md, paddingVertical: SPACE.xs, borderRadius: RADIUS.lg, borderWidth: 1, backgroundColor: statusBg, borderColor: statusBorder }}>
           <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal, color: statusColor }}>
             {overallStatus}
           </Text>
@@ -170,7 +272,7 @@ export const LicensingSection: React.FC = () => {
 
       {/* Community list */}
       {communities.length > 0 && (
-        <View style={{ gap: SPACE.md }}>
+        <View style={{ gap: SPACE.lg }}>
           <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
             Community Status
           </Text>
@@ -178,7 +280,7 @@ export const LicensingSection: React.FC = () => {
             const statusInfo = getCommunityStatus(community);
             const isOwner = community.ownerId === userProfile?.id;
             return (
-              <View key={community.id} style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.xl }}>
+              <View key={community.id} style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
                   <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.successTintSoft, alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: PRIMARY }}>{community.name.charAt(0)}</Text>
@@ -216,11 +318,93 @@ export const LicensingSection: React.FC = () => {
                     </Text>
                   </View>
                 )}
+
+                <TouchableOpacity
+                  onPress={() => handleRemoveCommunity(community)}
+                  disabled={busyCommunityId === community.id}
+                  style={{
+                    alignSelf: 'flex-start',
+                    backgroundColor: THEME_COLORS.surfaceContainerLow,
+                    borderWidth: 1,
+                    borderColor: THEME_COLORS.alias_rgba_239_68_68_0_25,
+                    paddingHorizontal: SPACE.lg,
+                    paddingVertical: SPACE.sm,
+                    borderRadius: RADIUS.chip,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: SPACE.xs,
+                    opacity: busyCommunityId === community.id ? 0.7 : 1,
+                  }}
+                >
+                  {busyCommunityId === community.id ? (
+                    <ActivityIndicator size="small" color={THEME_COLORS.errorStrong} />
+                  ) : (
+                    <Trash2 size={12} color={THEME_COLORS.errorStrong} />
+                  )}
+                  <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.errorStrong, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                    {community.ownerId === userProfile?.id ? 'Delete' : 'Leave'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             );
           })}
         </View>
       )}
+
+      <View style={{ gap: SPACE.md, marginTop: SPACE.sm }}>
+        <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+          Account Management
+        </Text>
+
+        <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Logout Account</Text>
+          <TouchableOpacity
+            onPress={signOut}
+            style={{
+              paddingVertical: SPACE.lg,
+              borderRadius: RADIUS.lg,
+              backgroundColor: THEME_COLORS.alias_rgba_22_163_74_0_06,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: SPACE.sm,
+            }}
+          >
+            <LogOut size={16} color={THEME_COLORS.primary} />
+            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary }}>Logout Account</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ backgroundColor: THEME_COLORS.errorStrong, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Delete Account Permanently</Text>
+          <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.whiteOverlay70, lineHeight: LINE_HEIGHT.compact }}>
+            Permanently delete your account and associated data. This action cannot be undone.
+          </Text>
+          <TouchableOpacity
+            onPress={handleDeleteAccount}
+            disabled={isDeletingAccount}
+            style={{
+              paddingVertical: SPACE.lg,
+              borderRadius: RADIUS.lg,
+              backgroundColor: THEME_COLORS.surfaceContainerLowOverlay20,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: SPACE.sm,
+              opacity: isDeletingAccount ? 0.7 : 1,
+            }}
+          >
+            {isDeletingAccount ? (
+              <ActivityIndicator size="small" color={THEME_COLORS.white} />
+            ) : (
+              <Trash2 size={16} color={THEME_COLORS.white} />
+            )}
+            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>
+              {isDeletingAccount ? 'Deleting…' : 'Delete Permanently'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };

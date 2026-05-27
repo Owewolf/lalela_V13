@@ -293,7 +293,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       message: string;
     } | null>(null);
     const [contentFilter, setContentFilter] = useState<
-      'all' | 'notices' | 'listings' | 'businesses' | 'public_queue'
+      'all' | 'notices' | 'listings' | 'businesses'
     >('all');
     const [logs, setLogs] = useState<any[]>([]);
     const [themeDraft, setThemeDraft] = useState<ThemeDraft>({
@@ -874,23 +874,19 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     };
 
     const tabs: { id: ModTab; label: string; icon: React.ReactNode }[] = [
-      { id: 'members', label: 'Members', icon: <Users size={20} color={activeTab === 'members' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
-      { id: 'content', label: 'Content', icon: <FileText size={20} color={activeTab === 'content' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
-      { id: 'businesses', label: 'Businesses', icon: <Store size={20} color={activeTab === 'businesses' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
-      { id: 'categories', label: 'Categories', icon: <Tag size={20} color={activeTab === 'categories' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
-      { id: 'rules', label: 'Rules', icon: <Shield size={20} color={activeTab === 'rules' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
-      { id: 'coverage', label: 'Coverage', icon: <Map size={20} color={activeTab === 'coverage' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
-      { id: 'charity', label: 'Charity', icon: <Heart size={20} color={activeTab === 'charity' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
-      { id: 'logs', label: 'Manage', icon: <Sparkles size={20} color={activeTab === 'logs' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'members', label: 'Members', icon: <Users size={16} color={activeTab === 'members' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'content', label: 'Content', icon: <FileText size={16} color={activeTab === 'content' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'businesses', label: 'Businesses', icon: <Store size={16} color={activeTab === 'businesses' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'categories', label: 'Categories', icon: <Tag size={16} color={activeTab === 'categories' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'rules', label: 'Rules', icon: <Shield size={16} color={activeTab === 'rules' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'coverage', label: 'Coverage', icon: <Map size={16} color={activeTab === 'coverage' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'charity', label: 'Charity', icon: <Heart size={16} color={activeTab === 'charity' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
+      { id: 'logs', label: 'Manage', icon: <Sparkles size={16} color={activeTab === 'logs' ? THEME_COLORS.white : THEME_COLORS.neutralTextSubtle} /> },
     ];
 
     const renderTabBar = () => (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabBar}
-        contentContainerStyle={styles.tabBarContent}
-      >
+      <View style={styles.tabBar}>
+        <View style={styles.tabBarContent}>
         {tabs.map((t) => (
           <TouchableOpacity
             key={t.id}
@@ -901,7 +897,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             {t.icon}
           </TouchableOpacity>
         ))}
-      </ScrollView>
+        </View>
+      </View>
     );
 
     const renderCharityModeration = () => (
@@ -910,7 +907,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         contentContainerStyle={{ paddingBottom: SPACE.s40 }}
         keyboardShouldPersistTaps="handled"
       >
-        <ManageCommunityCharity initialMode="manage" clearInitialMode={() => {}} />
+        <ManageCommunityCharity />
       </ScrollView>
     );
 
@@ -1542,7 +1539,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
     const renderContent = () => {
       const activePosts = posts.filter((p: any) => p.status !== 'deleted');
-      const pendingPublic = posts.filter((p: any) => p.status === 'PendingPublic');
       const businesses = currentCommunity?.businesses || [];
 
       const filteredItems = (() => {
@@ -1550,7 +1546,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           case 'notices': return activePosts.filter((p: any) => p.type === 'notice');
           case 'listings': return activePosts.filter((p: any) => p.type === 'listing');
           case 'businesses': return [];
-          case 'public_queue': return pendingPublic;
           default: return activePosts;
         }
       })();
@@ -1560,7 +1555,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         { key: 'notices' as const, label: 'Notices', count: activePosts.filter((p: any) => p.type === 'notice').length },
         { key: 'listings' as const, label: 'Listings', count: activePosts.filter((p: any) => p.type === 'listing').length },
         { key: 'businesses' as const, label: 'Businesses', count: businesses.length },
-        { key: 'public_queue' as const, label: 'Queue', count: pendingPublic.length },
       ];
 
       return (
@@ -1568,22 +1562,25 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           <Text style={styles.sectionTitle}>Content & Notice Control</Text>
 
           {/* Filter tabs */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: SPACE.sm }}>
-            <View style={{ flexDirection: 'row', gap: SPACE.lg, paddingVertical: SPACE.sm }}>
-              {filterTabs.map((tab) => (
-                <TouchableOpacity
-                  key={tab.key}
-                  style={[styles.filterTab, contentFilter === tab.key && styles.filterTabActive]}
-                  onPress={() => setContentFilter(tab.key)}
+          <View style={styles.contentFilterRow}>
+            {filterTabs.map((tab) => (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.filterTab, styles.contentFilterTab, contentFilter === tab.key && styles.filterTabActive]}
+                onPress={() => setContentFilter(tab.key)}
+              >
+                <Text
+                  style={[styles.contentFilterLabel, contentFilter === tab.key && styles.contentFilterLabelActive]}
+                  numberOfLines={1}
                 >
-                  <Text style={[styles.filterTabText, contentFilter === tab.key && styles.filterTabTextActive]}>
-                    {tab.label}
-                    {tab.count > 0 ? ` (${tab.count})` : ''}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
+                  {tab.label}
+                </Text>
+                <Text style={[styles.contentFilterCount, contentFilter === tab.key && styles.contentFilterCountActive]}>
+                  {tab.count}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
           {contentFilter === 'businesses' ? (
             businesses.map((biz: any) => (
@@ -1721,21 +1718,33 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             </TouchableOpacity>
           </View>
 
-          <View style={{ flexDirection: 'row', gap: SPACE.lg }}>
+          <View style={styles.bizFilterRow}>
             <TouchableOpacity
-              style={[styles.filterTab, bizFilter === 'user' && styles.filterTabActive]}
+              style={[styles.filterTab, styles.bizFilterTab, bizFilter === 'user' && styles.filterTabActive]}
               onPress={() => setBizFilter('user')}
             >
-              <Text style={bizFilter === 'user' ? styles.filterTabTextActive : styles.filterTabText}>
-                User Businesses ({userCommunityBizs.length})
+              <Text
+                style={[styles.bizFilterLabel, bizFilter === 'user' && styles.bizFilterLabelActive]}
+                numberOfLines={1}
+              >
+                User
+              </Text>
+              <Text style={[styles.bizFilterCount, bizFilter === 'user' && styles.bizFilterCountActive]}>
+                {userCommunityBizs.length}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.filterTab, bizFilter === 'ai' && styles.filterTabActive]}
+              style={[styles.filterTab, styles.bizFilterTab, bizFilter === 'ai' && styles.filterTabActive]}
               onPress={() => setBizFilter('ai')}
             >
-              <Text style={bizFilter === 'ai' ? styles.filterTabTextActive : styles.filterTabText}>
-                AI Imported Businesses ({importedBizs.length})
+              <Text
+                style={[styles.bizFilterLabel, bizFilter === 'ai' && styles.bizFilterLabelActive]}
+                numberOfLines={1}
+              >
+                Imported
+              </Text>
+              <Text style={[styles.bizFilterCount, bizFilter === 'ai' && styles.bizFilterCountActive]}>
+                {importedBizs.length}
               </Text>
             </TouchableOpacity>
           </View>
@@ -2241,11 +2250,19 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
   backBtn: { padding: SPACE.md },
-  tabBar: { backgroundColor: APP_SHELL_COLORS.body, flexGrow: 0, minHeight: 74 },
-  tabBarContent: { paddingHorizontal: SPACE.s16, paddingTop: SPACE.s16, paddingBottom: SPACE.xl, gap: SPACE.xxl, flexDirection: 'row', alignItems: 'center' },
+  tabBar: { backgroundColor: APP_SHELL_COLORS.body, flexGrow: 0 },
+  tabBarContent: {
+    paddingHorizontal: SPACE.s16,
+    paddingTop: SPACE.s16,
+    paddingBottom: SPACE.xl,
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   tabBtn: {
-    width: 56,
-    height: 56,
+    width: 40,
+    height: 40,
     borderRadius: RADIUS.card,
     backgroundColor: getCardSurfaceColor('default'),
     alignItems: 'center',
@@ -2528,6 +2545,69 @@ const styles = StyleSheet.create({
   filterTabActive: { backgroundColor: PRIMARY },
   filterTabText: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.medium, color: THEME_COLORS.neutralTextHeading },
   filterTabTextActive: { color: THEME_COLORS.white },
+  contentFilterRow: {
+    flexDirection: 'row',
+    gap: SPACE.lg,
+    marginBottom: SPACE.sm,
+  },
+  contentFilterTab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACE.lg,
+    paddingHorizontal: SPACE.sm,
+    minHeight: 72,
+  },
+  contentFilterLabel: {
+    fontSize: TYPE_SCALE.xxl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.neutralTextHeading,
+    textAlign: 'center',
+  },
+  contentFilterLabelActive: {
+    color: THEME_COLORS.white,
+  },
+  contentFilterCount: {
+    marginTop: SPACE.xs,
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.semibold,
+    color: THEME_COLORS.neutralTextSubtle,
+    textAlign: 'center',
+  },
+  contentFilterCountActive: {
+    color: THEME_COLORS.whiteOverlay90,
+  },
+  bizFilterRow: {
+    flexDirection: 'row',
+    gap: SPACE.lg,
+  },
+  bizFilterTab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACE.md,
+    paddingHorizontal: SPACE.md,
+    minHeight: 56,
+  },
+  bizFilterLabel: {
+    fontSize: TYPE_SCALE.h1,
+    fontWeight: FONT_WEIGHT.semibold,
+    color: THEME_COLORS.neutralTextHeading,
+    textAlign: 'center',
+  },
+  bizFilterLabelActive: {
+    color: THEME_COLORS.white,
+  },
+  bizFilterCount: {
+    marginTop: SPACE.xxxs,
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.semibold,
+    color: THEME_COLORS.neutralTextSubtle,
+    textAlign: 'center',
+  },
+  bizFilterCountActive: {
+    color: THEME_COLORS.whiteOverlay90,
+  },
 
   contentItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.xxxl,
@@ -2536,8 +2616,8 @@ const styles = StyleSheet.create({
     ...getCardShadow('soft'),
   },
   contentIcon: { width: 54, height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  contentTitle: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
-  contentSub: { fontSize: TYPE_SCALE.h2, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs, lineHeight: 22 },
+  contentTitle: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
+  contentSub: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs, lineHeight: LINE_HEIGHT.compact },
   contentActions: { alignItems: 'center', gap: SPACE.md },
   statusChip: { paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill },
   statusChipText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },

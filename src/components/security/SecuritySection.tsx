@@ -287,6 +287,14 @@ export const SecuritySection: React.FC = () => {
     return new Date(userProfile.lastPasswordChanged as string).toLocaleDateString();
   };
 
+  const authItemCardStyle = {
+    backgroundColor: THEME_COLORS.neutralBg,
+    borderRadius: RADIUS.xl,
+    padding: SPACE.lg,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.overlayBorderSoft,
+  } as const;
+
   return (
     <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.xxl, gap: SPACE.xl }}>
       {/* Header */}
@@ -298,7 +306,7 @@ export const SecuritySection: React.FC = () => {
       </View>
 
       {/* Password Card */}
-      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <View style={[authItemCardStyle, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
           <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Key size={22} color={THEME_COLORS.primary} />
@@ -380,7 +388,7 @@ export const SecuritySection: React.FC = () => {
       )}
 
       {/* Email Address Card */}
-      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <View style={[authItemCardStyle, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, flex: 1 }}>
           <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Mail size={22} color={THEME_COLORS.primary} />
@@ -486,7 +494,7 @@ export const SecuritySection: React.FC = () => {
       )}
 
       {/* Phone Number Card */}
-      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <View style={[authItemCardStyle, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, flex: 1 }}>
           <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Phone size={22} color={THEME_COLORS.primary} />
@@ -581,7 +589,7 @@ export const SecuritySection: React.FC = () => {
       )}
 
       {/* 2FA Card */}
-      <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xl, padding: SPACE.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <View style={[authItemCardStyle, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
           <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
             <Smartphone size={22} color={THEME_COLORS.brandBlueText} />

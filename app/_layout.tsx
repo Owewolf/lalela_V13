@@ -132,7 +132,7 @@ function AppGuard() {
         .then((pendingCode) => {
           router.replace(pendingCode ? (`/onboarding?join=${pendingCode}` as any) : '/onboarding');
         });
-    } else if (onboardingComplete && !['(tabs)', 'admin', 'checkout', 'pricing', 'create-post', 'chat', 'emergency', 'call', 'notifications-settings', 'security', 'onboarding-create'].includes(segments[0] as string)) {
+    } else if (onboardingComplete && !['(tabs)', 'admin', 'checkout', 'pricing', 'create-post', 'create-business', 'chat', 'emergency', 'call', 'notifications-settings', 'security', 'onboarding-create'].includes(segments[0] as string)) {
       // Navigate to tabs whenever authenticated+onboarded and not already there.
       // Do NOT gate on inAuthGroup — on web, segments may not reflect the current
       // URL at the exact moment setUserProfile fires (static rendering hydration),
@@ -325,6 +325,7 @@ export default function RootLayout() {
                     <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
                     <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
                     <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="create-business" options={{ presentation: 'modal' }} />
                     <Stack.Screen name="join" options={{ headerShown: false }} />
                     <Stack.Screen name="chat/[id]" />
                     <Stack.Screen name="emergency/[id]" />

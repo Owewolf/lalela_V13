@@ -9,18 +9,17 @@ import {
   Platform,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, ShieldCheck, User, Lock, Clock, Key, Activity, AlertTriangle, Building2 } from 'lucide-react-native';
+import { ArrowLeft, ShieldCheck, User, Lock, Clock, Key, Activity, Building2 } from 'lucide-react-native';
 import { ProfileSection } from './ProfileSection';
 import { SecuritySection } from './SecuritySection';
 import { SessionsSection } from './SessionsSection';
 import { LicensingSection } from './LicensingSection';
 import { AuditLogsSection } from './AuditLogsSection';
-import { DangerZoneSection } from './DangerZoneSection';
 import ManageUserBusinesses from '../settings/ManageUserBusinesses';
 import { useCommunity } from '../../context/CommunityContext';
 import { THEME_COLORS } from '../../theme/colors';
 
-type Tab = 'profile' | 'businesses' | 'security' | 'sessions' | 'licensing' | 'activity' | 'danger';
+type Tab = 'profile' | 'businesses' | 'security' | 'sessions' | 'licensing' | 'activity';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'profile', label: 'Profile' },
@@ -29,7 +28,6 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'sessions', label: 'Sessions' },
   { key: 'licensing', label: 'Licensing' },
   { key: 'activity', label: 'Activity' },
-  { key: 'danger', label: 'Account' },
 ];
 
 const TYPE_SCALE = {
@@ -49,30 +47,30 @@ const SPACE = {
   md: 12,
   lg: 16,
   xl: 20,
+  s40: 40,
   s44: 44,
   s150: 150,
 };
 const RADIUS = {
   md: 12,
+  card: 16,
   full: 22,
 };
 
 const AccountSecurityPage: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams<{
-    edit?: string | string[];
     tab?: string | string[];
     warningMode?: string | string[];
     securityHandoff?: string | string[];
     emergencyId?: string | string[];
   }>();
-  const routeEdit = Array.isArray(params.edit) ? params.edit[0] : params.edit;
   const routeTab = Array.isArray(params.tab) ? params.tab[0] : params.tab;
   const routeWarningMode = Array.isArray(params.warningMode) ? params.warningMode[0] : params.warningMode;
   const routeSecurityHandoff = Array.isArray(params.securityHandoff) ? params.securityHandoff[0] : params.securityHandoff;
   const routeEmergencyId = Array.isArray(params.emergencyId) ? params.emergencyId[0] : params.emergencyId;
-  const initialProfileEdit = routeEdit === 'true';
-  const validTabs: Tab[] = ['profile', 'businesses', 'security', 'sessions', 'licensing', 'activity', 'danger'];
+  const initialProfileEdit = true;
+  const validTabs: Tab[] = ['profile', 'businesses', 'security', 'sessions', 'licensing', 'activity'];
   const [activeTab, setActiveTab] = useState<Tab>(
     validTabs.includes(routeTab as Tab) ? (routeTab as Tab) : 'profile'
   );
@@ -124,8 +122,6 @@ const AccountSecurityPage: React.FC = () => {
         return <LicensingSection />;
       case 'activity':
         return <AuditLogsSection />;
-      case 'danger':
-        return <DangerZoneSection />;
       default:
         return null;
     }
@@ -180,7 +176,6 @@ const AccountSecurityPage: React.FC = () => {
               case 'sessions': IconComponent = Clock; break;
               case 'licensing': IconComponent = Key; break;
               case 'activity': IconComponent = Activity; break;
-              case 'danger': IconComponent = AlertTriangle; break;
               default: IconComponent = User; break;
             }
 
@@ -190,9 +185,9 @@ const AccountSecurityPage: React.FC = () => {
                 onPress={() => setActiveTab(tab.key)}
                 activeOpacity={0.7}
                 style={{
-                  width: SPACE.s44,
-                  height: SPACE.s44,
-                  borderRadius: RADIUS.full,
+                  width: SPACE.s40,
+                  height: SPACE.s40,
+                  borderRadius: RADIUS.card,
                   backgroundColor: isActive ? THEME_COLORS.primary : THEME_COLORS.neutralBg,
                   alignItems: 'center',
                   justifyContent: 'center',

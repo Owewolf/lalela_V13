@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 import { Building2, MapPin, Pencil, Plus, Power, Trash2 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { Community, UserBusiness } from '../../types';
-import CreateBusinessForm from './CreateBusinessForm';
 import { THEME_COLORS } from '../../theme/colors';
 
 const TYPE_SCALE = {
@@ -64,9 +64,8 @@ interface ManageUserBusinessesProps {
 }
 
 const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities, currentCommunity }) => {
+  const router = useRouter();
   const { userBusinesses, updateUserBusiness, removeUserBusiness, deleteUserBusiness } = useCommunity();
-  const [showForm, setShowForm] = useState(false);
-  const [editingBusiness, setEditingBusiness] = useState<UserBusiness | null>(null);
   const [busyBusinessId, setBusyBusinessId] = useState<string | null>(null);
 
   const sortedBusinesses = useMemo(() => {
@@ -87,18 +86,11 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
   };
 
   const openCreate = () => {
-    setEditingBusiness(null);
-    setShowForm(true);
+    router.push('/create-business');
   };
 
   const openEdit = (business: UserBusiness) => {
-    setEditingBusiness(business);
-    setShowForm(true);
-  };
-
-  const closeForm = () => {
-    setShowForm(false);
-    setEditingBusiness(null);
+    router.push({ pathname: '/create-business', params: { businessId: business.id } });
   };
 
   const handleToggleStatus = async (business: UserBusiness) => {
@@ -142,8 +134,8 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
 
   return (
     <View style={{ gap: SPACE.xxl }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: SPACE.xs }}>
-        <View>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', paddingHorizontal: SPACE.xs, gap: SPACE.xl }}>
+        <View style={{ flex: 1 }}>
           <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
             My Businesses
           </Text>
@@ -151,7 +143,7 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
             Create and manage the business profiles attached to your communities.
           </Text>
         </View>
-        <TouchableOpacity onPress={openCreate} style={{ width: SPACE.s42, height: SPACE.s42, borderRadius: RADIUS.action, backgroundColor: THEME_COLORS.primary, alignItems: 'center', justifyContent: 'center' }}>
+        <TouchableOpacity onPress={openCreate} style={{ width: SPACE.s42, height: SPACE.s42, borderRadius: RADIUS.action, backgroundColor: THEME_COLORS.primary, alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: SPACE.xxs }}>
           <Plus size={20} color={THEME_COLORS.white} />
         </TouchableOpacity>
       </View>
@@ -268,14 +260,6 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
           })}
         </View>
       )}
-
-      <CreateBusinessForm
-        visible={showForm}
-        business={editingBusiness}
-        communities={communities}
-        currentCommunity={currentCommunity}
-        onClose={closeForm}
-      />
     </View>
   );
 };

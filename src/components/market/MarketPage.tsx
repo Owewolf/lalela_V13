@@ -31,6 +31,7 @@ import { useAuth } from '../../context/AuthContext';
 import { BUSINESS_CATEGORIES } from '../../constants';
 import { calculateDistance } from '../../lib/utils';
 import { resolveMediaUrl } from '../../lib/config';
+import { resolveActiveCharity } from '../../lib/activeCharity';
 import type { UserBusiness } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
@@ -142,7 +143,10 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
   const [focusedBusinessId, setFocusedBusinessId] = useState<string | null>(null);
 
   const coverageArea = currentCommunity?.coverageArea;
-  const cycleFeaturedCharity = charities.find((charity) => charity.id === currentCommunity?.catFeaturedCharityId);
+  // Resolve the active community charity via the shared rule:
+  //   catCycleActive ON  → admin-marked Featured charity is active
+  //   catCycleActive OFF → CAT baseline charity is active
+  const cycleFeaturedCharity = resolveActiveCharity(charities, currentCommunity ?? null).active;
 
   const listings = useMemo(() => {
     let l = posts.filter(p => p.type === 'listing');

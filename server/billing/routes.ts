@@ -104,14 +104,16 @@ router.post('/simulate-payment', async (req, res) => {
       }
 
       const activatedAt = new Date();
-      const owner = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { licenseStatus: true },
-      });
-      const creatorTrialEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-      const userUpdate = owner?.licenseStatus === 'ACTIVE'
-        ? { communityCreated: true }
-        : { communityCreated: true, trialExpiresAt: creatorTrialEnd, licenseStatus: 'TRIAL' };
+      // Paying R999 for a community licence also bundles the R99/year member
+      // platform licence for the community owner. Set the user's membership to
+      // ACTIVE with a 1-year renewal so they have full member access immediately.
+      const renewalDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+      const userUpdate = {
+        communityCreated: true,
+        licenseStatus: 'ACTIVE',
+        subscriptionActive: true,
+        subscriptionRenewalDate: renewalDate,
+      };
 
       const [community] = await prisma.$transaction([
         prisma.community.update({
