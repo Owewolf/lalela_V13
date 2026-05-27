@@ -197,9 +197,24 @@ type ThemeColorField =
   | 'textSecondary';
 
 const COLOR_SWATCH_PRESETS = [
-  '#2D4B32', '#BD5D38', '#FAFAFA', '#E8DDC8', '#1A1C18', '#4A4F45',
-  '#0F4E55', '#D86F41', '#F0E6D9', '#FAF6EF', '#16363C', '#5A655D',
-  '#10B981', '#075985', '#DC2626', '#F59E0B', '#FFFFFF', '#000000',
+  THEME_COLORS.aliasHex_2d4b32,
+  THEME_COLORS.aliasHex_bd5d38,
+  THEME_COLORS.aliasHex_fafafa,
+  THEME_COLORS.aliasHex_e8ddc8,
+  THEME_COLORS.neutralTextStrong,
+  THEME_COLORS.aliasHex_4a4f45,
+  THEME_COLORS.primary,
+  THEME_COLORS.secondary,
+  THEME_COLORS.surfaceContainer,
+  THEME_COLORS.surfaceContainerLow,
+  THEME_COLORS.onSurface,
+  THEME_COLORS.aliasHex_5a655d,
+  THEME_COLORS.success,
+  THEME_COLORS.info,
+  THEME_COLORS.errorStrong,
+  THEME_COLORS.warningStrong,
+  THEME_COLORS.white,
+  THEME_COLORS.black,
 ];
 
 type MemberInsightsSnapshot = {
@@ -719,7 +734,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     const openColorPicker = (field: ThemeColorField) => {
       const current = normalizeHexColor((themeDraft[field] || '').trim());
       setActiveColorField(field);
-      setPickerColorValue(current || '#000000');
+      setPickerColorValue(current || THEME_COLORS.black);
       setShowColorPicker(true);
     };
 
@@ -737,7 +752,9 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         <View style={styles.colorInputRow}>
           <TouchableOpacity
             onPress={() => openColorPicker(field)}
-            style={[styles.colorSwatchBtn, { backgroundColor: normalizeHexColor(themeDraft[field] || '#000000') || '#000000' }]}
+            style={[styles.colorSwatchBtn, {
+              backgroundColor: normalizeHexColor(themeDraft[field] || THEME_COLORS.black) || THEME_COLORS.black,
+            }]}
             activeOpacity={0.8}
           />
           <TextInput

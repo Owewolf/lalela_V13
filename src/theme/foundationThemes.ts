@@ -1,3 +1,5 @@
+import { THEME_COLORS } from './colors';
+
 export type FoundationThemePresetId = 'lalela-light';
 
 export type FoundationTheme = {
@@ -22,15 +24,15 @@ export const LALELA_LIGHT_THEME: FoundationTheme = {
   presetId: 'lalela-light',
   mode: 'light',
   name: 'Lalela',
-  primaryColor: '#0F4E55',
-  secondaryColor: '#D86F41',
-  backgroundColor: '#F0E6D9',
-  surfaceColor: '#FAF6EF',
-  cardSurfaceColor: '#FAF6EF',
-  cardSurfaceMutedColor: '#F6EFE4',
-  cardBorderColor: '#E2D7C3',
-  textPrimary: '#16363C',
-  textSecondary: '#5A655D',
+  primaryColor: THEME_COLORS.primary,
+  secondaryColor: THEME_COLORS.secondary,
+  backgroundColor: THEME_COLORS.surfaceContainer,
+  surfaceColor: THEME_COLORS.surfaceContainerLow,
+  cardSurfaceColor: THEME_COLORS.surfaceContainerLow,
+  cardSurfaceMutedColor: THEME_COLORS.surface,
+  cardBorderColor: THEME_COLORS.neutralBorderSoft,
+  textPrimary: THEME_COLORS.onSurface,
+  textSecondary: THEME_COLORS.aliasHex_5a655d,
   borderRadius: '14px',
   fontFamily: 'Manrope',
   iconUrl: null,

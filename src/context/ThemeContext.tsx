@@ -101,7 +101,9 @@ function applyThemeToRuntime(theme: ThemeConfig): void {
   const { bodyColor, cardColor: resolvedCardColor } = resolveBodyAndCardColors(theme);
   const cardColor = theme.cardSurfaceColor ?? resolvedCardColor;
   const cardMutedColor = theme.cardSurfaceMutedColor ?? resolvedCardColor;
-  const cardBorderColor = theme.cardBorderColor ?? (theme.mode === 'dark' ? '#3A3F36' : '#E2D7C3');
+  const cardBorderColor = theme.cardBorderColor ?? (theme.mode === 'dark'
+    ? THEME_COLORS.aliasHex_3a3f36
+    : THEME_COLORS.neutralBorderSoft);
   const chromeColor = cardColor;
 
   mutableThemeColors.primary = theme.primaryColor;
