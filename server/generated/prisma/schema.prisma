@@ -206,7 +206,7 @@ model Community {
   createdAt                DateTime  @default(now()) @map("created_at")
   updatedAt                DateTime  @updatedAt @map("updated_at")
 
-  owner              User                  @relation("CommunityOwner", fields: [ownerId], references: [id])
+  owner              User                      @relation("CommunityOwner", fields: [ownerId], references: [id])
   members            CommunityMember[]
   posts              Post[]
   messages           Message[]
@@ -223,6 +223,7 @@ model Community {
   licenses           License[]
   billingRecords     BillingRecord[]
   catTransactions    CatTransaction[]
+  campaignSnapshots  CharityCampaignSnapshot[]
 
   @@index([ownerId])
   @@index([status])
@@ -366,7 +367,6 @@ model Post {
   charityPercentage    Float?    @map("charity_percentage")
   imageUrl             String?   @map("image_url")
   postsImage           String?   @map("posts_image")
-  isPublic             Boolean   @default(false) @map("is_public")
   isCommunityPick      Boolean   @default(false) @map("is_community_pick")
   isCharity            Boolean   @default(false) @map("is_charity")
   charityId            String?   @map("charity_id")
@@ -401,42 +401,65 @@ model Post {
 // CHARITIES & SUGGESTIONS
 // =============================================
 model Charity {
-  id                   String   @id @default(cuid())
-  communityId          String   @map("community_id")
-  name                 String
-  description          String?
-  category             String?
-  percentage           Float    @default(0)
-  status               String   @default("ACTIVE")
-  urgency              String?
-  fundraisingGoal      Float?   @map("fundraising_goal")
-  raisedAmount         Float    @default(0) @map("raised_amount")
-  imageUrl             String?  @map("image_url")
-  logo                 String?  @map("logo")
-  coverImage           String?  @map("cover_image")
-  contactPhone         String?  @map("contact_phone")
-  contactEmail         String?  @map("contact_email")
-  website              String?  @map("website")
-  locationName         String?  @map("location_name")
-  latitude             Float?
-  longitude            Float?
-  isVerified           Boolean  @default(false) @map("is_verified")
-  isFeatured           Boolean  @default(false) @map("is_featured")
-  isCATCharity         Boolean  @default(false) @map("is_cat_charity")
-  tags                 String[] @default([])
-  linkedBusinessIds    String[] @default([]) @map("linked_business_ids")
-  campaignCompleted    Boolean  @default(false) @map("campaign_completed")
-  isApprovedSuggestion Boolean  @default(false) @map("is_approved_suggestion")
-  suggestedById        String?  @map("suggested_by_id")
-  createdAt            DateTime @default(now()) @map("created_at")
-  updatedAt            DateTime @updatedAt @map("updated_at")
+  id                       String    @id @default(cuid())
+  communityId              String    @map("community_id")
+  name                     String
+  description              String?
+  category                 String?
+  percentage               Float     @default(0)
+  status                   String    @default("ACTIVE")
+  urgency                  String?
+  fundraisingGoal          Float?    @map("fundraising_goal")
+  raisedAmount             Float     @default(0) @map("raised_amount")
+  imageUrl                 String?   @map("image_url")
+  logo                     String?   @map("logo")
+  coverImage               String?   @map("cover_image")
+  contactPhone             String?   @map("contact_phone")
+  contactEmail             String?   @map("contact_email")
+  website                  String?   @map("website")
+  locationName             String?   @map("location_name")
+  latitude                 Float?
+  longitude                Float?
+  isVerified               Boolean   @default(false) @map("is_verified")
+  isFeatured               Boolean   @default(false) @map("is_featured")
+  isCATCharity             Boolean   @default(false) @map("is_cat_charity")
+  currentCampaignStartedAt DateTime? @map("current_campaign_started_at")
+  tags                     String[]  @default([])
+  linkedBusinessIds        String[]  @default([]) @map("linked_business_ids")
+  campaignCompleted        Boolean   @default(false) @map("campaign_completed")
+  isApprovedSuggestion     Boolean   @default(false) @map("is_approved_suggestion")
+  suggestedById            String?   @map("suggested_by_id")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
 
-  community          Community           @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  community          Community                 @relation(fields: [communityId], references: [id], onDelete: Cascade)
   charitySuggestions CharitySuggestion[]
   catTransactions    CatTransaction[]
+  campaignSnapshots  CharityCampaignSnapshot[]
 
   @@index([communityId])
   @@map("charities")
+}
+
+model CharityCampaignSnapshot {
+  id             String   @id @default(cuid())
+  communityId    String   @map("community_id")
+  charityId      String   @map("charity_id")
+  startedAt      DateTime @map("started_at")
+  endedAt        DateTime @map("ended_at")
+  goalAmount     Float?   @map("goal_amount")
+  finalRaised    Float    @default(0) @map("final_raised")
+  finalPotential Float    @default(0) @map("final_potential")
+  itemsSold      Int      @default(0) @map("items_sold")
+  reason         String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  charity   Charity   @relation(fields: [charityId], references: [id], onDelete: Cascade)
+
+  @@index([communityId, endedAt])
+  @@index([charityId, endedAt])
+  @@map("charity_campaign_snapshots")
 }
 
 model CharitySuggestion {

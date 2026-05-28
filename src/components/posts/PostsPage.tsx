@@ -235,9 +235,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
 
       Alert.alert(
         'Mark as sold',
-        listing.isPublic
-          ? 'This will mark the listing sold and trigger CAT accounting for this public listing.'
-          : 'This will mark the listing sold. Local listing sales do not trigger CAT.',
+        'This will mark the listing sold and record the CAT contribution for the community.',
         [
           { text: 'Cancel', style: 'cancel' },
           {
@@ -250,7 +248,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                   'Listing updated',
                   result.catTriggered
                     ? `Sold marked. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
-                    : 'Sold marked with no CAT trigger (local listing).'
+                    : 'Sold marked.'
                 );
               } catch {
                 Alert.alert('Unable to mark sold', 'Please try again.');
@@ -712,8 +710,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         <Text className="text-orange-400 font-bold text-xs">.00</Text>
                       </View>
                     </View>
-                    {post.isPublic &&
-                      post.publicPrice &&
+                    {post.publicPrice &&
                       post.publicPrice > (post.communityPrice || post.price) ? (
                       <View className="opacity-50">
                         <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
@@ -725,7 +722,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                       </View>
                     ) : null}
                   </View>
-                  {post.isPublic && post.charityId ? (
+                  {post.charityId ? (
                     <View className="items-end">
                       <View className="flex-row items-center gap-1.5 bg-orange-50 px-2 py-1 rounded-lg mb-1">
                         <Heart size={12} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />

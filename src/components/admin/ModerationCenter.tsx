@@ -74,6 +74,9 @@ import { Share } from 'react-native';
 import type { UserRole, UserProfile } from '../../types';
 import { BusinessImportTool } from './BusinessImportTool';
 import ManageCommunityCharity from '../settings/ManageCommunityCharity';
+import { useModerationLogs } from '../../hooks/queries/useModerationLogs';
+import { useMemberInsights } from '../../hooks/queries/useMemberInsights';
+import { queryClient } from '../../lib/queryClient';
 import { GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from 'react-native-google-places-autocomplete';
 import Slider from '@react-native-community/slider';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
@@ -217,25 +220,6 @@ const COLOR_SWATCH_PRESETS = [
   THEME_COLORS.black,
 ];
 
-type MemberInsightsSnapshot = {
-  totalListings?: number;
-  totalNotices?: number;
-  totalSuggestions?: number;
-  activeListings?: number;
-  last30dListings?: number;
-  last30dSuggestions?: number;
-  topCategories?: string[];
-  computedAt?: any;
-};
-
-type MemberRoleHistoryEntry = {
-  id: string;
-  action: string;
-  reason?: string;
-  timestamp?: any;
-  moderator_id?: string;
-};
-
 interface ModerationCenterProps {
   onBack: () => void;
   embedded?: boolean;
@@ -310,7 +294,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     const [contentFilter, setContentFilter] = useState<
       'all' | 'notices' | 'listings' | 'businesses'
     >('all');
-    const [logs, setLogs] = useState<any[]>([]);
     const [themeDraft, setThemeDraft] = useState<ThemeDraft>({
       presetId: 'lalela-light',
       mode: 'light',
@@ -343,16 +326,24 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     const [pendingCancelInvitation, setPendingCancelInvitation] = useState<{ id: string; label: string } | null>(null);
     const [isProcessingDestructiveAction, setIsProcessingDestructiveAction] = useState(false);
     const [showImportTool, setShowImportTool] = useState(false);
-    const [selectedMemberProfile, setSelectedMemberProfile] = useState<Partial<UserProfile> | null>(null);
-    const [selectedMemberStats, setSelectedMemberStats] = useState<MemberInsightsSnapshot | null>(null);
-    const [selectedMemberRoleHistory, setSelectedMemberRoleHistory] = useState<MemberRoleHistoryEntry[]>([]);
-    const [isLoadingMemberInsights, setIsLoadingMemberInsights] = useState(false);
     const [pendingRoleChange, setPendingRoleChange] = useState<{
       userId: string;
       userName: string;
       currentRole: UserRole;
       nextRole: UserRole;
     } | null>(null);
+
+    const moderationLogsQuery = useModerationLogs(currentCommunity?.id, { limit: 50 });
+    const memberInsightsQuery = useMemberInsights(
+      currentCommunity?.id,
+      memberSubView === 'details' ? selectedMember?.userId : null,
+    );
+
+    const logs = moderationLogsQuery.data ?? [];
+    const selectedMemberProfile = memberInsightsQuery.data?.profile ?? null;
+    const selectedMemberStats = memberInsightsQuery.data?.stats ?? null;
+    const selectedMemberRoleHistory = memberInsightsQuery.data?.history ?? [];
+    const isLoadingMemberInsights = memberInsightsQuery.isFetching;
 
     useEffect(() => {
       if (initialTab) setActiveTab(initialTab);
@@ -430,13 +421,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       }
     }, [currentCommunity?.coverageArea]);
 
-    useEffect(() => {
-      if (!currentCommunity?.id || currentCommunity.id === 'loading') return;
-      api.get(`/communities/${currentCommunity.id}/moderation-logs?limit=50`)
-        .then(({ data }) => setLogs(data))
-        .catch(console.error);
-    }, [currentCommunity?.id]);
-
     const handleSaveCoverage = async () => {
       if (currentCommunity?.id) {
         await updateCommunityCoverage(currentCommunity.id, tempCoverage);
@@ -513,6 +497,9 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             target_id: userId,
             target_type: 'user',
             reason: isPromotion ? 'Promoted to moderator' : 'Moderator privileges removed',
+          }).then(() => {
+            queryClient.invalidateQueries({ queryKey: ['moderation-logs', currentCommunity.id] });
+            queryClient.invalidateQueries({ queryKey: ['member-insights', currentCommunity.id] });
           }).catch(console.error);
         }
         if (selectedMember?.userId === userId) {
@@ -522,39 +509,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         console.error('Failed to update role:', e);
       }
     };
-
-    useEffect(() => {
-      const loadMemberInsights = async () => {
-        if (!currentCommunity?.id || !selectedMember?.userId || memberSubView !== 'details') {
-          return;
-        }
-
-        setIsLoadingMemberInsights(true);
-        try {
-          // Load member profile and stats via REST
-          const [profileRes, statsRes, historyRes] = await Promise.all([
-            api.get(`/users/${selectedMember.userId}/profile`).catch(() => ({ data: null })),
-            api.get(`/communities/${currentCommunity.id}/members/${selectedMember.userId}/stats`).catch(() => ({ data: null })),
-            api.get(`/communities/${currentCommunity.id}/moderation-logs?target_type=user&target_id=${selectedMember.userId}&limit=5`).catch(() => ({ data: [] })),
-          ]);
-
-          setSelectedMemberProfile(profileRes.data ?? null);
-          setSelectedMemberStats(statsRes.data ?? null);
-          setSelectedMemberRoleHistory(
-            (historyRes.data ?? []).map((entry: any) => ({ id: entry.id, ...entry }))
-          );
-        } catch (err) {
-          console.error('Failed to load member insights:', err);
-          setSelectedMemberProfile(null);
-          setSelectedMemberStats(null);
-          setSelectedMemberRoleHistory([]);
-        } finally {
-          setIsLoadingMemberInsights(false);
-        }
-      };
-
-      loadMemberInsights();
-    }, [currentCommunity?.id, memberSubView, selectedMember?.userId]);
 
     const handleDeletePost = async (postId: string) => {
       try {
@@ -567,7 +521,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             action: 'delete',
             target_id: postId,
             target_type: 'post',
-          }).catch(() => {});
+          });
+          queryClient.invalidateQueries({ queryKey: ['moderation-logs', currentCommunity.id] });
           if (post?.authorId && post.authorId !== currentUserProfile?.id) {
             await addNotification(post.authorId, {
               title: 'Post Removed',
@@ -638,7 +593,9 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             target_id: pendingRemoveMember.id,
             target_type: 'user',
             reason: 'Member deactivated by admin',
-          }).catch(() => {});
+          });
+          queryClient.invalidateQueries({ queryKey: ['moderation-logs', currentCommunity.id] });
+          queryClient.invalidateQueries({ queryKey: ['member-insights', currentCommunity.id] });
         }
         setPendingRemoveMember(null);
       }
@@ -658,7 +615,9 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             target_id: pendingDeleteMember.id,
             target_type: 'user',
             reason: 'Member deleted by admin',
-          }).catch(() => {});
+          });
+          queryClient.invalidateQueries({ queryKey: ['moderation-logs', currentCommunity.id] });
+          queryClient.invalidateQueries({ queryKey: ['member-insights', currentCommunity.id] });
         }
         setPendingDeleteMember(null);
       }

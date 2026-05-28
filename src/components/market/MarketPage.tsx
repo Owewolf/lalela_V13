@@ -435,7 +435,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   <Text className="text-primary/60 font-bold text-sm">.00</Text>
                 </View>
               </View>
-              {listing.isPublic && listing.publicPrice ? (
+              {listing.publicPrice ? (
                 <View className="items-end">
                   <Text className="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">
                     Public Price
@@ -454,7 +454,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
             ) : null}
 
             {/* Charity */}
-            {listing.isPublic && listing.charityId ? (
+            {listing.charityId ? (
               <View className="bg-surface-container p-3 rounded-2xl flex-row items-start gap-3 border" style={SURFACE_BORDER_STYLE}>
                 <View className="bg-orange-50 p-2 rounded-full items-center justify-center">
                   <Heart size={20} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
@@ -544,9 +544,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
 
     Alert.alert(
       'Mark as sold',
-      listing.isPublic
-        ? 'This will mark the listing sold and trigger CAT accounting for this public listing.'
-        : 'This will mark the listing sold. Local listing sales do not trigger CAT.',
+      'This will mark the listing sold and record the CAT contribution for the community.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -560,7 +558,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                 'Listing updated',
                 result.catTriggered
                   ? `Sold marked. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
-                  : 'Sold marked with no CAT trigger (local listing).'
+                  : 'Sold marked.'
               );
             } catch (error) {
               Alert.alert('Unable to mark sold', 'Please try again.');
@@ -627,7 +625,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   <Text style={{ fontSize: TYPE_SCALE.price, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.indigo, marginTop: SPACE.xs }}>
                     R{(selectedListing.communityPrice || selectedListing.price || 0).toLocaleString()}
                   </Text>
-                  {selectedListing.isPublic && selectedListing.publicPrice ? (
+                  {selectedListing.publicPrice ? (
                     <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.sm }}>
                       Public price: R{selectedListing.publicPrice.toLocaleString()}
                     </Text>
@@ -636,7 +634,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
 
                 <Text style={{ fontSize: TYPE_SCALE.body, lineHeight: LINE_HEIGHT.body, color: THEME_COLORS.neutralTextEmphasis }}>{selectedListing.description}</Text>
 
-                {selectedListing.isPublic && charity ? (
+                {charity ? (
                   <View style={{ backgroundColor: THEME_COLORS.aliasHex_fff7ed, borderRadius: RADIUS.lg, padding: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_249_115_22_0_18 }}>
                     <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.aliasHex_9a3412 }}>Charity contribution</Text>
                     <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.aliasHex_7c2d12, marginTop: SPACE.xs }}>

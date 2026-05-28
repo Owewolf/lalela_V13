@@ -19,7 +19,6 @@ export interface CommunityNotice {
   // Charity integration
   charityId?: string;
   charityPercentage?: number;
-  isPublic?: boolean;
   price?: number;
   communityPrice?: number;
   status?: 'Active' | 'active' | 'Pinned' | 'deleted' | 'Deleted' | 'Archived' | 'PendingPublic' | 'Rejected' | 'ChangesRequested' | 'SOLD';
@@ -333,9 +332,59 @@ export interface Charity {
   fundraisingGoal?: number;
   campaignCompleted?: boolean;
   isCATCharity?: boolean;
+  currentCampaignStartedAt?: any;
   createdAt: any;
   isApprovedSuggestion?: boolean;
   suggestedById?: string;
+}
+
+export interface FeaturedCharitySummary {
+  charityId: string | null;
+  name: string | null;
+  goalAmount: number;
+  potentialEarnings: number;
+  raisedEarnings: number;
+  progressPercentage: number;
+  itemsAvailable: number;
+  itemsSold: number;
+  activeCampaign: boolean;
+  isCATBaseline: boolean;
+  campaignStartedAt: any;
+  /** Lifetime CAT raised across the community (CAT baseline + every featured charity that has run a cycle). */
+  lifetimeRaised: number;
+  lastUpdated: any;
+}
+
+export interface CharityCampaignHistoryItem {
+  id: string;
+  communityId: string;
+  charityId: string;
+  charityName: string;
+  isCATCharity: boolean;
+  logo?: string | null;
+  startedAt: any;
+  endedAt: any;
+  goalAmount: number;
+  finalRaised: number;
+  finalPotential: number;
+  itemsSold: number;
+  reason: string;
+  finalPercentage: number | null;
+}
+
+export interface CharityTotalsItem {
+  charityId: string;
+  name: string;
+  isCATCharity: boolean;
+  goalAmount: number;
+  potentialEarnings: number;
+  raisedEarnings: number;
+  progressPercentage: number;
+  itemsAvailable: number;
+  itemsSold: number;
+  campaignStartedAt: any;
+  lifetimeRaised: number;
+  lastUpdated: any;
 }
 
 export interface CatTransaction {
@@ -355,6 +404,7 @@ export interface CatHubSummary {
   catCycleActive: boolean;
   activeCycleCharity: Charity | null;
   recentTransactions: CatTransaction[];
+  featuredCharity?: FeaturedCharitySummary;
 }
 
 export interface CharitySuggestion {
@@ -551,6 +601,7 @@ export interface CommunityContextType {
   setCatCycle: (active: boolean, featuredCharityId?: string) => Promise<void>;
   markPostSold: (postId: string) => Promise<{ catTriggered: boolean; catAmount?: number; pooledToCharity?: boolean }>;
   getCatHub: () => Promise<CatHubSummary>;
+  getFeaturedCharity: () => Promise<FeaturedCharitySummary>;
   syncAllUsersToSearch: () => Promise<void>;
   // Invitation & Notification Integration
   userInvitations: CommunityInvitation[];

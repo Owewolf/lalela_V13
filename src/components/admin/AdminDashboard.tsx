@@ -47,7 +47,11 @@ import { useLiveInsights } from '../../hooks/useLiveInsights';
 import { CommunityInsightPanels } from './CommunityInsightPanels';
 import { InteractiveCoverageMap } from '../home/InteractiveCoverageMap';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
-import type { CatHubSummary } from '../../types';
+import { useFeaturedCharity } from '../../hooks/queries/useFeaturedCharity';
+import { useCharityCampaignHistory } from '../../hooks/queries/useCharityCampaignHistory';
+import { useCatHub } from '../../hooks/queries/useCatHub';
+import { useModerationLogs } from '../../hooks/queries/useModerationLogs';
+import { useSecurityEvents } from '../../hooks/queries/useSecurityEvents';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
 import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
@@ -170,11 +174,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     securityResponders,
     charities,
     communityBusinesses,
-    getCatHub,
     startConversation,
     setActiveConversation,
   } = useCommunity();
   const { data: liveInsights } = useLiveInsights(currentCommunity?.id);
+  const { data: featuredCharitySummary } = useFeaturedCharity(currentCommunity?.id);
+  const { data: charityCampaignHistory = [] } = useCharityCampaignHistory(currentCommunity?.id);
+  const { data: catHubSummary } = useCatHub(currentCommunity?.id);
+  const { data: moderationLogs = [] } = useModerationLogs(currentCommunity?.id, { limit: 5 });
+  const { data: unresolvedSecurityEvents = [] } = useSecurityEvents(currentCommunity?.id, { resolved: false });
+  const { data: highSecurityEvents = [] } = useSecurityEvents(currentCommunity?.id, { severity: 'high,critical', status: 'active' });
   const previousRaisedRef = useRef<number | null>(null);
   const previousLiveDonationsRef = useRef<number | null>(null);
   const [donationTicker, setDonationTicker] = React.useState<Array<{ id: string; amount: number; at: number }>>([]);
@@ -182,14 +191,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [activeView, setActiveView] = React.useState<'dashboard' | 'moderation' | 'members'>(
     readOnly ? 'dashboard' : initialView
   );
+  const [showAllCampaignHistory, setShowAllCampaignHistory] = React.useState(false);
   const [moderationTab, setModerationTab] = React.useState<any>(initialModerationTab);
   const [memberCount, setMemberCount] = React.useState(0);
-  const [activeAlertsCount, setActiveAlertsCount] = React.useState(0);
-  const [recentActivities, setRecentActivities] = React.useState<any[]>([]);
   const [systemUptime, setSystemUptime] = React.useState(99.9);
-  const [securityThreats, setSecurityThreats] = React.useState(0);
   const [activeVolunteersCount, setActiveVolunteersCount] = React.useState(0);
-  const [catHubSummary, setCatHubSummary] = React.useState<CatHubSummary | null>(null);
 
   // Guided setup
   const [setupStepIndex, setSetupStepIndex] = React.useState(0);
@@ -325,7 +331,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const responderTotal = communityResponderInsights.length;
   const emergencyCount = activeEmergencyPosts.length;
   const warningCount = activeWarningPosts.length;
-  const openAlertsDisplay = Math.max(activeAlertsCount, emergencyCount + warningCount);
+  const openAlertsDisplay = Math.max(unresolvedSecurityEvents.length, emergencyCount + warningCount);
 
   const activeNoticeCount = React.useMemo(() => {
     return (posts || []).filter((post: any) => {
@@ -515,8 +521,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Track donation deltas from featured charity (no donor identity) → ephemeral ticker chips
   React.useEffect(() => {
-    const activeCharity = resolveActiveCharity(charities, currentCommunity ?? null).active;
-    const raised = activeCharity?.raisedAmount ?? 0;
+    const raised = featuredCharitySummary?.raisedEarnings ?? 0;
     const prev = previousRaisedRef.current;
     if (prev !== null && raised > prev) {
       const delta = raised - prev;
@@ -526,7 +531,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       ].slice(0, 3));
     }
     previousRaisedRef.current = raised;
-  }, [charities, currentCommunity?.catCycleActive, currentCommunity?.catFeaturedCharityId]);
+  }, [featuredCharitySummary?.raisedEarnings]);
 
   // Also derive ticker from polled live-insights donationsTotal deltas
   React.useEffect(() => {
@@ -543,52 +548,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     previousLiveDonationsRef.current = total;
   }, [liveInsights?.counts?.donationsTotal]);
 
-  // Load moderation logs + security event counts via REST
-  React.useEffect(() => {
-    if (!currentCommunity?.id || readOnly) return;
-    const cid = currentCommunity.id;
-
-    api.get(`/communities/${cid}/moderation-logs?limit=5`).then(({ data }) => {
-      setRecentActivities(
-        data.map((d: any) => ({
-          id: d.id,
-          title: `${(d.action?.charAt(0)?.toUpperCase() ?? '') + (d.action?.slice(1) ?? '')} Action`,
-          subtitle: `${d.target_type} • ${d.reason || 'No reason provided'}`,
-          time: d.timestamp ? new Date(d.timestamp).toLocaleString() : 'Just now',
-          icon: d.action === 'approve' ? UserPlus : Flag,
-          iconBg: d.action === 'approve' ? THEME_COLORS.successSurface : THEME_COLORS.errorSurface,
-          iconColor: d.action === 'approve' ? PRIMARY : ERROR,
-        }))
-      );
-    }).catch(console.error);
-
-    api.get(`/communities/${cid}/security-events?resolved=false`).then(({ data }) => {
-      setActiveAlertsCount(Array.isArray(data) ? data.length : 0);
-    }).catch(console.error);
-
-    api.get(`/communities/${cid}/security-events?severity=high,critical&status=active`).then(({ data }) => {
-      setSecurityThreats(Array.isArray(data) ? data.length : 0);
-    }).catch(console.error);
-  }, [currentCommunity?.id, readOnly]);
-
-  React.useEffect(() => {
-    let mounted = true;
-    if (!currentCommunity?.id) {
-      setCatHubSummary(null);
-      return;
-    }
-    getCatHub()
-      .then((summary) => {
-        if (mounted) setCatHubSummary(summary);
-      })
-      .catch((error) => {
-        console.error('Failed to load CAT hub summary:', error);
-        if (mounted) setCatHubSummary(null);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [currentCommunity?.id, getCatHub]);
+  const recentActivities = React.useMemo(() => moderationLogs.map((d: any) => ({
+    id: d.id,
+    title: `${(d.action?.charAt(0)?.toUpperCase() ?? '') + (d.action?.slice(1) ?? '')} Action`,
+    subtitle: `${d.target_type} • ${d.reason || 'No reason provided'}`,
+    time: d.timestamp ? new Date(d.timestamp).toLocaleString() : 'Just now',
+    icon: d.action === 'approve' ? UserPlus : Flag,
+    iconBg: d.action === 'approve' ? THEME_COLORS.successSurface : THEME_COLORS.errorSurface,
+    iconColor: d.action === 'approve' ? PRIMARY : ERROR,
+  })), [moderationLogs]);
+  const activeAlertsCount = unresolvedSecurityEvents.length;
+  const securityThreats = highSecurityEvents.length;
 
   // Init completed steps
   React.useEffect(() => {
@@ -662,15 +632,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const isCatCharity = (charity: any) => isCatCharityShared(charity);
-  const featuredForStats = resolveActiveCharity(charities, currentCommunity ?? null).active;
-  const featuredRaisedTotal = Number(featuredForStats?.raisedAmount ?? 0);
-  const catGeneratedTotal = Number(catHubSummary?.totalCATGenerated ?? 0);
+  const featuredForStats = featuredCharitySummary?.charityId
+    ? charities.find((charity: any) => charity.id === featuredCharitySummary.charityId) ?? resolveActiveCharity(charities, currentCommunity ?? null).active
+    : resolveActiveCharity(charities, currentCommunity ?? null).active;
+  const featuredRaisedTotal = Number(featuredCharitySummary?.raisedEarnings ?? 0);
 
   const stats = [
     { label: 'Active Users', value: memberCount.toLocaleString(), icon: Users, color: PRIMARY },
     {
       label: featuredForStats?.name?.trim() ? featuredForStats.name : 'CAT',
-      value: `R${Math.round(featuredForStats ? featuredRaisedTotal : catGeneratedTotal).toLocaleString()}`,
+      value: `R${Math.round(featuredRaisedTotal).toLocaleString()}`,
       icon: HeartHandshake,
       color: SECONDARY,
     },
@@ -685,15 +656,42 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   ];
 
   const availableCharities = charities.filter((c: any) => c.status !== 'Archived');
-  const featuredCharity = resolveActiveCharity(availableCharities, currentCommunity ?? null).active;
-  const otherCharities = charities.filter((c: any) => c !== featuredCharity && ((c.raisedAmount || c.totalRaised || 0) > 0));
+  const featuredCharity = featuredCharitySummary?.charityId
+    ? availableCharities.find((charity: any) => charity.id === featuredCharitySummary.charityId)
+      ?? resolveActiveCharity(availableCharities, currentCommunity ?? null).active
+    : resolveActiveCharity(availableCharities, currentCommunity ?? null).active;
+  const dedupedCampaignHistory = React.useMemo(() => {
+    let catIncluded = false;
+    return charityCampaignHistory.filter((campaign) => {
+      if (!campaign.isCATCharity) return true;
+      if (catIncluded) return false;
+      catIncluded = true;
+      return true;
+    });
+  }, [charityCampaignHistory]);
+  const catPreviousCampaign = React.useMemo(
+    () => dedupedCampaignHistory.find((campaign) => campaign.isCATCharity) ?? null,
+    [dedupedCampaignHistory],
+  );
+  const nonCatCampaignHistory = React.useMemo(
+    () => dedupedCampaignHistory.filter((campaign) => !campaign.isCATCharity),
+    [dedupedCampaignHistory],
+  );
+  const displayedCampaignHistory = showAllCampaignHistory
+    ? nonCatCampaignHistory
+    : nonCatCampaignHistory.slice(0, 3);
+  const featuredGoalAmount = Number(featuredCharitySummary?.goalAmount || featuredCharity?.fundraisingGoal || 0);
+  const featuredRaisedAmount = Number(featuredCharitySummary?.raisedEarnings ?? 0);
+  const featuredDisplayPercentage = featuredGoalAmount > 0
+    ? Math.max(0, Math.round((featuredRaisedAmount / featuredGoalAmount) * 100))
+    : Math.max(0, Math.round(featuredCharitySummary?.progressPercentage ?? 0));
+  const featuredProgressBarPercentage = Math.min(featuredDisplayPercentage, 100);
 
-  // Potential CAT running total across all approved Public listings, shown
-  // whether or not a charity is currently featured.
+  // Potential CAT running total across all approved listings (every listing
+  // carries CAT now), shown whether or not a charity is currently featured.
   const potentialCatTotal = (posts as any[])
     .filter((p) => {
       if (p?.type !== 'listing') return false;
-      if (!p?.isPublic) return false;
       const s = typeof p?.status === 'string' ? p.status.toLowerCase() : '';
       return s === 'active' || s === 'pinned';
     })
@@ -710,7 +708,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       return sum + Math.max(0, pub - base);
     }, 0);
   const potentialCatCount = (posts as any[]).filter(
-    (p) => p?.type === 'listing' && p?.isPublic,
+    (p) => p?.type === 'listing',
   ).length;
 
   const renderDashboard = () => (
@@ -940,62 +938,76 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <Text style={styles.bentoDesc}>Community-driven support for rural upliftment projects.</Text>
 
         {featuredCharity ? (
-          <View style={styles.featuredCharity}>
-            <Text style={styles.featuredCharityLabel}>CURRENT INITIATIVE</Text>
-            <Text style={styles.featuredCharityName}>{featuredCharity.name || 'Unnamed Charity'}</Text>
-            {featuredCharity.campaignCompleted && (
-              <View style={styles.completedBadge}>
-                <CheckCircle2 size={12} color={THEME_COLORS.secondaryContainer} />
-                <Text style={styles.completedBadgeText}>Completed</Text>
+          <>
+            <View style={styles.activeCharityCard}>
+              <View style={styles.activeCharityHeaderRow}>
+                <Text style={styles.activeCharityName}>{featuredCharity.name || 'Unnamed Charity'}</Text>
+                <Text style={styles.activeCharityTag}>Active</Text>
               </View>
-            )}
-            <View style={styles.progressRow}>
-              <Text style={styles.progressText}>
-                R{(featuredCharity.raisedAmount ?? 0).toLocaleString()} raised
-              </Text>
-              <Text style={styles.goalText}>
-                Goal: R{(featuredCharity.fundraisingGoal || 0).toLocaleString()}
-              </Text>
-            </View>
-            <View style={styles.progressTrack}>
-              <View
-                style={[styles.progressFill, {
-                  width: `${Math.min(Math.max(((featuredCharity.raisedAmount ?? 0) / (featuredCharity.fundraisingGoal || 1)) * 100, 0), 100)}%`
-                }]}
-              />
-            </View>
-            {donationTicker.length > 0 && (
-              <View style={styles.donorTickerRow}>
-                {donationTicker.map((d) => (
-                  <View key={d.id} style={styles.donorChip}>
-                    <Text style={styles.donorChipText}>+R{d.amount.toLocaleString()}</Text>
-                  </View>
-                ))}
+              {featuredCharity.campaignCompleted && (
+                <View style={styles.completedBadge}>
+                  <CheckCircle2 size={12} color={THEME_COLORS.secondaryContainer} />
+                  <Text style={styles.completedBadgeText}>Completed</Text>
+                </View>
+              )}
+              <View style={styles.activeRow}>
+                <Text style={styles.activeRowStrong}>
+                  R{featuredRaisedAmount.toLocaleString()} raised
+                </Text>
+                <Text style={styles.activeRowMuted}>
+                  Goal: R{featuredGoalAmount.toLocaleString()} • {featuredDisplayPercentage}%
+                </Text>
               </View>
-            )}
-            {!readOnly && !featuredCharity.campaignCompleted && currentCommunity?.id && (
-              <TouchableOpacity
-                style={styles.completeBtn}
-                onPress={async () => {
-                  try {
-                    await api.patch(`/communities/${currentCommunity.id}/charities/${featuredCharity.id}`, {
-                      campaignCompleted: true
-                    });
-                  } catch (e) { console.error(e); }
-                }}
-                activeOpacity={0.8}
-              >
-                <CheckCircle2 size={18} color={PRIMARY} />
-                <Text style={styles.completeBtnText}>Complete Campaign</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+              <View style={styles.activeProgressTrack}>
+                <View
+                  style={[
+                    styles.activeProgressFill,
+                    { width: `${featuredProgressBarPercentage}%` },
+                  ]}
+                />
+              </View>
+              <View style={styles.activeRow}>
+                <Text style={styles.activeRowStrong}>
+                  Potential: R{(featuredCharitySummary?.potentialEarnings ?? 0).toLocaleString()}
+                </Text>
+                <Text style={styles.activeRowMuted}>
+                  {featuredCharitySummary?.itemsAvailable ?? 0} active listing{(featuredCharitySummary?.itemsAvailable ?? 0) === 1 ? '' : 's'}
+                </Text>
+              </View>
+              {donationTicker.length > 0 && (
+                <View style={styles.donorTickerRow}>
+                  {donationTicker.map((d) => (
+                    <View key={d.id} style={styles.donorChip}>
+                      <Text style={styles.donorChipText}>+R{d.amount.toLocaleString()}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+            {catPreviousCampaign ? (
+              <View style={styles.catPreviousCard}>
+                <View style={styles.catPreviousHeaderRow}>
+                  <Text style={styles.catPreviousTitle}>CAT</Text>
+                  <Text style={styles.catPreviousMonth}>
+                    {new Intl.DateTimeFormat(undefined, {
+                      month: 'long',
+                      year: 'numeric',
+                    }).format(new Date(catPreviousCampaign.endedAt))}
+                  </Text>
+                </View>
+                <Text style={styles.catPreviousValue}>
+                  Lifetime total: R{catPreviousCampaign.finalRaised.toLocaleString()}
+                </Text>
+              </View>
+            ) : null}
+          </>
         ) : (
           <View style={styles.noCharity}>
             <Droplets size={28} color={THEME_COLORS.neutralBorderStrong} />
             <Text style={styles.noCharityText}>CAT is in effect</Text>
             <Text style={styles.noCharitySubtext}>
-              No featured charity is selected yet.
+              CAT is the active charity. Public listings accrue the CAT
+              margin and route to CAT by default.
             </Text>
             <View style={styles.potentialCatBox}>
               <View>
@@ -1011,17 +1023,86 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </View>
         )}
 
-        {otherCharities.length > 0 && (
+        {displayedCampaignHistory.length > 0 && (
           <View style={styles.previousCampaigns}>
             <Text style={styles.previousCampaignsTitle}>Previous Campaigns</Text>
-            {otherCharities.slice(0, 3).map((c) => (
-              <View key={c.id} style={styles.prevCampaignRow}>
-                <Text style={styles.prevCampaignName} numberOfLines={1}>{c.name}</Text>
-                <Text style={styles.prevCampaignAmount}>R{(c.raisedAmount ?? 0).toLocaleString()}</Text>
-              </View>
-            ))}
+            <Text style={styles.prevCampaignMeta}>Snapshots from past CAT and featured charity cycles.</Text>
+            {displayedCampaignHistory.map((campaign) => {
+              const monthLabel = new Intl.DateTimeFormat(undefined, {
+                month: 'long',
+                year: 'numeric',
+              }).format(new Date(campaign.endedAt));
+              const isCatCampaign = campaign.isCATCharity;
+              const finalPercentage = campaign.goalAmount > 0
+                ? Math.max(0, Math.round((campaign.finalRaised / campaign.goalAmount) * 100))
+                : typeof campaign.finalPercentage === 'number'
+                  ? Math.max(0, Math.round(campaign.finalPercentage))
+                : null;
+              const finalProgressBarPercentage = finalPercentage === null
+                ? 0
+                : Math.min(finalPercentage, 100);
+              const goalLabel = campaign.goalAmount > 0
+                ? `R${campaign.goalAmount.toLocaleString()}`
+                : 'No goal';
+
+              return (
+                <View key={campaign.id} style={styles.prevCampaignRow}>
+                  <View style={styles.prevCampaignMainRow}>
+                    <View style={styles.prevCampaignLeft}>
+                      <View style={styles.prevCampaignTitleRow}>
+                        <Text style={styles.prevCampaignName} numberOfLines={1}>{campaign.charityName}</Text>
+                      </View>
+                      <Text style={styles.prevCampaignMeta}>{monthLabel}</Text>
+                    </View>
+                    <View style={styles.prevCampaignRight}>
+                      <Text style={styles.prevCampaignAmount}>
+                        {isCatCampaign
+                          ? `Lifetime total: R${campaign.finalRaised.toLocaleString()}`
+                          : `R${campaign.finalRaised.toLocaleString()} / ${goalLabel}`}
+                      </Text>
+                      {!isCatCampaign ? (
+                        <Text style={styles.prevCampaignPct}>
+                          {finalPercentage === null ? '-' : `${finalPercentage}%`}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
+                  {!isCatCampaign ? (
+                    <View style={styles.prevCampaignProgressTrack}>
+                      <View
+                        style={[
+                          styles.prevCampaignProgressFill,
+                          { width: `${finalProgressBarPercentage}%` },
+                        ]}
+                      />
+                    </View>
+                  ) : null}
+                </View>
+              );
+            })}
+            {nonCatCampaignHistory.length > 3 ? (
+              <TouchableOpacity
+                style={styles.prevCampaignViewAll}
+                onPress={() => setShowAllCampaignHistory((current) => !current)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.prevCampaignViewAllText}>
+                  {showAllCampaignHistory
+                    ? 'Show less'
+                    : `View all (${nonCatCampaignHistory.length})`}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
         )}
+
+        <View style={styles.communityLifetimeCard}>
+          <Text style={styles.communityLifetimeLabel}>Community Lifetime Total</Text>
+          <Text style={styles.communityLifetimeValue}>
+            R{(featuredCharitySummary?.lifetimeRaised ?? 0).toLocaleString()}
+          </Text>
+          <Text style={styles.communityLifetimeMeta}>Across all CAT and featured cycles</Text>
+        </View>
       </View>
 
       {/* Community Insights */}
@@ -1304,30 +1385,108 @@ const styles = StyleSheet.create({
   },
   manageFundsBtnText: { color: THEME_COLORS.white, fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold },
 
-  featuredCharity: {
-    backgroundColor: PRIMARY, borderRadius: RADIUS.cardLg, padding: SPACE.s16, gap: SPACE.md, marginTop: SPACE.lg,
+  activeCharityCard: {
+    backgroundColor: PRIMARY,
+    borderRadius: RADIUS.cardLg,
+    padding: SPACE.s16,
+    gap: SPACE.md,
+    marginTop: SPACE.lg,
+    borderWidth: 1,
+    borderColor: PRIMARY,
   },
-  featuredCharityLabel: {
-    fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.alias_rgba_255_255_255_0_6,
-    textTransform: 'uppercase', letterSpacing: LETTER_SPACING.hero,
+  activeCharityHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: SPACE.lg,
   },
-  featuredCharityName: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white },
+  activeCharityName: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white, flex: 1 },
+  activeCharityTag: {
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: PRIMARY,
+    backgroundColor: THEME_COLORS.surface,
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.sm,
+    textTransform: 'uppercase',
+    letterSpacing: LETTER_SPACING.wide,
+  },
   completedBadge: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
-    alignSelf: 'flex-start', backgroundColor: THEME_COLORS.alias_rgba_74_222_128_0_15,
+    alignSelf: 'flex-start', backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_15,
     paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill,
   },
-  completedBadgeText: { fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.secondaryContainer },
-  progressRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: SPACE.xs },
-  progressText: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.whiteOverlay90 },
-  goalText: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.alias_rgba_255_255_255_0_6 },
-  progressTrack: { height: 6, backgroundColor: THEME_COLORS.blackOverlay20, borderRadius: RADIUS.sm, overflow: 'hidden', marginTop: SPACE.md },
-  progressFill: { height: '100%', backgroundColor: THEME_COLORS.secondaryContainer, borderRadius: RADIUS.sm },
-  completeBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg,
-    backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.xxl, paddingVertical: SPACE.xl, marginTop: SPACE.lg,
+  completedBadgeText: { fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white },
+  activeRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: SPACE.xs, gap: SPACE.lg },
+  activeRowStrong: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.white, flex: 1 },
+  activeRowMuted: { fontSize: TYPE_SCALE.lg, color: THEME_COLORS.whiteOverlay90 },
+  activeProgressTrack: {
+    height: 8,
+    backgroundColor: THEME_COLORS.blackOverlay20,
+    borderRadius: RADIUS.sm,
+    overflow: 'hidden',
+    marginTop: SPACE.md,
   },
-  completeBtnText: { color: PRIMARY, fontWeight: FONT_WEIGHT.bold, fontSize: TYPE_SCALE.xxl },
+  activeProgressFill: { height: '100%', backgroundColor: THEME_COLORS.secondaryContainer, borderRadius: RADIUS.sm },
+  catPreviousCard: {
+    marginTop: SPACE.lg,
+    borderRadius: RADIUS.cardLg,
+    backgroundColor: SECONDARY,
+    paddingHorizontal: SPACE.s16,
+    paddingVertical: SPACE.xl,
+    gap: SPACE.sm,
+  },
+  catPreviousHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: SPACE.lg,
+  },
+  catPreviousTitle: {
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.white,
+    textTransform: 'uppercase',
+    letterSpacing: LETTER_SPACING.tight,
+    flex: 1,
+  },
+  catPreviousMonth: {
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.whiteOverlay90,
+  },
+  catPreviousValue: {
+    fontSize: TYPE_SCALE.xl,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.white,
+  },
+  communityLifetimeCard: {
+    marginTop: SPACE.lg,
+    borderRadius: RADIUS.cardLg,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.overlayBorderSoft,
+    backgroundColor: THEME_COLORS.surfaceContainerLow,
+    paddingHorizontal: SPACE.s16,
+    paddingVertical: SPACE.xxl,
+    gap: SPACE.xs,
+  },
+  communityLifetimeLabel: {
+    fontSize: TYPE_SCALE.md,
+    color: THEME_COLORS.neutralTextMuted,
+    fontWeight: FONT_WEIGHT.black,
+    textTransform: 'uppercase',
+    letterSpacing: LETTER_SPACING.wide,
+  },
+  communityLifetimeValue: {
+    fontSize: TYPE_SCALE.display,
+    fontWeight: FONT_WEIGHT.black,
+    color: PRIMARY,
+  },
+  communityLifetimeMeta: {
+    fontSize: TYPE_SCALE.md,
+    color: THEME_COLORS.neutralTextSubtle,
+  },
   noCharity: {
     alignItems: 'center', justifyContent: 'center', paddingVertical: SPACE.s24,
     backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.xxl, gap: SPACE.lg, marginTop: SPACE.lg,
@@ -1364,13 +1523,58 @@ const styles = StyleSheet.create({
   },
   previousCampaigns: { marginTop: SPACE.lg, gap: SPACE.lg },
   previousCampaignsTitle: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY },
+  prevCampaignMeta: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextMuted },
   prevCampaignRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    gap: SPACE.md,
     backgroundColor: THEME_COLORS.neutralBg, padding: SPACE.xl, borderRadius: RADIUS.xxl,
     borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
   },
+  prevCampaignMainRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: SPACE.xl,
+  },
+  prevCampaignLeft: { flex: 1, gap: SPACE.sm },
+  prevCampaignTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
   prevCampaignName: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong, flex: 1 },
+  prevCampaignBadge: {
+    backgroundColor: THEME_COLORS.successSurface,
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.sm,
+  },
+  prevCampaignBadgeText: {
+    fontSize: TYPE_SCALE.sm,
+    fontWeight: FONT_WEIGHT.black,
+    color: PRIMARY,
+  },
+  prevCampaignProgressTrack: {
+    height: 6,
+    backgroundColor: THEME_COLORS.neutralBorderMuted,
+    borderRadius: RADIUS.sm,
+    overflow: 'hidden',
+  },
+  prevCampaignProgressFill: {
+    height: '100%',
+    backgroundColor: THEME_COLORS.secondaryContainer,
+    borderRadius: RADIUS.sm,
+  },
+  prevCampaignRight: { alignItems: 'flex-end', gap: SPACE.xs },
   prevCampaignAmount: { fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.secondaryContainer },
+  prevCampaignPct: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.black, color: PRIMARY },
+  prevCampaignViewAll: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.sm,
+    borderRadius: RADIUS.pill,
+    backgroundColor: THEME_COLORS.successSurface,
+  },
+  prevCampaignViewAllText: {
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.bold,
+    color: PRIMARY,
+  },
 
   emergencyBadge: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,

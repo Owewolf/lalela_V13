@@ -19,6 +19,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '../../lib/api';
 import { Users } from 'lucide-react-native';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
+import { useInvitePreview } from '../../hooks/queries/useInvitePreview';
 
 const TYPE_SCALE = {
   h2Web: 36,
@@ -68,13 +69,11 @@ const LandingPage: React.FC = () => {
   const { verified, join } = useLocalSearchParams<{ verified?: string; join?: string }>();
   const scrollRef = useRef<ScrollView>(null);
   const [invitedCommunityName, setInvitedCommunityName] = useState<string | null>(null);
+  const invitePreview = useInvitePreview(join ? String(join) : null);
 
   useEffect(() => {
-    if (!join) return;
-    api.get(`/communities/join/${join}`)
-      .then((res) => { if (res.data?.communityName) setInvitedCommunityName(res.data.communityName); })
-      .catch(() => {});
-  }, [join]);
+    if (invitePreview.data?.communityName) setInvitedCommunityName(invitePreview.data.communityName);
+  }, [invitePreview.data]);
   // Auto-switch to login and show success banner if arriving from email verification link
   const [joinMode, setJoinMode] = useState<JoinMode>(verified === '1' ? 'login' : 'login');
   const [emailJustVerified, setEmailJustVerified] = useState(verified === '1');

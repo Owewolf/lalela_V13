@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {
 } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { accountService } from '../../services/accountService';
-import { UserSession } from '../../types';
+import { useCurrentUserSessions } from '../../hooks/queries/useCurrentUserSessions';
 import { THEME_COLORS } from '../../theme/colors';
 
 const TYPE_SCALE = {
@@ -62,30 +62,19 @@ const LETTER_SPACING = {
 
 export const SessionsSection: React.FC = () => {
   const { userProfile } = useAuth();
-  const [sessions, setSessions] = useState<UserSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRevokingAll, setIsRevokingAll] = useState(false);
+  const sessionsQuery = useCurrentUserSessions(Boolean(userProfile));
+  const sessions = sessionsQuery.data ?? [];
 
-  const fetchSessions = async () => {
-    try {
-      const data = await accountService.getSessions();
-      setSessions(data);
-    } catch (error) {
-      console.error('Failed to fetch sessions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!userProfile) return;
-    fetchSessions();
-  }, [userProfile]);
+  React.useEffect(() => {
+    setLoading(sessionsQuery.isLoading);
+  }, [sessionsQuery.isLoading]);
 
   const handleLogoutSession = async (sessionId: string) => {
     try {
       await accountService.revokeSession(sessionId);
-      setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+      await sessionsQuery.refetch();
     } catch (error) {
       console.error('Failed to logout session:', error);
     }
@@ -96,7 +85,7 @@ export const SessionsSection: React.FC = () => {
     setIsRevokingAll(true);
     try {
       await accountService.revokeAllOtherSessions();
-      setSessions((prev) => prev.filter((s) => s.isCurrent));
+      await sessionsQuery.refetch();
     } catch (error) {
       console.error('Failed to logout all sessions:', error);
     } finally {

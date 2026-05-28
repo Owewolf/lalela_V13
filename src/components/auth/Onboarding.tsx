@@ -26,6 +26,7 @@ import {
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/uploadImage';
+import { useInvitePreview } from '../../hooks/queries/useInvitePreview';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LocationPickerSection from '../shared/LocationPickerSection';
@@ -109,6 +110,7 @@ const OnboardingInvite: React.FC = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const isProfileValid = fullName.trim().length > 0 && locationName.trim().length > 0 && locationLat !== 0;
+  const invitePreview = useInvitePreview(inviteCode || urlInviteCode);
 
   // Redirect community creators to the dedicated create route.
   // URL param takes priority — if a join code is present in the URL, this user
@@ -148,11 +150,6 @@ const OnboardingInvite: React.FC = () => {
       const code = urlInviteCode || pendingJoinCode || pendingInvite || '';
       if (code) {
         setInviteCode(code);
-        // Fetch community name and coverage for the invite link (best-effort)
-        api.get(`/communities/join/${code}`).then((res) => {
-          if (res.data?.communityName) setInvitedCommunityName(res.data.communityName);
-          if (res.data?.coverageArea) setInviteCoverageArea(res.data.coverageArea);
-        }).catch(() => {});
       }
 
       if (pendingName) setFullName(pendingName);
@@ -165,6 +162,11 @@ const OnboardingInvite: React.FC = () => {
     };
     load();
   }, []);
+
+  useEffect(() => {
+    if (invitePreview.data?.communityName) setInvitedCommunityName(invitePreview.data.communityName);
+    if (invitePreview.data?.coverageArea) setInviteCoverageArea(invitePreview.data.coverageArea);
+  }, [invitePreview.data]);
 
   // Pre-fill from auth / existing profile
   useEffect(() => {

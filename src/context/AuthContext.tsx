@@ -11,6 +11,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../lib/api';
 import { disconnectSocket, updateSocketAuth } from '../lib/socket';
 import { migrateAsyncStorageKeys } from '../lib/migrateStorage';
+import { queryClient } from '../lib/queryClient';
+import { queryKeys } from '../lib/queryKeys';
 import { UserProfile } from '../types';
 
 // ─── Context shape ─────────────────────────────────────────────────────────────
@@ -87,6 +89,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isAuthReady, setIsAuthReady] = useState(false);
 
+  const syncProfileFromServer = useCallback(async (): Promise<UserProfile | null> => {
+    try {
+      const fresh = await queryClient.fetchQuery({
+        queryKey: queryKeys.currentUserProfile(),
+        queryFn: async (): Promise<UserProfile> => {
+          const { data } = await api.get<UserProfile>('/users/me');
+          return data;
+        },
+      });
+      setUserProfile(fresh);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
+      return fresh;
+    } catch {
+      return null;
+    }
+  }, []);
+
   // ── Boot: restore session from stored tokens ──────────────────────────────
   useEffect(() => {
     (async () => {
@@ -104,9 +123,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           // Fetch fresh profile (this also validates the token)
           try {
-            const { data } = await api.get<UserProfile>('/users/me');
-            setUserProfile(data);
-            await AsyncStorage.setItem('userProfile', JSON.stringify(data));
+            const fresh = await syncProfileFromServer();
+            if (!fresh) throw new Error('Profile refresh failed');
           } catch {
             // 401 → interceptor will attempt refresh; if that fails it clears tokens
             // and a subsequent render will see null userProfile → AppGuard routes to /landing
@@ -120,22 +138,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAuthReady(true);
       }
     })();
-  }, []);
+  }, [syncProfileFromServer]);
 
   // ── Sign in ───────────────────────────────────────────────────────────────
   const signIn = useCallback(async (email: string, password: string) => {
     const { data } = await api.post('/auth/login', { email, password });
     await storeTokens(data.accessToken, data.refreshToken);
     // Refetch canonical profile so cache always matches /users/me shape.
-    try {
-      const { data: fresh } = await api.get<UserProfile>('/users/me');
-      setUserProfile(fresh);
-      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
-    } catch {
+    const fresh = await syncProfileFromServer();
+    if (!fresh) {
       setUserProfile(data.user);
       await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+      queryClient.setQueryData(queryKeys.currentUserProfile(), data.user);
     }
-  }, []);
+  }, [syncProfileFromServer]);
 
   // ── Sign out ──────────────────────────────────────────────
   const signOut = useCallback(async () => {
@@ -147,6 +163,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       await clearTokens();
       setUserProfile(null);
+      queryClient.removeQueries({ queryKey: queryKeys.currentUserProfile() });
+      queryClient.removeQueries({ queryKey: queryKeys.currentUserSessions() });
+      queryClient.removeQueries({ queryKey: queryKeys.currentUserTwoFA() });
+      queryClient.removeQueries({ queryKey: queryKeys.currentUserAuditLogs() });
     }
   }, []);
 
@@ -168,21 +188,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── Refresh profile (used after email verification deep-link or app resume) ─
   const refreshProfile = useCallback(async (): Promise<UserProfile | null> => {
-    try {
-      const { data: fresh } = await api.get<UserProfile>('/users/me');
-      setUserProfile(fresh);
-      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
-      return fresh;
-    } catch {
-      return null;
-    }
-  }, []);
+    return syncProfileFromServer();
+  }, [syncProfileFromServer]);
 
   // ── Update profile ────────────────────────────────────────────────────────
   const updateUserProfile = useCallback(async (data: Partial<UserProfile>) => {
     const { data: updated } = await api.put<UserProfile>('/users/me', data);
     setUserProfile(updated);
     await AsyncStorage.setItem('userProfile', JSON.stringify(updated));
+    queryClient.setQueryData(queryKeys.currentUserProfile(), updated);
   }, []);
 
   // ── Forgot / reset password ───────────────────────────────────────────────
@@ -199,6 +213,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await api.delete('/users/me');
     await clearTokens();
     setUserProfile(null);
+    queryClient.removeQueries({ queryKey: queryKeys.currentUserProfile() });
+    queryClient.removeQueries({ queryKey: queryKeys.currentUserSessions() });
+    queryClient.removeQueries({ queryKey: queryKeys.currentUserTwoFA() });
+    queryClient.removeQueries({ queryKey: queryKeys.currentUserAuditLogs() });
   }, []);
 
   // ── Phone OTP ─────────────────────────────────────────────────────────────
@@ -213,16 +231,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Refetch the canonical profile so we get the full shape (role,
       // lastCommunityId, licenseStatus, etc.) — mirrors the boot path and
       // guards against any drift in the verify-otp response payload.
-      try {
-        const { data: fresh } = await api.get<UserProfile>('/users/me');
-        setUserProfile(fresh);
-        await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
-      } catch {
+      const fresh = await syncProfileFromServer();
+      if (!fresh) {
         setUserProfile(data.user);
         await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+        queryClient.setQueryData(queryKeys.currentUserProfile(), data.user);
       }
     }
-  }, []);
+  }, [syncProfileFromServer]);
 
   // ── Link phone to current account ─────────────────────────────────────────
   const linkPhone = useCallback(async (phone: string) => {
@@ -241,26 +257,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const linkEmail = useCallback(async (email: string) => {
     await api.post('/auth/link-email', { email });
     // Refresh the canonical profile so email + emailVerified=false are reflected.
-    try {
-      const { data: fresh } = await api.get<UserProfile>('/users/me');
-      setUserProfile(fresh);
-      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
-    } catch {
+    const fresh = await syncProfileFromServer();
+    if (!fresh) {
       // Non-fatal — next /users/me call will pick it up.
     }
-  }, []);
+  }, [syncProfileFromServer]);
 
   // ── Set initial password (phone-only accounts) ────────────────────────
   const setInitialPassword = useCallback(async (newPassword: string) => {
     await api.post('/auth/set-password', { newPassword });
-    try {
-      const { data: fresh } = await api.get<UserProfile>('/users/me');
-      setUserProfile(fresh);
-      await AsyncStorage.setItem('userProfile', JSON.stringify(fresh));
-    } catch {
+    const fresh = await syncProfileFromServer();
+    if (!fresh) {
       // Non-fatal.
     }
-  }, []);
+  }, [syncProfileFromServer]);
 
   // ── Phone-based password reset ────────────────────────────────────────────
   const sendPhoneResetOtp = useCallback(async (phone: string) => {

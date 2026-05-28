@@ -12,8 +12,8 @@ import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { accountService } from '../../services/accountService';
+import { useCurrentUserProfile } from '../../hooks/queries/useCurrentUserProfile';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import api from '../../lib/api';
 import { THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
 
@@ -79,6 +79,7 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
   const [success, setSuccess] = useState(false);
   const { licenseCommunity } = useCommunity();
   const { updateUserProfile } = useAuth();
+  const currentUserProfileQuery = useCurrentUserProfile();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -117,9 +118,11 @@ const MockStripeCheckout: React.FC<MockStripeCheckoutProps> = ({
       } else if (type === 'membership') {
         // Server updates DB: user.licenseStatus='ACTIVE', subscriptionActive=true, renewalDate=now+1yr
         await accountService.simulateSuccessfulPayment('membership');
-        // Refresh local profile from server so new licenseStatus is reflected immediately
-        const { data: freshUser } = await api.get('/users/me');
-        await updateUserProfile(freshUser);
+        // Refresh local profile from the cached query so the new licenseStatus is reflected immediately.
+        const freshUserResult = await currentUserProfileQuery.refetch();
+        if (freshUserResult.data) {
+          await updateUserProfile(freshUserResult.data);
+        }
       }
       setLoading(false);
       setSuccess(true);

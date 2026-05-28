@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import {
   History,
 } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
-import { accountService } from '../../services/accountService';
+import { useCurrentUserAuditLogs } from '../../hooks/queries/useCurrentUserAuditLogs';
 import { THEME_COLORS } from '../../theme/colors';
 
 const TYPE_SCALE = {
@@ -71,17 +71,9 @@ const getLogIcon = (type: string) => {
 
 export const AuditLogsSection: React.FC = () => {
   const { userProfile } = useAuth();
-  const [logs, setLogs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!userProfile) return;
-    accountService
-      .getAuditLogs()
-      .then(setLogs)
-      .catch((e) => console.error('Failed to fetch audit logs:', e))
-      .finally(() => setLoading(false));
-  }, [userProfile]);
+  const auditLogsQuery = useCurrentUserAuditLogs(Boolean(userProfile));
+  const logs = auditLogsQuery.data ?? [];
+  const loading = auditLogsQuery.isLoading;
 
   return (
     <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.xxxl }}>

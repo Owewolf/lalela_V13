@@ -12,12 +12,18 @@ import React, {
 } from 'react';
 import { useAuth } from './AuthContext';
 import api from '../lib/api';
+import { queryClient } from '../lib/queryClient';
+import { queryKeys } from '../lib/queryKeys';
+import { useCommunityBootstrap } from '../hooks/queries/useCommunityBootstrap';
+import { useCommunityBundle } from '../hooks/queries/useCommunityBundle';
+import { useConversationMessages } from '../hooks/queries/useConversationMessages';
 import { getSocket, disconnectSocket } from '../lib/socket';
 import type {
   Community, CommunityContextType, UserBusiness, CoverageArea, Business,
   Charity, CommunityNotice, CommunityMember, UserProfile, UserRole,
   Conversation, Message, CharitySuggestion, CommunityInvitation,
   CommunityInviteLink, AppNotification, NotificationPreferences, ChatUnreadTotals,
+  FeaturedCharitySummary,
 } from '../types';
 
 const CommunityContext = createContext<CommunityContextType | undefined>(undefined);
@@ -59,6 +65,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const { userProfile, updateUserProfile } = useAuth();
   const userId = userProfile?.id ?? null;
   const currentCommunityId = userProfile?.lastCommunityId ?? null;
+  const bootstrapQuery = useCommunityBootstrap(userId);
+  const bundleQuery = useCommunityBundle(currentCommunityId, userId);
 
   // ── State ─────────────────────────────────────────────────────────────────
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -77,10 +85,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [activeCommunityLink, setActiveCommunityLink] = useState<CommunityInviteLink | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [securityResponders, setSecurityResponders] = useState<CommunityContextType['securityResponders']>([]);
+  const messagesQuery = useConversationMessages(activeConversationId);
 
   const socketRef = useRef<Awaited<ReturnType<typeof getSocket>> | null>(null);
-  // Holds the latest `load` function so it can be called outside the useEffect.
-  const loadRef = useRef<(() => Promise<void>) | null>(null);
   // Tracks the active conversation id so socket handlers (bound once per
   // community/user) can read the current value without closing over stale state.
   const activeConversationIdRef = useRef<string | null>(null);
@@ -89,8 +96,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [activeConversationId]);
 
   const refreshCommunities = useCallback(async () => {
-    if (loadRef.current) await loadRef.current();
-  }, []);
+    await bootstrapQuery.refetch();
+  }, [bootstrapQuery]);
 
   const currentCommunity = useMemo(
     () => communities.find((c) => c.id === currentCommunityId) ?? EMPTY_COMMUNITY,
@@ -134,85 +141,51 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     return totals;
   }, [conversations]);
 
-  // ── Initial data load ─────────────────────────────────────────────────────
+  // ─── Bootstrap queries ───────────────────────────────────────────────────
   useEffect(() => {
     if (!userId) {
       setCommunities([]);
-      setMembers([]);
-      setPosts([]);
       setConversations([]);
       setNotifications([]);
       return;
     }
 
-    const load = async () => {
-      try {
-        const [commRes, convRes, notifRes] = await Promise.allSettled([
-          api.get('/communities'),
-          api.get('/conversations'),
-          api.get('/users/me/notifications'),
-        ]);
-        if (commRes.status === 'fulfilled') setCommunities(commRes.value.data.map(mapServerCommunity));
-        if (convRes.status === 'fulfilled') setConversations(convRes.value.data);
-        if (notifRes.status === 'fulfilled') setNotifications(notifRes.value.data);
-      } catch (err) {
-        console.error('CommunityContext load error:', err);
-      }
-    };
-
-    load();
-    // Expose load so callers can trigger a re-fetch (e.g. after community creation).
-    loadRef.current = load;
-  }, [userId]);
+    setCommunities((bootstrapQuery.data?.communities ?? []).map(mapServerCommunity));
+    setConversations(bootstrapQuery.data?.conversations ?? []);
+    setNotifications(bootstrapQuery.data?.notifications ?? []);
+  }, [userId, bootstrapQuery.data]);
 
   // If lastCommunityId is set but not yet in the communities list (e.g. just
   // created), re-fetch once to pick it up with the correct userRole.
   useEffect(() => {
-    if (!currentCommunityId) return;
-    const alreadyLoaded = communities.some((c) => c.id === currentCommunityId);
-    if (!alreadyLoaded && loadRef.current) {
-      loadRef.current();
+    if (!currentCommunityId) {
+      setMembers([]);
+      setPosts([]);
+      setCharities([]);
+      setCharitySuggestions([]);
+      setUserBusinesses([]);
+      setCommunityBusinesses([]);
+      setSecurityResponders([]);
+      return;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCommunityId]);
 
-  // Load community-specific data when current community changes
+    setMembers(bundleQuery.data?.members ?? []);
+    setPosts(bundleQuery.data?.posts ?? []);
+    setCharities(bundleQuery.data?.charities ?? []);
+    setCharitySuggestions(bundleQuery.data?.charitySuggestions ?? []);
+    const allBusinesses = bundleQuery.data?.businesses ?? [];
+    setUserBusinesses(allBusinesses.filter((b: UserBusiness) => b.ownerId === userId));
+    setCommunityBusinesses(allBusinesses.filter((b: UserBusiness) => (b.communityIds ?? []).includes(currentCommunityId)));
+    setSecurityResponders(bundleQuery.data?.locations?.security ?? []);
+  }, [currentCommunityId, bundleQuery.data, userId]);
+
   useEffect(() => {
-    if (!currentCommunityId) return;
-
-    const loadCommunity = async () => {
-      try {
-        const [membersRes, postsRes, charitiesRes, charitySuggestionsRes, bizRes, locRes] = await Promise.allSettled([
-          api.get(`/communities/${currentCommunityId}/members`),
-          api.get(`/communities/${currentCommunityId}/posts`),
-          api.get(`/communities/${currentCommunityId}/charities`),
-          api.get(`/communities/${currentCommunityId}/charity-suggestions`),
-          api.get('/businesses'),
-          api.get(`/communities/${currentCommunityId}/locations`),
-        ]);
-        // Members always use their default location (lat/lng from user profile)
-        if (membersRes.status === 'fulfilled') setMembers(membersRes.value.data);
-        // Live locations from /locations are used only for security responders
-        if (locRes.status === 'fulfilled') {
-          const liveLocations: { userId: string; name: string; image: string; latitude: number; longitude: number; timestamp: string }[] =
-            locRes.value.data?.security ?? [];
-          setSecurityResponders(liveLocations);
-        }
-        if (postsRes.status === 'fulfilled') setPosts(postsRes.value.data);
-        if (charitiesRes.status === 'fulfilled') setCharities(charitiesRes.value.data);
-        if (charitySuggestionsRes.status === 'fulfilled') setCharitySuggestions(charitySuggestionsRes.value.data);
-        if (bizRes.status === 'fulfilled') {
-          const all: UserBusiness[] = bizRes.value.data;
-          setUserBusinesses(all.filter((b) => b.ownerId === userId));
-          setCommunityBusinesses(all.filter((b) => (b.communityIds ?? []).includes(currentCommunityId!)));
-        }
-      } catch (err) {
-        console.error('CommunityContext community load error:', err);
-      }
-    };
-
-    loadCommunity();
-  }, [currentCommunityId, userId]);
+    if (!activeConversationId) {
+      setMessages([]);
+      return;
+    }
+    setMessages(messagesQuery.data ?? []);
+  }, [activeConversationId, messagesQuery.data]);
 
   // ── Socket.io realtime ────────────────────────────────────────────────────
   useEffect(() => {
@@ -297,14 +270,10 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     };
   }, [userId, currentCommunityId]);
 
-  // Join conversation room when active conversation changes
+    // Join conversation room when active conversation changes
   useEffect(() => {
     if (!activeConversationId) return;
     socketRef.current?.emit('join:conversation', { conversationId: activeConversationId });
-    // Load messages
-    api.get(`/conversations/${activeConversationId}/messages`)
-      .then((res) => setMessages(res.data))
-      .catch(console.error);
   }, [activeConversationId]);
 
   // ── Context methods ───────────────────────────────────────────────────────
@@ -350,8 +319,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       subscriptionActive: true,
       subscriptionRenewalDate: renewalDate,
     } as any);
-    if (loadRef.current) loadRef.current().catch(console.error);
-  }, [updateUserProfile]);
+    await bootstrapQuery.refetch();
+  }, [updateUserProfile, bootstrapQuery]);
 
   const updateCommunityCoverage = useCallback(async (communityId: string, coverage: CoverageArea) => {
     await api.put(`/communities/${communityId}`, {
@@ -386,9 +355,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const bulkAddCommunityBusinesses = useCallback(async (communityId: string, businesses: Business[]) => {
     await api.post('/businesses/import', { communityId, businesses });
-    const { data } = await api.get('/businesses');
-    setCommunityBusinesses(data.filter((b: UserBusiness) => (b.communityIds ?? []).includes(communityId)));
-  }, []);
+    if (currentCommunityId === communityId) {
+      await bundleQuery.refetch();
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: queryKeys.communityBundle(communityId) });
+  }, [bundleQuery, currentCommunityId]);
 
   const addUserBusiness = useCallback(async (business: Omit<UserBusiness, 'id'>) => {
     const { data } = await api.post('/businesses', business);
@@ -548,8 +520,41 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         recentTransactions: [],
       };
     }
-    const { data } = await api.get(`/communities/${currentCommunityId}/cat-hub`);
-    return data;
+    return queryClient.fetchQuery({
+      queryKey: queryKeys.catHub(currentCommunityId),
+      queryFn: async () => {
+        const { data } = await api.get(`/communities/${currentCommunityId}/cat-hub`);
+        return data;
+      },
+    });
+  }, [currentCommunityId]);
+
+  const getFeaturedCharity = useCallback(async (): Promise<FeaturedCharitySummary> => {
+    if (!currentCommunityId) {
+      return {
+        charityId: null,
+        name: null,
+        goalAmount: 0,
+        potentialEarnings: 0,
+        raisedEarnings: 0,
+        progressPercentage: 0,
+        itemsAvailable: 0,
+        itemsSold: 0,
+        activeCampaign: false,
+        isCATBaseline: false,
+        campaignStartedAt: null,
+        lifetimeRaised: 0,
+        lastUpdated: new Date().toISOString(),
+      };
+    }
+
+    return queryClient.fetchQuery({
+      queryKey: queryKeys.featuredCharity(currentCommunityId),
+      queryFn: async () => {
+        const { data } = await api.get(`/communities/${currentCommunityId}/featured-charity`);
+        return data;
+      },
+    });
   }, [currentCommunityId]);
 
   // ── Posts ─────────────────────────────────────────────────────────────────
@@ -617,8 +622,14 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   // ── User search ───────────────────────────────────────────────────────────
   const searchUsers = useCallback(async (query: string): Promise<UserProfile[]> => {
-    const { data } = await api.get(`/users?search=${encodeURIComponent(query)}`);
-    return data;
+    return queryClient.fetchQuery({
+      queryKey: queryKeys.userSearch(query),
+      queryFn: async (): Promise<UserProfile[]> => {
+        const { data } = await api.get(`/users?search=${encodeURIComponent(query)}`);
+        return data ?? [];
+      },
+      staleTime: 30_000,
+    });
   }, []);
 
   // ── Emergency / Security ──────────────────────────────────────────────────
@@ -721,11 +732,17 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const joinViaInviteLink = useCallback(async (linkCode: string): Promise<string> => {
     const { data } = await api.post(`/communities/join/${linkCode}`);
     // Reload the joined community from the server so the list is always fresh
-    const { data: communityData } = await api.get(`/communities/${data.communityId}`);
+    const communityData = await queryClient.fetchQuery({
+      queryKey: queryKeys.communityById(data.communityId),
+      queryFn: async () => {
+        const { data: responseData } = await api.get(`/communities/${data.communityId}`);
+        return mapServerCommunity(responseData);
+      },
+    });
     setCommunities((prev) =>
       prev.find((c) => c.id === data.communityId)
-        ? prev.map((c) => (c.id === data.communityId ? mapServerCommunity(communityData) : c))
-        : [...prev, mapServerCommunity(communityData)]
+        ? prev.map((c) => (c.id === data.communityId ? communityData : c))
+        : [...prev, communityData]
     );
     // Select the joined community immediately
     await updateUserProfile({ lastCommunityId: data.communityId } as any);
@@ -784,6 +801,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         setCatCycle,
         markPostSold,
         getCatHub,
+        getFeaturedCharity,
         charitySuggestions,
         posts,
         addPost,

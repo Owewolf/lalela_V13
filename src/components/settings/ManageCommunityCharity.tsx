@@ -22,6 +22,7 @@ import {
 } from 'lucide-react-native';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
+import { useCharityTotals } from '../../hooks/queries/useCharityTotals';
 import type { Charity, CharitySuggestion, CatHubSummary } from '../../types';
 import { resolveActiveCharity, isCatCharity as isCatCharityShared } from '../../lib/activeCharity';
 import { THEME_COLORS } from '../../theme/colors';
@@ -59,7 +60,7 @@ interface SuggestionFormState {
 const EMPTY_CHARITY_FORM: CharityFormState = {
   name: '',
   description: '',
-  percentage: '5',
+  percentage: '15',
   website: '',
   contactEmail: '',
   contactPhone: '',
@@ -135,7 +136,7 @@ const toCharityForm = (
   name: charity?.name ?? '',
   description: charity?.description ?? '',
   percentage:
-    typeof charity?.percentage === 'number' ? String(charity.percentage) : '5',
+    typeof charity?.percentage === 'number' ? String(charity.percentage) : '15',
   website: charity?.website ?? '',
   contactEmail: charity?.contactEmail ?? '',
   contactPhone: charity?.contactPhone ?? '',
@@ -167,6 +168,7 @@ export default function ManageCommunityCharity({
     setCatCycle,
     getCatHub,
   } = useCommunity();
+  const { data: charityTotals = [] } = useCharityTotals(currentCommunity?.id);
 
   const canManageCharity =
     currentCommunity?.userRole === 'OWNER' ||
@@ -215,6 +217,11 @@ export default function ManageCommunityCharity({
     [charitySuggestions]
   );
 
+  const charityTotalsMap = useMemo(
+    () => new Map(charityTotals.map((item) => [item.charityId, item])),
+    [charityTotals]
+  );
+
   useEffect(() => {
     if (initialMode === 'manage' && canManageCharity) {
       setShowManager(true);
@@ -261,7 +268,7 @@ export default function ManageCommunityCharity({
           percentage:
             typeof suggestion.suggestedDonationAmount === 'number'
               ? String(suggestion.suggestedDonationAmount)
-              : '5',
+              : '15',
           website: suggestion.website ?? '',
           tags: 'Verified, Member Suggested',
           isFeatured: fallbackFeatured,
@@ -298,12 +305,22 @@ export default function ManageCommunityCharity({
       return;
     }
 
+    const isCat = Boolean(selectedCharity?.isCATCharity);
+    const parsedFundraisingGoal = charityForm.fundraisingGoal.trim()
+      ? Number(charityForm.fundraisingGoal)
+      : undefined;
+    if (!isCat && (!Number.isFinite(parsedFundraisingGoal) || Number(parsedFundraisingGoal) <= 0)) {
+      Alert.alert(
+        'Fundraising goal required',
+        'Enter a fundraising goal greater than R0 for this charity.'
+      );
+      return;
+    }
+
     setSavingCharity(true);
     try {
       const coverage = currentCommunity?.coverageArea;
-      const fundraisingGoal = charityForm.fundraisingGoal.trim()
-        ? Number(charityForm.fundraisingGoal)
-        : undefined;
+      const fundraisingGoal = isCat ? parsedFundraisingGoal : Number(parsedFundraisingGoal);
 
       const basePayload: Omit<Charity, 'id' | 'createdAt'> = {
         communityId: currentCommunity!.id,
@@ -521,6 +538,55 @@ export default function ManageCommunityCharity({
                   <Text style={styles.listItemMeta}>
                     Active charity: {effectiveFeaturedCharity?.name || 'CAT (default)'}
                   </Text>
+                  {(() => {
+                    const activeIsCat = !effectiveFeaturedCharity || isCatCharity(effectiveFeaturedCharity);
+                    if (activeIsCat) {
+                      return (
+                        <View style={styles.progressBlock}>
+                          <View style={styles.progressTrack}>
+                            <View style={[styles.progressFill, styles.progressFillFull]} />
+                          </View>
+                          <Text style={styles.progressLabel}>
+                            Total raised: R{Number(catHubSummary?.totalRaisedForCharity ?? 0).toLocaleString()}
+                          </Text>
+                        </View>
+                      );
+                    }
+
+                    const activeTotals = effectiveFeaturedCharity?.id
+                      ? charityTotalsMap.get(effectiveFeaturedCharity.id)
+                      : null;
+                    const raisedAmount = Number(
+                      activeTotals?.raisedEarnings ?? effectiveFeaturedCharity?.raisedAmount ?? 0
+                    );
+                    const goal = Number(
+                      activeTotals?.goalAmount ?? effectiveFeaturedCharity?.fundraisingGoal ?? 0
+                    );
+                    if (!Number.isFinite(goal) || goal <= 0) {
+                      return (
+                        <View style={styles.progressBlock}>
+                          <View style={styles.progressTrack}>
+                            <View style={[styles.progressFill, { width: '0%' }]} />
+                          </View>
+                          <Text style={styles.progressLabelMuted}>
+                            Set a fundraising goal to track progress.
+                          </Text>
+                        </View>
+                      );
+                    }
+
+                    const pct = Math.max(0, Math.min(100, Math.round((raisedAmount / goal) * 100)));
+                    return (
+                      <View style={styles.progressBlock}>
+                        <View style={styles.progressTrack}>
+                          <View style={[styles.progressFill, { width: `${pct}%` }]} />
+                        </View>
+                        <Text style={styles.progressLabel}>
+                          R{raisedAmount.toLocaleString()} / R{goal.toLocaleString()} ({pct}%)
+                        </Text>
+                      </View>
+                    );
+                  })()}
                   <Text style={styles.listItemMeta}>
                     Recent transactions: {catHubSummary?.recentTransactions?.length ?? 0}
                   </Text>
@@ -564,6 +630,8 @@ export default function ManageCommunityCharity({
                   .map((charity) => {
                     const isActive = charity.id === effectiveFeaturedCharity?.id;
                     const isFeaturedCandidate = Boolean(charity.isFeatured) && !isCatCharity(charity);
+                    const rowTotals = charityTotalsMap.get(charity.id);
+                    const raisedAmount = Number(rowTotals?.raisedEarnings ?? charity.raisedAmount ?? 0);
                     return (
                       <View
                         key={charity.id}
@@ -593,9 +661,7 @@ export default function ManageCommunityCharity({
                           </View>
                           <Text style={styles.listItemMeta}>
                             {charity.percentage}% impact
-                            {typeof charity.raisedAmount === 'number'
-                              ? ` • R${charity.raisedAmount.toLocaleString()} raised`
-                              : ''}
+                            {` • R${raisedAmount.toLocaleString()} raised`}
                           </Text>
                         </View>
                         <TouchableOpacity
@@ -687,7 +753,11 @@ export default function ManageCommunityCharity({
                   </Text>
                   <Text style={styles.cardDescription}>
                     {effectiveFeaturedCharity
-                      ? `${effectiveFeaturedCharity.percentage}% impact${typeof effectiveFeaturedCharity.raisedAmount === 'number' ? ` • R${effectiveFeaturedCharity.raisedAmount.toLocaleString()} raised` : ''}`
+                      ? `${effectiveFeaturedCharity.percentage}% impact • R${Number(
+                          charityTotalsMap.get(effectiveFeaturedCharity.id)?.raisedEarnings
+                          ?? effectiveFeaturedCharity.raisedAmount
+                          ?? 0
+                        ).toLocaleString()} raised`
                       : 'No featured charity selected yet. CAT is shown by default.'}
                   </Text>
                 </View>
@@ -768,7 +838,7 @@ export default function ManageCommunityCharity({
                     onChangeText={(value) =>
                       setCharityForm((current) => ({ ...current, percentage: value }))
                     }
-                    placeholder="Donation percentage"
+                    placeholder="Donation percentage (default 15%)"
                     placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     keyboardType="numeric"
                   />
@@ -778,7 +848,7 @@ export default function ManageCommunityCharity({
                     onChangeText={(value) =>
                       setCharityForm((current) => ({ ...current, fundraisingGoal: value }))
                     }
-                    placeholder="Fundraising goal (optional)"
+                    placeholder="Fundraising goal (R)"
                     placeholderTextColor={THEME_COLORS.neutralTextMuted}
                     keyboardType="numeric"
                   />
@@ -836,25 +906,27 @@ export default function ManageCommunityCharity({
                     onChangeText={(value) =>
                       setCharityForm((current) => ({ ...current, tags: value }))
                     }
-                    placeholder="Tags separated by commas"
+                    placeholder="Tags (comma separated)"
                     placeholderTextColor={THEME_COLORS.neutralTextMuted}
                   />
-                  <View style={styles.switchRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.switchLabel}>Featured charity</Text>
-                      <Text style={styles.listItemMeta}>
-                        Marks this charity as the candidate. It only becomes the community's
-                        active charity once the CAT Charity Cycle switch is turned on.
-                      </Text>
+                  <View style={styles.featuredCard}>
+                    <View style={styles.switchRow}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.featuredCardTitle}>Featured charity</Text>
+                        <Text style={styles.listItemMeta}>
+                          Marks this charity as the candidate. It only becomes the community's
+                          active charity once the CAT Charity Cycle switch is turned on.
+                        </Text>
+                      </View>
+                      <Switch
+                        value={charityForm.isFeatured}
+                        onValueChange={(value) =>
+                          setCharityForm((current) => ({ ...current, isFeatured: value }))
+                        }
+                        trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
+                        thumbColor={THEME_COLORS.white}
+                      />
                     </View>
-                    <Switch
-                      value={charityForm.isFeatured}
-                      onValueChange={(value) =>
-                        setCharityForm((current) => ({ ...current, isFeatured: value }))
-                      }
-                      trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
-                      thumbColor={THEME_COLORS.white}
-                    />
                   </View>
                   {selectedSuggestion && (
                     <TextInput
@@ -1196,6 +1268,34 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHT.bold,
     color: THEME_COLORS.neutralTextStrong,
   },
+  progressBlock: {
+    gap: SPACE.xs,
+    marginTop: SPACE.xs,
+  },
+  progressTrack: {
+    width: '100%',
+    height: 8,
+    borderRadius: RADIUS.full,
+    backgroundColor: THEME_COLORS.neutralBorderMuted,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: RADIUS.full,
+    backgroundColor: THEME_COLORS.primary,
+  },
+  progressFillFull: {
+    width: '100%',
+  },
+  progressLabel: {
+    fontSize: TYPE_SCALE.md,
+    color: THEME_COLORS.neutralTextStrong,
+    fontWeight: FONT_WEIGHT.semibold,
+  },
+  progressLabelMuted: {
+    fontSize: TYPE_SCALE.md,
+    color: THEME_COLORS.neutralTextSubtle,
+  },
   listItemTitle: { fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
   listItemMeta: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle },
   inlineRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
@@ -1253,7 +1353,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: SPACE.xxs,
+    gap: SPACE.xl,
   },
   switchLabel: { fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextEmphasis },
+  featuredCard: {
+    borderRadius: RADIUS.lg,
+    borderWidth: 2,
+    borderColor: THEME_COLORS.primary,
+    paddingHorizontal: SPACE.xxl,
+    paddingVertical: SPACE.xl,
+    backgroundColor: THEME_COLORS.successSurface,
+  },
+  featuredCardTitle: {
+    fontSize: TYPE_SCALE.lg,
+    fontWeight: FONT_WEIGHT.extrabold,
+    color: THEME_COLORS.primary,
+    marginBottom: SPACE.xs,
+  },
 });

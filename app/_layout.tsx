@@ -10,6 +10,7 @@ import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { CommunityProvider, useCommunity } from '../src/context/CommunityContext';
 import { ThemeProvider } from '../src/context/ThemeContext';
@@ -17,6 +18,8 @@ import { GoogleMapsProvider } from '../src/context/GoogleMapsContext';
 import { CallProvider } from '../src/context/CallContext';
 import { IncomingCallOverlay } from '../src/components/call/IncomingCallOverlay';
 import { THEME_COLORS } from '../src/theme/colors';
+import { queryClient } from '../src/lib/queryClient';
+import { useRealtimeSync } from '../src/hooks/useRealtimeSync';
 
 
 // ─── Parse lalela://join?join=<code> ────────────────────────────────────────
@@ -290,6 +293,11 @@ function LoadingOverlay() {
   return <Animated.View style={[styles.overlay, { opacity }]} />;
 }
 
+function RealtimeSyncGate() {
+  useRealtimeSync();
+  return null;
+}
+
 const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
@@ -308,36 +316,39 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <AuthProvider>
-          <CommunityProvider>
-            <ThemeProvider>
-              <GoogleMapsProvider>
-                <CallProvider>
-                  <AppGuard />
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(tabs)" />
-                    <Stack.Screen name="landing" />
-                    <Stack.Screen name="onboarding" />
-                    <Stack.Screen name="onboarding-create" />
-                    <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="security" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="notifications-settings" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="create-business" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="join" options={{ headerShown: false }} />
-                    <Stack.Screen name="chat/[id]" />
-                    <Stack.Screen name="emergency/[id]" />
-                    <Stack.Screen name="call/[id]" options={{ animation: 'fade' }} />
-                  </Stack>
-                  <IncomingCallOverlay />
-                  <LoadingOverlay />
-                </CallProvider>
-              </GoogleMapsProvider>
-            </ThemeProvider>
-          </CommunityProvider>
-        </AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <CommunityProvider>
+              <ThemeProvider>
+                <GoogleMapsProvider>
+                  <CallProvider>
+                    <RealtimeSyncGate />
+                    <AppGuard />
+                    <Stack screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name="(tabs)" />
+                      <Stack.Screen name="landing" />
+                      <Stack.Screen name="onboarding" />
+                      <Stack.Screen name="onboarding-create" />
+                      <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
+                      <Stack.Screen name="security" options={{ presentation: 'modal' }} />
+                      <Stack.Screen name="notifications-settings" options={{ presentation: 'modal' }} />
+                      <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
+                      <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
+                      <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
+                      <Stack.Screen name="create-business" options={{ presentation: 'modal' }} />
+                      <Stack.Screen name="join" options={{ headerShown: false }} />
+                      <Stack.Screen name="chat/[id]" />
+                      <Stack.Screen name="emergency/[id]" />
+                      <Stack.Screen name="call/[id]" options={{ animation: 'fade' }} />
+                    </Stack>
+                    <IncomingCallOverlay />
+                    <LoadingOverlay />
+                  </CallProvider>
+                </GoogleMapsProvider>
+              </ThemeProvider>
+            </CommunityProvider>
+          </AuthProvider>
+        </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

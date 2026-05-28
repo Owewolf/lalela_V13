@@ -130,13 +130,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
         : undefined) ||
       'info',
   );
-  const [isPublic, setIsPublic] = useState(postToEdit?.isPublic ?? false);
   const [isFree, setIsFree] = useState(postToEdit?.price === 0);
   const [price, setPrice] = useState<string>(postToEdit?.price?.toString() || '');
-  const [selectedCharityId, setSelectedCharityId] = useState<string>(postToEdit?.charityId || '');
-  const [customCharityPercentage, setCustomCharityPercentage] = useState<string>(
-    postToEdit?.charityPercentage?.toString() || '',
-  );
   const [title, setTitle] = useState(postToEdit?.title || '');
   const [description, setDescription] = useState(postToEdit?.description || '');
   const [category, setCategory] = useState(postToEdit?.category || 'All');
@@ -154,22 +149,12 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const [categoryPickerVisible, setCategoryPickerVisible] = useState(false);
 
   // ── Derived values ──────────────────────────────────────────────────────────
+  // CAT is always active for every listing. Resolve the community's active
+  // charity (CAT by default, featured charity during a CAT cycle) so we can
+  // preview the contribution and public price; the server re-derives these
+  // authoritatively on save.
   const availableCharities = charities.filter((c) => c.status !== 'Archived');
-  const { active: featuredCharity, cat: catCharity, featured: configuredFeaturedCharity } =
-    resolveActiveCharity(availableCharities, currentCommunity ?? null);
-  const selectedCharity = featuredCharity ?? availableCharities.find((c) => c.id === selectedCharityId);
-
-  useEffect(() => {
-    if (featuredCharity && selectedCharityId !== featuredCharity.id) {
-      setSelectedCharityId(featuredCharity.id);
-      if (!customCharityPercentage || parseFloat(customCharityPercentage) < featuredCharity.percentage) {
-        setCustomCharityPercentage(featuredCharity.percentage.toString());
-      }
-    }
-    if (!featuredCharity && selectedCharityId) {
-      setSelectedCharityId('');
-    }
-  }, [featuredCharity]);
+  const { active: activeCharity } = resolveActiveCharity(availableCharities, currentCommunity ?? null);
 
   const enabledListingCategories = useMemo(() => {
     const enabledIds = currentCommunity?.enabledCategories ?? BUSINESS_CATEGORIES.map((c) => c.id);
@@ -182,12 +167,11 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
     }
   }, [enabledListingCategories]);
 
-  const basePercentage = isPublic ? Math.max(selectedCharity?.percentage || 0, 15) : 0;
-  const parsedCustom = parseFloat(customCharityPercentage) || 0;
-  const charityPercentage = Math.max(parsedCustom, basePercentage);
+  const CAT_MIN_PERCENTAGE = 15;
+  const charityPercentage = Math.max(activeCharity?.percentage || 0, CAT_MIN_PERCENTAGE);
   const numericPrice = parseFloat(price) || 0;
-  const charityAmount = (numericPrice * charityPercentage) / 100;
-  const publicPrice = numericPrice + charityAmount;
+  const charityAmount = Math.round(((numericPrice * charityPercentage) / 100) * 100) / 100;
+  const publicPrice = Math.round((numericPrice + charityAmount) * 100) / 100;
   const locationDefaults = useMemo(
     () => resolveCreatePostLocationDefaults(currentCommunity, userProfile),
     [currentCommunity?.coverageArea, userProfile?.defaultLocation, userProfile?.locationSharing],
@@ -286,18 +270,15 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
         postToEdit?.authorImage ||
         userProfile?.profileImage ||
         `https://picsum.photos/seed/${userProfile?.id}/200/200`,
-      charityId: isPublic ? selectedCharityId : undefined,
-      charityPercentage: isPublic ? charityPercentage : undefined,
-      charityAmount: postType === 'listing' ? (isPublic ? charityAmount : 0) : undefined,
-      isPublic,
+      // The server re-derives charityId / charityPercentage / charityAmount /
+      // publicPrice from the active charity — we send the client-side preview
+      // values for optimistic display only.
+      charityId: postType === 'listing' ? activeCharity?.id : undefined,
+      charityPercentage: postType === 'listing' ? charityPercentage : undefined,
+      charityAmount: postType === 'listing' ? charityAmount : undefined,
       price: postType === 'listing' ? numericPrice : undefined,
       communityPrice: postType === 'listing' ? numericPrice : undefined,
-      publicPrice:
-        postType === 'listing'
-          ? isPublic
-            ? numericPrice + charityAmount
-            : numericPrice
-          : undefined,
+      publicPrice: postType === 'listing' ? publicPrice : undefined,
       urgency: postType === 'notice' ? urgencyMap[urgency] : undefined,
       urgencyLevel: postType === 'notice' ? urgency : undefined,
       locationName,
@@ -738,131 +719,68 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     </View>
                   </View>
 
-                  {/* Visibility toggle */}
-                  <View className="gap-1">
-                    <Text className="text-sm font-semibold text-primary ml-1">Post Visibility</Text>
-                    <View
-                      className="flex-row p-1 rounded-full border"
-                      style={CARD_SURFACE_STYLE}
-                    >
-                      <TouchableOpacity
-                        onPress={() => setIsPublic(false)}
-                        className="flex-1 py-2 rounded-full items-center"
-                        style={{
-                          backgroundColor: !isPublic ? THEME_COLORS.surface : 'transparent',
-                        }}
-                        activeOpacity={0.8}
-                      >
-                        <Text
-                          className="text-xs font-semibold"
-                          style={{ color: !isPublic ? THEME_COLORS.primary : THEME_COLORS.neutralTextSubtle }}
-                        >
-                          Local
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => setIsPublic(true)}
-                        className="flex-1 py-2 rounded-full items-center"
-                        style={{
-                          backgroundColor: isPublic ? THEME_COLORS.surface : 'transparent',
-                        }}
-                        activeOpacity={0.8}
-                      >
-                        <Text
-                          className="text-xs font-semibold"
-                          style={{ color: isPublic ? THEME_COLORS.primary : THEME_COLORS.neutralTextSubtle }}
-                        >
-                          Public
-                        </Text>
-                      </TouchableOpacity>
+                  {/* Active charity / CAT card — always shown for listings.
+                      Every listing carries CAT (or the featured charity during
+                      a CAT cycle). The user enters only the local price;
+                      the public price and contribution are derived. */}
+                  <View className="bg-surface-container-low border border-outline-variant rounded-3xl p-5 gap-4">
+                    <View className="flex-row gap-3">
+                      <Info color={THEME_COLORS.primary} size={18} />
+                      <Text className="flex-1 text-xs text-gray-700 leading-5">
+                        Every listing includes a community contribution (CAT) added on top of your local price.
+                        Funds route to the active community charity, or to CAT when no charity is featured.
+                      </Text>
                     </View>
-                    <Text className="text-xs text-gray-400 ml-1 mt-1">
-                      Local listings are only seen by community members.
-                    </Text>
+
+                    {activeCharity ? (
+                      <View className="gap-1">
+                        <Text className="text-xs font-bold uppercase tracking-widest text-primary ml-1">
+                          Active Charity
+                        </Text>
+                        <View className="bg-surface-container-low border-b-2 border-outline-variant px-4 py-3 rounded-t-xl flex-row items-center justify-between">
+                          <Text className="font-semibold text-gray-800 flex-1">{activeCharity.name}</Text>
+                          <Text className="text-xs font-bold text-primary">
+                            {charityPercentage}%
+                          </Text>
+                        </View>
+                      </View>
+                    ) : (
+                      <View className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                        <Text className="text-xs text-amber-700 leading-5">
+                          No featured charity yet — the {CAT_MIN_PERCENTAGE}% CAT margin applies and represents the buyer’s potential resale earning.
+                        </Text>
+                      </View>
+                    )}
+
+                    {/* Price breakdown */}
+                    <View className="bg-surface-container-low/60 rounded-2xl p-4 gap-2">
+                      <View className="flex-row justify-between">
+                        <Text className="text-xs font-bold text-gray-500">Charity</Text>
+                        <Text className="text-xs text-gray-600 max-w-[60%]" numberOfLines={1}>
+                          {activeCharity?.name || 'CAT'}
+                        </Text>
+                      </View>
+                      <View className="flex-row justify-between">
+                        <Text className="text-xs font-bold text-gray-500">Local Price</Text>
+                        <Text className="text-xs text-gray-600">R {numericPrice.toFixed(2)}</Text>
+                      </View>
+                      <View className="flex-row justify-between">
+                        <Text className="text-xs font-bold text-primary">
+                          {activeCharity ? `To Charity (${charityPercentage}%)` : `CAT Margin (${charityPercentage}%)`}
+                        </Text>
+                        <Text className="text-xs font-bold text-primary">
+                          + R {charityAmount.toFixed(2)}
+                        </Text>
+                      </View>
+                      <View className="h-px my-1" style={{ backgroundColor: THEME_COLORS.neutralBorderSoft }} />
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm font-bold text-primary">Public Price</Text>
+                        <Text className="text-sm font-bold text-primary">
+                          R {publicPrice.toFixed(2)}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-
-                  {/* CAT card when public */}
-                  {isPublic && (
-                    <View className="bg-surface-container-low border border-outline-variant rounded-3xl p-5 gap-4">
-                      <View className="flex-row gap-3">
-                        <Info color={THEME_COLORS.primary} size={18} />
-                        <Text className="flex-1 text-xs text-gray-700 leading-5">
-                          Public listings include a community contribution (CAT) added to your price.
-                          The charity is locked to the active community cause.
-                        </Text>
-                      </View>
-
-                      {selectedCharity ? (
-                        <View className="gap-3">
-                          <View className="gap-1">
-                            <Text className="text-xs font-bold uppercase tracking-widest text-primary ml-1">
-                              Active Charity
-                            </Text>
-                            <View className="bg-surface-container-low border-b-2 border-outline-variant px-4 py-3 rounded-t-xl flex-row items-center justify-between">
-                              <Text className="font-semibold text-gray-800 flex-1">{selectedCharity.name}</Text>
-                              <Text className="text-xs font-bold text-primary">
-                                {basePercentage}% min
-                              </Text>
-                            </View>
-                          </View>
-                          <View className="gap-1">
-                            <Text className="text-xs font-bold uppercase tracking-widest text-primary ml-1">
-                              Contribution %
-                            </Text>
-                            <TextInput
-                              value={customCharityPercentage}
-                              onChangeText={setCustomCharityPercentage}
-                              placeholder={basePercentage.toString()}
-                              placeholderTextColor={THEME_COLORS.neutralTextSoft}
-                              keyboardType="decimal-pad"
-                              className="bg-surface-container-low border-b-2 border-outline-variant px-4 py-3 rounded-t-xl text-gray-800 text-sm"
-                              onBlur={() => {
-                                const val = parseFloat(customCharityPercentage) || 0;
-                                if (val < basePercentage) {
-                                  setCustomCharityPercentage(basePercentage.toString());
-                                }
-                              }}
-                            />
-                          </View>
-                        </View>
-                      ) : (
-                        <View className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                          <Text className="text-xs text-amber-700 leading-5">
-                            No active community charity has been set yet — the {basePercentage}% CAT margin still applies and represents the buyer’s potential resale earning.
-                          </Text>
-                        </View>
-                      )}
-
-                      {/* Price breakdown */}
-                      <View className="bg-surface-container-low/60 rounded-2xl p-4 gap-2">
-                        <View className="flex-row justify-between">
-                          <Text className="text-xs font-bold text-gray-500">Charity</Text>
-                          <Text className="text-xs text-gray-600 max-w-[60%]" numberOfLines={1}>
-                            {selectedCharity?.name || 'None selected'}
-                          </Text>
-                        </View>
-                        <View className="flex-row justify-between">
-                          <Text className="text-xs font-bold text-gray-500">Local Amount</Text>
-                          <Text className="text-xs text-gray-600">R {numericPrice.toFixed(2)}</Text>
-                        </View>
-                        <View className="flex-row justify-between">
-                          <Text className="text-xs font-bold text-primary">
-                            {selectedCharity ? `To Charity (${charityPercentage}%)` : `CAT Margin (${charityPercentage}%)`}
-                          </Text>
-                          <Text className="text-xs font-bold text-primary">
-                            + R {charityAmount.toFixed(2)}
-                          </Text>
-                        </View>
-                        <View className="h-px my-1" style={{ backgroundColor: THEME_COLORS.neutralBorderSoft }} />
-                        <View className="flex-row justify-between">
-                          <Text className="text-sm font-bold text-primary">Public Price</Text>
-                          <Text className="text-sm font-bold text-primary">
-                            R {publicPrice.toFixed(2)}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  )}
 
                   {/* Category picker */}
                   <View className="gap-1">

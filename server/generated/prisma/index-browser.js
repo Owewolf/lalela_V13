@@ -348,7 +348,6 @@ exports.Prisma.PostScalarFieldEnum = {
   charityPercentage: 'charityPercentage',
   imageUrl: 'imageUrl',
   postsImage: 'postsImage',
-  isPublic: 'isPublic',
   isCommunityPick: 'isCommunityPick',
   isCharity: 'isCharity',
   charityId: 'charityId',
@@ -393,6 +392,7 @@ exports.Prisma.CharityScalarFieldEnum = {
   isVerified: 'isVerified',
   isFeatured: 'isFeatured',
   isCATCharity: 'isCATCharity',
+  currentCampaignStartedAt: 'currentCampaignStartedAt',
   tags: 'tags',
   linkedBusinessIds: 'linkedBusinessIds',
   campaignCompleted: 'campaignCompleted',
@@ -400,6 +400,20 @@ exports.Prisma.CharityScalarFieldEnum = {
   suggestedById: 'suggestedById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CharityCampaignSnapshotScalarFieldEnum = {
+  id: 'id',
+  communityId: 'communityId',
+  charityId: 'charityId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  goalAmount: 'goalAmount',
+  finalRaised: 'finalRaised',
+  finalPotential: 'finalPotential',
+  itemsSold: 'itemsSold',
+  reason: 'reason',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.CharitySuggestionScalarFieldEnum = {
@@ -613,6 +627,7 @@ exports.Prisma.ModelName = {
   Message: 'Message',
   Post: 'Post',
   Charity: 'Charity',
+  CharityCampaignSnapshot: 'CharityCampaignSnapshot',
   CharitySuggestion: 'CharitySuggestion',
   CatTransaction: 'CatTransaction',
   Business: 'Business',

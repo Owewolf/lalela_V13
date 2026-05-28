@@ -34,6 +34,7 @@ import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
 import { resolveMediaUrl } from '../../lib/config';
 import { resolveActiveCharity } from '../../lib/activeCharity';
+import { useFeaturedCharity } from '../../hooks/queries/useFeaturedCharity';
 import { InteractiveCoverageMap } from './InteractiveCoverageMap';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
 import { CommunityNotice } from '../../types';
@@ -340,102 +341,40 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   const { active: resolvedCharity, cat: catCharity, featured: configuredFeaturedCharity } =
     resolveActiveCharity(charities, currentCommunity ?? null);
+  const { data: featuredCharitySummary } = useFeaturedCharity(currentCommunity?.id);
 
   const selectedCharity =
     resolvedCharity ??
     charities.find((c) => c.id === selectedCharityId);
+  const featuredCharityTotals = featuredCharitySummary ?? {
+    charityId: null,
+    name: null,
+    goalAmount: 0,
+    potentialEarnings: 0,
+    raisedEarnings: 0,
+    progressPercentage: 0,
+    itemsAvailable: 0,
+    itemsSold: 0,
+    activeCampaign: false,
+    isCATBaseline: false,
+    campaignStartedAt: null,
+    lifetimeRaised: 0,
+    lastUpdated: null,
+  };
 
-  const approvedPublicCharityListings = useMemo(() => {
-    if (!selectedCharity) return [] as CommunityNotice[];
-    return posts.filter((post) => {
-      if (post.type !== 'listing') return false;
-      if (!post.isPublic) return false;
-      if (post.charityId !== selectedCharity.id) return false;
-      const s = typeof post.status === 'string' ? post.status.toLowerCase() : '';
-      return s === 'active' || s === 'pinned';
-    });
-  }, [posts, selectedCharity]);
-
-  const totalCollectedAmount = useMemo(() => {
-    return approvedPublicCharityListings.reduce((sum, listing) => {
-      if (
-        typeof listing.charityAmount === 'number' &&
-        Number.isFinite(listing.charityAmount)
-      ) {
-        return sum + Math.max(0, listing.charityAmount);
-      }
-      const base =
-        typeof listing.communityPrice === 'number'
-          ? listing.communityPrice
-          : typeof listing.price === 'number'
-          ? listing.price
-          : 0;
-      const pub =
-        typeof listing.publicPrice === 'number'
-          ? listing.publicPrice
-          : typeof listing.price === 'number'
-          ? listing.price
-          : base;
-      return sum + Math.max(0, pub - base);
-    }, 0);
-  }, [approvedPublicCharityListings]);
-
-  // Potential CAT running total across ALL approved Public listings in the
-  // community (regardless of whether a charity is selected). Represents the
-  // benefit CAT brings to the community when activated.
-  const potentialCatTotal = useMemo(() => {
-    const eligible = posts.filter((post) => {
-      if (post.type !== 'listing') return false;
-      if (!post.isPublic) return false;
-      const s = typeof post.status === 'string' ? post.status.toLowerCase() : '';
-      return s === 'active' || s === 'pinned';
-    });
-    return eligible.reduce((sum, listing) => {
-      if (
-        typeof listing.charityAmount === 'number' &&
-        Number.isFinite(listing.charityAmount)
-      ) {
-        return sum + Math.max(0, listing.charityAmount);
-      }
-      const base =
-        typeof listing.communityPrice === 'number'
-          ? listing.communityPrice
-          : typeof listing.price === 'number'
-          ? listing.price
-          : 0;
-      const pub =
-        typeof listing.publicPrice === 'number'
-          ? listing.publicPrice
-          : typeof listing.price === 'number'
-          ? listing.price
-          : base;
-      return sum + Math.max(0, pub - base);
-    }, 0);
-  }, [posts]);
-  const potentialCatLabel = `R${potentialCatTotal.toLocaleString()}`;
-  const potentialCatCount = useMemo(
-    () => posts.filter((p) => p.type === 'listing' && p.isPublic).length,
-    [posts],
-  );
-
-  const fundraisingGoal =
-    typeof selectedCharity?.fundraisingGoal === 'number'
-      ? selectedCharity.fundraisingGoal
-      : undefined;
-  const hasFundraisingGoal =
-    typeof fundraisingGoal === 'number' && fundraisingGoal > 0;
-  const progressDenominator = hasFundraisingGoal
-    ? fundraisingGoal!
-    : Math.max(totalCollectedAmount, 1);
-  const potentialProgressPercent = Math.min(
-    100,
-    Math.max((totalCollectedAmount / progressDenominator) * 100, 0)
-  );
-  const totalCollectedLabel = `R${totalCollectedAmount.toLocaleString()}`;
+  const totalRaisedLabel = `R${featuredCharityTotals.raisedEarnings.toLocaleString()}`;
+  const potentialEarningsLabel = `R${featuredCharityTotals.potentialEarnings.toLocaleString()}`;
+  const lifetimeRaisedLabel = `R${(featuredCharityTotals.lifetimeRaised ?? 0).toLocaleString()}`;
+  const fundraisingGoal = featuredCharityTotals.goalAmount > 0 ? featuredCharityTotals.goalAmount : undefined;
+  const hasFundraisingGoal = Boolean(fundraisingGoal);
+  const computedProgressPercentage = hasFundraisingGoal
+    ? Math.max(0, Math.round((featuredCharityTotals.raisedEarnings / fundraisingGoal!) * 100))
+    : Math.max(0, featuredCharityTotals.progressPercentage);
+  const progressBarPercentage = Math.min(computedProgressPercentage, 100);
+  const progressPercentLabel = `${computedProgressPercentage}%`;
   const progressTargetLabel = hasFundraisingGoal
     ? `R${fundraisingGoal!.toLocaleString()}`
-    : totalCollectedLabel;
-  const progressPercentLabel = `${Math.round(potentialProgressPercent)}% to goal`;
+    : totalRaisedLabel;
 
   const charityDescription =
     typeof communityData.charity_description === 'string'
@@ -453,11 +392,11 @@ export const HomePage: React.FC<HomePageProps> = ({
   // Animate progress bar
   useEffect(() => {
     Animated.timing(progressAnim, {
-      toValue: potentialProgressPercent,
+      toValue: progressBarPercentage,
       duration: 800,
       useNativeDriver: false,
     }).start();
-  }, [potentialProgressPercent]);
+  }, [progressBarPercentage]);
 
   // ─── helpers ──────────────────────────────────────────────────────────────
 
@@ -513,9 +452,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       Alert.alert(
         'Mark as sold',
-        listing.isPublic
-          ? 'This will mark the listing sold and trigger CAT accounting for this public listing.'
-          : 'This will mark the listing sold. Local listing sales do not trigger CAT.',
+        'This will mark the listing sold and record the CAT contribution for the community.',
         [
           { text: 'Cancel', style: 'cancel' },
           {
@@ -528,7 +465,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   'Listing updated',
                   result.catTriggered
                     ? `Sold marked. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
-                    : 'Sold marked with no CAT trigger (local listing).'
+                    : 'Sold marked.'
                 );
               } catch {
                 Alert.alert('Unable to mark sold', 'Please try again.');
@@ -990,7 +927,6 @@ export const HomePage: React.FC<HomePageProps> = ({
     const localPrice = listing.price ?? 0;
     const publicPrice = listing.publicPrice ?? 0;
     const hasPublicPrice =
-      listing.isPublic === true &&
       listing.publicPrice != null &&
       listing.price != null &&
       publicPrice > localPrice;
@@ -1628,13 +1564,11 @@ export const HomePage: React.FC<HomePageProps> = ({
                   <View className="gap-1 pt-1">
                     <View className="flex-row items-center justify-between">
                       <Text className="text-[10px] font-semibold text-primary">
-                        Total Collected: {totalCollectedLabel}
+                        Raised: {totalRaisedLabel}
                       </Text>
-                      {hasFundraisingGoal && (
-                        <Text className="text-[10px] font-semibold text-primary">
-                          {progressPercentLabel}
-                        </Text>
-                      )}
+                      <Text className="text-[10px] font-semibold text-primary">
+                        {progressPercentLabel}
+                      </Text>
                     </View>
                     <View className="flex-row items-center gap-2">
                       <View className="h-2 flex-1 rounded-full bg-surface overflow-hidden">
@@ -1652,6 +1586,12 @@ export const HomePage: React.FC<HomePageProps> = ({
                         {progressTargetLabel}
                       </Text>
                     </View>
+                    <Text className="text-[10px] text-gray-500">
+                      Potential Earnings: {potentialEarningsLabel}
+                    </Text>
+                    <Text className="text-[10px] text-gray-500">
+                      Community Lifetime: {lifetimeRaisedLabel}
+                    </Text>
                   </View>
 
                 </View>
@@ -1662,21 +1602,21 @@ export const HomePage: React.FC<HomePageProps> = ({
                   CAT is in effect
                 </Text>
                 <Text className="text-sm text-gray-500">
-                  No featured charity is selected yet. Every public listing still
-                  accrues the CAT margin — funds will route once a charity is
-                  featured.
+                  Every public listing accrues the CAT margin for this
+                  community. Funds route to CAT by default, and to the
+                  featured charity whenever a CAT cycle is active.
                 </Text>
                 <View className="flex-row items-end justify-between rounded-2xl bg-primary/5 px-4 py-3">
                   <View>
                     <Text className="text-[10px] font-semibold uppercase tracking-wide text-primary/70">
-                      Potential CAT Total
+                      Potential Earnings
                     </Text>
                     <Text className="text-lg font-bold text-primary">
-                      {potentialCatLabel}
+                      {potentialEarningsLabel}
                     </Text>
                   </View>
                   <Text className="text-[10px] font-semibold text-primary/70">
-                    {potentialCatCount} public listing{potentialCatCount === 1 ? '' : 's'}
+                    {featuredCharityTotals.itemsAvailable} active listing{featuredCharityTotals.itemsAvailable === 1 ? '' : 's'}
                   </Text>
                 </View>
               </View>

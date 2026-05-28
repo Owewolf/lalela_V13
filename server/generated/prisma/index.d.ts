@@ -89,6 +89,11 @@ export type Post = $Result.DefaultSelection<Prisma.$PostPayload>
  */
 export type Charity = $Result.DefaultSelection<Prisma.$CharityPayload>
 /**
+ * Model CharityCampaignSnapshot
+ * 
+ */
+export type CharityCampaignSnapshot = $Result.DefaultSelection<Prisma.$CharityCampaignSnapshotPayload>
+/**
  * Model CharitySuggestion
  * 
  */
@@ -429,6 +434,16 @@ export class PrismaClient<
     * ```
     */
   get charity(): Prisma.CharityDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.charityCampaignSnapshot`: Exposes CRUD operations for the **CharityCampaignSnapshot** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CharityCampaignSnapshots
+    * const charityCampaignSnapshots = await prisma.charityCampaignSnapshot.findMany()
+    * ```
+    */
+  get charityCampaignSnapshot(): Prisma.CharityCampaignSnapshotDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.charitySuggestion`: Exposes CRUD operations for the **CharitySuggestion** model.
@@ -1018,6 +1033,7 @@ export namespace Prisma {
     Message: 'Message',
     Post: 'Post',
     Charity: 'Charity',
+    CharityCampaignSnapshot: 'CharityCampaignSnapshot',
     CharitySuggestion: 'CharitySuggestion',
     CatTransaction: 'CatTransaction',
     Business: 'Business',
@@ -1047,7 +1063,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "emailVerificationToken" | "passwordResetToken" | "otpCode" | "blacklistedEmail" | "userSession" | "auditLog" | "community" | "theme" | "communityMember" | "memberLocation" | "securityLocation" | "message" | "post" | "charity" | "charitySuggestion" | "catTransaction" | "business" | "report" | "communityInvitation" | "communityInviteLink" | "conversation" | "conversationParticipant" | "notification" | "license" | "moderationLog" | "securityEvent" | "billingRecord" | "invoice"
+      modelProps: "user" | "emailVerificationToken" | "passwordResetToken" | "otpCode" | "blacklistedEmail" | "userSession" | "auditLog" | "community" | "theme" | "communityMember" | "memberLocation" | "securityLocation" | "message" | "post" | "charity" | "charityCampaignSnapshot" | "charitySuggestion" | "catTransaction" | "business" | "report" | "communityInvitation" | "communityInviteLink" | "conversation" | "conversationParticipant" | "notification" | "license" | "moderationLog" | "securityEvent" | "billingRecord" | "invoice"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2158,6 +2174,80 @@ export namespace Prisma {
           count: {
             args: Prisma.CharityCountArgs<ExtArgs>
             result: $Utils.Optional<CharityCountAggregateOutputType> | number
+          }
+        }
+      }
+      CharityCampaignSnapshot: {
+        payload: Prisma.$CharityCampaignSnapshotPayload<ExtArgs>
+        fields: Prisma.CharityCampaignSnapshotFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CharityCampaignSnapshotFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CharityCampaignSnapshotFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>
+          }
+          findFirst: {
+            args: Prisma.CharityCampaignSnapshotFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CharityCampaignSnapshotFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>
+          }
+          findMany: {
+            args: Prisma.CharityCampaignSnapshotFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>[]
+          }
+          create: {
+            args: Prisma.CharityCampaignSnapshotCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>
+          }
+          createMany: {
+            args: Prisma.CharityCampaignSnapshotCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CharityCampaignSnapshotCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>[]
+          }
+          delete: {
+            args: Prisma.CharityCampaignSnapshotDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>
+          }
+          update: {
+            args: Prisma.CharityCampaignSnapshotUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>
+          }
+          deleteMany: {
+            args: Prisma.CharityCampaignSnapshotDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CharityCampaignSnapshotUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CharityCampaignSnapshotUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>[]
+          }
+          upsert: {
+            args: Prisma.CharityCampaignSnapshotUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharityCampaignSnapshotPayload>
+          }
+          aggregate: {
+            args: Prisma.CharityCampaignSnapshotAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCharityCampaignSnapshot>
+          }
+          groupBy: {
+            args: Prisma.CharityCampaignSnapshotGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CharityCampaignSnapshotGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CharityCampaignSnapshotCountArgs<ExtArgs>
+            result: $Utils.Optional<CharityCampaignSnapshotCountAggregateOutputType> | number
           }
         }
       }
@@ -3320,6 +3410,7 @@ export namespace Prisma {
     message?: MessageOmit
     post?: PostOmit
     charity?: CharityOmit
+    charityCampaignSnapshot?: CharityCampaignSnapshotOmit
     charitySuggestion?: CharitySuggestionOmit
     catTransaction?: CatTransactionOmit
     business?: BusinessOmit
@@ -3640,6 +3731,7 @@ export namespace Prisma {
     licenses: number
     billingRecords: number
     catTransactions: number
+    campaignSnapshots: number
   }
 
   export type CommunityCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3658,6 +3750,7 @@ export namespace Prisma {
     licenses?: boolean | CommunityCountOutputTypeCountLicensesArgs
     billingRecords?: boolean | CommunityCountOutputTypeCountBillingRecordsArgs
     catTransactions?: boolean | CommunityCountOutputTypeCountCatTransactionsArgs
+    campaignSnapshots?: boolean | CommunityCountOutputTypeCountCampaignSnapshotsArgs
   }
 
   // Custom InputTypes
@@ -3776,6 +3869,13 @@ export namespace Prisma {
     where?: CatTransactionWhereInput
   }
 
+  /**
+   * CommunityCountOutputType without action
+   */
+  export type CommunityCountOutputTypeCountCampaignSnapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CharityCampaignSnapshotWhereInput
+  }
+
 
   /**
    * Count Type MessageCountOutputType
@@ -3846,11 +3946,13 @@ export namespace Prisma {
   export type CharityCountOutputType = {
     charitySuggestions: number
     catTransactions: number
+    campaignSnapshots: number
   }
 
   export type CharityCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     charitySuggestions?: boolean | CharityCountOutputTypeCountCharitySuggestionsArgs
     catTransactions?: boolean | CharityCountOutputTypeCountCatTransactionsArgs
+    campaignSnapshots?: boolean | CharityCountOutputTypeCountCampaignSnapshotsArgs
   }
 
   // Custom InputTypes
@@ -3876,6 +3978,13 @@ export namespace Prisma {
    */
   export type CharityCountOutputTypeCountCatTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CatTransactionWhereInput
+  }
+
+  /**
+   * CharityCountOutputType without action
+   */
+  export type CharityCountOutputTypeCountCampaignSnapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CharityCampaignSnapshotWhereInput
   }
 
 
@@ -12944,6 +13053,7 @@ export namespace Prisma {
     licenses?: boolean | Community$licensesArgs<ExtArgs>
     billingRecords?: boolean | Community$billingRecordsArgs<ExtArgs>
     catTransactions?: boolean | Community$catTransactionsArgs<ExtArgs>
+    campaignSnapshots?: boolean | Community$campaignSnapshotsArgs<ExtArgs>
     _count?: boolean | CommunityCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["community"]>
 
@@ -13046,6 +13156,7 @@ export namespace Prisma {
     licenses?: boolean | Community$licensesArgs<ExtArgs>
     billingRecords?: boolean | Community$billingRecordsArgs<ExtArgs>
     catTransactions?: boolean | Community$catTransactionsArgs<ExtArgs>
+    campaignSnapshots?: boolean | Community$campaignSnapshotsArgs<ExtArgs>
     _count?: boolean | CommunityCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CommunityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13075,6 +13186,7 @@ export namespace Prisma {
       licenses: Prisma.$LicensePayload<ExtArgs>[]
       billingRecords: Prisma.$BillingRecordPayload<ExtArgs>[]
       catTransactions: Prisma.$CatTransactionPayload<ExtArgs>[]
+      campaignSnapshots: Prisma.$CharityCampaignSnapshotPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -13511,6 +13623,7 @@ export namespace Prisma {
     licenses<T extends Community$licensesArgs<ExtArgs> = {}>(args?: Subset<T, Community$licensesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LicensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billingRecords<T extends Community$billingRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Community$billingRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     catTransactions<T extends Community$catTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Community$catTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    campaignSnapshots<T extends Community$campaignSnapshotsArgs<ExtArgs> = {}>(args?: Subset<T, Community$campaignSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14340,6 +14453,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: CatTransactionScalarFieldEnum | CatTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * Community.campaignSnapshots
+   */
+  export type Community$campaignSnapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    where?: CharityCampaignSnapshotWhereInput
+    orderBy?: CharityCampaignSnapshotOrderByWithRelationInput | CharityCampaignSnapshotOrderByWithRelationInput[]
+    cursor?: CharityCampaignSnapshotWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CharityCampaignSnapshotScalarFieldEnum | CharityCampaignSnapshotScalarFieldEnum[]
   }
 
   /**
@@ -20436,7 +20573,6 @@ export namespace Prisma {
     charityPercentage: number | null
     imageUrl: string | null
     postsImage: string | null
-    isPublic: boolean | null
     isCommunityPick: boolean | null
     isCharity: boolean | null
     charityId: string | null
@@ -20476,7 +20612,6 @@ export namespace Prisma {
     charityPercentage: number | null
     imageUrl: string | null
     postsImage: string | null
-    isPublic: boolean | null
     isCommunityPick: boolean | null
     isCharity: boolean | null
     charityId: string | null
@@ -20516,7 +20651,6 @@ export namespace Prisma {
     charityPercentage: number
     imageUrl: number
     postsImage: number
-    isPublic: number
     isCommunityPick: number
     isCharity: number
     charityId: number
@@ -20578,7 +20712,6 @@ export namespace Prisma {
     charityPercentage?: true
     imageUrl?: true
     postsImage?: true
-    isPublic?: true
     isCommunityPick?: true
     isCharity?: true
     charityId?: true
@@ -20618,7 +20751,6 @@ export namespace Prisma {
     charityPercentage?: true
     imageUrl?: true
     postsImage?: true
-    isPublic?: true
     isCommunityPick?: true
     isCharity?: true
     charityId?: true
@@ -20658,7 +20790,6 @@ export namespace Prisma {
     charityPercentage?: true
     imageUrl?: true
     postsImage?: true
-    isPublic?: true
     isCommunityPick?: true
     isCharity?: true
     charityId?: true
@@ -20785,7 +20916,6 @@ export namespace Prisma {
     charityPercentage: number | null
     imageUrl: string | null
     postsImage: string | null
-    isPublic: boolean
     isCommunityPick: boolean
     isCharity: boolean
     charityId: string | null
@@ -20844,7 +20974,6 @@ export namespace Prisma {
     charityPercentage?: boolean
     imageUrl?: boolean
     postsImage?: boolean
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: boolean
@@ -20888,7 +21017,6 @@ export namespace Prisma {
     charityPercentage?: boolean
     imageUrl?: boolean
     postsImage?: boolean
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: boolean
@@ -20930,7 +21058,6 @@ export namespace Prisma {
     charityPercentage?: boolean
     imageUrl?: boolean
     postsImage?: boolean
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: boolean
@@ -20972,7 +21099,6 @@ export namespace Prisma {
     charityPercentage?: boolean
     imageUrl?: boolean
     postsImage?: boolean
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: boolean
@@ -20994,7 +21120,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "authorId" | "type" | "title" | "description" | "category" | "subtype" | "urgency" | "urgencyLevel" | "price" | "communityPrice" | "publicPrice" | "charityAmount" | "charityPercentage" | "imageUrl" | "postsImage" | "isPublic" | "isCommunityPick" | "isCharity" | "charityId" | "authorName" | "authorRole" | "authorImage" | "locationName" | "latitude" | "longitude" | "source" | "status" | "rejectionReason" | "changesRequestedNote" | "expiresAt" | "soldAt" | "expiredAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
+  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "authorId" | "type" | "title" | "description" | "category" | "subtype" | "urgency" | "urgencyLevel" | "price" | "communityPrice" | "publicPrice" | "charityAmount" | "charityPercentage" | "imageUrl" | "postsImage" | "isCommunityPick" | "isCharity" | "charityId" | "authorName" | "authorRole" | "authorImage" | "locationName" | "latitude" | "longitude" | "source" | "status" | "rejectionReason" | "changesRequestedNote" | "expiresAt" | "soldAt" | "expiredAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
   export type PostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
@@ -21035,7 +21161,6 @@ export namespace Prisma {
       charityPercentage: number | null
       imageUrl: string | null
       postsImage: string | null
-      isPublic: boolean
       isCommunityPick: boolean
       isCharity: boolean
       charityId: string | null
@@ -21498,7 +21623,6 @@ export namespace Prisma {
     readonly charityPercentage: FieldRef<"Post", 'Float'>
     readonly imageUrl: FieldRef<"Post", 'String'>
     readonly postsImage: FieldRef<"Post", 'String'>
-    readonly isPublic: FieldRef<"Post", 'Boolean'>
     readonly isCommunityPick: FieldRef<"Post", 'Boolean'>
     readonly isCharity: FieldRef<"Post", 'Boolean'>
     readonly charityId: FieldRef<"Post", 'String'>
@@ -22012,6 +22136,7 @@ export namespace Prisma {
     isVerified: boolean | null
     isFeatured: boolean | null
     isCATCharity: boolean | null
+    currentCampaignStartedAt: Date | null
     campaignCompleted: boolean | null
     isApprovedSuggestion: boolean | null
     suggestedById: string | null
@@ -22042,6 +22167,7 @@ export namespace Prisma {
     isVerified: boolean | null
     isFeatured: boolean | null
     isCATCharity: boolean | null
+    currentCampaignStartedAt: Date | null
     campaignCompleted: boolean | null
     isApprovedSuggestion: boolean | null
     suggestedById: string | null
@@ -22072,6 +22198,7 @@ export namespace Prisma {
     isVerified: number
     isFeatured: number
     isCATCharity: number
+    currentCampaignStartedAt: number
     tags: number
     linkedBusinessIds: number
     campaignCompleted: number
@@ -22122,6 +22249,7 @@ export namespace Prisma {
     isVerified?: true
     isFeatured?: true
     isCATCharity?: true
+    currentCampaignStartedAt?: true
     campaignCompleted?: true
     isApprovedSuggestion?: true
     suggestedById?: true
@@ -22152,6 +22280,7 @@ export namespace Prisma {
     isVerified?: true
     isFeatured?: true
     isCATCharity?: true
+    currentCampaignStartedAt?: true
     campaignCompleted?: true
     isApprovedSuggestion?: true
     suggestedById?: true
@@ -22182,6 +22311,7 @@ export namespace Prisma {
     isVerified?: true
     isFeatured?: true
     isCATCharity?: true
+    currentCampaignStartedAt?: true
     tags?: true
     linkedBusinessIds?: true
     campaignCompleted?: true
@@ -22301,6 +22431,7 @@ export namespace Prisma {
     isVerified: boolean
     isFeatured: boolean
     isCATCharity: boolean
+    currentCampaignStartedAt: Date | null
     tags: string[]
     linkedBusinessIds: string[]
     campaignCompleted: boolean
@@ -22352,6 +22483,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: boolean
     tags?: boolean
     linkedBusinessIds?: boolean
     campaignCompleted?: boolean
@@ -22362,6 +22494,7 @@ export namespace Prisma {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     charitySuggestions?: boolean | Charity$charitySuggestionsArgs<ExtArgs>
     catTransactions?: boolean | Charity$catTransactionsArgs<ExtArgs>
+    campaignSnapshots?: boolean | Charity$campaignSnapshotsArgs<ExtArgs>
     _count?: boolean | CharityCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["charity"]>
 
@@ -22388,6 +22521,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: boolean
     tags?: boolean
     linkedBusinessIds?: boolean
     campaignCompleted?: boolean
@@ -22421,6 +22555,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: boolean
     tags?: boolean
     linkedBusinessIds?: boolean
     campaignCompleted?: boolean
@@ -22454,6 +22589,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: boolean
     tags?: boolean
     linkedBusinessIds?: boolean
     campaignCompleted?: boolean
@@ -22463,11 +22599,12 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type CharityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "name" | "description" | "category" | "percentage" | "status" | "urgency" | "fundraisingGoal" | "raisedAmount" | "imageUrl" | "logo" | "coverImage" | "contactPhone" | "contactEmail" | "website" | "locationName" | "latitude" | "longitude" | "isVerified" | "isFeatured" | "isCATCharity" | "tags" | "linkedBusinessIds" | "campaignCompleted" | "isApprovedSuggestion" | "suggestedById" | "createdAt" | "updatedAt", ExtArgs["result"]["charity"]>
+  export type CharityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "name" | "description" | "category" | "percentage" | "status" | "urgency" | "fundraisingGoal" | "raisedAmount" | "imageUrl" | "logo" | "coverImage" | "contactPhone" | "contactEmail" | "website" | "locationName" | "latitude" | "longitude" | "isVerified" | "isFeatured" | "isCATCharity" | "currentCampaignStartedAt" | "tags" | "linkedBusinessIds" | "campaignCompleted" | "isApprovedSuggestion" | "suggestedById" | "createdAt" | "updatedAt", ExtArgs["result"]["charity"]>
   export type CharityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     charitySuggestions?: boolean | Charity$charitySuggestionsArgs<ExtArgs>
     catTransactions?: boolean | Charity$catTransactionsArgs<ExtArgs>
+    campaignSnapshots?: boolean | Charity$campaignSnapshotsArgs<ExtArgs>
     _count?: boolean | CharityCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CharityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -22483,6 +22620,7 @@ export namespace Prisma {
       community: Prisma.$CommunityPayload<ExtArgs>
       charitySuggestions: Prisma.$CharitySuggestionPayload<ExtArgs>[]
       catTransactions: Prisma.$CatTransactionPayload<ExtArgs>[]
+      campaignSnapshots: Prisma.$CharityCampaignSnapshotPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -22507,6 +22645,7 @@ export namespace Prisma {
       isVerified: boolean
       isFeatured: boolean
       isCATCharity: boolean
+      currentCampaignStartedAt: Date | null
       tags: string[]
       linkedBusinessIds: string[]
       campaignCompleted: boolean
@@ -22911,6 +23050,7 @@ export namespace Prisma {
     community<T extends CommunityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CommunityDefaultArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     charitySuggestions<T extends Charity$charitySuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, Charity$charitySuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharitySuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     catTransactions<T extends Charity$catTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Charity$catTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CatTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    campaignSnapshots<T extends Charity$campaignSnapshotsArgs<ExtArgs> = {}>(args?: Subset<T, Charity$campaignSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -22962,6 +23102,7 @@ export namespace Prisma {
     readonly isVerified: FieldRef<"Charity", 'Boolean'>
     readonly isFeatured: FieldRef<"Charity", 'Boolean'>
     readonly isCATCharity: FieldRef<"Charity", 'Boolean'>
+    readonly currentCampaignStartedAt: FieldRef<"Charity", 'DateTime'>
     readonly tags: FieldRef<"Charity", 'String[]'>
     readonly linkedBusinessIds: FieldRef<"Charity", 'String[]'>
     readonly campaignCompleted: FieldRef<"Charity", 'Boolean'>
@@ -23418,6 +23559,30 @@ export namespace Prisma {
   }
 
   /**
+   * Charity.campaignSnapshots
+   */
+  export type Charity$campaignSnapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    where?: CharityCampaignSnapshotWhereInput
+    orderBy?: CharityCampaignSnapshotOrderByWithRelationInput | CharityCampaignSnapshotOrderByWithRelationInput[]
+    cursor?: CharityCampaignSnapshotWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CharityCampaignSnapshotScalarFieldEnum | CharityCampaignSnapshotScalarFieldEnum[]
+  }
+
+  /**
    * Charity without action
    */
   export type CharityDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -23433,6 +23598,1201 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CharityInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CharityCampaignSnapshot
+   */
+
+  export type AggregateCharityCampaignSnapshot = {
+    _count: CharityCampaignSnapshotCountAggregateOutputType | null
+    _avg: CharityCampaignSnapshotAvgAggregateOutputType | null
+    _sum: CharityCampaignSnapshotSumAggregateOutputType | null
+    _min: CharityCampaignSnapshotMinAggregateOutputType | null
+    _max: CharityCampaignSnapshotMaxAggregateOutputType | null
+  }
+
+  export type CharityCampaignSnapshotAvgAggregateOutputType = {
+    goalAmount: number | null
+    finalRaised: number | null
+    finalPotential: number | null
+    itemsSold: number | null
+  }
+
+  export type CharityCampaignSnapshotSumAggregateOutputType = {
+    goalAmount: number | null
+    finalRaised: number | null
+    finalPotential: number | null
+    itemsSold: number | null
+  }
+
+  export type CharityCampaignSnapshotMinAggregateOutputType = {
+    id: string | null
+    communityId: string | null
+    charityId: string | null
+    startedAt: Date | null
+    endedAt: Date | null
+    goalAmount: number | null
+    finalRaised: number | null
+    finalPotential: number | null
+    itemsSold: number | null
+    reason: string | null
+    createdAt: Date | null
+  }
+
+  export type CharityCampaignSnapshotMaxAggregateOutputType = {
+    id: string | null
+    communityId: string | null
+    charityId: string | null
+    startedAt: Date | null
+    endedAt: Date | null
+    goalAmount: number | null
+    finalRaised: number | null
+    finalPotential: number | null
+    itemsSold: number | null
+    reason: string | null
+    createdAt: Date | null
+  }
+
+  export type CharityCampaignSnapshotCountAggregateOutputType = {
+    id: number
+    communityId: number
+    charityId: number
+    startedAt: number
+    endedAt: number
+    goalAmount: number
+    finalRaised: number
+    finalPotential: number
+    itemsSold: number
+    reason: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type CharityCampaignSnapshotAvgAggregateInputType = {
+    goalAmount?: true
+    finalRaised?: true
+    finalPotential?: true
+    itemsSold?: true
+  }
+
+  export type CharityCampaignSnapshotSumAggregateInputType = {
+    goalAmount?: true
+    finalRaised?: true
+    finalPotential?: true
+    itemsSold?: true
+  }
+
+  export type CharityCampaignSnapshotMinAggregateInputType = {
+    id?: true
+    communityId?: true
+    charityId?: true
+    startedAt?: true
+    endedAt?: true
+    goalAmount?: true
+    finalRaised?: true
+    finalPotential?: true
+    itemsSold?: true
+    reason?: true
+    createdAt?: true
+  }
+
+  export type CharityCampaignSnapshotMaxAggregateInputType = {
+    id?: true
+    communityId?: true
+    charityId?: true
+    startedAt?: true
+    endedAt?: true
+    goalAmount?: true
+    finalRaised?: true
+    finalPotential?: true
+    itemsSold?: true
+    reason?: true
+    createdAt?: true
+  }
+
+  export type CharityCampaignSnapshotCountAggregateInputType = {
+    id?: true
+    communityId?: true
+    charityId?: true
+    startedAt?: true
+    endedAt?: true
+    goalAmount?: true
+    finalRaised?: true
+    finalPotential?: true
+    itemsSold?: true
+    reason?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type CharityCampaignSnapshotAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CharityCampaignSnapshot to aggregate.
+     */
+    where?: CharityCampaignSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CharityCampaignSnapshots to fetch.
+     */
+    orderBy?: CharityCampaignSnapshotOrderByWithRelationInput | CharityCampaignSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CharityCampaignSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CharityCampaignSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CharityCampaignSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CharityCampaignSnapshots
+    **/
+    _count?: true | CharityCampaignSnapshotCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CharityCampaignSnapshotAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CharityCampaignSnapshotSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CharityCampaignSnapshotMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CharityCampaignSnapshotMaxAggregateInputType
+  }
+
+  export type GetCharityCampaignSnapshotAggregateType<T extends CharityCampaignSnapshotAggregateArgs> = {
+        [P in keyof T & keyof AggregateCharityCampaignSnapshot]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCharityCampaignSnapshot[P]>
+      : GetScalarType<T[P], AggregateCharityCampaignSnapshot[P]>
+  }
+
+
+
+
+  export type CharityCampaignSnapshotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CharityCampaignSnapshotWhereInput
+    orderBy?: CharityCampaignSnapshotOrderByWithAggregationInput | CharityCampaignSnapshotOrderByWithAggregationInput[]
+    by: CharityCampaignSnapshotScalarFieldEnum[] | CharityCampaignSnapshotScalarFieldEnum
+    having?: CharityCampaignSnapshotScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CharityCampaignSnapshotCountAggregateInputType | true
+    _avg?: CharityCampaignSnapshotAvgAggregateInputType
+    _sum?: CharityCampaignSnapshotSumAggregateInputType
+    _min?: CharityCampaignSnapshotMinAggregateInputType
+    _max?: CharityCampaignSnapshotMaxAggregateInputType
+  }
+
+  export type CharityCampaignSnapshotGroupByOutputType = {
+    id: string
+    communityId: string
+    charityId: string
+    startedAt: Date
+    endedAt: Date
+    goalAmount: number | null
+    finalRaised: number
+    finalPotential: number
+    itemsSold: number
+    reason: string
+    createdAt: Date
+    _count: CharityCampaignSnapshotCountAggregateOutputType | null
+    _avg: CharityCampaignSnapshotAvgAggregateOutputType | null
+    _sum: CharityCampaignSnapshotSumAggregateOutputType | null
+    _min: CharityCampaignSnapshotMinAggregateOutputType | null
+    _max: CharityCampaignSnapshotMaxAggregateOutputType | null
+  }
+
+  type GetCharityCampaignSnapshotGroupByPayload<T extends CharityCampaignSnapshotGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CharityCampaignSnapshotGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CharityCampaignSnapshotGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CharityCampaignSnapshotGroupByOutputType[P]>
+            : GetScalarType<T[P], CharityCampaignSnapshotGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CharityCampaignSnapshotSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    charityId?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    goalAmount?: boolean
+    finalRaised?: boolean
+    finalPotential?: boolean
+    itemsSold?: boolean
+    reason?: boolean
+    createdAt?: boolean
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    charity?: boolean | CharityDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["charityCampaignSnapshot"]>
+
+  export type CharityCampaignSnapshotSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    charityId?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    goalAmount?: boolean
+    finalRaised?: boolean
+    finalPotential?: boolean
+    itemsSold?: boolean
+    reason?: boolean
+    createdAt?: boolean
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    charity?: boolean | CharityDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["charityCampaignSnapshot"]>
+
+  export type CharityCampaignSnapshotSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    communityId?: boolean
+    charityId?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    goalAmount?: boolean
+    finalRaised?: boolean
+    finalPotential?: boolean
+    itemsSold?: boolean
+    reason?: boolean
+    createdAt?: boolean
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    charity?: boolean | CharityDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["charityCampaignSnapshot"]>
+
+  export type CharityCampaignSnapshotSelectScalar = {
+    id?: boolean
+    communityId?: boolean
+    charityId?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    goalAmount?: boolean
+    finalRaised?: boolean
+    finalPotential?: boolean
+    itemsSold?: boolean
+    reason?: boolean
+    createdAt?: boolean
+  }
+
+  export type CharityCampaignSnapshotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "charityId" | "startedAt" | "endedAt" | "goalAmount" | "finalRaised" | "finalPotential" | "itemsSold" | "reason" | "createdAt", ExtArgs["result"]["charityCampaignSnapshot"]>
+  export type CharityCampaignSnapshotInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    charity?: boolean | CharityDefaultArgs<ExtArgs>
+  }
+  export type CharityCampaignSnapshotIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    charity?: boolean | CharityDefaultArgs<ExtArgs>
+  }
+  export type CharityCampaignSnapshotIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    charity?: boolean | CharityDefaultArgs<ExtArgs>
+  }
+
+  export type $CharityCampaignSnapshotPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CharityCampaignSnapshot"
+    objects: {
+      community: Prisma.$CommunityPayload<ExtArgs>
+      charity: Prisma.$CharityPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      communityId: string
+      charityId: string
+      startedAt: Date
+      endedAt: Date
+      goalAmount: number | null
+      finalRaised: number
+      finalPotential: number
+      itemsSold: number
+      reason: string
+      createdAt: Date
+    }, ExtArgs["result"]["charityCampaignSnapshot"]>
+    composites: {}
+  }
+
+  type CharityCampaignSnapshotGetPayload<S extends boolean | null | undefined | CharityCampaignSnapshotDefaultArgs> = $Result.GetResult<Prisma.$CharityCampaignSnapshotPayload, S>
+
+  type CharityCampaignSnapshotCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CharityCampaignSnapshotFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CharityCampaignSnapshotCountAggregateInputType | true
+    }
+
+  export interface CharityCampaignSnapshotDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CharityCampaignSnapshot'], meta: { name: 'CharityCampaignSnapshot' } }
+    /**
+     * Find zero or one CharityCampaignSnapshot that matches the filter.
+     * @param {CharityCampaignSnapshotFindUniqueArgs} args - Arguments to find a CharityCampaignSnapshot
+     * @example
+     * // Get one CharityCampaignSnapshot
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CharityCampaignSnapshotFindUniqueArgs>(args: SelectSubset<T, CharityCampaignSnapshotFindUniqueArgs<ExtArgs>>): Prisma__CharityCampaignSnapshotClient<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CharityCampaignSnapshot that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CharityCampaignSnapshotFindUniqueOrThrowArgs} args - Arguments to find a CharityCampaignSnapshot
+     * @example
+     * // Get one CharityCampaignSnapshot
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CharityCampaignSnapshotFindUniqueOrThrowArgs>(args: SelectSubset<T, CharityCampaignSnapshotFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CharityCampaignSnapshotClient<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CharityCampaignSnapshot that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharityCampaignSnapshotFindFirstArgs} args - Arguments to find a CharityCampaignSnapshot
+     * @example
+     * // Get one CharityCampaignSnapshot
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CharityCampaignSnapshotFindFirstArgs>(args?: SelectSubset<T, CharityCampaignSnapshotFindFirstArgs<ExtArgs>>): Prisma__CharityCampaignSnapshotClient<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CharityCampaignSnapshot that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharityCampaignSnapshotFindFirstOrThrowArgs} args - Arguments to find a CharityCampaignSnapshot
+     * @example
+     * // Get one CharityCampaignSnapshot
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CharityCampaignSnapshotFindFirstOrThrowArgs>(args?: SelectSubset<T, CharityCampaignSnapshotFindFirstOrThrowArgs<ExtArgs>>): Prisma__CharityCampaignSnapshotClient<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CharityCampaignSnapshots that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharityCampaignSnapshotFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CharityCampaignSnapshots
+     * const charityCampaignSnapshots = await prisma.charityCampaignSnapshot.findMany()
+     * 
+     * // Get first 10 CharityCampaignSnapshots
+     * const charityCampaignSnapshots = await prisma.charityCampaignSnapshot.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const charityCampaignSnapshotWithIdOnly = await prisma.charityCampaignSnapshot.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CharityCampaignSnapshotFindManyArgs>(args?: SelectSubset<T, CharityCampaignSnapshotFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CharityCampaignSnapshot.
+     * @param {CharityCampaignSnapshotCreateArgs} args - Arguments to create a CharityCampaignSnapshot.
+     * @example
+     * // Create one CharityCampaignSnapshot
+     * const CharityCampaignSnapshot = await prisma.charityCampaignSnapshot.create({
+     *   data: {
+     *     // ... data to create a CharityCampaignSnapshot
+     *   }
+     * })
+     * 
+     */
+    create<T extends CharityCampaignSnapshotCreateArgs>(args: SelectSubset<T, CharityCampaignSnapshotCreateArgs<ExtArgs>>): Prisma__CharityCampaignSnapshotClient<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CharityCampaignSnapshots.
+     * @param {CharityCampaignSnapshotCreateManyArgs} args - Arguments to create many CharityCampaignSnapshots.
+     * @example
+     * // Create many CharityCampaignSnapshots
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CharityCampaignSnapshotCreateManyArgs>(args?: SelectSubset<T, CharityCampaignSnapshotCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CharityCampaignSnapshots and returns the data saved in the database.
+     * @param {CharityCampaignSnapshotCreateManyAndReturnArgs} args - Arguments to create many CharityCampaignSnapshots.
+     * @example
+     * // Create many CharityCampaignSnapshots
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CharityCampaignSnapshots and only return the `id`
+     * const charityCampaignSnapshotWithIdOnly = await prisma.charityCampaignSnapshot.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CharityCampaignSnapshotCreateManyAndReturnArgs>(args?: SelectSubset<T, CharityCampaignSnapshotCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CharityCampaignSnapshot.
+     * @param {CharityCampaignSnapshotDeleteArgs} args - Arguments to delete one CharityCampaignSnapshot.
+     * @example
+     * // Delete one CharityCampaignSnapshot
+     * const CharityCampaignSnapshot = await prisma.charityCampaignSnapshot.delete({
+     *   where: {
+     *     // ... filter to delete one CharityCampaignSnapshot
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CharityCampaignSnapshotDeleteArgs>(args: SelectSubset<T, CharityCampaignSnapshotDeleteArgs<ExtArgs>>): Prisma__CharityCampaignSnapshotClient<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CharityCampaignSnapshot.
+     * @param {CharityCampaignSnapshotUpdateArgs} args - Arguments to update one CharityCampaignSnapshot.
+     * @example
+     * // Update one CharityCampaignSnapshot
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CharityCampaignSnapshotUpdateArgs>(args: SelectSubset<T, CharityCampaignSnapshotUpdateArgs<ExtArgs>>): Prisma__CharityCampaignSnapshotClient<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CharityCampaignSnapshots.
+     * @param {CharityCampaignSnapshotDeleteManyArgs} args - Arguments to filter CharityCampaignSnapshots to delete.
+     * @example
+     * // Delete a few CharityCampaignSnapshots
+     * const { count } = await prisma.charityCampaignSnapshot.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CharityCampaignSnapshotDeleteManyArgs>(args?: SelectSubset<T, CharityCampaignSnapshotDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CharityCampaignSnapshots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharityCampaignSnapshotUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CharityCampaignSnapshots
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CharityCampaignSnapshotUpdateManyArgs>(args: SelectSubset<T, CharityCampaignSnapshotUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CharityCampaignSnapshots and returns the data updated in the database.
+     * @param {CharityCampaignSnapshotUpdateManyAndReturnArgs} args - Arguments to update many CharityCampaignSnapshots.
+     * @example
+     * // Update many CharityCampaignSnapshots
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CharityCampaignSnapshots and only return the `id`
+     * const charityCampaignSnapshotWithIdOnly = await prisma.charityCampaignSnapshot.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CharityCampaignSnapshotUpdateManyAndReturnArgs>(args: SelectSubset<T, CharityCampaignSnapshotUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CharityCampaignSnapshot.
+     * @param {CharityCampaignSnapshotUpsertArgs} args - Arguments to update or create a CharityCampaignSnapshot.
+     * @example
+     * // Update or create a CharityCampaignSnapshot
+     * const charityCampaignSnapshot = await prisma.charityCampaignSnapshot.upsert({
+     *   create: {
+     *     // ... data to create a CharityCampaignSnapshot
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CharityCampaignSnapshot we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CharityCampaignSnapshotUpsertArgs>(args: SelectSubset<T, CharityCampaignSnapshotUpsertArgs<ExtArgs>>): Prisma__CharityCampaignSnapshotClient<$Result.GetResult<Prisma.$CharityCampaignSnapshotPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CharityCampaignSnapshots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharityCampaignSnapshotCountArgs} args - Arguments to filter CharityCampaignSnapshots to count.
+     * @example
+     * // Count the number of CharityCampaignSnapshots
+     * const count = await prisma.charityCampaignSnapshot.count({
+     *   where: {
+     *     // ... the filter for the CharityCampaignSnapshots we want to count
+     *   }
+     * })
+    **/
+    count<T extends CharityCampaignSnapshotCountArgs>(
+      args?: Subset<T, CharityCampaignSnapshotCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CharityCampaignSnapshotCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CharityCampaignSnapshot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharityCampaignSnapshotAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CharityCampaignSnapshotAggregateArgs>(args: Subset<T, CharityCampaignSnapshotAggregateArgs>): Prisma.PrismaPromise<GetCharityCampaignSnapshotAggregateType<T>>
+
+    /**
+     * Group by CharityCampaignSnapshot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharityCampaignSnapshotGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CharityCampaignSnapshotGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CharityCampaignSnapshotGroupByArgs['orderBy'] }
+        : { orderBy?: CharityCampaignSnapshotGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CharityCampaignSnapshotGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCharityCampaignSnapshotGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CharityCampaignSnapshot model
+   */
+  readonly fields: CharityCampaignSnapshotFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CharityCampaignSnapshot.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CharityCampaignSnapshotClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    community<T extends CommunityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CommunityDefaultArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    charity<T extends CharityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CharityDefaultArgs<ExtArgs>>): Prisma__CharityClient<$Result.GetResult<Prisma.$CharityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CharityCampaignSnapshot model
+   */
+  interface CharityCampaignSnapshotFieldRefs {
+    readonly id: FieldRef<"CharityCampaignSnapshot", 'String'>
+    readonly communityId: FieldRef<"CharityCampaignSnapshot", 'String'>
+    readonly charityId: FieldRef<"CharityCampaignSnapshot", 'String'>
+    readonly startedAt: FieldRef<"CharityCampaignSnapshot", 'DateTime'>
+    readonly endedAt: FieldRef<"CharityCampaignSnapshot", 'DateTime'>
+    readonly goalAmount: FieldRef<"CharityCampaignSnapshot", 'Float'>
+    readonly finalRaised: FieldRef<"CharityCampaignSnapshot", 'Float'>
+    readonly finalPotential: FieldRef<"CharityCampaignSnapshot", 'Float'>
+    readonly itemsSold: FieldRef<"CharityCampaignSnapshot", 'Int'>
+    readonly reason: FieldRef<"CharityCampaignSnapshot", 'String'>
+    readonly createdAt: FieldRef<"CharityCampaignSnapshot", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CharityCampaignSnapshot findUnique
+   */
+  export type CharityCampaignSnapshotFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which CharityCampaignSnapshot to fetch.
+     */
+    where: CharityCampaignSnapshotWhereUniqueInput
+  }
+
+  /**
+   * CharityCampaignSnapshot findUniqueOrThrow
+   */
+  export type CharityCampaignSnapshotFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which CharityCampaignSnapshot to fetch.
+     */
+    where: CharityCampaignSnapshotWhereUniqueInput
+  }
+
+  /**
+   * CharityCampaignSnapshot findFirst
+   */
+  export type CharityCampaignSnapshotFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which CharityCampaignSnapshot to fetch.
+     */
+    where?: CharityCampaignSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CharityCampaignSnapshots to fetch.
+     */
+    orderBy?: CharityCampaignSnapshotOrderByWithRelationInput | CharityCampaignSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CharityCampaignSnapshots.
+     */
+    cursor?: CharityCampaignSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CharityCampaignSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CharityCampaignSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CharityCampaignSnapshots.
+     */
+    distinct?: CharityCampaignSnapshotScalarFieldEnum | CharityCampaignSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * CharityCampaignSnapshot findFirstOrThrow
+   */
+  export type CharityCampaignSnapshotFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which CharityCampaignSnapshot to fetch.
+     */
+    where?: CharityCampaignSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CharityCampaignSnapshots to fetch.
+     */
+    orderBy?: CharityCampaignSnapshotOrderByWithRelationInput | CharityCampaignSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CharityCampaignSnapshots.
+     */
+    cursor?: CharityCampaignSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CharityCampaignSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CharityCampaignSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CharityCampaignSnapshots.
+     */
+    distinct?: CharityCampaignSnapshotScalarFieldEnum | CharityCampaignSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * CharityCampaignSnapshot findMany
+   */
+  export type CharityCampaignSnapshotFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which CharityCampaignSnapshots to fetch.
+     */
+    where?: CharityCampaignSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CharityCampaignSnapshots to fetch.
+     */
+    orderBy?: CharityCampaignSnapshotOrderByWithRelationInput | CharityCampaignSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CharityCampaignSnapshots.
+     */
+    cursor?: CharityCampaignSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CharityCampaignSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CharityCampaignSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CharityCampaignSnapshots.
+     */
+    distinct?: CharityCampaignSnapshotScalarFieldEnum | CharityCampaignSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * CharityCampaignSnapshot create
+   */
+  export type CharityCampaignSnapshotCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CharityCampaignSnapshot.
+     */
+    data: XOR<CharityCampaignSnapshotCreateInput, CharityCampaignSnapshotUncheckedCreateInput>
+  }
+
+  /**
+   * CharityCampaignSnapshot createMany
+   */
+  export type CharityCampaignSnapshotCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CharityCampaignSnapshots.
+     */
+    data: CharityCampaignSnapshotCreateManyInput | CharityCampaignSnapshotCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CharityCampaignSnapshot createManyAndReturn
+   */
+  export type CharityCampaignSnapshotCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * The data used to create many CharityCampaignSnapshots.
+     */
+    data: CharityCampaignSnapshotCreateManyInput | CharityCampaignSnapshotCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CharityCampaignSnapshot update
+   */
+  export type CharityCampaignSnapshotUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CharityCampaignSnapshot.
+     */
+    data: XOR<CharityCampaignSnapshotUpdateInput, CharityCampaignSnapshotUncheckedUpdateInput>
+    /**
+     * Choose, which CharityCampaignSnapshot to update.
+     */
+    where: CharityCampaignSnapshotWhereUniqueInput
+  }
+
+  /**
+   * CharityCampaignSnapshot updateMany
+   */
+  export type CharityCampaignSnapshotUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CharityCampaignSnapshots.
+     */
+    data: XOR<CharityCampaignSnapshotUpdateManyMutationInput, CharityCampaignSnapshotUncheckedUpdateManyInput>
+    /**
+     * Filter which CharityCampaignSnapshots to update
+     */
+    where?: CharityCampaignSnapshotWhereInput
+    /**
+     * Limit how many CharityCampaignSnapshots to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CharityCampaignSnapshot updateManyAndReturn
+   */
+  export type CharityCampaignSnapshotUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * The data used to update CharityCampaignSnapshots.
+     */
+    data: XOR<CharityCampaignSnapshotUpdateManyMutationInput, CharityCampaignSnapshotUncheckedUpdateManyInput>
+    /**
+     * Filter which CharityCampaignSnapshots to update
+     */
+    where?: CharityCampaignSnapshotWhereInput
+    /**
+     * Limit how many CharityCampaignSnapshots to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CharityCampaignSnapshot upsert
+   */
+  export type CharityCampaignSnapshotUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CharityCampaignSnapshot to update in case it exists.
+     */
+    where: CharityCampaignSnapshotWhereUniqueInput
+    /**
+     * In case the CharityCampaignSnapshot found by the `where` argument doesn't exist, create a new CharityCampaignSnapshot with this data.
+     */
+    create: XOR<CharityCampaignSnapshotCreateInput, CharityCampaignSnapshotUncheckedCreateInput>
+    /**
+     * In case the CharityCampaignSnapshot was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CharityCampaignSnapshotUpdateInput, CharityCampaignSnapshotUncheckedUpdateInput>
+  }
+
+  /**
+   * CharityCampaignSnapshot delete
+   */
+  export type CharityCampaignSnapshotDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter which CharityCampaignSnapshot to delete.
+     */
+    where: CharityCampaignSnapshotWhereUniqueInput
+  }
+
+  /**
+   * CharityCampaignSnapshot deleteMany
+   */
+  export type CharityCampaignSnapshotDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CharityCampaignSnapshots to delete
+     */
+    where?: CharityCampaignSnapshotWhereInput
+    /**
+     * Limit how many CharityCampaignSnapshots to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CharityCampaignSnapshot without action
+   */
+  export type CharityCampaignSnapshotDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharityCampaignSnapshot
+     */
+    select?: CharityCampaignSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharityCampaignSnapshot
+     */
+    omit?: CharityCampaignSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CharityCampaignSnapshotInclude<ExtArgs> | null
   }
 
 
@@ -39804,7 +41164,6 @@ export namespace Prisma {
     charityPercentage: 'charityPercentage',
     imageUrl: 'imageUrl',
     postsImage: 'postsImage',
-    isPublic: 'isPublic',
     isCommunityPick: 'isCommunityPick',
     isCharity: 'isCharity',
     charityId: 'charityId',
@@ -39852,6 +41211,7 @@ export namespace Prisma {
     isVerified: 'isVerified',
     isFeatured: 'isFeatured',
     isCATCharity: 'isCATCharity',
+    currentCampaignStartedAt: 'currentCampaignStartedAt',
     tags: 'tags',
     linkedBusinessIds: 'linkedBusinessIds',
     campaignCompleted: 'campaignCompleted',
@@ -39862,6 +41222,23 @@ export namespace Prisma {
   };
 
   export type CharityScalarFieldEnum = (typeof CharityScalarFieldEnum)[keyof typeof CharityScalarFieldEnum]
+
+
+  export const CharityCampaignSnapshotScalarFieldEnum: {
+    id: 'id',
+    communityId: 'communityId',
+    charityId: 'charityId',
+    startedAt: 'startedAt',
+    endedAt: 'endedAt',
+    goalAmount: 'goalAmount',
+    finalRaised: 'finalRaised',
+    finalPotential: 'finalPotential',
+    itemsSold: 'itemsSold',
+    reason: 'reason',
+    createdAt: 'createdAt'
+  };
+
+  export type CharityCampaignSnapshotScalarFieldEnum = (typeof CharityCampaignSnapshotScalarFieldEnum)[keyof typeof CharityCampaignSnapshotScalarFieldEnum]
 
 
   export const CharitySuggestionScalarFieldEnum: {
@@ -40943,6 +42320,7 @@ export namespace Prisma {
     licenses?: LicenseListRelationFilter
     billingRecords?: BillingRecordListRelationFilter
     catTransactions?: CatTransactionListRelationFilter
+    campaignSnapshots?: CharityCampaignSnapshotListRelationFilter
   }
 
   export type CommunityOrderByWithRelationInput = {
@@ -40986,6 +42364,7 @@ export namespace Prisma {
     licenses?: LicenseOrderByRelationAggregateInput
     billingRecords?: BillingRecordOrderByRelationAggregateInput
     catTransactions?: CatTransactionOrderByRelationAggregateInput
+    campaignSnapshots?: CharityCampaignSnapshotOrderByRelationAggregateInput
   }
 
   export type CommunityWhereUniqueInput = Prisma.AtLeast<{
@@ -41032,6 +42411,7 @@ export namespace Prisma {
     licenses?: LicenseListRelationFilter
     billingRecords?: BillingRecordListRelationFilter
     catTransactions?: CatTransactionListRelationFilter
+    campaignSnapshots?: CharityCampaignSnapshotListRelationFilter
   }, "id">
 
   export type CommunityOrderByWithAggregationInput = {
@@ -41597,7 +42977,6 @@ export namespace Prisma {
     charityPercentage?: FloatNullableFilter<"Post"> | number | null
     imageUrl?: StringNullableFilter<"Post"> | string | null
     postsImage?: StringNullableFilter<"Post"> | string | null
-    isPublic?: BoolFilter<"Post"> | boolean
     isCommunityPick?: BoolFilter<"Post"> | boolean
     isCharity?: BoolFilter<"Post"> | boolean
     charityId?: StringNullableFilter<"Post"> | string | null
@@ -41640,7 +43019,6 @@ export namespace Prisma {
     charityPercentage?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
     postsImage?: SortOrderInput | SortOrder
-    isPublic?: SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
     charityId?: SortOrderInput | SortOrder
@@ -41686,7 +43064,6 @@ export namespace Prisma {
     charityPercentage?: FloatNullableFilter<"Post"> | number | null
     imageUrl?: StringNullableFilter<"Post"> | string | null
     postsImage?: StringNullableFilter<"Post"> | string | null
-    isPublic?: BoolFilter<"Post"> | boolean
     isCommunityPick?: BoolFilter<"Post"> | boolean
     isCharity?: BoolFilter<"Post"> | boolean
     charityId?: StringNullableFilter<"Post"> | string | null
@@ -41729,7 +43106,6 @@ export namespace Prisma {
     charityPercentage?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
     postsImage?: SortOrderInput | SortOrder
-    isPublic?: SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
     charityId?: SortOrderInput | SortOrder
@@ -41777,7 +43153,6 @@ export namespace Prisma {
     charityPercentage?: FloatNullableWithAggregatesFilter<"Post"> | number | null
     imageUrl?: StringNullableWithAggregatesFilter<"Post"> | string | null
     postsImage?: StringNullableWithAggregatesFilter<"Post"> | string | null
-    isPublic?: BoolWithAggregatesFilter<"Post"> | boolean
     isCommunityPick?: BoolWithAggregatesFilter<"Post"> | boolean
     isCharity?: BoolWithAggregatesFilter<"Post"> | boolean
     charityId?: StringNullableWithAggregatesFilter<"Post"> | string | null
@@ -41825,6 +43200,7 @@ export namespace Prisma {
     isVerified?: BoolFilter<"Charity"> | boolean
     isFeatured?: BoolFilter<"Charity"> | boolean
     isCATCharity?: BoolFilter<"Charity"> | boolean
+    currentCampaignStartedAt?: DateTimeNullableFilter<"Charity"> | Date | string | null
     tags?: StringNullableListFilter<"Charity">
     linkedBusinessIds?: StringNullableListFilter<"Charity">
     campaignCompleted?: BoolFilter<"Charity"> | boolean
@@ -41835,6 +43211,7 @@ export namespace Prisma {
     community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
     charitySuggestions?: CharitySuggestionListRelationFilter
     catTransactions?: CatTransactionListRelationFilter
+    campaignSnapshots?: CharityCampaignSnapshotListRelationFilter
   }
 
   export type CharityOrderByWithRelationInput = {
@@ -41860,6 +43237,7 @@ export namespace Prisma {
     isVerified?: SortOrder
     isFeatured?: SortOrder
     isCATCharity?: SortOrder
+    currentCampaignStartedAt?: SortOrderInput | SortOrder
     tags?: SortOrder
     linkedBusinessIds?: SortOrder
     campaignCompleted?: SortOrder
@@ -41870,6 +43248,7 @@ export namespace Prisma {
     community?: CommunityOrderByWithRelationInput
     charitySuggestions?: CharitySuggestionOrderByRelationAggregateInput
     catTransactions?: CatTransactionOrderByRelationAggregateInput
+    campaignSnapshots?: CharityCampaignSnapshotOrderByRelationAggregateInput
   }
 
   export type CharityWhereUniqueInput = Prisma.AtLeast<{
@@ -41898,6 +43277,7 @@ export namespace Prisma {
     isVerified?: BoolFilter<"Charity"> | boolean
     isFeatured?: BoolFilter<"Charity"> | boolean
     isCATCharity?: BoolFilter<"Charity"> | boolean
+    currentCampaignStartedAt?: DateTimeNullableFilter<"Charity"> | Date | string | null
     tags?: StringNullableListFilter<"Charity">
     linkedBusinessIds?: StringNullableListFilter<"Charity">
     campaignCompleted?: BoolFilter<"Charity"> | boolean
@@ -41908,6 +43288,7 @@ export namespace Prisma {
     community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
     charitySuggestions?: CharitySuggestionListRelationFilter
     catTransactions?: CatTransactionListRelationFilter
+    campaignSnapshots?: CharityCampaignSnapshotListRelationFilter
   }, "id">
 
   export type CharityOrderByWithAggregationInput = {
@@ -41933,6 +43314,7 @@ export namespace Prisma {
     isVerified?: SortOrder
     isFeatured?: SortOrder
     isCATCharity?: SortOrder
+    currentCampaignStartedAt?: SortOrderInput | SortOrder
     tags?: SortOrder
     linkedBusinessIds?: SortOrder
     campaignCompleted?: SortOrder
@@ -41973,6 +43355,7 @@ export namespace Prisma {
     isVerified?: BoolWithAggregatesFilter<"Charity"> | boolean
     isFeatured?: BoolWithAggregatesFilter<"Charity"> | boolean
     isCATCharity?: BoolWithAggregatesFilter<"Charity"> | boolean
+    currentCampaignStartedAt?: DateTimeNullableWithAggregatesFilter<"Charity"> | Date | string | null
     tags?: StringNullableListFilter<"Charity">
     linkedBusinessIds?: StringNullableListFilter<"Charity">
     campaignCompleted?: BoolWithAggregatesFilter<"Charity"> | boolean
@@ -41980,6 +43363,96 @@ export namespace Prisma {
     suggestedById?: StringNullableWithAggregatesFilter<"Charity"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Charity"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Charity"> | Date | string
+  }
+
+  export type CharityCampaignSnapshotWhereInput = {
+    AND?: CharityCampaignSnapshotWhereInput | CharityCampaignSnapshotWhereInput[]
+    OR?: CharityCampaignSnapshotWhereInput[]
+    NOT?: CharityCampaignSnapshotWhereInput | CharityCampaignSnapshotWhereInput[]
+    id?: StringFilter<"CharityCampaignSnapshot"> | string
+    communityId?: StringFilter<"CharityCampaignSnapshot"> | string
+    charityId?: StringFilter<"CharityCampaignSnapshot"> | string
+    startedAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+    endedAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+    goalAmount?: FloatNullableFilter<"CharityCampaignSnapshot"> | number | null
+    finalRaised?: FloatFilter<"CharityCampaignSnapshot"> | number
+    finalPotential?: FloatFilter<"CharityCampaignSnapshot"> | number
+    itemsSold?: IntFilter<"CharityCampaignSnapshot"> | number
+    reason?: StringFilter<"CharityCampaignSnapshot"> | string
+    createdAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+    community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
+    charity?: XOR<CharityScalarRelationFilter, CharityWhereInput>
+  }
+
+  export type CharityCampaignSnapshotOrderByWithRelationInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    charityId?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    goalAmount?: SortOrderInput | SortOrder
+    finalRaised?: SortOrder
+    finalPotential?: SortOrder
+    itemsSold?: SortOrder
+    reason?: SortOrder
+    createdAt?: SortOrder
+    community?: CommunityOrderByWithRelationInput
+    charity?: CharityOrderByWithRelationInput
+  }
+
+  export type CharityCampaignSnapshotWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CharityCampaignSnapshotWhereInput | CharityCampaignSnapshotWhereInput[]
+    OR?: CharityCampaignSnapshotWhereInput[]
+    NOT?: CharityCampaignSnapshotWhereInput | CharityCampaignSnapshotWhereInput[]
+    communityId?: StringFilter<"CharityCampaignSnapshot"> | string
+    charityId?: StringFilter<"CharityCampaignSnapshot"> | string
+    startedAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+    endedAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+    goalAmount?: FloatNullableFilter<"CharityCampaignSnapshot"> | number | null
+    finalRaised?: FloatFilter<"CharityCampaignSnapshot"> | number
+    finalPotential?: FloatFilter<"CharityCampaignSnapshot"> | number
+    itemsSold?: IntFilter<"CharityCampaignSnapshot"> | number
+    reason?: StringFilter<"CharityCampaignSnapshot"> | string
+    createdAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+    community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
+    charity?: XOR<CharityScalarRelationFilter, CharityWhereInput>
+  }, "id">
+
+  export type CharityCampaignSnapshotOrderByWithAggregationInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    charityId?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    goalAmount?: SortOrderInput | SortOrder
+    finalRaised?: SortOrder
+    finalPotential?: SortOrder
+    itemsSold?: SortOrder
+    reason?: SortOrder
+    createdAt?: SortOrder
+    _count?: CharityCampaignSnapshotCountOrderByAggregateInput
+    _avg?: CharityCampaignSnapshotAvgOrderByAggregateInput
+    _max?: CharityCampaignSnapshotMaxOrderByAggregateInput
+    _min?: CharityCampaignSnapshotMinOrderByAggregateInput
+    _sum?: CharityCampaignSnapshotSumOrderByAggregateInput
+  }
+
+  export type CharityCampaignSnapshotScalarWhereWithAggregatesInput = {
+    AND?: CharityCampaignSnapshotScalarWhereWithAggregatesInput | CharityCampaignSnapshotScalarWhereWithAggregatesInput[]
+    OR?: CharityCampaignSnapshotScalarWhereWithAggregatesInput[]
+    NOT?: CharityCampaignSnapshotScalarWhereWithAggregatesInput | CharityCampaignSnapshotScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CharityCampaignSnapshot"> | string
+    communityId?: StringWithAggregatesFilter<"CharityCampaignSnapshot"> | string
+    charityId?: StringWithAggregatesFilter<"CharityCampaignSnapshot"> | string
+    startedAt?: DateTimeWithAggregatesFilter<"CharityCampaignSnapshot"> | Date | string
+    endedAt?: DateTimeWithAggregatesFilter<"CharityCampaignSnapshot"> | Date | string
+    goalAmount?: FloatNullableWithAggregatesFilter<"CharityCampaignSnapshot"> | number | null
+    finalRaised?: FloatWithAggregatesFilter<"CharityCampaignSnapshot"> | number
+    finalPotential?: FloatWithAggregatesFilter<"CharityCampaignSnapshot"> | number
+    itemsSold?: IntWithAggregatesFilter<"CharityCampaignSnapshot"> | number
+    reason?: StringWithAggregatesFilter<"CharityCampaignSnapshot"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"CharityCampaignSnapshot"> | Date | string
   }
 
   export type CharitySuggestionWhereInput = {
@@ -43954,6 +45427,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateInput = {
@@ -43996,6 +45470,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUpdateInput = {
@@ -44038,6 +45513,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateInput = {
@@ -44080,6 +45556,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateManyInput = {
@@ -44709,7 +46186,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -44752,7 +46228,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -44791,7 +46266,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44834,7 +46308,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44875,7 +46348,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -44913,7 +46385,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44953,7 +46424,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44997,6 +46467,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -45007,6 +46478,7 @@ export namespace Prisma {
     community: CommunityCreateNestedOneWithoutCharitiesInput
     charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCharityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCharityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUncheckedCreateInput = {
@@ -45032,6 +46504,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -45041,6 +46514,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCharityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUpdateInput = {
@@ -45065,6 +46539,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -45075,6 +46550,7 @@ export namespace Prisma {
     community?: CommunityUpdateOneRequiredWithoutCharitiesNestedInput
     charitySuggestions?: CharitySuggestionUpdateManyWithoutCharityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCharityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateInput = {
@@ -45100,6 +46576,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -45109,6 +46586,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCharityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityCreateManyInput = {
@@ -45134,6 +46612,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -45165,6 +46644,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -45197,6 +46677,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -45204,6 +46685,102 @@ export namespace Prisma {
     suggestedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CharityCampaignSnapshotCreateInput = {
+    id?: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+    community: CommunityCreateNestedOneWithoutCampaignSnapshotsInput
+    charity: CharityCreateNestedOneWithoutCampaignSnapshotsInput
+  }
+
+  export type CharityCampaignSnapshotUncheckedCreateInput = {
+    id?: string
+    communityId: string
+    charityId: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+  }
+
+  export type CharityCampaignSnapshotUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutCampaignSnapshotsNestedInput
+    charity?: CharityUpdateOneRequiredWithoutCampaignSnapshotsNestedInput
+  }
+
+  export type CharityCampaignSnapshotUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    charityId?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CharityCampaignSnapshotCreateManyInput = {
+    id?: string
+    communityId: string
+    charityId: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+  }
+
+  export type CharityCampaignSnapshotUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CharityCampaignSnapshotUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    charityId?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type CharitySuggestionCreateInput = {
@@ -47155,6 +48732,12 @@ export namespace Prisma {
     isNot?: ThemeWhereInput | null
   }
 
+  export type CharityCampaignSnapshotListRelationFilter = {
+    every?: CharityCampaignSnapshotWhereInput
+    some?: CharityCampaignSnapshotWhereInput
+    none?: CharityCampaignSnapshotWhereInput
+  }
+
   export type CharityOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -47172,6 +48755,10 @@ export namespace Prisma {
   }
 
   export type SecurityEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CharityCampaignSnapshotOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -47590,7 +49177,6 @@ export namespace Prisma {
     charityPercentage?: SortOrder
     imageUrl?: SortOrder
     postsImage?: SortOrder
-    isPublic?: SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
     charityId?: SortOrder
@@ -47640,7 +49226,6 @@ export namespace Prisma {
     charityPercentage?: SortOrder
     imageUrl?: SortOrder
     postsImage?: SortOrder
-    isPublic?: SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
     charityId?: SortOrder
@@ -47680,7 +49265,6 @@ export namespace Prisma {
     charityPercentage?: SortOrder
     imageUrl?: SortOrder
     postsImage?: SortOrder
-    isPublic?: SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
     charityId?: SortOrder
@@ -47735,6 +49319,7 @@ export namespace Prisma {
     isVerified?: SortOrder
     isFeatured?: SortOrder
     isCATCharity?: SortOrder
+    currentCampaignStartedAt?: SortOrder
     tags?: SortOrder
     linkedBusinessIds?: SortOrder
     campaignCompleted?: SortOrder
@@ -47775,6 +49360,7 @@ export namespace Prisma {
     isVerified?: SortOrder
     isFeatured?: SortOrder
     isCATCharity?: SortOrder
+    currentCampaignStartedAt?: SortOrder
     campaignCompleted?: SortOrder
     isApprovedSuggestion?: SortOrder
     suggestedById?: SortOrder
@@ -47805,6 +49391,7 @@ export namespace Prisma {
     isVerified?: SortOrder
     isFeatured?: SortOrder
     isCATCharity?: SortOrder
+    currentCampaignStartedAt?: SortOrder
     campaignCompleted?: SortOrder
     isApprovedSuggestion?: SortOrder
     suggestedById?: SortOrder
@@ -47818,6 +49405,94 @@ export namespace Prisma {
     raisedAmount?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type CharityScalarRelationFilter = {
+    is?: CharityWhereInput
+    isNot?: CharityWhereInput
+  }
+
+  export type CharityCampaignSnapshotCountOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    charityId?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    goalAmount?: SortOrder
+    finalRaised?: SortOrder
+    finalPotential?: SortOrder
+    itemsSold?: SortOrder
+    reason?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CharityCampaignSnapshotAvgOrderByAggregateInput = {
+    goalAmount?: SortOrder
+    finalRaised?: SortOrder
+    finalPotential?: SortOrder
+    itemsSold?: SortOrder
+  }
+
+  export type CharityCampaignSnapshotMaxOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    charityId?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    goalAmount?: SortOrder
+    finalRaised?: SortOrder
+    finalPotential?: SortOrder
+    itemsSold?: SortOrder
+    reason?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CharityCampaignSnapshotMinOrderByAggregateInput = {
+    id?: SortOrder
+    communityId?: SortOrder
+    charityId?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    goalAmount?: SortOrder
+    finalRaised?: SortOrder
+    finalPotential?: SortOrder
+    itemsSold?: SortOrder
+    reason?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CharityCampaignSnapshotSumOrderByAggregateInput = {
+    goalAmount?: SortOrder
+    finalRaised?: SortOrder
+    finalPotential?: SortOrder
+    itemsSold?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type CharityNullableScalarRelationFilter = {
@@ -48079,17 +49754,6 @@ export namespace Prisma {
     expiresAt?: SortOrder
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -48148,22 +49812,6 @@ export namespace Prisma {
   export type CommunityInviteLinkSumOrderByAggregateInput = {
     uses?: SortOrder
     maxUses?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -49565,6 +51213,13 @@ export namespace Prisma {
     connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
   }
 
+  export type CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput = {
+    create?: XOR<CharityCampaignSnapshotCreateWithoutCommunityInput, CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput> | CharityCampaignSnapshotCreateWithoutCommunityInput[] | CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput[]
+    connectOrCreate?: CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput | CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput[]
+    createMany?: CharityCampaignSnapshotCreateManyCommunityInputEnvelope
+    connect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+  }
+
   export type CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput = {
     create?: XOR<CommunityMemberCreateWithoutCommunityInput, CommunityMemberUncheckedCreateWithoutCommunityInput> | CommunityMemberCreateWithoutCommunityInput[] | CommunityMemberUncheckedCreateWithoutCommunityInput[]
     connectOrCreate?: CommunityMemberCreateOrConnectWithoutCommunityInput | CommunityMemberCreateOrConnectWithoutCommunityInput[]
@@ -49674,6 +51329,13 @@ export namespace Prisma {
     connectOrCreate?: CatTransactionCreateOrConnectWithoutCommunityInput | CatTransactionCreateOrConnectWithoutCommunityInput[]
     createMany?: CatTransactionCreateManyCommunityInputEnvelope
     connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+  }
+
+  export type CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput = {
+    create?: XOR<CharityCampaignSnapshotCreateWithoutCommunityInput, CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput> | CharityCampaignSnapshotCreateWithoutCommunityInput[] | CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput[]
+    connectOrCreate?: CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput | CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput[]
+    createMany?: CharityCampaignSnapshotCreateManyCommunityInputEnvelope
+    connect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
   }
 
   export type CommunityUpdateenabledCategoriesInput = {
@@ -49914,6 +51576,20 @@ export namespace Prisma {
     deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
   }
 
+  export type CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput = {
+    create?: XOR<CharityCampaignSnapshotCreateWithoutCommunityInput, CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput> | CharityCampaignSnapshotCreateWithoutCommunityInput[] | CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput[]
+    connectOrCreate?: CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput | CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput[]
+    upsert?: CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCommunityInput | CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCommunityInput[]
+    createMany?: CharityCampaignSnapshotCreateManyCommunityInputEnvelope
+    set?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    disconnect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    delete?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    connect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    update?: CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCommunityInput | CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCommunityInput[]
+    updateMany?: CharityCampaignSnapshotUpdateManyWithWhereWithoutCommunityInput | CharityCampaignSnapshotUpdateManyWithWhereWithoutCommunityInput[]
+    deleteMany?: CharityCampaignSnapshotScalarWhereInput | CharityCampaignSnapshotScalarWhereInput[]
+  }
+
   export type CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput = {
     create?: XOR<CommunityMemberCreateWithoutCommunityInput, CommunityMemberUncheckedCreateWithoutCommunityInput> | CommunityMemberCreateWithoutCommunityInput[] | CommunityMemberUncheckedCreateWithoutCommunityInput[]
     connectOrCreate?: CommunityMemberCreateOrConnectWithoutCommunityInput | CommunityMemberCreateOrConnectWithoutCommunityInput[]
@@ -50132,6 +51808,20 @@ export namespace Prisma {
     update?: CatTransactionUpdateWithWhereUniqueWithoutCommunityInput | CatTransactionUpdateWithWhereUniqueWithoutCommunityInput[]
     updateMany?: CatTransactionUpdateManyWithWhereWithoutCommunityInput | CatTransactionUpdateManyWithWhereWithoutCommunityInput[]
     deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
+  export type CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput = {
+    create?: XOR<CharityCampaignSnapshotCreateWithoutCommunityInput, CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput> | CharityCampaignSnapshotCreateWithoutCommunityInput[] | CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput[]
+    connectOrCreate?: CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput | CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput[]
+    upsert?: CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCommunityInput | CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCommunityInput[]
+    createMany?: CharityCampaignSnapshotCreateManyCommunityInputEnvelope
+    set?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    disconnect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    delete?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    connect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    update?: CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCommunityInput | CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCommunityInput[]
+    updateMany?: CharityCampaignSnapshotUpdateManyWithWhereWithoutCommunityInput | CharityCampaignSnapshotUpdateManyWithWhereWithoutCommunityInput[]
+    deleteMany?: CharityCampaignSnapshotScalarWhereInput | CharityCampaignSnapshotScalarWhereInput[]
   }
 
   export type CommunityCreateNestedOneWithoutThemeInput = {
@@ -50427,6 +52117,13 @@ export namespace Prisma {
     connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
   }
 
+  export type CharityCampaignSnapshotCreateNestedManyWithoutCharityInput = {
+    create?: XOR<CharityCampaignSnapshotCreateWithoutCharityInput, CharityCampaignSnapshotUncheckedCreateWithoutCharityInput> | CharityCampaignSnapshotCreateWithoutCharityInput[] | CharityCampaignSnapshotUncheckedCreateWithoutCharityInput[]
+    connectOrCreate?: CharityCampaignSnapshotCreateOrConnectWithoutCharityInput | CharityCampaignSnapshotCreateOrConnectWithoutCharityInput[]
+    createMany?: CharityCampaignSnapshotCreateManyCharityInputEnvelope
+    connect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+  }
+
   export type CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput = {
     create?: XOR<CharitySuggestionCreateWithoutCharityInput, CharitySuggestionUncheckedCreateWithoutCharityInput> | CharitySuggestionCreateWithoutCharityInput[] | CharitySuggestionUncheckedCreateWithoutCharityInput[]
     connectOrCreate?: CharitySuggestionCreateOrConnectWithoutCharityInput | CharitySuggestionCreateOrConnectWithoutCharityInput[]
@@ -50439,6 +52136,13 @@ export namespace Prisma {
     connectOrCreate?: CatTransactionCreateOrConnectWithoutCharityInput | CatTransactionCreateOrConnectWithoutCharityInput[]
     createMany?: CatTransactionCreateManyCharityInputEnvelope
     connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
+  }
+
+  export type CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCharityInput = {
+    create?: XOR<CharityCampaignSnapshotCreateWithoutCharityInput, CharityCampaignSnapshotUncheckedCreateWithoutCharityInput> | CharityCampaignSnapshotCreateWithoutCharityInput[] | CharityCampaignSnapshotUncheckedCreateWithoutCharityInput[]
+    connectOrCreate?: CharityCampaignSnapshotCreateOrConnectWithoutCharityInput | CharityCampaignSnapshotCreateOrConnectWithoutCharityInput[]
+    createMany?: CharityCampaignSnapshotCreateManyCharityInputEnvelope
+    connect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
   }
 
   export type CharityUpdatetagsInput = {
@@ -50487,6 +52191,20 @@ export namespace Prisma {
     deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
   }
 
+  export type CharityCampaignSnapshotUpdateManyWithoutCharityNestedInput = {
+    create?: XOR<CharityCampaignSnapshotCreateWithoutCharityInput, CharityCampaignSnapshotUncheckedCreateWithoutCharityInput> | CharityCampaignSnapshotCreateWithoutCharityInput[] | CharityCampaignSnapshotUncheckedCreateWithoutCharityInput[]
+    connectOrCreate?: CharityCampaignSnapshotCreateOrConnectWithoutCharityInput | CharityCampaignSnapshotCreateOrConnectWithoutCharityInput[]
+    upsert?: CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCharityInput | CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCharityInput[]
+    createMany?: CharityCampaignSnapshotCreateManyCharityInputEnvelope
+    set?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    disconnect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    delete?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    connect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    update?: CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCharityInput | CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCharityInput[]
+    updateMany?: CharityCampaignSnapshotUpdateManyWithWhereWithoutCharityInput | CharityCampaignSnapshotUpdateManyWithWhereWithoutCharityInput[]
+    deleteMany?: CharityCampaignSnapshotScalarWhereInput | CharityCampaignSnapshotScalarWhereInput[]
+  }
+
   export type CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput = {
     create?: XOR<CharitySuggestionCreateWithoutCharityInput, CharitySuggestionUncheckedCreateWithoutCharityInput> | CharitySuggestionCreateWithoutCharityInput[] | CharitySuggestionUncheckedCreateWithoutCharityInput[]
     connectOrCreate?: CharitySuggestionCreateOrConnectWithoutCharityInput | CharitySuggestionCreateOrConnectWithoutCharityInput[]
@@ -50513,6 +52231,56 @@ export namespace Prisma {
     update?: CatTransactionUpdateWithWhereUniqueWithoutCharityInput | CatTransactionUpdateWithWhereUniqueWithoutCharityInput[]
     updateMany?: CatTransactionUpdateManyWithWhereWithoutCharityInput | CatTransactionUpdateManyWithWhereWithoutCharityInput[]
     deleteMany?: CatTransactionScalarWhereInput | CatTransactionScalarWhereInput[]
+  }
+
+  export type CharityCampaignSnapshotUncheckedUpdateManyWithoutCharityNestedInput = {
+    create?: XOR<CharityCampaignSnapshotCreateWithoutCharityInput, CharityCampaignSnapshotUncheckedCreateWithoutCharityInput> | CharityCampaignSnapshotCreateWithoutCharityInput[] | CharityCampaignSnapshotUncheckedCreateWithoutCharityInput[]
+    connectOrCreate?: CharityCampaignSnapshotCreateOrConnectWithoutCharityInput | CharityCampaignSnapshotCreateOrConnectWithoutCharityInput[]
+    upsert?: CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCharityInput | CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCharityInput[]
+    createMany?: CharityCampaignSnapshotCreateManyCharityInputEnvelope
+    set?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    disconnect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    delete?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    connect?: CharityCampaignSnapshotWhereUniqueInput | CharityCampaignSnapshotWhereUniqueInput[]
+    update?: CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCharityInput | CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCharityInput[]
+    updateMany?: CharityCampaignSnapshotUpdateManyWithWhereWithoutCharityInput | CharityCampaignSnapshotUpdateManyWithWhereWithoutCharityInput[]
+    deleteMany?: CharityCampaignSnapshotScalarWhereInput | CharityCampaignSnapshotScalarWhereInput[]
+  }
+
+  export type CommunityCreateNestedOneWithoutCampaignSnapshotsInput = {
+    create?: XOR<CommunityCreateWithoutCampaignSnapshotsInput, CommunityUncheckedCreateWithoutCampaignSnapshotsInput>
+    connectOrCreate?: CommunityCreateOrConnectWithoutCampaignSnapshotsInput
+    connect?: CommunityWhereUniqueInput
+  }
+
+  export type CharityCreateNestedOneWithoutCampaignSnapshotsInput = {
+    create?: XOR<CharityCreateWithoutCampaignSnapshotsInput, CharityUncheckedCreateWithoutCampaignSnapshotsInput>
+    connectOrCreate?: CharityCreateOrConnectWithoutCampaignSnapshotsInput
+    connect?: CharityWhereUniqueInput
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type CommunityUpdateOneRequiredWithoutCampaignSnapshotsNestedInput = {
+    create?: XOR<CommunityCreateWithoutCampaignSnapshotsInput, CommunityUncheckedCreateWithoutCampaignSnapshotsInput>
+    connectOrCreate?: CommunityCreateOrConnectWithoutCampaignSnapshotsInput
+    upsert?: CommunityUpsertWithoutCampaignSnapshotsInput
+    connect?: CommunityWhereUniqueInput
+    update?: XOR<XOR<CommunityUpdateToOneWithWhereWithoutCampaignSnapshotsInput, CommunityUpdateWithoutCampaignSnapshotsInput>, CommunityUncheckedUpdateWithoutCampaignSnapshotsInput>
+  }
+
+  export type CharityUpdateOneRequiredWithoutCampaignSnapshotsNestedInput = {
+    create?: XOR<CharityCreateWithoutCampaignSnapshotsInput, CharityUncheckedCreateWithoutCampaignSnapshotsInput>
+    connectOrCreate?: CharityCreateOrConnectWithoutCampaignSnapshotsInput
+    upsert?: CharityUpsertWithoutCampaignSnapshotsInput
+    connect?: CharityWhereUniqueInput
+    update?: XOR<XOR<CharityUpdateToOneWithWhereWithoutCampaignSnapshotsInput, CharityUpdateWithoutCampaignSnapshotsInput>, CharityUncheckedUpdateWithoutCampaignSnapshotsInput>
   }
 
   export type CommunityCreateNestedOneWithoutCharitySuggestionsInput = {
@@ -50722,14 +52490,6 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutInviteLinksInput, UserUncheckedCreateWithoutInviteLinksInput>
     connectOrCreate?: UserCreateOrConnectWithoutInviteLinksInput
     connect?: UserWhereUniqueInput
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -51348,7 +53108,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -51389,7 +53148,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -51533,6 +53291,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutOwnerInput = {
@@ -51574,6 +53333,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutOwnerInput = {
@@ -52149,7 +53909,6 @@ export namespace Prisma {
     charityPercentage?: FloatNullableFilter<"Post"> | number | null
     imageUrl?: StringNullableFilter<"Post"> | string | null
     postsImage?: StringNullableFilter<"Post"> | string | null
-    isPublic?: BoolFilter<"Post"> | boolean
     isCommunityPick?: BoolFilter<"Post"> | boolean
     isCharity?: BoolFilter<"Post"> | boolean
     charityId?: StringNullableFilter<"Post"> | string | null
@@ -54372,7 +56131,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -54413,7 +56171,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -54510,6 +56267,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -54519,6 +56277,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCharityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCharityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUncheckedCreateWithoutCommunityInput = {
@@ -54543,6 +56302,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -54552,6 +56312,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCharityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCharityInput
   }
 
   export type CharityCreateOrConnectWithoutCommunityInput = {
@@ -54955,6 +56716,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CharityCampaignSnapshotCreateWithoutCommunityInput = {
+    id?: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+    charity: CharityCreateNestedOneWithoutCampaignSnapshotsInput
+  }
+
+  export type CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput = {
+    id?: string
+    charityId: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+  }
+
+  export type CharityCampaignSnapshotCreateOrConnectWithoutCommunityInput = {
+    where: CharityCampaignSnapshotWhereUniqueInput
+    create: XOR<CharityCampaignSnapshotCreateWithoutCommunityInput, CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput>
+  }
+
+  export type CharityCampaignSnapshotCreateManyCommunityInputEnvelope = {
+    data: CharityCampaignSnapshotCreateManyCommunityInput | CharityCampaignSnapshotCreateManyCommunityInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutOwnedCommunitiesInput = {
     update: XOR<UserUpdateWithoutOwnedCommunitiesInput, UserUncheckedUpdateWithoutOwnedCommunitiesInput>
     create: XOR<UserCreateWithoutOwnedCommunitiesInput, UserUncheckedCreateWithoutOwnedCommunitiesInput>
@@ -55194,6 +56991,7 @@ export namespace Prisma {
     isVerified?: BoolFilter<"Charity"> | boolean
     isFeatured?: BoolFilter<"Charity"> | boolean
     isCATCharity?: BoolFilter<"Charity"> | boolean
+    currentCampaignStartedAt?: DateTimeNullableFilter<"Charity"> | Date | string | null
     tags?: StringNullableListFilter<"Charity">
     linkedBusinessIds?: StringNullableListFilter<"Charity">
     campaignCompleted?: BoolFilter<"Charity"> | boolean
@@ -55491,6 +57289,39 @@ export namespace Prisma {
     data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyWithoutCommunityInput>
   }
 
+  export type CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCommunityInput = {
+    where: CharityCampaignSnapshotWhereUniqueInput
+    update: XOR<CharityCampaignSnapshotUpdateWithoutCommunityInput, CharityCampaignSnapshotUncheckedUpdateWithoutCommunityInput>
+    create: XOR<CharityCampaignSnapshotCreateWithoutCommunityInput, CharityCampaignSnapshotUncheckedCreateWithoutCommunityInput>
+  }
+
+  export type CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCommunityInput = {
+    where: CharityCampaignSnapshotWhereUniqueInput
+    data: XOR<CharityCampaignSnapshotUpdateWithoutCommunityInput, CharityCampaignSnapshotUncheckedUpdateWithoutCommunityInput>
+  }
+
+  export type CharityCampaignSnapshotUpdateManyWithWhereWithoutCommunityInput = {
+    where: CharityCampaignSnapshotScalarWhereInput
+    data: XOR<CharityCampaignSnapshotUpdateManyMutationInput, CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityInput>
+  }
+
+  export type CharityCampaignSnapshotScalarWhereInput = {
+    AND?: CharityCampaignSnapshotScalarWhereInput | CharityCampaignSnapshotScalarWhereInput[]
+    OR?: CharityCampaignSnapshotScalarWhereInput[]
+    NOT?: CharityCampaignSnapshotScalarWhereInput | CharityCampaignSnapshotScalarWhereInput[]
+    id?: StringFilter<"CharityCampaignSnapshot"> | string
+    communityId?: StringFilter<"CharityCampaignSnapshot"> | string
+    charityId?: StringFilter<"CharityCampaignSnapshot"> | string
+    startedAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+    endedAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+    goalAmount?: FloatNullableFilter<"CharityCampaignSnapshot"> | number | null
+    finalRaised?: FloatFilter<"CharityCampaignSnapshot"> | number
+    finalPotential?: FloatFilter<"CharityCampaignSnapshot"> | number
+    itemsSold?: IntFilter<"CharityCampaignSnapshot"> | number
+    reason?: StringFilter<"CharityCampaignSnapshot"> | string
+    createdAt?: DateTimeFilter<"CharityCampaignSnapshot"> | Date | string
+  }
+
   export type CommunityCreateWithoutThemeInput = {
     id?: string
     name: string
@@ -55530,6 +57361,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutThemeInput = {
@@ -55571,6 +57403,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutThemeInput = {
@@ -55628,6 +57461,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutThemeInput = {
@@ -55669,6 +57503,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutMembersInput = {
@@ -55710,6 +57545,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutMembersInput = {
@@ -55751,6 +57587,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutMembersInput = {
@@ -55951,6 +57788,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutMembersInput = {
@@ -55992,6 +57830,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutCommunitiesInput = {
@@ -56182,6 +58021,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutMemberLocationsInput = {
@@ -56223,6 +58063,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutMemberLocationsInput = {
@@ -56280,6 +58121,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutMemberLocationsInput = {
@@ -56321,6 +58163,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutSecurityLocationsInput = {
@@ -56362,6 +58205,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutSecurityLocationsInput = {
@@ -56403,6 +58247,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutSecurityLocationsInput = {
@@ -56460,6 +58305,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutSecurityLocationsInput = {
@@ -56501,6 +58347,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutMessagesInput = {
@@ -56542,6 +58389,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutMessagesInput = {
@@ -56583,6 +58431,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutMessagesInput = {
@@ -56893,6 +58742,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutMessagesInput = {
@@ -56934,6 +58784,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type ConversationUpsertWithoutMessagesInput = {
@@ -57220,6 +59071,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutPostsInput = {
@@ -57261,6 +59113,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutPostsInput = {
@@ -57491,6 +59344,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutPostsInput = {
@@ -57532,6 +59386,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutPostsInput = {
@@ -57738,6 +59593,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutCharitiesInput = {
@@ -57779,6 +59635,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutCharitiesInput = {
@@ -57854,6 +59711,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CharityCampaignSnapshotCreateWithoutCharityInput = {
+    id?: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+    community: CommunityCreateNestedOneWithoutCampaignSnapshotsInput
+  }
+
+  export type CharityCampaignSnapshotUncheckedCreateWithoutCharityInput = {
+    id?: string
+    communityId: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+  }
+
+  export type CharityCampaignSnapshotCreateOrConnectWithoutCharityInput = {
+    where: CharityCampaignSnapshotWhereUniqueInput
+    create: XOR<CharityCampaignSnapshotCreateWithoutCharityInput, CharityCampaignSnapshotUncheckedCreateWithoutCharityInput>
+  }
+
+  export type CharityCampaignSnapshotCreateManyCharityInputEnvelope = {
+    data: CharityCampaignSnapshotCreateManyCharityInput | CharityCampaignSnapshotCreateManyCharityInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CommunityUpsertWithoutCharitiesInput = {
     update: XOR<CommunityUpdateWithoutCharitiesInput, CommunityUncheckedUpdateWithoutCharitiesInput>
     create: XOR<CommunityCreateWithoutCharitiesInput, CommunityUncheckedCreateWithoutCharitiesInput>
@@ -57904,6 +59797,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutCharitiesInput = {
@@ -57945,6 +59839,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CharitySuggestionUpsertWithWhereUniqueWithoutCharityInput = {
@@ -57977,6 +59872,362 @@ export namespace Prisma {
   export type CatTransactionUpdateManyWithWhereWithoutCharityInput = {
     where: CatTransactionScalarWhereInput
     data: XOR<CatTransactionUpdateManyMutationInput, CatTransactionUncheckedUpdateManyWithoutCharityInput>
+  }
+
+  export type CharityCampaignSnapshotUpsertWithWhereUniqueWithoutCharityInput = {
+    where: CharityCampaignSnapshotWhereUniqueInput
+    update: XOR<CharityCampaignSnapshotUpdateWithoutCharityInput, CharityCampaignSnapshotUncheckedUpdateWithoutCharityInput>
+    create: XOR<CharityCampaignSnapshotCreateWithoutCharityInput, CharityCampaignSnapshotUncheckedCreateWithoutCharityInput>
+  }
+
+  export type CharityCampaignSnapshotUpdateWithWhereUniqueWithoutCharityInput = {
+    where: CharityCampaignSnapshotWhereUniqueInput
+    data: XOR<CharityCampaignSnapshotUpdateWithoutCharityInput, CharityCampaignSnapshotUncheckedUpdateWithoutCharityInput>
+  }
+
+  export type CharityCampaignSnapshotUpdateManyWithWhereWithoutCharityInput = {
+    where: CharityCampaignSnapshotScalarWhereInput
+    data: XOR<CharityCampaignSnapshotUpdateManyMutationInput, CharityCampaignSnapshotUncheckedUpdateManyWithoutCharityInput>
+  }
+
+  export type CommunityCreateWithoutCampaignSnapshotsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    status?: string
+    isEmergencyMode?: boolean
+    coverageLat?: number | null
+    coverageLng?: number | null
+    coverageRadius?: number | null
+    coverageLocation?: string | null
+    enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
+    activeEmergencyId?: string | null
+    onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: boolean
+    isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutOwnedCommunitiesInput
+    members?: CommunityMemberCreateNestedManyWithoutCommunityInput
+    posts?: PostCreateNestedManyWithoutCommunityInput
+    messages?: MessageCreateNestedManyWithoutCommunityInput
+    charities?: CharityCreateNestedManyWithoutCommunityInput
+    charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCommunityInput
+    reports?: ReportCreateNestedManyWithoutCommunityInput
+    invitations?: CommunityInvitationCreateNestedManyWithoutCommunityInput
+    inviteLinks?: CommunityInviteLinkCreateNestedManyWithoutCommunityInput
+    memberLocations?: MemberLocationCreateNestedManyWithoutCommunityInput
+    securityLocations?: SecurityLocationCreateNestedManyWithoutCommunityInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutCommunityInput
+    securityEvents?: SecurityEventCreateNestedManyWithoutCommunityInput
+    theme?: ThemeCreateNestedOneWithoutCommunityInput
+    licenses?: LicenseCreateNestedManyWithoutCommunityInput
+    billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+  }
+
+  export type CommunityUncheckedCreateWithoutCampaignSnapshotsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    ownerId: string
+    type?: string
+    status?: string
+    isEmergencyMode?: boolean
+    coverageLat?: number | null
+    coverageLng?: number | null
+    coverageRadius?: number | null
+    coverageLocation?: string | null
+    enabledCategories?: CommunityCreateenabledCategoriesInput | string[]
+    trialExpiresAt?: Date | string | null
+    isPaid?: boolean
+    activatedAt?: Date | string | null
+    activeEmergencyId?: string | null
+    onboardingStepsCompleted?: CommunityCreateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: boolean
+    isPublic?: boolean
+    catCycleActive?: boolean
+    catFeaturedCharityId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    members?: CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
+    posts?: PostUncheckedCreateNestedManyWithoutCommunityInput
+    messages?: MessageUncheckedCreateNestedManyWithoutCommunityInput
+    charities?: CharityUncheckedCreateNestedManyWithoutCommunityInput
+    charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCommunityInput
+    reports?: ReportUncheckedCreateNestedManyWithoutCommunityInput
+    invitations?: CommunityInvitationUncheckedCreateNestedManyWithoutCommunityInput
+    inviteLinks?: CommunityInviteLinkUncheckedCreateNestedManyWithoutCommunityInput
+    memberLocations?: MemberLocationUncheckedCreateNestedManyWithoutCommunityInput
+    securityLocations?: SecurityLocationUncheckedCreateNestedManyWithoutCommunityInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutCommunityInput
+    securityEvents?: SecurityEventUncheckedCreateNestedManyWithoutCommunityInput
+    theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
+    licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
+    billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+  }
+
+  export type CommunityCreateOrConnectWithoutCampaignSnapshotsInput = {
+    where: CommunityWhereUniqueInput
+    create: XOR<CommunityCreateWithoutCampaignSnapshotsInput, CommunityUncheckedCreateWithoutCampaignSnapshotsInput>
+  }
+
+  export type CharityCreateWithoutCampaignSnapshotsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: string | null
+    percentage?: number
+    status?: string
+    urgency?: string | null
+    fundraisingGoal?: number | null
+    raisedAmount?: number
+    imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
+    locationName?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    isFeatured?: boolean
+    isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
+    tags?: CharityCreatetagsInput | string[]
+    linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
+    campaignCompleted?: boolean
+    isApprovedSuggestion?: boolean
+    suggestedById?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    community: CommunityCreateNestedOneWithoutCharitiesInput
+    charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCharityInput
+    catTransactions?: CatTransactionCreateNestedManyWithoutCharityInput
+  }
+
+  export type CharityUncheckedCreateWithoutCampaignSnapshotsInput = {
+    id?: string
+    communityId: string
+    name: string
+    description?: string | null
+    category?: string | null
+    percentage?: number
+    status?: string
+    urgency?: string | null
+    fundraisingGoal?: number | null
+    raisedAmount?: number
+    imageUrl?: string | null
+    logo?: string | null
+    coverImage?: string | null
+    contactPhone?: string | null
+    contactEmail?: string | null
+    website?: string | null
+    locationName?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    isFeatured?: boolean
+    isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
+    tags?: CharityCreatetagsInput | string[]
+    linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
+    campaignCompleted?: boolean
+    isApprovedSuggestion?: boolean
+    suggestedById?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput
+    catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCharityInput
+  }
+
+  export type CharityCreateOrConnectWithoutCampaignSnapshotsInput = {
+    where: CharityWhereUniqueInput
+    create: XOR<CharityCreateWithoutCampaignSnapshotsInput, CharityUncheckedCreateWithoutCampaignSnapshotsInput>
+  }
+
+  export type CommunityUpsertWithoutCampaignSnapshotsInput = {
+    update: XOR<CommunityUpdateWithoutCampaignSnapshotsInput, CommunityUncheckedUpdateWithoutCampaignSnapshotsInput>
+    create: XOR<CommunityCreateWithoutCampaignSnapshotsInput, CommunityUncheckedCreateWithoutCampaignSnapshotsInput>
+    where?: CommunityWhereInput
+  }
+
+  export type CommunityUpdateToOneWithWhereWithoutCampaignSnapshotsInput = {
+    where?: CommunityWhereInput
+    data: XOR<CommunityUpdateWithoutCampaignSnapshotsInput, CommunityUncheckedUpdateWithoutCampaignSnapshotsInput>
+  }
+
+  export type CommunityUpdateWithoutCampaignSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    isEmergencyMode?: BoolFieldUpdateOperationsInput | boolean
+    coverageLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutOwnedCommunitiesNestedInput
+    members?: CommunityMemberUpdateManyWithoutCommunityNestedInput
+    posts?: PostUpdateManyWithoutCommunityNestedInput
+    messages?: MessageUpdateManyWithoutCommunityNestedInput
+    charities?: CharityUpdateManyWithoutCommunityNestedInput
+    charitySuggestions?: CharitySuggestionUpdateManyWithoutCommunityNestedInput
+    reports?: ReportUpdateManyWithoutCommunityNestedInput
+    invitations?: CommunityInvitationUpdateManyWithoutCommunityNestedInput
+    inviteLinks?: CommunityInviteLinkUpdateManyWithoutCommunityNestedInput
+    memberLocations?: MemberLocationUpdateManyWithoutCommunityNestedInput
+    securityLocations?: SecurityLocationUpdateManyWithoutCommunityNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutCommunityNestedInput
+    securityEvents?: SecurityEventUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUpdateOneWithoutCommunityNestedInput
+    licenses?: LicenseUpdateManyWithoutCommunityNestedInput
+    billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+  }
+
+  export type CommunityUncheckedUpdateWithoutCampaignSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    ownerId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    isEmergencyMode?: BoolFieldUpdateOperationsInput | boolean
+    coverageLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageRadius?: NullableFloatFieldUpdateOperationsInput | number | null
+    coverageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    enabledCategories?: CommunityUpdateenabledCategoriesInput | string[]
+    trialExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    activatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activeEmergencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingStepsCompleted?: CommunityUpdateonboardingStepsCompletedInput | string[]
+    guidedSetupRequired?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    catCycleActive?: BoolFieldUpdateOperationsInput | boolean
+    catFeaturedCharityId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
+    posts?: PostUncheckedUpdateManyWithoutCommunityNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutCommunityNestedInput
+    charities?: CharityUncheckedUpdateManyWithoutCommunityNestedInput
+    charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCommunityNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutCommunityNestedInput
+    invitations?: CommunityInvitationUncheckedUpdateManyWithoutCommunityNestedInput
+    inviteLinks?: CommunityInviteLinkUncheckedUpdateManyWithoutCommunityNestedInput
+    memberLocations?: MemberLocationUncheckedUpdateManyWithoutCommunityNestedInput
+    securityLocations?: SecurityLocationUncheckedUpdateManyWithoutCommunityNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutCommunityNestedInput
+    securityEvents?: SecurityEventUncheckedUpdateManyWithoutCommunityNestedInput
+    theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
+    licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
+    billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+  }
+
+  export type CharityUpsertWithoutCampaignSnapshotsInput = {
+    update: XOR<CharityUpdateWithoutCampaignSnapshotsInput, CharityUncheckedUpdateWithoutCampaignSnapshotsInput>
+    create: XOR<CharityCreateWithoutCampaignSnapshotsInput, CharityUncheckedCreateWithoutCampaignSnapshotsInput>
+    where?: CharityWhereInput
+  }
+
+  export type CharityUpdateToOneWithWhereWithoutCampaignSnapshotsInput = {
+    where?: CharityWhereInput
+    data: XOR<CharityUpdateWithoutCampaignSnapshotsInput, CharityUncheckedUpdateWithoutCampaignSnapshotsInput>
+  }
+
+  export type CharityUpdateWithoutCampaignSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    percentage?: FloatFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    urgency?: NullableStringFieldUpdateOperationsInput | string | null
+    fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
+    raisedAmount?: FloatFieldUpdateOperationsInput | number
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    locationName?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tags?: CharityUpdatetagsInput | string[]
+    linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
+    campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
+    isApprovedSuggestion?: BoolFieldUpdateOperationsInput | boolean
+    suggestedById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutCharitiesNestedInput
+    charitySuggestions?: CharitySuggestionUpdateManyWithoutCharityNestedInput
+    catTransactions?: CatTransactionUpdateManyWithoutCharityNestedInput
+  }
+
+  export type CharityUncheckedUpdateWithoutCampaignSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    percentage?: FloatFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    urgency?: NullableStringFieldUpdateOperationsInput | string | null
+    fundraisingGoal?: NullableFloatFieldUpdateOperationsInput | number | null
+    raisedAmount?: FloatFieldUpdateOperationsInput | number
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    locationName?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tags?: CharityUpdatetagsInput | string[]
+    linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
+    campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
+    isApprovedSuggestion?: BoolFieldUpdateOperationsInput | boolean
+    suggestedById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput
+    catTransactions?: CatTransactionUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type CommunityCreateWithoutCharitySuggestionsInput = {
@@ -58018,6 +60269,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutCharitySuggestionsInput = {
@@ -58059,6 +60311,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutCharitySuggestionsInput = {
@@ -58088,6 +60341,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -58097,6 +60351,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     community: CommunityCreateNestedOneWithoutCharitiesInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCharityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUncheckedCreateWithoutCharitySuggestionsInput = {
@@ -58122,6 +60377,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -58130,6 +60386,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCharityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCharityInput
   }
 
   export type CharityCreateOrConnectWithoutCharitySuggestionsInput = {
@@ -58330,6 +60587,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutCharitySuggestionsInput = {
@@ -58371,6 +60629,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CharityUpsertWithoutCharitySuggestionsInput = {
@@ -58406,6 +60665,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -58415,6 +60675,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutCharitiesNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCharityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateWithoutCharitySuggestionsInput = {
@@ -58440,6 +60701,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -58448,6 +60710,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCharityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type UserUpsertWithoutCharitySuggestionsInput = {
@@ -58638,6 +60901,7 @@ export namespace Prisma {
     theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutCatTransactionsInput = {
@@ -58679,6 +60943,7 @@ export namespace Prisma {
     theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutCatTransactionsInput = {
@@ -58702,7 +60967,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -58744,7 +61008,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -58936,6 +61199,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -58945,6 +61209,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     community: CommunityCreateNestedOneWithoutCharitiesInput
     charitySuggestions?: CharitySuggestionCreateNestedManyWithoutCharityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCharityInput
   }
 
   export type CharityUncheckedCreateWithoutCatTransactionsInput = {
@@ -58970,6 +61235,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -58978,6 +61244,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     charitySuggestions?: CharitySuggestionUncheckedCreateNestedManyWithoutCharityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCharityInput
   }
 
   export type CharityCreateOrConnectWithoutCatTransactionsInput = {
@@ -59035,6 +61302,7 @@ export namespace Prisma {
     theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutCatTransactionsInput = {
@@ -59076,6 +61344,7 @@ export namespace Prisma {
     theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type PostUpsertWithoutCatTransactionsInput = {
@@ -59105,7 +61374,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59147,7 +61415,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59351,6 +61618,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -59360,6 +61628,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutCharitiesNestedInput
     charitySuggestions?: CharitySuggestionUpdateManyWithoutCharityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateWithoutCatTransactionsInput = {
@@ -59385,6 +61654,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -59393,6 +61663,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type UserCreateWithoutBusinessesInput = {
@@ -59726,6 +61997,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutReportsInput = {
@@ -59767,6 +62039,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutReportsInput = {
@@ -59967,6 +62240,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutReportsInput = {
@@ -60008,6 +62282,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutReportsInput = {
@@ -60198,6 +62473,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutInvitationsInput = {
@@ -60239,6 +62515,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutInvitationsInput = {
@@ -60582,6 +62859,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutInvitationsInput = {
@@ -60623,6 +62901,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutSentInvitationsInput = {
@@ -60962,6 +63241,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutInviteLinksInput = {
@@ -61003,6 +63283,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutInviteLinksInput = {
@@ -61203,6 +63484,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutInviteLinksInput = {
@@ -61244,6 +63526,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserUpsertWithoutInviteLinksInput = {
@@ -62327,6 +64610,7 @@ export namespace Prisma {
     theme?: ThemeCreateNestedOneWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutLicensesInput = {
@@ -62368,6 +64652,7 @@ export namespace Prisma {
     theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutLicensesInput = {
@@ -62574,6 +64859,7 @@ export namespace Prisma {
     theme?: ThemeUpdateOneWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutLicensesInput = {
@@ -62615,6 +64901,7 @@ export namespace Prisma {
     theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutModerationLogsInput = {
@@ -62656,6 +64943,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutModerationLogsInput = {
@@ -62697,6 +64985,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutModerationLogsInput = {
@@ -62754,6 +65043,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutModerationLogsInput = {
@@ -62795,6 +65085,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityCreateWithoutSecurityEventsInput = {
@@ -62836,6 +65127,7 @@ export namespace Prisma {
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutSecurityEventsInput = {
@@ -62877,6 +65169,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     billingRecords?: BillingRecordUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutSecurityEventsInput = {
@@ -62934,6 +65227,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutSecurityEventsInput = {
@@ -62975,6 +65269,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserCreateWithoutBillingRecordsInput = {
@@ -63159,6 +65454,7 @@ export namespace Prisma {
     theme?: ThemeCreateNestedOneWithoutCommunityInput
     licenses?: LicenseCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityUncheckedCreateWithoutBillingRecordsInput = {
@@ -63200,6 +65496,7 @@ export namespace Prisma {
     theme?: ThemeUncheckedCreateNestedOneWithoutCommunityInput
     licenses?: LicenseUncheckedCreateNestedManyWithoutCommunityInput
     catTransactions?: CatTransactionUncheckedCreateNestedManyWithoutCommunityInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedCreateNestedManyWithoutCommunityInput
   }
 
   export type CommunityCreateOrConnectWithoutBillingRecordsInput = {
@@ -63406,6 +65703,7 @@ export namespace Prisma {
     theme?: ThemeUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutBillingRecordsInput = {
@@ -63447,6 +65745,7 @@ export namespace Prisma {
     theme?: ThemeUncheckedUpdateOneWithoutCommunityNestedInput
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type UserCreateWithoutInvoicesInput = {
@@ -63794,7 +66093,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -64140,7 +66438,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -64181,7 +66478,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -64221,7 +66517,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -64359,6 +66654,7 @@ export namespace Prisma {
     licenses?: LicenseUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateWithoutOwnerInput = {
@@ -64400,6 +66696,7 @@ export namespace Prisma {
     licenses?: LicenseUncheckedUpdateManyWithoutCommunityNestedInput
     billingRecords?: BillingRecordUncheckedUpdateManyWithoutCommunityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCommunityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityNestedInput
   }
 
   export type CommunityUncheckedUpdateManyWithoutOwnerInput = {
@@ -64908,7 +67205,6 @@ export namespace Prisma {
     charityPercentage?: number | null
     imageUrl?: string | null
     postsImage?: string | null
-    isPublic?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
     charityId?: string | null
@@ -64967,6 +67263,7 @@ export namespace Prisma {
     isVerified?: boolean
     isFeatured?: boolean
     isCATCharity?: boolean
+    currentCampaignStartedAt?: Date | string | null
     tags?: CharityCreatetagsInput | string[]
     linkedBusinessIds?: CharityCreatelinkedBusinessIdsInput | string[]
     campaignCompleted?: boolean
@@ -65092,6 +67389,19 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type CharityCampaignSnapshotCreateManyCommunityInput = {
+    id?: string
+    charityId: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+  }
+
   export type CommunityMemberUpdateWithoutCommunityInput = {
     role?: StringFieldUpdateOperationsInput | string
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -65150,7 +67460,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -65191,7 +67500,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -65231,7 +67539,6 @@ export namespace Prisma {
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isPublic?: BoolFieldUpdateOperationsInput | boolean
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -65322,6 +67629,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -65331,6 +67639,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     charitySuggestions?: CharitySuggestionUpdateManyWithoutCharityNestedInput
     catTransactions?: CatTransactionUpdateManyWithoutCharityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateWithoutCommunityInput = {
@@ -65355,6 +67664,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -65364,6 +67674,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     charitySuggestions?: CharitySuggestionUncheckedUpdateManyWithoutCharityNestedInput
     catTransactions?: CatTransactionUncheckedUpdateManyWithoutCharityNestedInput
+    campaignSnapshots?: CharityCampaignSnapshotUncheckedUpdateManyWithoutCharityNestedInput
   }
 
   export type CharityUncheckedUpdateManyWithoutCommunityInput = {
@@ -65388,6 +67699,7 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
     isCATCharity?: BoolFieldUpdateOperationsInput | boolean
+    currentCampaignStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tags?: CharityUpdatetagsInput | string[]
     linkedBusinessIds?: CharityUpdatelinkedBusinessIdsInput | string[]
     campaignCompleted?: BoolFieldUpdateOperationsInput | boolean
@@ -65745,6 +68057,45 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CharityCampaignSnapshotUpdateWithoutCommunityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charity?: CharityUpdateOneRequiredWithoutCampaignSnapshotsNestedInput
+  }
+
+  export type CharityCampaignSnapshotUncheckedUpdateWithoutCommunityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    charityId?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CharityCampaignSnapshotUncheckedUpdateManyWithoutCommunityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    charityId?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MessageCreateManyReplyToInput = {
     id?: string
     communityId?: string | null
@@ -65871,6 +68222,19 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type CharityCampaignSnapshotCreateManyCharityInput = {
+    id?: string
+    communityId: string
+    startedAt: Date | string
+    endedAt: Date | string
+    goalAmount?: number | null
+    finalRaised?: number
+    finalPotential?: number
+    itemsSold?: number
+    reason: string
+    createdAt?: Date | string
+  }
+
   export type CharitySuggestionUpdateWithoutCharityInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
@@ -65940,6 +68304,45 @@ export namespace Prisma {
     sellerId?: StringFieldUpdateOperationsInput | string
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CharityCampaignSnapshotUpdateWithoutCharityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    community?: CommunityUpdateOneRequiredWithoutCampaignSnapshotsNestedInput
+  }
+
+  export type CharityCampaignSnapshotUncheckedUpdateWithoutCharityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CharityCampaignSnapshotUncheckedUpdateManyWithoutCharityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    communityId?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    goalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
+    finalRaised?: FloatFieldUpdateOperationsInput | number
+    finalPotential?: FloatFieldUpdateOperationsInput | number
+    itemsSold?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
