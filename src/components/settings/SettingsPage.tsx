@@ -24,6 +24,7 @@ import {
   Plus,
 } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { isCommunityActive, isCommunityTrial, isCommunityLicensed, isUserLicensed } from '../../lib/licensing';
@@ -115,6 +116,7 @@ const SETTINGS_CARD_SURFACE = {
 
 const SettingsPage: React.FC = () => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ charityMode?: string | string[] }>();
   const { userProfile, updateUserProfile, refreshProfile } = useAuth();
   const { currentCommunity, communities, setCurrentCommunity, updateNotificationPreferences } = useCommunity();
@@ -192,7 +194,12 @@ const SettingsPage: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
       <ScrollView
-        contentContainerStyle={{ padding: SPACE.s16, paddingBottom: SPACE.s48, gap: SPACE.s20 }}
+        contentContainerStyle={{
+          padding: SPACE.s16,
+          paddingBottom: Math.max(SPACE.s48, insets.bottom + 120),
+          gap: SPACE.s20,
+        }}
+        scrollIndicatorInsets={{ bottom: Math.max(SPACE.s48, insets.bottom + 120) }}
         showsVerticalScrollIndicator={false}
       >
         {/* ── Profile Identity Card ── */}

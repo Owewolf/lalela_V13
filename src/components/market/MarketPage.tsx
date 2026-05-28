@@ -381,6 +381,9 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       const initialQuantity = Math.max(1, Number((listing as any).initialQuantity ?? 1));
       const soldQuantity = Math.max(0, Number((listing as any).soldQuantity ?? 0));
       const remainingQuantity = Math.max(0, Number((listing as any).remainingQuantity ?? (initialQuantity - soldQuantity)));
+      const perUnitCharityImpact = Math.max(0, Number(listing.charityAmount ?? 0));
+      const totalAvailableCharityImpact = perUnitCharityImpact * remainingQuantity;
+      const totalSoldCharityImpact = perUnitCharityImpact * soldQuantity;
       const isSoldOut = remainingQuantity === 0 || String(listing.status || '').toUpperCase() === 'SOLD';
       const hasSales = soldQuantity > 0;
       const hasListingImage = typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0;
@@ -389,7 +392,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
         <TouchableOpacity
           activeOpacity={0.92}
           onPress={() => setSelectedListing(listing)}
-          className="mb-4 bg-surface-container-low rounded-[2rem] overflow-hidden border shadow-sm"
+          className="mb-5 bg-surface-container-low rounded-[2.2rem] overflow-hidden border"
           style={SURFACE_BORDER_STYLE}
         >
           {hasListingImage ? (
@@ -399,6 +402,11 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                 className="w-full h-full"
                 resizeMode="cover"
               />
+              <View
+                className="absolute inset-0"
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.14)' }}
+                pointerEvents="none"
+              />
               {listing.isCommunityPick && (
                 <View className="absolute top-4 left-4 bg-orange-500 px-3 py-1 rounded-full flex-row items-center gap-1">
                   <View className="w-2 h-2 bg-surface-container-low rounded-full" />
@@ -407,14 +415,28 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   </Text>
                 </View>
               )}
-              {/* Gradient overlay */}
+              {isSoldOut ? (
+                <View
+                  className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
+                  style={{ backgroundColor: 'rgba(10, 20, 34, 0.78)' }}
+                >
+                  <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
+                </View>
+              ) : hasSales ? (
+                <View
+                  className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
+                  style={{ backgroundColor: 'rgba(217, 119, 6, 0.88)' }}
+                >
+                  <Text className="text-white text-[10px] font-black uppercase tracking-widest">Partially Sold</Text>
+                </View>
+              ) : null}
               <View
-                className="absolute bottom-0 left-0 right-0 h-32"
-                style={{ backgroundColor: 'transparent' }}
+                className="absolute bottom-0 left-0 right-0 h-36"
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.34)' }}
                 pointerEvents="none"
               />
               <View className="absolute bottom-4 left-4 right-4">
-                <Text className="text-white text-xl font-bold leading-tight" numberOfLines={2}>
+                <Text className="text-white text-[48px] font-black leading-none" numberOfLines={2}>
                   {listing.title}
                 </Text>
               </View>
@@ -433,65 +455,76 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                     </Text>
                   </View>
                 ) : null}
-                <Text className="text-primary text-xl font-bold leading-tight" numberOfLines={2}>
-                  {listing.title}
-                </Text>
+                <View className="flex-row items-start justify-between gap-3">
+                  <Text className="text-primary text-xl font-bold leading-tight flex-1" numberOfLines={2}>
+                    {listing.title}
+                  </Text>
+                  {isSoldOut ? (
+                    <View
+                      className="px-3 py-1 rounded-full"
+                      style={{ backgroundColor: 'rgba(10, 20, 34, 0.78)' }}
+                    >
+                      <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
+                    </View>
+                  ) : null}
+                </View>
               </View>
             ) : null}
 
             {/* Price row */}
             <View className="flex-row justify-between items-end">
               <View>
-                <Text className="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">
+                <Text className="text-gray-400 text-[10px] uppercase font-black tracking-widest mb-1">
                   Unit Price
                 </Text>
-                <View className="flex-row items-baseline gap-1">
-                  <Text className="text-primary text-[28px] font-black">
+                <View className="flex-row items-baseline gap-0.5">
+                  <Text className="text-primary text-[58px] font-black leading-none">
                     R{(listing.communityPrice || listing.price || 0).toLocaleString()}
                   </Text>
-                  <Text className="text-primary/60 font-bold text-sm">.00</Text>
+                  <Text className="text-primary/60 font-extrabold text-lg">.00</Text>
                 </View>
               </View>
               {listing.publicPrice ? (
                 <View className="items-end">
-                  <Text className="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">
+                  <Text className="text-gray-400 text-[10px] uppercase font-black tracking-widest mb-1">
                     Public Price
                   </Text>
-                  <Text className="text-gray-400 font-bold text-lg line-through decoration-orange-400">
+                  <Text className="text-gray-400 font-black text-[38px] leading-none">
                     R{listing.publicPrice.toLocaleString()}
                   </Text>
                 </View>
               ) : null}
             </View>
 
-            <View className="bg-surface-container px-3 py-2 rounded-xl border" style={SURFACE_BORDER_STYLE}>
-              <View className="flex-row items-center justify-between">
-                <Text className="text-[11px] font-bold text-gray-500">
-                  Initial: {initialQuantity} {listing.quantityType || 'items'}
-                </Text>
-                <Text className="text-[11px] font-black text-primary">
-                  Left: {remainingQuantity}
-                </Text>
-              </View>
-              {hasSales ? (
-                <Text className="text-[10px] font-semibold text-gray-500 mt-1">
-                  Sold so far: {soldQuantity}
-                </Text>
-              ) : null}
-            </View>
-
-            {isSoldOut ? (
-              <View className="self-start bg-surface-container px-3 py-1 rounded-full">
-                <Text className="text-[10px] font-bold uppercase tracking-widest text-gray-700">Sold Out</Text>
-              </View>
-            ) : hasSales ? (
-              <View className="self-start bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
-                <Text className="text-[10px] font-bold uppercase tracking-widest text-orange-600">Partially Sold</Text>
+            {initialQuantity > 1 ? (
+              <View className="bg-surface-container px-4 py-3 rounded-2xl border" style={SURFACE_BORDER_STYLE}>
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-[12px] font-bold text-gray-500">
+                    Initial: {initialQuantity} {listing.quantityType || 'items'}
+                  </Text>
+                  <Text className="text-[12px] font-black text-primary">
+                    Left: {remainingQuantity}
+                  </Text>
+                </View>
+                <View className="h-1.5 bg-surface-container-low rounded-full mt-2 overflow-hidden">
+                  <View
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${Math.max(0, Math.min(100, (soldQuantity / initialQuantity) * 100))}%`,
+                      backgroundColor: THEME_COLORS.primary,
+                    }}
+                  />
+                </View>
+                {hasSales ? (
+                  <Text className="text-[11px] font-semibold text-gray-500 mt-2">
+                    Sold so far: {soldQuantity}
+                  </Text>
+                ) : null}
               </View>
             ) : null}
 
             {/* Charity */}
-            {listing.charityId ? (
+            {listing.charityId && perUnitCharityImpact > 0 ? (
               <View className="bg-surface-container p-3 rounded-2xl flex-row items-start gap-3 border" style={SURFACE_BORDER_STYLE}>
                 <View className="bg-orange-50 p-2 rounded-full items-center justify-center">
                   <Heart size={20} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
@@ -500,13 +533,15 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   <View className="flex-row justify-between items-center mb-1">
                     <Text className="text-primary font-bold text-sm">Charity Impact</Text>
                     <Text className="text-orange-500 font-black text-sm">
-                      R{(listing.charityAmount || 0).toFixed(2)}
+                      R{(activeTab === 'sold' ? totalSoldCharityImpact : totalAvailableCharityImpact).toFixed(2)}
                     </Text>
                   </View>
                   <Text className="text-gray-400 text-[11px] leading-relaxed">
-                    {currentCommunity?.catCycleActive && cycleFeaturedCharity
-                      ? `CAT pooled to ${cycleFeaturedCharity.name} during active charity cycle.`
-                      : `Seller CAT earning via ${charity?.name || 'Local Charity'} for public sale.`}
+                    {activeTab === 'sold'
+                      ? `R${perUnitCharityImpact.toFixed(2)} per item sold${soldQuantity > 0 ? ` • ${soldQuantity} sold` : ''}.`
+                      : `${remainingQuantity} available × R${perUnitCharityImpact.toFixed(2)} per unit.${currentCommunity?.catCycleActive && cycleFeaturedCharity
+                        ? ` CAT pooled to ${cycleFeaturedCharity.name} during active charity cycle.`
+                        : ` Seller CAT earning via ${charity?.name || 'Local Charity'} for public sale.`}`}
                   </Text>
                 </View>
               </View>
@@ -572,7 +607,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
         </TouchableOpacity>
       );
     },
-    [charities, currentCommunity?.catCycleActive, cycleFeaturedCharity, handleOpenListingChat]
+    [activeTab, charities, currentCommunity?.catCycleActive, cycleFeaturedCharity, handleOpenListingChat]
   );
 
   const handleMarkListingSold = useCallback(async (listing: (typeof listings)[0]) => {

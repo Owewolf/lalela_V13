@@ -2,7 +2,7 @@
   "expo": {
     "name": "lalela",
     "slug": "lalela",
-    "version": "1.1.0",
+    "version": "1.68",
     "scheme": "lalela",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.lalela.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "buildNumber": "68"
     },
     "android": {
       "adaptiveIcon": {
@@ -49,7 +50,8 @@
         "googleMaps": {
           "apiKey": ""
         }
-      }
+      },
+      "versionCode": 68
     },
     "web": {
       "output": "single",

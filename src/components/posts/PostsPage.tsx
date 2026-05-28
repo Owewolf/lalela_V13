@@ -558,10 +558,13 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       const initialQuantity = Math.max(1, Number(post.initialQuantity ?? 1));
       const soldQuantity = Math.max(0, Number(post.soldQuantity ?? 0));
       const remainingQuantity = Math.max(0, Number(post.remainingQuantity ?? (initialQuantity - soldQuantity)));
+      const perUnitCharityImpact = Math.max(0, Number(post.charityAmount ?? 0));
+      const totalAvailableCharityImpact = perUnitCharityImpact * remainingQuantity;
+      const hasListingImage = post.type === 'listing' && typeof post.postsImage === 'string' && post.postsImage.trim().length > 0;
       const saleActionLabel = remainingQuantity > 1 ? 'Record Sale' : 'Mark as Sold';
 
       return (
-        <View className="bg-surface-container-low rounded-[2rem] overflow-hidden border mb-6" style={{ ...CARD_DEPTH_HERO, ...SURFACE_BORDER_STYLE }}>
+        <View className="bg-surface-container-low rounded-[2.2rem] overflow-hidden border mb-6" style={{ ...CARD_DEPTH_HERO, ...SURFACE_BORDER_STYLE }}>
           {/* Map (emergency) or image */}
           {isEmergency && post.latitude && post.longitude ? (
             <View className="w-full aspect-video overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
@@ -588,12 +591,42 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               </View>
             </View>
           ) : post.postsImage ? (
-            <View className="w-full aspect-video overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
+            <View className="w-full aspect-[4/3] overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
               <Image
                 source={{ uri: resolveMediaUrl(post.postsImage) }}
                 className="w-full h-full"
                 resizeMode="cover"
               />
+              <View
+                className="absolute inset-0"
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.14)' }}
+                pointerEvents="none"
+              />
+              {isSold ? (
+                <View
+                  className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
+                  style={{ backgroundColor: 'rgba(10, 20, 34, 0.78)' }}
+                >
+                  <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
+                </View>
+              ) : soldQuantity > 0 ? (
+                <View
+                  className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
+                  style={{ backgroundColor: 'rgba(217, 119, 6, 0.88)' }}
+                >
+                  <Text className="text-white text-[10px] font-black uppercase tracking-widest">Partially Sold</Text>
+                </View>
+              ) : null}
+              <View
+                className="absolute bottom-0 left-0 right-0 h-36"
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.34)' }}
+                pointerEvents="none"
+              />
+              <View className="absolute bottom-4 left-4 right-4">
+                <Text className="text-white text-[48px] font-black leading-none" numberOfLines={2}>
+                  {post.title}
+                </Text>
+              </View>
             </View>
           ) : null}
 
@@ -628,9 +661,21 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                     </View>
                   ) : null}
                 </View>
-                <Text className="text-2xl font-black text-primary leading-tight" numberOfLines={2}>
-                  {post.title}
-                </Text>
+                {!hasListingImage ? (
+                  <View className="flex-row items-start justify-between gap-3">
+                    <Text className="text-2xl font-black text-primary leading-tight flex-1" numberOfLines={2}>
+                      {post.title}
+                    </Text>
+                    {isSold ? (
+                      <View
+                        className="px-3 py-1 rounded-full"
+                        style={{ backgroundColor: 'rgba(10, 20, 34, 0.78)' }}
+                      >
+                        <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                ) : null}
               </View>
 
               <View className="relative">
@@ -713,45 +758,73 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             {/* Price block */}
             {post.type === 'listing' && post.price !== undefined ? (
               <View className="bg-surface-container p-5 rounded-2xl border gap-4" style={{ ...CARD_DEPTH_SOFT, ...SURFACE_BORDER_STYLE }}>
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center gap-6">
-                    <View>
-                      <Text className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">
-                        Local Price
+                <View className="flex-row justify-between items-end">
+                  <View>
+                    <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                      Unit Price
+                    </Text>
+                    <View className="flex-row items-baseline gap-0.5">
+                      <Text className="text-primary text-[54px] font-black leading-none">
+                        R{(post.communityPrice || post.price).toLocaleString()}
                       </Text>
-                      <View className="flex-row items-baseline gap-0.5">
-                        <Text className="text-2xl font-black text-orange-500 leading-none">
-                          R{(post.communityPrice || post.price).toLocaleString()}
-                        </Text>
-                        <Text className="text-orange-400 font-bold text-xs">.00</Text>
-                      </View>
+                      <Text className="text-primary/60 font-extrabold text-lg">.00</Text>
                     </View>
-                    {post.publicPrice &&
-                      post.publicPrice > (post.communityPrice || post.price) ? (
-                      <View className="opacity-50">
-                        <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                          Public Price
-                        </Text>
-                        <Text className="text-lg font-bold text-gray-400 leading-none line-through">
-                          R{post.publicPrice.toLocaleString()}
-                        </Text>
-                      </View>
-                    ) : null}
                   </View>
-                  {post.charityId ? (
+                  {post.publicPrice ? (
                     <View className="items-end">
-                      <View className="flex-row items-center gap-1.5 bg-orange-50 px-2 py-1 rounded-lg mb-1">
-                        <Heart size={12} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
-                        <Text className="text-[9px] font-black text-orange-500 uppercase tracking-wider">
-                          {charity?.name || 'Charity Impact'}
-                        </Text>
-                      </View>
-                      <Text className="text-[10px] font-bold text-gray-400">
-                        Contribution: R{post.charityAmount?.toFixed(2) || '0.00'}
+                      <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                        Public Price
+                      </Text>
+                      <Text className="text-gray-400 font-black text-[34px] leading-none">
+                        R{post.publicPrice.toLocaleString()}
                       </Text>
                     </View>
                   ) : null}
                 </View>
+
+                {initialQuantity > 1 ? (
+                  <View className="bg-surface-container-low px-4 py-3 rounded-2xl border" style={SURFACE_BORDER_STYLE}>
+                    <View className="flex-row items-center justify-between">
+                      <Text className="text-[12px] font-bold text-gray-500">
+                        Initial: {initialQuantity} {post.quantityType || 'items'}
+                      </Text>
+                      <Text className="text-[12px] font-black text-primary">
+                        Left: {remainingQuantity}
+                      </Text>
+                    </View>
+                    <View className="h-1.5 bg-surface-container rounded-full mt-2 overflow-hidden">
+                      <View
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.max(0, Math.min(100, (soldQuantity / initialQuantity) * 100))}%`,
+                          backgroundColor: THEME_COLORS.primary,
+                        }}
+                      />
+                    </View>
+                    {soldQuantity > 0 ? (
+                      <Text className="text-[11px] font-semibold text-gray-500 mt-2">
+                        Sold so far: {soldQuantity}
+                      </Text>
+                    ) : null}
+                  </View>
+                ) : null}
+
+                {post.charityId && perUnitCharityImpact > 0 ? (
+                  <View className="flex-row items-center justify-between px-1">
+                    <View className="flex-row items-center gap-2">
+                      <Heart size={16} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
+                      <Text className="text-primary font-bold text-sm">{charity?.name || 'Charity Impact'}</Text>
+                    </View>
+                    <Text className="text-orange-500 font-black text-base">
+                      R{totalAvailableCharityImpact.toFixed(2)}
+                    </Text>
+                  </View>
+                ) : null}
+                {post.charityId && perUnitCharityImpact > 0 ? (
+                  <Text className="text-gray-400 text-[11px] px-1 -mt-2">
+                    {`${remainingQuantity} available × R${perUnitCharityImpact.toFixed(2)} per unit.`}
+                  </Text>
+                ) : null}
               </View>
             ) : null}
 

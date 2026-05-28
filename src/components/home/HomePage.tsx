@@ -29,6 +29,7 @@ import {
   CheckCircle2,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
@@ -171,6 +172,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   onEditPost,
 }) => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   // Fallback navigation when no callback prop is provided (component used as a route)
   const openEmergencyHub = (post: any) => {
@@ -946,31 +948,42 @@ export const HomePage: React.FC<HomePageProps> = ({
       listing.publicPrice != null &&
       listing.price != null &&
       publicPrice > localPrice;
+    const catPullLabel = linkedCharity?.name || 'CAT Pull';
+    const hasListingImage = typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0;
+    const hasCoordinates = Boolean(listing.latitude && listing.longitude);
 
     return (
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => router.push(`/market?listingId=${listing.id}`)}
         key={listing.id}
-        className="flex-1 mx-0.5 mb-3 bg-surface-container-low rounded-3xl border overflow-hidden"
-        style={{ ...CARD_DEPTH, borderColor: THEME_COLORS.neutralBorderSoft }}
+        className="flex-1 mx-0.5 mb-3 bg-surface-container-low rounded-3xl border"
+        style={{
+          ...CARD_DEPTH,
+          borderColor: THEME_COLORS.neutralBorderSoft,
+          ...(activeMenuId === listing.id ? { zIndex: 80, elevation: 20 } : null),
+          overflow: 'visible',
+        }}
       >
-        {typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0 && (
-          <Image 
-            source={{ uri: resolveMediaUrl(listing.postsImage) }} 
-            className="w-full h-24 bg-surface-container" 
-            resizeMode="cover" 
-          />
-        )}
-        <View className="p-3 gap-1">
-          {/* Header: title + kebab */}
+        {hasListingImage ? (
+          <View className="w-full aspect-[4/3] bg-surface-container overflow-hidden rounded-t-3xl">
+            <Image
+              source={{ uri: resolveMediaUrl(listing.postsImage as string) }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
+          </View>
+        ) : null}
+
+        <View className="p-3 gap-1.5">
           <View className="flex-row items-start justify-between gap-2">
             <Text
-              className="flex-1 text-sm font-bold text-gray-900 leading-tight"
+              className="flex-1 text-[16px] font-bold text-primary leading-tight"
               numberOfLines={2}
             >
               {listing.title}
             </Text>
+
             <View className="relative shrink-0">
               <TouchableOpacity
                 activeOpacity={0.7}
@@ -979,7 +992,8 @@ export const HomePage: React.FC<HomePageProps> = ({
                     activeMenuId === listing.id ? null : listing.id
                   )
                 }
-                className="w-7 h-7 rounded-full bg-surface-container items-center justify-center"
+                className="w-7 h-7 rounded-full bg-surface-container items-center justify-center border"
+                style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
               >
                 <MoreVertical size={14} color={THEME_COLORS.neutralTextSubtle} />
               </TouchableOpacity>
@@ -1056,59 +1070,56 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           <Text
             className="text-xs text-gray-500 leading-snug"
-            numberOfLines={2}
+            numberOfLines={1}
           >
-            {listing.description}
+            {listing.description || listing.quantityType || 'listing'}
           </Text>
 
-          <View className="flex-row items-end justify-between mt-1">
-            <View className="gap-2 items-start">
-              <Text className="text-xl font-black text-gray-900 tracking-tight">
-                R{localPrice.toLocaleString()}
-              </Text>
-              {initialQuantity > 1 ? (
-                <View className="bg-surface-container px-2 py-1 rounded-md border" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
-                  <Text className="text-[10px] font-bold text-gray-500">
-                    Initial: {initialQuantity} {listing.quantityType || 'items'}
-                  </Text>
-                  <Text className="text-[10px] font-black text-primary">
-                    Left: {remainingQuantity}
-                  </Text>
-                </View>
-              ) : null}
-              {hasPublicPrice && (
-                <View className="flex-row items-center gap-1.5 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">
-                  <Heart size={10} color={THEME_COLORS.indigo} />
-                  <Text
-                    className="text-[10px] font-bold text-indigo-700"
-                    numberOfLines={1}
-                  >
-                    {linkedCharity?.name || 'CAT'}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            {(listing.latitude && listing.longitude) && (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => {
-                  setMapFilterOverride('listings');
-                  setMapCenter({
-                    latitude: listing.latitude!,
-                    longitude: listing.longitude!,
-                  });
-                  scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-                }}
-                className="flex-row items-center justify-center rounded-full bg-indigo-50 w-8 h-8"
-              >
-                <MapPin size={14} color={THEME_COLORS.indigo} />
-              </TouchableOpacity>
-            )}
+          <View className="flex-row items-end justify-between mt-1 gap-2">
+            <Text className="text-[22px] font-black text-primary tracking-tight leading-none">
+              R{localPrice.toLocaleString()}
+            </Text>
+            {initialQuantity > 1 ? (
+              <View className="bg-surface-container px-2.5 py-1 rounded-lg border" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
+                <Text className="text-[10px] font-black text-primary">
+                  Left: {remainingQuantity}
+                </Text>
+              </View>
+            ) : null}
           </View>
 
-          <View className="flex-row items-center gap-2 pt-1 mt-1 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
-            <View className="w-6 h-6 rounded-full bg-surface-container overflow-hidden">
+          <View className="flex-row items-center justify-between mt-1 gap-3">
+            <TouchableOpacity
+              activeOpacity={0.7}
+              className="h-8 rounded-full bg-indigo-50 border border-indigo-100 px-3 flex-row items-center justify-center"
+              onPress={() => router.push(`/market?listingId=${listing.id}`)}
+            >
+              <Text className="text-[11px] font-bold text-indigo-700" numberOfLines={1}>
+                {catPullLabel}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              disabled={!hasCoordinates}
+              onPress={() => {
+                if (!hasCoordinates) return;
+                setMapFilterOverride('listings');
+                setMapCenter({
+                  latitude: listing.latitude!,
+                  longitude: listing.longitude!,
+                });
+                scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+              }}
+              className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 items-center justify-center"
+              style={!hasCoordinates ? { opacity: 0.5 } : { marginLeft: 'auto' }}
+            >
+              <MapPin size={14} color={THEME_COLORS.indigo} />
+            </TouchableOpacity>
+          </View>
+
+          <View className="flex-row items-center gap-2 mt-1">
+            <View className="w-7 h-7 rounded-full bg-surface-container overflow-hidden border" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
               {listing.authorImage ? (
                 <Image
                   source={{ uri: listing.authorImage }}
@@ -1116,28 +1127,19 @@ export const HomePage: React.FC<HomePageProps> = ({
                   resizeMode="cover"
                 />
               ) : (
-                <View className="w-full h-full items-center justify-center">
+                <View className="w-full h-full items-center justify-center bg-surface-container">
                   <Text className="text-[10px] font-bold text-gray-500">
-                    {listing.authorName?.charAt(0)}
+                    {(listing.authorName || 'C').trim().charAt(0).toUpperCase()}
                   </Text>
                 </View>
               )}
             </View>
             <Text
-              className="flex-1 text-[10px] font-semibold text-gray-800"
+              className="flex-1 text-[11px] font-semibold text-gray-700"
               numberOfLines={1}
             >
-              {listing.authorName}
+              {listing.authorName || 'Community Seller'}
             </Text>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              className="w-7 h-7 rounded-full bg-surface-container-low items-center justify-center"
-              onPress={() =>
-                onOpenChat ? onOpenChat(listing) : handleOpenContextChat(listing)
-              }
-            >
-              <MessageSquare size={14} color={THEME_COLORS.primary} />
-            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
@@ -1314,7 +1316,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       ref={scrollViewRef}
       className="flex-1"
       style={{ backgroundColor: APP_SHELL_COLORS.body }}
-      contentContainerStyle={{ paddingBottom: SPACE.s40 }}
+      contentContainerStyle={{ paddingBottom: Math.max(SPACE.s40, insets.bottom + 120) }}
+      scrollIndicatorInsets={{ bottom: Math.max(SPACE.s40, insets.bottom + 120) }}
       showsVerticalScrollIndicator={false}
       onScrollBeginDrag={() => {
         if (activeMenuId) setActiveMenuId(null);

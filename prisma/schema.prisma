@@ -65,8 +65,8 @@ model User {
   businesses          Business[]
   posts               Post[]
   messages            Message[]
-  reports             Report[]              @relation("Reporter")
-  ownedCommunities    Community[]           @relation("CommunityOwner")
+  reports             Report[]                  @relation("Reporter")
+  ownedCommunities    Community[]               @relation("CommunityOwner")
   sessions            UserSession[]
   auditLogs           AuditLog[]
   notifications       Notification[]
@@ -74,8 +74,8 @@ model User {
   otpCodes            OtpCode[]
   passwordResetTokens PasswordResetToken[]
   charitySuggestions  CharitySuggestion[]
-  sentInvitations     CommunityInvitation[] @relation("InvitedBy")
-  receivedInvitations CommunityInvitation[] @relation("InvitedUser")
+  sentInvitations     CommunityInvitation[]     @relation("InvitedBy")
+  receivedInvitations CommunityInvitation[]     @relation("InvitedUser")
   inviteLinks         CommunityInviteLink[]
   conversations       ConversationParticipant[]
   licenses            License[]
@@ -206,7 +206,7 @@ model Community {
   createdAt                DateTime  @default(now()) @map("created_at")
   updatedAt                DateTime  @updatedAt @map("updated_at")
 
-  owner              User               @relation("CommunityOwner", fields: [ownerId], references: [id])
+  owner              User                      @relation("CommunityOwner", fields: [ownerId], references: [id])
   members            CommunityMember[]
   posts              Post[]
   messages           Message[]
@@ -231,26 +231,26 @@ model Community {
 }
 
 model Theme {
-  id              String   @id @default(cuid())
-  communityId     String?  @unique @map("community_id")
-  presetId        String?  @map("preset_id")
-  mode            String   @default("light")
-  name            String
-  primaryColor    String   @map("primary_color")
-  secondaryColor  String   @map("secondary_color")
-  backgroundColor String   @map("background_color")
-  surfaceColor    String   @map("surface_color")
+  id                    String   @id @default(cuid())
+  communityId           String?  @unique @map("community_id")
+  presetId              String?  @map("preset_id")
+  mode                  String   @default("light")
+  name                  String
+  primaryColor          String   @map("primary_color")
+  secondaryColor        String   @map("secondary_color")
+  backgroundColor       String   @map("background_color")
+  surfaceColor          String   @map("surface_color")
   cardSurfaceColor      String   @map("card_surface_color")
   cardSurfaceMutedColor String   @map("card_surface_muted_color")
   cardBorderColor       String   @map("card_border_color")
-  textPrimary     String   @map("text_primary")
-  textSecondary   String   @map("text_secondary")
-  borderRadius    String   @map("border_radius")
-  fontFamily      String   @map("font_family")
-  iconUrl         String?  @map("icon_url")
-  isDefault       Boolean  @default(false) @map("is_default")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  textPrimary           String   @map("text_primary")
+  textSecondary         String   @map("text_secondary")
+  borderRadius          String   @map("border_radius")
+  fontFamily            String   @map("font_family")
+  iconUrl               String?  @map("icon_url")
+  isDefault             Boolean  @default(false) @map("is_default")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
 
   community Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
@@ -389,8 +389,8 @@ model Post {
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  author    User      @relation(fields: [authorId], references: [id])
+  community       Community        @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  author          User             @relation(fields: [authorId], references: [id])
   catTransactions CatTransaction[]
 
   @@index([communityId, createdAt])
@@ -403,38 +403,38 @@ model Post {
 // CHARITIES & SUGGESTIONS
 // =============================================
 model Charity {
-  id                   String   @id @default(cuid())
-  communityId          String   @map("community_id")
-  name                 String
-  description          String?
-  category             String?
-  percentage           Float    @default(0)
-  status               String   @default("ACTIVE")
-  urgency              String?
-  fundraisingGoal      Float?   @map("fundraising_goal")
-  raisedAmount         Float    @default(0) @map("raised_amount")
-  imageUrl             String?  @map("image_url")
-  logo                 String?  @map("logo")
-  coverImage           String?  @map("cover_image")
-  contactPhone         String?  @map("contact_phone")
-  contactEmail         String?  @map("contact_email")
-  website              String?  @map("website")
-  locationName         String?  @map("location_name")
-  latitude             Float?
-  longitude            Float?
-  isVerified           Boolean  @default(false) @map("is_verified")
-  isFeatured           Boolean  @default(false) @map("is_featured")
-  isCATCharity         Boolean  @default(false) @map("is_cat_charity")
+  id                       String    @id @default(cuid())
+  communityId              String    @map("community_id")
+  name                     String
+  description              String?
+  category                 String?
+  percentage               Float     @default(0)
+  status                   String    @default("ACTIVE")
+  urgency                  String?
+  fundraisingGoal          Float?    @map("fundraising_goal")
+  raisedAmount             Float     @default(0) @map("raised_amount")
+  imageUrl                 String?   @map("image_url")
+  logo                     String?   @map("logo")
+  coverImage               String?   @map("cover_image")
+  contactPhone             String?   @map("contact_phone")
+  contactEmail             String?   @map("contact_email")
+  website                  String?   @map("website")
+  locationName             String?   @map("location_name")
+  latitude                 Float?
+  longitude                Float?
+  isVerified               Boolean   @default(false) @map("is_verified")
+  isFeatured               Boolean   @default(false) @map("is_featured")
+  isCATCharity             Boolean   @default(false) @map("is_cat_charity")
   currentCampaignStartedAt DateTime? @map("current_campaign_started_at")
-  tags                 String[] @default([])
-  linkedBusinessIds    String[] @default([]) @map("linked_business_ids")
-  campaignCompleted    Boolean  @default(false) @map("campaign_completed")
-  isApprovedSuggestion Boolean  @default(false) @map("is_approved_suggestion")
-  suggestedById        String?  @map("suggested_by_id")
-  createdAt            DateTime @default(now()) @map("created_at")
-  updatedAt            DateTime @updatedAt @map("updated_at")
+  tags                     String[]  @default([])
+  linkedBusinessIds        String[]  @default([]) @map("linked_business_ids")
+  campaignCompleted        Boolean   @default(false) @map("campaign_completed")
+  isApprovedSuggestion     Boolean   @default(false) @map("is_approved_suggestion")
+  suggestedById            String?   @map("suggested_by_id")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
 
-  community          Community           @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  community          Community                 @relation(fields: [communityId], references: [id], onDelete: Cascade)
   charitySuggestions CharitySuggestion[]
   catTransactions    CatTransaction[]
   campaignSnapshots  CharityCampaignSnapshot[]
@@ -487,18 +487,18 @@ model CharitySuggestion {
 }
 
 model CatTransaction {
-  id            String   @id @default(cuid())
-  communityId   String   @map("community_id")
-  postId        String   @map("post_id")
-  sellerId      String   @map("seller_id")
-  quantitySold  Int      @default(1) @map("quantity_sold")
-  unitPriceAtSale Float? @map("unit_price_at_sale")
-  totalSaleValue Float?  @map("total_sale_value")
-  catAmount     Float    @map("cat_amount")
-  catPercentage Float    @map("cat_percentage")
-  charityId     String?  @map("charity_id")
-  reversedAt    DateTime? @map("reversed_at")
-  createdAt     DateTime @default(now()) @map("created_at")
+  id              String    @id @default(cuid())
+  communityId     String    @map("community_id")
+  postId          String    @map("post_id")
+  sellerId        String    @map("seller_id")
+  quantitySold    Int       @default(1) @map("quantity_sold")
+  unitPriceAtSale Float?    @map("unit_price_at_sale")
+  totalSaleValue  Float?    @map("total_sale_value")
+  catAmount       Float     @map("cat_amount")
+  catPercentage   Float     @map("cat_percentage")
+  charityId       String?   @map("charity_id")
+  reversedAt      DateTime? @map("reversed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
 
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -516,26 +516,26 @@ model CatTransaction {
 // BUSINESSES
 // =============================================
 model Business {
-  id           String   @id @default(cuid())
-  ownerId      String   @map("owner_id")
-  name         String
-  category     String
-  description  String?
-  latitude     Float?
-  longitude    Float?
-  address      String?
-  phone        String?
-  website      String?
-  rating       Float?
-  imageUrl     String?  @map("image_url")
-  charityId    String?  @map("charity_id")
-  communityIds String[] @default([]) @map("community_ids")
-  subcategory        String?  @map("subcategory")
-  charityPercentage  Float?   @map("charity_percentage")
-  status       String   @default("ACTIVE")
-  source       String   @default("MEMBER")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(cuid())
+  ownerId           String   @map("owner_id")
+  name              String
+  category          String
+  description       String?
+  latitude          Float?
+  longitude         Float?
+  address           String?
+  phone             String?
+  website           String?
+  rating            Float?
+  imageUrl          String?  @map("image_url")
+  charityId         String?  @map("charity_id")
+  communityIds      String[] @default([]) @map("community_ids")
+  subcategory       String?  @map("subcategory")
+  charityPercentage Float?   @map("charity_percentage")
+  status            String   @default("ACTIVE")
+  source            String   @default("MEMBER")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   owner User @relation(fields: [ownerId], references: [id])
 
@@ -667,12 +667,12 @@ model Notification {
 // LICENSES
 // =============================================
 model License {
-  id          String    @id @default(cuid())
-  userId      String    @map("user_id")
-  communityId String?   @map("community_id")
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  communityId String?  @map("community_id")
   type        String
-  status      String    @default("ACTIVE")
-  createdAt   DateTime  @default(now()) @map("created_at")
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now()) @map("created_at")
 
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   community Community? @relation(fields: [communityId], references: [id])
@@ -725,8 +725,8 @@ model SecurityEvent {
 model BillingRecord {
   id          String   @id @default(cuid())
   userId      String   @map("user_id")
-  type        String   // 'COMMUNITY' | 'MEMBERSHIP'
-  amount      Int      // cents
+  type        String // 'COMMUNITY' | 'MEMBERSHIP'
+  amount      Int // cents
   status      String   @default("PAID")
   communityId String?  @map("community_id")
   createdAt   DateTime @default(now()) @map("created_at")
@@ -743,8 +743,8 @@ model Invoice {
   id            String   @id @default(cuid())
   userId        String   @map("user_id")
   invoiceNumber String   @unique @map("invoice_number")
-  amount        Int      // cents
-  type          String   // 'COMMUNITY' | 'MEMBERSHIP'
+  amount        Int // cents
+  type          String // 'COMMUNITY' | 'MEMBERSHIP'
   pdfUrl        String   @map("pdf_url")
   createdAt     DateTime @default(now()) @map("created_at")
 
