@@ -121,7 +121,7 @@ export const DangerZoneSection: React.FC = () => {
           <TouchableOpacity
             onPress={() => setShowConfirmDelete(true)}
             style={{
-              paddingVertical: SPACE.lg, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLowOverlay20,
+              paddingVertical: SPACE.lg, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow,
               flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.xs,
             }}
           >

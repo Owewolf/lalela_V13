@@ -326,7 +326,7 @@ export const LicensingSection: React.FC = () => {
                     alignSelf: 'flex-start',
                     backgroundColor: THEME_COLORS.surfaceContainerLow,
                     borderWidth: 1,
-                    borderColor: THEME_COLORS.alias_rgba_239_68_68_0_25,
+                    borderColor: THEME_COLORS.alias_rgba_239_68_68_0_2,
                     paddingHorizontal: SPACE.lg,
                     paddingVertical: SPACE.sm,
                     borderRadius: RADIUS.chip,
@@ -386,7 +386,7 @@ export const LicensingSection: React.FC = () => {
             style={{
               paddingVertical: SPACE.lg,
               borderRadius: RADIUS.lg,
-              backgroundColor: THEME_COLORS.surfaceContainerLowOverlay20,
+              backgroundColor: THEME_COLORS.surfaceContainerLow,
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',

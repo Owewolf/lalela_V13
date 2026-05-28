@@ -261,6 +261,46 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 
           <View style={styles.separator} />
 
+          {/* Section C: Active Community Dashboard */}
+          {currentCommunity && (
+            <>
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>Active Community</Text>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={handleOpenAdmin}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.adminLogo}>
+                    <Image source={APP_LOGO} style={styles.communityLogoImg} resizeMode="contain" />
+                  </View>
+                  <View style={styles.adminInfo}>
+                    <Text style={styles.adminName} numberOfLines={1}>
+                      {currentCommunity.name}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.adminRole,
+                        {
+                          color:
+                            currentCommunity.userRole === "ADMIN"
+                              ? THEME_COLORS.errorStrong
+                              : currentCommunity.userRole === "MODERATOR"
+                              ? THEME_COLORS.md3Primary
+                              : THEME_COLORS.neutralTextMuted,
+                        },
+                      ]}
+                    >
+                      {(currentCommunity.userRole ?? 'Member').toUpperCase()} DASHBOARD
+                    </Text>
+                  </View>
+                  <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} style={{ marginLeft: 'auto' }} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.separator} />
+            </>
+          )}
+
           {/* Section B: Communities */}
           <View style={styles.section}>
             <TouchableOpacity
@@ -388,46 +428,6 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
               </View>
             )}
           </View>
-
-          {/* Section C: Active Community Dashboard */}
-          {currentCommunity && (
-            <>
-              <View style={styles.separator} />
-              <View style={styles.section}>
-                <Text style={styles.sectionLabel}>Active Community</Text>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={handleOpenAdmin}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.adminLogo}>
-                    <Image source={APP_LOGO} style={styles.communityLogoImg} resizeMode="contain" />
-                  </View>
-                  <View style={styles.adminInfo}>
-                    <Text style={styles.adminName} numberOfLines={1}>
-                      {currentCommunity.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.adminRole,
-                        {
-                          color:
-                            currentCommunity.userRole === "ADMIN"
-                              ? THEME_COLORS.errorStrong
-                              : currentCommunity.userRole === "MODERATOR"
-                              ? THEME_COLORS.md3Primary
-                              : THEME_COLORS.neutralTextMuted,
-                        },
-                      ]}
-                    >
-                      {(currentCommunity.userRole ?? 'Member').toUpperCase()} DASHBOARD
-                    </Text>
-                  </View>
-                  <ChevronRight size={16} color={THEME_COLORS.neutralTextMuted} style={{ marginLeft: 'auto' }} />
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
         </ScrollView>
 
         {/* Footer */}

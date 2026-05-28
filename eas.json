@@ -1,11 +1,15 @@
 {
   "cli": {
-    "version": ">= 16.0.0"
+    "version": ">= 16.0.0",
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.wolfslair.cc/api"
+      },
       "android": {
         "gradleCommand": ":app:assembleDebug",
         "buildType": "apk"
@@ -16,18 +20,26 @@
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.wolfslair.cc/api"
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "ios-ipa": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.wolfslair.cc/api"
+      },
       "ios": {
         "buildConfiguration": "Release"
       }
     },
     "production": {
-      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.wolfslair.cc/api"
+      },
       "android": {
         "buildType": "app-bundle"
       }

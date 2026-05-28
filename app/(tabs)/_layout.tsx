@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { View, Text } from 'react-native';
 import { Tabs, useRouter, useSegments } from 'expo-router';
+import { BottomTabBar, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Home, ShoppingBag, MessageCircle, FileText, Settings } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCommunity } from '../../src/context/CommunityContext';
 import { Header } from '../../src/components/shared/Header';
 import { MobileSidebar } from '../../src/components/shared/MobileSidebar';
@@ -10,7 +12,55 @@ import { APP_SHELL_COLORS, THEME_COLORS } from '../../src/theme/colors';
 
 const SPACE = {
   sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
 };
+
+const PILL_SIDE_INSET = 20;
+const PILL_HEIGHT = 56;
+
+function FloatingTabBar(props: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View
+      pointerEvents="box-none"
+      style={{
+        position: 'absolute',
+        left: PILL_SIDE_INSET,
+        right: PILL_SIDE_INSET,
+        bottom: insets.bottom + SPACE.md,
+      }}
+    >
+      <View
+        style={{
+          height: PILL_HEIGHT,
+          borderRadius: 999,
+          backgroundColor: APP_SHELL_COLORS.chrome,
+          overflow: 'hidden',
+          shadowColor: THEME_COLORS.black,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.16,
+          shadowRadius: 16,
+          elevation: 10,
+        }}
+      >
+        <BottomTabBar
+          {...props}
+          insets={{ top: 0, bottom: 0, left: 0, right: 0 }}
+          style={{
+            backgroundColor: 'transparent',
+            borderTopWidth: 0,
+            height: PILL_HEIGHT,
+            elevation: 0,
+            shadowOpacity: 0,
+          }}
+        />
+      </View>
+    </View>
+  );
+}
 
 function ChatTabIcon({ color, focused }: { color: string; focused: boolean }) {
   const { chatUnreadTotals } = useCommunity();
@@ -31,6 +81,7 @@ function ChatTabIcon({ color, focused }: { color: string; focused: boolean }) {
 export default function TabLayout() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const segments = useSegments();
   // Derive active tab name from route segments
@@ -57,15 +108,25 @@ export default function TabLayout() {
 
       {/* Tab navigator fills remaining space */}
       <Tabs
+        tabBar={(props) => <FloatingTabBar {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: THEME_COLORS.primary,
           tabBarInactiveTintColor: THEME_COLORS.neutralTextSoft,
-          tabBarStyle: {
-            backgroundColor: APP_SHELL_COLORS.chrome,
-            borderTopColor: THEME_COLORS.neutralBorder,
-            height: 60,
-            paddingBottom: SPACE.sm,
+          sceneStyle: {
+            backgroundColor: APP_SHELL_COLORS.body,
+          },
+          tabBarItemStyle: {
+            marginHorizontal: 6,
+            paddingHorizontal: 0,
+          },
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: '700',
+            marginBottom: 2,
+          },
+          tabBarIconStyle: {
+            marginTop: 2,
           },
         }}
       >

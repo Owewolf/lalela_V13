@@ -30,6 +30,26 @@ echo "${BUILD_NUM}" > "${BUILD_NUMBER_FILE}"
 ZIPNAME="lalela-static-v${VERSION}-build${BUILD_NUM}.zip"
 info "Version: ${VERSION}  |  Build: #${BUILD_NUM}"
 
+# ── Sync app.json with build number for EAS (appVersionSource: local) ────────
+# EAS reads expo.version, expo.ios.buildNumber, expo.android.versionCode from
+# app.json. Format chosen: version = "1.<BUILD_NUM>", iOS buildNumber and
+# Android versionCode = <BUILD_NUM>. Keeps native + web artifacts aligned.
+APP_VERSION="1.${BUILD_NUM}"
+info "Syncing app.json -> version ${APP_VERSION}, ios.buildNumber ${BUILD_NUM}, android.versionCode ${BUILD_NUM}"
+node -e "
+  const fs = require('fs');
+  const path = './app.json';
+  const cfg = JSON.parse(fs.readFileSync(path, 'utf8'));
+  cfg.expo = cfg.expo || {};
+  cfg.expo.version = '${APP_VERSION}';
+  cfg.expo.ios = cfg.expo.ios || {};
+  cfg.expo.ios.buildNumber = '${BUILD_NUM}';
+  cfg.expo.android = cfg.expo.android || {};
+  cfg.expo.android.versionCode = ${BUILD_NUM};
+  fs.writeFileSync(path, JSON.stringify(cfg, null, 2) + '\n');
+" || fail "Failed to update app.json with new build number"
+success "app.json synced"
+
 API_URL="$(grep '^EXPO_PUBLIC_API_URL=' .env.production 2>/dev/null | cut -d '=' -f2-)"
 if [ -z "${API_URL}" ]; then
   fail "EXPO_PUBLIC_API_URL is missing from .env.production"

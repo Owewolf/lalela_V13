@@ -185,7 +185,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
       </View>
 
       {isEditing && hasUnsavedChanges && (
-        <View className="flex-row items-center gap-2 rounded-2xl px-3 py-2 border" style={{ backgroundColor: THEME_COLORS.warningTintSoft, borderColor: THEME_COLORS.warningTintStrong }}>
+        <View className="flex-row items-center gap-2 rounded-2xl px-3 py-2 border" style={{ backgroundColor: THEME_COLORS.warningTintSoft, borderColor: THEME_COLORS.warningStrong }}>
           <Text className="text-xs font-black uppercase tracking-widest" style={{ color: THEME_COLORS.warningStrong }}>
             Reminder
           </Text>

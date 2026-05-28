@@ -61,7 +61,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   visible, title, message, confirmLabel, cancelLabel = 'No, cancel', onConfirm, onCancel,
 }) => (
   <Modal transparent visible={visible} animationType="fade" onRequestClose={() => {}}>
-    <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_5 }}>
+    <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_05 }}>
       <View className="rounded-3xl p-8 w-full max-w-sm shadow-2xl" style={{ backgroundColor: THEME_COLORS.surface }}>
         <Text className="text-xl font-black text-primary mb-2">{title}</Text>
         <Text className="text-sm text-gray-500 mb-6 leading-relaxed">{message}</Text>

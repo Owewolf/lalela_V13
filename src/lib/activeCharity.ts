@@ -15,7 +15,7 @@ type CharityLike = {
   isCatCharity?: boolean | null;
   isFeatured?: boolean | null;
   status?: string | null;
-} & Record<string, unknown>;
+};
 
 type CommunityLike = {
   catCycleActive?: boolean | null;
