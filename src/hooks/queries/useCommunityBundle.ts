@@ -18,26 +18,33 @@ export function useCommunityBundle(communityId?: string | null, userId?: string 
         };
       }
 
-      const [membersRes, postsRes, charitiesRes, charitySuggestionsRes, bizRes, locRes] = await Promise.allSettled([
+      const [membersRes, postsRes, charitiesRes] = await Promise.all([
         api.get(`/communities/${communityId}/members`),
         api.get(`/communities/${communityId}/posts`),
         api.get(`/communities/${communityId}/charities`),
-        api.get(`/communities/${communityId}/charity-suggestions`),
-        api.get('/businesses'),
-        api.get(`/communities/${communityId}/locations`),
+      ]);
+
+      const [charitySuggestions, businesses, locations] = await Promise.all([
+        api.get(`/communities/${communityId}/charity-suggestions`).then((res) => res.data).catch(() => []),
+        api.get('/businesses').then((res) => res.data).catch(() => []),
+        api.get(`/communities/${communityId}/locations`).then((res) => res.data).catch(() => ({ members: [], security: [] })),
       ]);
 
       return {
-        members: membersRes.status === 'fulfilled' ? membersRes.value.data : [],
-        posts: postsRes.status === 'fulfilled' ? postsRes.value.data : [],
-        charities: charitiesRes.status === 'fulfilled' ? charitiesRes.value.data : [],
-        charitySuggestions: charitySuggestionsRes.status === 'fulfilled' ? charitySuggestionsRes.value.data : [],
-        businesses: bizRes.status === 'fulfilled' ? bizRes.value.data : [],
-        locations: locRes.status === 'fulfilled' ? locRes.value.data : { members: [], security: [] },
+        members: membersRes.data ?? [],
+        posts: postsRes.data ?? [],
+        charities: charitiesRes.data ?? [],
+        charitySuggestions,
+        businesses,
+        locations,
       };
     },
     initialData: {
       members: [], posts: [], charities: [], charitySuggestions: [], businesses: [], locations: { members: [], security: [] },
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnReconnect: true,
+    retry: 2,
   });
 }

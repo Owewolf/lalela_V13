@@ -62,15 +62,15 @@ async function loadCampaignTotals(tx: DbClient, communityId: string, charity: { 
   // created (listings re-point to the active charity on each cycle).
   // raised / itemsSold are cycle-scoped: only transactions since the cycle
   // start count toward the running cycle total.
-  const [potentialAggregate, raisedAggregate, availableCount, soldCount] = await Promise.all([
-    tx.post.aggregate({
+  const [activeListings, raisedAggregate, soldAggregate] = await Promise.all([
+    tx.post.findMany({
       where: {
         communityId,
         type: 'listing',
         charityId: charity.id,
         status: { notIn: [...CLOSED_POST_STATUSES] },
       },
-      _sum: { charityAmount: true },
+      select: { id: true, charityAmount: true, initialQuantity: true },
     }),
     tx.catTransaction.aggregate({
       where: {
@@ -80,27 +80,53 @@ async function loadCampaignTotals(tx: DbClient, communityId: string, charity: { 
       },
       _sum: { catAmount: true },
     }),
-    tx.post.count({
-      where: {
-        communityId,
-        type: 'listing',
-        charityId: charity.id,
-        status: { notIn: [...CLOSED_POST_STATUSES] },
-      },
-    }),
-    tx.catTransaction.count({
+    tx.catTransaction.aggregate({
       where: {
         communityId,
         charityId: charity.id,
         createdAt: { gte: startedAt },
+        reversedAt: null,
       },
+      _sum: { quantitySold: true },
     }),
   ]);
 
+  // Per-listing sold quantity for unreversed transactions (any time), used to
+  // compute remaining inventory per listing so multi-unit listings contribute
+  // the FULL potential of all remaining units, not just one unit.
+  const listingIds = activeListings.map((listing: { id: string }) => listing.id);
+  const soldByPostId = new Map<string, number>();
+  if (listingIds.length > 0) {
+    const grouped = await tx.catTransaction.groupBy({
+      by: ['postId'],
+      where: {
+        communityId,
+        postId: { in: listingIds },
+        reversedAt: null,
+      },
+      _sum: { quantitySold: true },
+    });
+    for (const row of grouped as Array<{ postId: string; _sum: { quantitySold: number | null } }>) {
+      soldByPostId.set(row.postId, toNumber(row?._sum?.quantitySold));
+    }
+  }
+
+  let potentialEarnings = 0;
+  for (const listing of activeListings as Array<{ id: string; charityAmount: number | null; initialQuantity: number | null }>) {
+    const unitCharity = toNumber(listing.charityAmount);
+    if (unitCharity <= 0) continue;
+    const initial = Math.max(1, Math.floor(toNumber(listing.initialQuantity) || 1));
+    const sold = Math.max(0, Math.floor(toNumber(soldByPostId.get(listing.id))));
+    const remaining = Math.max(0, initial - sold);
+    potentialEarnings += unitCharity * remaining;
+  }
+
+  const soldCount = toNumber(soldAggregate?._sum?.quantitySold);
+
   return {
-    potentialEarnings: toNumber(potentialAggregate?._sum?.charityAmount),
+    potentialEarnings,
     raisedEarnings: toNumber(raisedAggregate?._sum?.catAmount),
-    itemsAvailable: availableCount,
+    itemsAvailable: activeListings.length,
     itemsSold: soldCount,
     campaignStartedAt: startedAt,
     goalAmount: toNumber(charity.fundraisingGoal),

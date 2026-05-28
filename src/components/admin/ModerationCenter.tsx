@@ -220,6 +220,10 @@ const COLOR_SWATCH_PRESETS = [
   THEME_COLORS.black,
 ];
 
+const VALID_COLOR_SWATCH_PRESETS = COLOR_SWATCH_PRESETS.filter(
+  (hex) => typeof hex === 'string' && hex.trim().length > 0,
+);
+
 interface ModerationCenterProps {
   onBack: () => void;
   embedded?: boolean;
@@ -510,7 +514,11 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       }
     };
 
-    const handleDeletePost = async (postId: string) => {
+    const handleDeletePost = async (postId?: string) => {
+      if (!postId || postId === 'undefined') {
+        Alert.alert('Delete failed', 'This post cannot be deleted because its ID is missing.');
+        return;
+      }
       try {
         const post = posts.find((p: any) => p.id === postId);
         await removePost(postId);
@@ -532,8 +540,18 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             });
           }
         }
-      } catch (e) {
-        console.error('Failed to delete post:', e);
+      } catch (e: any) {
+        const status = e?.response?.status;
+        const message =
+          e?.response?.data?.error ||
+          e?.response?.data?.message ||
+          (status === 404
+            ? 'Post not found or already deleted.'
+            : status === 403
+            ? 'You do not have permission to delete this post.'
+            : 'Unable to delete post right now. Please try again.');
+        Alert.alert('Delete failed', message);
+        console.warn('Delete post request failed:', { status, postId });
       }
     };
 
@@ -1513,9 +1531,12 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       );
     };
 
-    const renderContent = () => {
-      const activePosts = posts.filter((p: any) => p.status !== 'deleted');
-      const businesses = currentCommunity?.businesses || [];
+    const renderContentTab = () => {
+      const allPosts = Array.isArray(posts) ? posts : [];
+      const isDeleted = (p: any) => String(p?.status || '').toUpperCase() === 'DELETED';
+      const isSold = (p: any) => String(p?.status || '').toUpperCase() === 'SOLD';
+      const activePosts = allPosts.filter((p: any) => !isDeleted(p));
+      const businesses = Array.isArray(currentCommunity?.businesses) ? currentCommunity.businesses : [];
 
       const filteredItems = (() => {
         switch (contentFilter) {
@@ -1526,10 +1547,13 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         }
       })();
 
+      const listingsAll = activePosts.filter((p: any) => p.type === 'listing');
+      const listingsSold = listingsAll.filter(isSold).length;
+
       const filterTabs = [
         { key: 'all' as const, label: 'All', count: activePosts.length },
         { key: 'notices' as const, label: 'Notices', count: activePosts.filter((p: any) => p.type === 'notice').length },
-        { key: 'listings' as const, label: 'Listings', count: activePosts.filter((p: any) => p.type === 'listing').length },
+        { key: 'listings' as const, label: 'Listings', count: listingsAll.length, sublabel: listingsSold > 0 ? `${listingsSold} sold` : undefined },
         { key: 'businesses' as const, label: 'Businesses', count: businesses.length },
       ];
 
@@ -1554,6 +1578,11 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 <Text style={[styles.contentFilterCount, contentFilter === tab.key && styles.contentFilterCountActive]}>
                   {tab.count}
                 </Text>
+                {('sublabel' in tab) && tab.sublabel ? (
+                  <Text style={[styles.contentFilterSub, contentFilter === tab.key && styles.contentFilterSubActive]} numberOfLines={1}>
+                    {tab.sublabel}
+                  </Text>
+                ) : null}
               </TouchableOpacity>
             ))}
           </View>
@@ -1576,28 +1605,75 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               </View>
             ))
           ) : (
-            filteredItems.map((notice: any) => (
-              <View key={notice.id} style={styles.contentItem}>
+            filteredItems.map((notice: any, index: number) => {
+              const rawStatus = String(notice?.status || '').toUpperCase();
+              const isListing = notice?.type === 'listing';
+              const isPending = notice?.status === 'PendingPublic';
+              const isSoldRow = rawStatus === 'SOLD';
+              const initialQty = Math.max(1, Number(notice?.initialQuantity ?? 1) || 1);
+              const soldQty = Math.max(0, Number(notice?.soldQuantity ?? 0) || 0);
+              const remainingQty = Math.max(
+                0,
+                Number(notice?.remainingQuantity ?? (initialQty - soldQty)) || 0,
+              );
+              const qtyUnit = (typeof notice?.quantityType === 'string' && notice.quantityType.trim().length > 0)
+                ? notice.quantityType.trim()
+                : 'items';
+              const priceValue = Number(notice?.communityPrice ?? notice?.publicPrice ?? notice?.price ?? 0);
+              const hasPrice = Number.isFinite(priceValue) && priceValue > 0;
+              const priceLabel = hasPrice ? `R${priceValue.toLocaleString()}` : null;
+              const statusLabel = isPending ? 'Pending'
+                : isSoldRow ? 'Sold out'
+                : rawStatus === 'PINNED' ? 'Pinned'
+                : isListing ? 'Active'
+                : (notice?.urgencyLevel || notice?.urgency || 'Notice');
+              const statusBg = isPending ? THEME_COLORS.warningSurface
+                : isSoldRow ? THEME_COLORS.neutralBorderSoft
+                : isListing ? THEME_COLORS.successSurface
+                : THEME_COLORS.infoSurfaceSoft;
+              const statusFg = isPending ? THEME_COLORS.warningText
+                : isSoldRow ? THEME_COLORS.neutralTextStrong
+                : isListing ? THEME_COLORS.primaryContainer
+                : THEME_COLORS.brandBlueText;
+
+              return (
+              <View key={notice?.id || `content-${index}`} style={styles.contentItem}>
                 <View style={[styles.contentIcon, {
-                  backgroundColor: notice.status === 'PendingPublic' ? THEME_COLORS.warningSurface
-                    : notice.type === 'listing' ? THEME_COLORS.brandPurpleSurface : THEME_COLORS.successSurface
+                  backgroundColor: isPending ? THEME_COLORS.warningSurface
+                    : isListing ? THEME_COLORS.brandPurpleSurface : THEME_COLORS.successSurface
                 }]}>
-                  {notice.status === 'PendingPublic' ? (
+                  {isPending ? (
                     <Globe size={18} color={THEME_COLORS.warningText} />
-                  ) : notice.type === 'listing' ? (
+                  ) : isListing ? (
                     <Tag size={18} color={SECONDARY} />
                   ) : (
                     <AlertTriangle size={18} color={PRIMARY} />
                   )}
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.contentTitle} numberOfLines={1}>{notice.title}</Text>
-                  <Text style={styles.contentSub}>
-                    {notice.authorName} • {notice.type}{notice.urgencyLevel ? ` • ${notice.urgencyLevel}` : ''}
+                  <Text style={styles.contentTitle} numberOfLines={1}>{notice?.title || 'Untitled'}</Text>
+                  <Text style={styles.contentSub} numberOfLines={1}>
+                    {notice?.authorName || 'Unknown'} • {notice?.type || 'notice'}{notice?.urgencyLevel ? ` • ${notice.urgencyLevel}` : ''}
                   </Text>
+                  {isListing ? (
+                    <View style={styles.contentMetaRow}>
+                      <View style={[styles.statusChip, { backgroundColor: statusBg }]}>
+                        <Text style={[styles.statusChipText, { color: statusFg }]}>{statusLabel}</Text>
+                      </View>
+                      {priceLabel ? (
+                        <Text style={styles.contentMetaText}>{priceLabel}</Text>
+                      ) : null}
+                      <Text style={styles.contentMetaText}>
+                        {`${soldQty}/${initialQty} ${qtyUnit} sold`}
+                      </Text>
+                      <Text style={styles.contentMetaText}>
+                        {`${remainingQty} left`}
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
                 <View style={styles.contentActions}>
-                  {notice.status === 'PendingPublic' ? (
+                  {isPending ? (
                     <>
                       <TouchableOpacity style={styles.iconBtn} onPress={() => handleApprovePublicListing(notice)}>
                         <CheckCircle2 size={18} color={THEME_COLORS.secondaryContainer} />
@@ -1612,19 +1688,26 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                         style={styles.iconBtn}
                         onPress={() => handleTogglePin(notice)}
                       >
-                        <Bookmark size={18} color={notice.status === 'Pinned' ? PRIMARY : THEME_COLORS.neutralTextMuted} />
+                          <Bookmark size={18} color={notice?.status === 'Pinned' ? PRIMARY : THEME_COLORS.neutralTextMuted} />
                       </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => setPendingDeletePost({ id: notice.id, title: notice.title || 'Untitled' })}
-                      >
+                        <TouchableOpacity
+                          style={styles.iconBtn}
+                          onPress={() => {
+                            if (!notice?.id) {
+                              Alert.alert('Delete failed', 'This post is missing an ID and cannot be deleted.');
+                              return;
+                            }
+                            setPendingDeletePost({ id: notice.id, title: notice?.title || 'Untitled' });
+                          }}
+                        >
                         <Trash2 size={16} color={ERROR} />
                       </TouchableOpacity>
                     </>
                   )}
                 </View>
               </View>
-            ))
+              );
+            })
           )}
 
           {filteredItems.length === 0 && contentFilter !== 'businesses' && (
@@ -2059,10 +2142,10 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                 autoCorrect={false}
               />
               <View style={styles.colorPresetGrid}>
-                {COLOR_SWATCH_PRESETS.map((hex) => (
+                {VALID_COLOR_SWATCH_PRESETS.map((hex) => (
                   <TouchableOpacity
                     key={hex}
-                    onPress={() => setPickerColorValue(hex)}
+                    onPress={() => setPickerColorValue(typeof hex === 'string' ? hex : THEME_COLORS.black)}
                     style={[styles.colorPresetSwatch, { backgroundColor: hex }]}
                     activeOpacity={0.85}
                   />
@@ -2089,7 +2172,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         case 'coverage': return renderCoverage();
         case 'charity': return renderCharityModeration();
         case 'members': return renderMembers();
-        case 'content': return renderContent();
+        case 'content': return renderContentTab();
         case 'businesses': return renderBusinesses();
         case 'categories': return renderCategories();
         case 'rules': return renderRules();
@@ -2594,6 +2677,10 @@ const styles = StyleSheet.create({
   contentIcon: { width: 54, height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   contentTitle: { fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
   contentSub: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs, lineHeight: LINE_HEIGHT.compact },
+  contentMetaRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: SPACE.sm, marginTop: SPACE.xs },
+  contentMetaText: { fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSubtle, fontWeight: FONT_WEIGHT.bold },
+  contentFilterSub: { fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxs, fontWeight: FONT_WEIGHT.bold },
+  contentFilterSubActive: { color: THEME_COLORS.white },
   contentActions: { alignItems: 'center', gap: SPACE.md },
   statusChip: { paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill },
   statusChipText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal },

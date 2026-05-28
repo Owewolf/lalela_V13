@@ -24,6 +24,61 @@ type UserRole = 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER';
 const router = Router();
 const CAT_MIN_PERCENTAGE = 15;
 
+function roundCurrency(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function normalizeQuantity(value: unknown): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 1;
+  return Math.floor(parsed);
+}
+
+async function getSoldQuantityForPost(tx: any, communityId: string, postId: string): Promise<number> {
+  const catTx = tx?.catTransaction;
+  if (!catTx?.aggregate) return 0;
+
+  const aggregate = await catTx.aggregate({
+    where: {
+      communityId,
+      postId,
+      reversedAt: null,
+    },
+    _sum: { quantitySold: true },
+  });
+
+  const sold = Number(aggregate?._sum?.quantitySold ?? 0);
+  return Number.isFinite(sold) ? sold : 0;
+}
+
+function getStockState(initialQuantity: number, remainingQuantity: number): 'active' | 'low_stock' | 'nearly_sold_out' | 'sold_out' {
+  if (remainingQuantity <= 0) return 'sold_out';
+  if (initialQuantity <= 0) return 'active';
+
+  const ratio = remainingQuantity / initialQuantity;
+  if (ratio <= 0.1) return 'nearly_sold_out';
+  if (ratio <= 0.25) return 'low_stock';
+  return 'active';
+}
+
+function withInventory(post: any, soldQuantity: number) {
+  const initialQuantity = Math.max(1, Number(post?.initialQuantity ?? 1));
+  const normalizedSold = Math.max(0, Number.isFinite(soldQuantity) ? soldQuantity : 0);
+  const remainingQuantity = Math.max(0, initialQuantity - normalizedSold);
+  const percentageSold = initialQuantity > 0
+    ? Math.min(100, Math.round((normalizedSold / initialQuantity) * 100))
+    : 0;
+
+  return {
+    ...post,
+    initialQuantity,
+    soldQuantity: normalizedSold,
+    remainingQuantity,
+    percentageSold,
+    stockState: getStockState(initialQuantity, remainingQuantity),
+  };
+}
+
 const isAdminRole = (role?: string | null) => role === 'OWNER' || role === 'ADMIN';
 
 function serializeCharitySuggestion(
@@ -624,19 +679,55 @@ router.get('/:id/posts', async (req, res) => {
     take: Number(limit ?? 50),
     include: { author: { select: { name: true, profileImage: true } } },
   });
+
+  const soldByPostId = new Map<string, number>();
+  const listingIds = posts.filter((post) => post.type === 'listing').map((post) => post.id);
+  if (listingIds.length > 0) {
+    const catTx = (prisma as any).catTransaction;
+    if (catTx?.groupBy) {
+      const grouped = await catTx.groupBy({
+        by: ['postId'],
+        where: {
+          communityId: req.params.id,
+          postId: { in: listingIds },
+          reversedAt: null,
+        },
+        _sum: { quantitySold: true },
+      });
+      for (const row of grouped) {
+        soldByPostId.set(row.postId, Number(row?._sum?.quantitySold ?? 0));
+      }
+    } else {
+      await Promise.all(
+        listingIds.map(async (postId) => {
+          const sold = await getSoldQuantityForPost(prisma as any, req.params.id, postId);
+          soldByPostId.set(postId, sold);
+        })
+      );
+    }
+  }
+
   // Flatten author fields — cached columns take priority, fall back to live user data
-  return res.json(posts.map(({ author, ...p }) => ({
-    ...p,
-    timestamp: p.createdAt,
-    authorName: p.authorName || author?.name || null,
-    authorImage: p.authorImage || author?.profileImage || null,
-    authorRole: p.authorRole || null,
-  })));
+  return res.json(
+    posts.map(({ author, ...p }) => {
+      const withInventoryFields = p.type === 'listing'
+        ? withInventory(p, soldByPostId.get(p.id) ?? 0)
+        : p;
+
+      return {
+        ...withInventoryFields,
+        timestamp: p.createdAt,
+        authorName: p.authorName || author?.name || null,
+        authorImage: p.authorImage || author?.profileImage || null,
+        authorRole: p.authorRole || null,
+      };
+    })
+  );
 });
 
 router.post('/:id/posts', async (req, res) => {
   const { type, category, subtype, postSubtype, title, description, image_url, imageUrl, postsImage, urgency, urgencyLevel,
-    latitude, longitude, price, communityPrice,
+    latitude, longitude, price, communityPrice, initialQuantity, quantityType,
     is_charity, expires_at, locationName, source,
     authorName: bodyAuthorName, authorRole: bodyAuthorRole, authorImage: bodyAuthorImage } = req.body;
   if (!type || !title?.trim()) return res.status(400).json({ error: 'type and title are required' });
@@ -663,6 +754,12 @@ router.post('/:id/posts', async (req, res) => {
   let resolvedPublicPrice: number | null = null;
   let resolvedCharityAmount: number | null = null;
   const resolvedCommunityPrice = communityPrice ?? price ?? null;
+  const resolvedInitialQuantity = type === 'listing'
+    ? Math.max(1, Math.floor(Number(initialQuantity ?? 1) || 1))
+    : 1;
+  const resolvedQuantityType = type === 'listing'
+    ? (typeof quantityType === 'string' && quantityType.trim().length > 0 ? quantityType.trim() : 'items')
+    : null;
 
   if (type === 'listing') {
     const activeCharity = await getActiveCharityForCommunity(prisma, req.params.id);
@@ -714,6 +811,8 @@ router.post('/:id/posts', async (req, res) => {
       price,
       communityPrice: resolvedCommunityPrice,
       publicPrice: resolvedPublicPrice,
+      initialQuantity: resolvedInitialQuantity,
+      quantityType: resolvedQuantityType,
       isCharity: is_charity ?? false,
       charityId: resolvedCharityId,
       charityPercentage: resolvedCharityPercentage,
@@ -818,7 +917,7 @@ router.put('/:id/posts/:postId', async (req, res) => {
 
   const allowed = [
     'title', 'description', 'imageUrl', 'postsImage', 'status', 'urgency', 'urgencyLevel',
-    'price', 'communityPrice',
+    'price', 'communityPrice', 'initialQuantity', 'quantityType',
     'category', 'subtype', 'locationName', 'latitude', 'longitude', 'source', 'expiresAt',
   ];
   const data: Record<string, unknown> = {};
@@ -828,6 +927,31 @@ router.put('/:id/posts/:postId', async (req, res) => {
   // Accept legacy camelCase alias from the mobile client.
   if (!('subtype' in data) && 'postSubtype' in req.body) {
     data.subtype = req.body.postSubtype;
+  }
+
+  if ('initialQuantity' in data) {
+    data.initialQuantity = Math.max(1, Math.floor(Number(data.initialQuantity) || 1));
+  }
+  if ('quantityType' in data && typeof data.quantityType === 'string') {
+    data.quantityType = data.quantityType.trim() || 'items';
+  }
+
+  if (existingPost.type === 'listing' && 'initialQuantity' in data) {
+    const catTx = (prisma as any).catTransaction;
+    const soldAggregate = catTx?.aggregate
+      ? await catTx.aggregate({
+          where: {
+            communityId: req.params.id,
+            postId: req.params.postId,
+            reversedAt: null,
+          },
+          _sum: { quantitySold: true },
+        })
+      : null;
+    const soldQuantity = Number(soldAggregate?._sum?.quantitySold ?? 0);
+    if (Number.isFinite(soldQuantity) && soldQuantity > 0) {
+      return res.status(409).json({ error: 'Initial quantity cannot be changed after sales are recorded' });
+    }
   }
 
   // For listings, re-derive charity link + public price whenever the
@@ -882,99 +1006,231 @@ router.put('/:id/posts/:postId', async (req, res) => {
 });
 
 router.post('/:id/posts/:postId/sold', async (req, res) => {
+  const requestedQuantity = normalizeQuantity(req.body?.quantity ?? 1);
+  if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+    return res.status(400).json({ error: 'quantity must be a positive integer' });
+  }
+
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const post = await tx.post.findFirst({
+        where: { id: req.params.postId, communityId: req.params.id },
+      });
+      if (!post) {
+        throw { status: 404, error: 'Post not found' };
+      }
+      if (post.authorId !== req.auth!.userId) {
+        throw { status: 403, error: 'Only the listing owner can mark a post as sold' };
+      }
+      if (String(post.status).toUpperCase() === 'SOLD') {
+        throw { status: 409, error: 'Post already marked as sold' };
+      }
+
+      const initialQuantity = Math.max(1, Number((post as any).initialQuantity ?? 1));
+      const soldQuantity = await getSoldQuantityForPost(tx, req.params.id, post.id);
+      const remainingQuantity = Math.max(0, initialQuantity - soldQuantity);
+      if (requestedQuantity > remainingQuantity) {
+        throw {
+          status: 409,
+          error: `Only ${remainingQuantity} item(s) remaining`,
+          remainingQuantity,
+        };
+      }
+
+      const unitPriceAtSale = Number(post.communityPrice ?? post.price ?? 0);
+      const catPercentage = Number(post.charityPercentage ?? CAT_MIN_PERCENTAGE);
+      const computedUnitCat = roundCurrency((unitPriceAtSale * catPercentage) / 100);
+      const unitCatAmount = Number(post.charityAmount ?? computedUnitCat);
+      const totalSaleValue = roundCurrency(unitPriceAtSale * requestedQuantity);
+      const catAmount = roundCurrency(unitCatAmount * requestedQuantity);
+
+      // CAT attribution rule:
+      // - Cycle OFF  => CAT baseline charity is always the beneficiary.
+      // - Cycle ON   => currently selected featured charity is the beneficiary.
+      const [community, catBaseline] = await Promise.all([
+        tx.community.findUnique({ where: { id: req.params.id } }),
+        tx.charity.findFirst({
+          where: {
+            communityId: req.params.id,
+            isCATCharity: true,
+            NOT: { status: { in: ['Archived', 'ARCHIVED'] } },
+          },
+          select: { id: true },
+          orderBy: { createdAt: 'asc' },
+        }),
+      ]);
+
+      let targetCharityId: string | null = null;
+      if ((community as any)?.catCycleActive) {
+        targetCharityId = (community as any)?.catFeaturedCharityId ?? null;
+        if (!targetCharityId) {
+          const featuredCharity = await tx.charity.findFirst({
+            where: {
+              communityId: req.params.id,
+              isFeatured: true,
+              NOT: { status: { in: ['Archived', 'ARCHIVED'] } },
+            },
+            select: { id: true },
+            orderBy: { createdAt: 'desc' },
+          });
+          targetCharityId = featuredCharity?.id ?? null;
+        }
+      } else {
+        targetCharityId = catBaseline?.id ?? null;
+      }
+
+      const catTx = (tx as any).catTransaction;
+      const transaction = catTx
+        ? await catTx.create({
+            data: {
+              communityId: req.params.id,
+              postId: post.id,
+              sellerId: req.auth!.userId,
+              quantitySold: requestedQuantity,
+              unitPriceAtSale,
+              totalSaleValue,
+              catAmount,
+              catPercentage,
+              charityId: targetCharityId,
+            },
+          })
+        : null;
+
+      if (targetCharityId && catAmount > 0) {
+        await tx.charity.update({
+          where: { id: targetCharityId },
+          data: { raisedAmount: { increment: catAmount } },
+        });
+      }
+
+      const nextSoldQuantity = soldQuantity + requestedQuantity;
+      const nextRemainingQuantity = Math.max(0, initialQuantity - nextSoldQuantity);
+      const shouldCloseListing = nextRemainingQuantity === 0;
+      const postUpdate = shouldCloseListing
+        ? await tx.post.update({
+            where: { id: post.id },
+            data: { status: 'SOLD', soldAt: new Date() } as any,
+          })
+        : post;
+
+      const postWithInventory = withInventory(postUpdate, nextSoldQuantity);
+      return {
+        post: { ...postWithInventory, timestamp: postUpdate.createdAt },
+        catTriggered: true,
+        catAmount,
+        pooledToCharity: Boolean(targetCharityId),
+        transaction,
+      };
+    });
+
+    broadcastPostEvent('post:updated', req.params.id, result.post);
+    await broadcastFeaturedCharityUpdate(req.params.id);
+    return res.json(result);
+  } catch (error: any) {
+    if (typeof error?.status === 'number') {
+      return res.status(error.status).json({
+        error: error.error ?? 'Unable to record sale',
+        remainingQuantity: error.remainingQuantity,
+      });
+    }
+    throw error;
+  }
+});
+
+router.get('/:id/posts/:postId/sales', async (req, res) => {
   const post = await prisma.post.findFirst({
     where: { id: req.params.postId, communityId: req.params.id },
+    select: { id: true, authorId: true },
   });
   if (!post) return res.status(404).json({ error: 'Post not found' });
   if (post.authorId !== req.auth!.userId) {
-    return res.status(403).json({ error: 'Only the listing owner can mark a post as sold' });
-  }
-
-  if (String(post.status).toUpperCase() === 'SOLD') {
-    return res.status(409).json({ error: 'Post already marked as sold' });
-  }
-
-  const soldAt = new Date();
-  const updatedPost = await prisma.post.update({
-    where: { id: post.id },
-    data: { status: 'SOLD', soldAt } as any,
-  });
-
-  // Every listing carries CAT now — there are no "local-only" sales.
-  const community = await prisma.community.findUnique({ where: { id: req.params.id } });
-  const catAmount = Number(post.charityAmount ?? 0);
-  const catPercentage = Number(post.charityPercentage ?? CAT_MIN_PERCENTAGE);
-
-  // CAT attribution rule:
-  // - Cycle OFF  => CAT baseline charity is always the beneficiary.
-  // - Cycle ON   => currently selected featured charity is the beneficiary.
-  const catBaseline = await prisma.charity.findFirst({
-    where: {
-      communityId: req.params.id,
-      isCATCharity: true,
-      NOT: { status: { in: ['Archived', 'ARCHIVED'] } },
-    },
-    select: { id: true },
-    orderBy: { createdAt: 'asc' },
-  });
-
-  let targetCharityId: string | null = null;
-  if ((community as any)?.catCycleActive) {
-    targetCharityId = (community as any)?.catFeaturedCharityId ?? null;
-    if (!targetCharityId) {
-      const featuredCharity = await prisma.charity.findFirst({
-        where: {
-          communityId: req.params.id,
-          isFeatured: true,
-          NOT: { status: { in: ['Archived', 'ARCHIVED'] } },
-        },
-        select: { id: true },
-        orderBy: { createdAt: 'desc' },
-      });
-      targetCharityId = featuredCharity?.id ?? null;
-    }
-  } else {
-    targetCharityId = catBaseline?.id ?? null;
+    return res.status(403).json({ error: 'Only the listing owner can view sales history' });
   }
 
   const catTx = (prisma as any).catTransaction;
-  const transaction = catTx
-    ? await catTx.create({
-        data: {
-          communityId: req.params.id,
-          postId: post.id,
-          sellerId: req.auth!.userId,
-          catAmount,
-          catPercentage,
-          charityId: targetCharityId,
-        },
-      })
-    : null;
-
-  if (targetCharityId && catAmount > 0) {
-    await prisma.charity.update({
-      where: { id: targetCharityId },
-      data: { raisedAmount: { increment: catAmount } },
-    });
+  if (!catTx?.findMany) {
+    return res.json({ sales: [] });
   }
 
-  broadcastPostEvent('post:updated', req.params.id, { ...updatedPost, timestamp: updatedPost.createdAt });
-  await broadcastFeaturedCharityUpdate(req.params.id);
+  const sales = await catTx.findMany({
+    where: {
+      communityId: req.params.id,
+      postId: req.params.postId,
+      reversedAt: null,
+    },
+    select: {
+      id: true,
+      quantitySold: true,
+      unitPriceAtSale: true,
+      totalSaleValue: true,
+      catAmount: true,
+      catPercentage: true,
+      charityId: true,
+      createdAt: true,
+      charity: { select: { id: true, name: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return res.json({
-    post: { ...updatedPost, timestamp: updatedPost.createdAt },
-    catTriggered: true,
-    catAmount,
-    pooledToCharity: Boolean(targetCharityId),
-    transaction,
+    sales: sales.map((sale: any) => ({
+      id: sale.id,
+      quantitySold: Number(sale.quantitySold ?? 1),
+      unitPriceAtSale: Number(sale.unitPriceAtSale ?? 0),
+      totalSaleValue: Number(sale.totalSaleValue ?? 0),
+      catAmount: Number(sale.catAmount ?? 0),
+      catPercentage: Number(sale.catPercentage ?? CAT_MIN_PERCENTAGE),
+      charityId: sale.charityId ?? null,
+      charityName: sale.charity?.name ?? null,
+      createdAt: sale.createdAt,
+    })),
   });
 });
 
 router.delete('/:id/posts/:postId', async (req, res) => {
-  await prisma.post.update({ where: { id: req.params.postId }, data: { status: 'Deleted' } });
-  broadcastPostEvent('post:deleted', req.params.id, { id: req.params.postId, communityId: req.params.id });
-  await broadcastFeaturedCharityUpdate(req.params.id);
-  return res.json({ message: 'Post deleted' });
+  const { id: communityId, postId } = req.params;
+  if (!postId || postId === 'undefined' || postId === 'null') {
+    return res.status(400).json({ error: 'Valid postId is required' });
+  }
+
+  try {
+    const existing = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { id: true, communityId: true, status: true },
+    });
+
+    if (!existing) {
+      console.warn('[communities/delete-post] post not found', { postId, communityId });
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    if (existing.communityId !== communityId) {
+      console.warn('[communities/delete-post] community mismatch', {
+        postId,
+        requestedCommunity: communityId,
+        actualCommunity: existing.communityId,
+      });
+      return res.status(404).json({ error: 'Post not found in this community' });
+    }
+
+    // Idempotent: if already deleted, just confirm without mutating.
+    if (String(existing.status || '').toUpperCase() === 'DELETED') {
+      broadcastPostEvent('post:deleted', communityId, { id: postId, communityId });
+      return res.json({ message: 'Post already deleted', alreadyDeleted: true });
+    }
+
+    await prisma.post.update({
+      where: { id: postId },
+      data: { status: 'Deleted' },
+    });
+
+    broadcastPostEvent('post:deleted', communityId, { id: postId, communityId });
+    await broadcastFeaturedCharityUpdate(communityId);
+    return res.json({ message: 'Post deleted' });
+  } catch (error: any) {
+    console.error('[communities/delete-post] error:', error);
+    return res.status(500).json({ error: error?.message || 'Failed to delete post' });
+  }
 });
 
 // ─── Member locations ─────────────────────────────────────────────────────────

@@ -20539,6 +20539,7 @@ export namespace Prisma {
     price: number | null
     communityPrice: number | null
     publicPrice: number | null
+    initialQuantity: number | null
     charityAmount: number | null
     charityPercentage: number | null
     latitude: number | null
@@ -20549,6 +20550,7 @@ export namespace Prisma {
     price: number | null
     communityPrice: number | null
     publicPrice: number | null
+    initialQuantity: number | null
     charityAmount: number | null
     charityPercentage: number | null
     latitude: number | null
@@ -20569,6 +20571,8 @@ export namespace Prisma {
     price: number | null
     communityPrice: number | null
     publicPrice: number | null
+    initialQuantity: number | null
+    quantityType: string | null
     charityAmount: number | null
     charityPercentage: number | null
     imageUrl: string | null
@@ -20608,6 +20612,8 @@ export namespace Prisma {
     price: number | null
     communityPrice: number | null
     publicPrice: number | null
+    initialQuantity: number | null
+    quantityType: string | null
     charityAmount: number | null
     charityPercentage: number | null
     imageUrl: string | null
@@ -20647,6 +20653,8 @@ export namespace Prisma {
     price: number
     communityPrice: number
     publicPrice: number
+    initialQuantity: number
+    quantityType: number
     charityAmount: number
     charityPercentage: number
     imageUrl: number
@@ -20678,6 +20686,7 @@ export namespace Prisma {
     price?: true
     communityPrice?: true
     publicPrice?: true
+    initialQuantity?: true
     charityAmount?: true
     charityPercentage?: true
     latitude?: true
@@ -20688,6 +20697,7 @@ export namespace Prisma {
     price?: true
     communityPrice?: true
     publicPrice?: true
+    initialQuantity?: true
     charityAmount?: true
     charityPercentage?: true
     latitude?: true
@@ -20708,6 +20718,8 @@ export namespace Prisma {
     price?: true
     communityPrice?: true
     publicPrice?: true
+    initialQuantity?: true
+    quantityType?: true
     charityAmount?: true
     charityPercentage?: true
     imageUrl?: true
@@ -20747,6 +20759,8 @@ export namespace Prisma {
     price?: true
     communityPrice?: true
     publicPrice?: true
+    initialQuantity?: true
+    quantityType?: true
     charityAmount?: true
     charityPercentage?: true
     imageUrl?: true
@@ -20786,6 +20800,8 @@ export namespace Prisma {
     price?: true
     communityPrice?: true
     publicPrice?: true
+    initialQuantity?: true
+    quantityType?: true
     charityAmount?: true
     charityPercentage?: true
     imageUrl?: true
@@ -20912,6 +20928,8 @@ export namespace Prisma {
     price: number | null
     communityPrice: number | null
     publicPrice: number | null
+    initialQuantity: number
+    quantityType: string | null
     charityAmount: number | null
     charityPercentage: number | null
     imageUrl: string | null
@@ -20970,6 +20988,8 @@ export namespace Prisma {
     price?: boolean
     communityPrice?: boolean
     publicPrice?: boolean
+    initialQuantity?: boolean
+    quantityType?: boolean
     charityAmount?: boolean
     charityPercentage?: boolean
     imageUrl?: boolean
@@ -21013,6 +21033,8 @@ export namespace Prisma {
     price?: boolean
     communityPrice?: boolean
     publicPrice?: boolean
+    initialQuantity?: boolean
+    quantityType?: boolean
     charityAmount?: boolean
     charityPercentage?: boolean
     imageUrl?: boolean
@@ -21054,6 +21076,8 @@ export namespace Prisma {
     price?: boolean
     communityPrice?: boolean
     publicPrice?: boolean
+    initialQuantity?: boolean
+    quantityType?: boolean
     charityAmount?: boolean
     charityPercentage?: boolean
     imageUrl?: boolean
@@ -21095,6 +21119,8 @@ export namespace Prisma {
     price?: boolean
     communityPrice?: boolean
     publicPrice?: boolean
+    initialQuantity?: boolean
+    quantityType?: boolean
     charityAmount?: boolean
     charityPercentage?: boolean
     imageUrl?: boolean
@@ -21120,7 +21146,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "authorId" | "type" | "title" | "description" | "category" | "subtype" | "urgency" | "urgencyLevel" | "price" | "communityPrice" | "publicPrice" | "charityAmount" | "charityPercentage" | "imageUrl" | "postsImage" | "isCommunityPick" | "isCharity" | "charityId" | "authorName" | "authorRole" | "authorImage" | "locationName" | "latitude" | "longitude" | "source" | "status" | "rejectionReason" | "changesRequestedNote" | "expiresAt" | "soldAt" | "expiredAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
+  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "authorId" | "type" | "title" | "description" | "category" | "subtype" | "urgency" | "urgencyLevel" | "price" | "communityPrice" | "publicPrice" | "initialQuantity" | "quantityType" | "charityAmount" | "charityPercentage" | "imageUrl" | "postsImage" | "isCommunityPick" | "isCharity" | "charityId" | "authorName" | "authorRole" | "authorImage" | "locationName" | "latitude" | "longitude" | "source" | "status" | "rejectionReason" | "changesRequestedNote" | "expiresAt" | "soldAt" | "expiredAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
   export type PostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
@@ -21157,6 +21183,8 @@ export namespace Prisma {
       price: number | null
       communityPrice: number | null
       publicPrice: number | null
+      initialQuantity: number
+      quantityType: string | null
       charityAmount: number | null
       charityPercentage: number | null
       imageUrl: string | null
@@ -21619,6 +21647,8 @@ export namespace Prisma {
     readonly price: FieldRef<"Post", 'Float'>
     readonly communityPrice: FieldRef<"Post", 'Float'>
     readonly publicPrice: FieldRef<"Post", 'Float'>
+    readonly initialQuantity: FieldRef<"Post", 'Int'>
+    readonly quantityType: FieldRef<"Post", 'String'>
     readonly charityAmount: FieldRef<"Post", 'Float'>
     readonly charityPercentage: FieldRef<"Post", 'Float'>
     readonly imageUrl: FieldRef<"Post", 'String'>
@@ -26032,11 +26062,17 @@ export namespace Prisma {
   }
 
   export type CatTransactionAvgAggregateOutputType = {
+    quantitySold: number | null
+    unitPriceAtSale: number | null
+    totalSaleValue: number | null
     catAmount: number | null
     catPercentage: number | null
   }
 
   export type CatTransactionSumAggregateOutputType = {
+    quantitySold: number | null
+    unitPriceAtSale: number | null
+    totalSaleValue: number | null
     catAmount: number | null
     catPercentage: number | null
   }
@@ -26046,9 +26082,13 @@ export namespace Prisma {
     communityId: string | null
     postId: string | null
     sellerId: string | null
+    quantitySold: number | null
+    unitPriceAtSale: number | null
+    totalSaleValue: number | null
     catAmount: number | null
     catPercentage: number | null
     charityId: string | null
+    reversedAt: Date | null
     createdAt: Date | null
   }
 
@@ -26057,9 +26097,13 @@ export namespace Prisma {
     communityId: string | null
     postId: string | null
     sellerId: string | null
+    quantitySold: number | null
+    unitPriceAtSale: number | null
+    totalSaleValue: number | null
     catAmount: number | null
     catPercentage: number | null
     charityId: string | null
+    reversedAt: Date | null
     createdAt: Date | null
   }
 
@@ -26068,20 +26112,30 @@ export namespace Prisma {
     communityId: number
     postId: number
     sellerId: number
+    quantitySold: number
+    unitPriceAtSale: number
+    totalSaleValue: number
     catAmount: number
     catPercentage: number
     charityId: number
+    reversedAt: number
     createdAt: number
     _all: number
   }
 
 
   export type CatTransactionAvgAggregateInputType = {
+    quantitySold?: true
+    unitPriceAtSale?: true
+    totalSaleValue?: true
     catAmount?: true
     catPercentage?: true
   }
 
   export type CatTransactionSumAggregateInputType = {
+    quantitySold?: true
+    unitPriceAtSale?: true
+    totalSaleValue?: true
     catAmount?: true
     catPercentage?: true
   }
@@ -26091,9 +26145,13 @@ export namespace Prisma {
     communityId?: true
     postId?: true
     sellerId?: true
+    quantitySold?: true
+    unitPriceAtSale?: true
+    totalSaleValue?: true
     catAmount?: true
     catPercentage?: true
     charityId?: true
+    reversedAt?: true
     createdAt?: true
   }
 
@@ -26102,9 +26160,13 @@ export namespace Prisma {
     communityId?: true
     postId?: true
     sellerId?: true
+    quantitySold?: true
+    unitPriceAtSale?: true
+    totalSaleValue?: true
     catAmount?: true
     catPercentage?: true
     charityId?: true
+    reversedAt?: true
     createdAt?: true
   }
 
@@ -26113,9 +26175,13 @@ export namespace Prisma {
     communityId?: true
     postId?: true
     sellerId?: true
+    quantitySold?: true
+    unitPriceAtSale?: true
+    totalSaleValue?: true
     catAmount?: true
     catPercentage?: true
     charityId?: true
+    reversedAt?: true
     createdAt?: true
     _all?: true
   }
@@ -26211,9 +26277,13 @@ export namespace Prisma {
     communityId: string
     postId: string
     sellerId: string
+    quantitySold: number
+    unitPriceAtSale: number | null
+    totalSaleValue: number | null
     catAmount: number
     catPercentage: number
     charityId: string | null
+    reversedAt: Date | null
     createdAt: Date
     _count: CatTransactionCountAggregateOutputType | null
     _avg: CatTransactionAvgAggregateOutputType | null
@@ -26241,9 +26311,13 @@ export namespace Prisma {
     communityId?: boolean
     postId?: boolean
     sellerId?: boolean
+    quantitySold?: boolean
+    unitPriceAtSale?: boolean
+    totalSaleValue?: boolean
     catAmount?: boolean
     catPercentage?: boolean
     charityId?: boolean
+    reversedAt?: boolean
     createdAt?: boolean
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     post?: boolean | PostDefaultArgs<ExtArgs>
@@ -26256,9 +26330,13 @@ export namespace Prisma {
     communityId?: boolean
     postId?: boolean
     sellerId?: boolean
+    quantitySold?: boolean
+    unitPriceAtSale?: boolean
+    totalSaleValue?: boolean
     catAmount?: boolean
     catPercentage?: boolean
     charityId?: boolean
+    reversedAt?: boolean
     createdAt?: boolean
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     post?: boolean | PostDefaultArgs<ExtArgs>
@@ -26271,9 +26349,13 @@ export namespace Prisma {
     communityId?: boolean
     postId?: boolean
     sellerId?: boolean
+    quantitySold?: boolean
+    unitPriceAtSale?: boolean
+    totalSaleValue?: boolean
     catAmount?: boolean
     catPercentage?: boolean
     charityId?: boolean
+    reversedAt?: boolean
     createdAt?: boolean
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     post?: boolean | PostDefaultArgs<ExtArgs>
@@ -26286,13 +26368,17 @@ export namespace Prisma {
     communityId?: boolean
     postId?: boolean
     sellerId?: boolean
+    quantitySold?: boolean
+    unitPriceAtSale?: boolean
+    totalSaleValue?: boolean
     catAmount?: boolean
     catPercentage?: boolean
     charityId?: boolean
+    reversedAt?: boolean
     createdAt?: boolean
   }
 
-  export type CatTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "postId" | "sellerId" | "catAmount" | "catPercentage" | "charityId" | "createdAt", ExtArgs["result"]["catTransaction"]>
+  export type CatTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "postId" | "sellerId" | "quantitySold" | "unitPriceAtSale" | "totalSaleValue" | "catAmount" | "catPercentage" | "charityId" | "reversedAt" | "createdAt", ExtArgs["result"]["catTransaction"]>
   export type CatTransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     post?: boolean | PostDefaultArgs<ExtArgs>
@@ -26325,9 +26411,13 @@ export namespace Prisma {
       communityId: string
       postId: string
       sellerId: string
+      quantitySold: number
+      unitPriceAtSale: number | null
+      totalSaleValue: number | null
       catAmount: number
       catPercentage: number
       charityId: string | null
+      reversedAt: Date | null
       createdAt: Date
     }, ExtArgs["result"]["catTransaction"]>
     composites: {}
@@ -26760,9 +26850,13 @@ export namespace Prisma {
     readonly communityId: FieldRef<"CatTransaction", 'String'>
     readonly postId: FieldRef<"CatTransaction", 'String'>
     readonly sellerId: FieldRef<"CatTransaction", 'String'>
+    readonly quantitySold: FieldRef<"CatTransaction", 'Int'>
+    readonly unitPriceAtSale: FieldRef<"CatTransaction", 'Float'>
+    readonly totalSaleValue: FieldRef<"CatTransaction", 'Float'>
     readonly catAmount: FieldRef<"CatTransaction", 'Float'>
     readonly catPercentage: FieldRef<"CatTransaction", 'Float'>
     readonly charityId: FieldRef<"CatTransaction", 'String'>
+    readonly reversedAt: FieldRef<"CatTransaction", 'DateTime'>
     readonly createdAt: FieldRef<"CatTransaction", 'DateTime'>
   }
     
@@ -41160,6 +41254,8 @@ export namespace Prisma {
     price: 'price',
     communityPrice: 'communityPrice',
     publicPrice: 'publicPrice',
+    initialQuantity: 'initialQuantity',
+    quantityType: 'quantityType',
     charityAmount: 'charityAmount',
     charityPercentage: 'charityPercentage',
     imageUrl: 'imageUrl',
@@ -41264,9 +41360,13 @@ export namespace Prisma {
     communityId: 'communityId',
     postId: 'postId',
     sellerId: 'sellerId',
+    quantitySold: 'quantitySold',
+    unitPriceAtSale: 'unitPriceAtSale',
+    totalSaleValue: 'totalSaleValue',
     catAmount: 'catAmount',
     catPercentage: 'catPercentage',
     charityId: 'charityId',
+    reversedAt: 'reversedAt',
     createdAt: 'createdAt'
   };
 
@@ -42973,6 +43073,8 @@ export namespace Prisma {
     price?: FloatNullableFilter<"Post"> | number | null
     communityPrice?: FloatNullableFilter<"Post"> | number | null
     publicPrice?: FloatNullableFilter<"Post"> | number | null
+    initialQuantity?: IntFilter<"Post"> | number
+    quantityType?: StringNullableFilter<"Post"> | string | null
     charityAmount?: FloatNullableFilter<"Post"> | number | null
     charityPercentage?: FloatNullableFilter<"Post"> | number | null
     imageUrl?: StringNullableFilter<"Post"> | string | null
@@ -43015,6 +43117,8 @@ export namespace Prisma {
     price?: SortOrderInput | SortOrder
     communityPrice?: SortOrderInput | SortOrder
     publicPrice?: SortOrderInput | SortOrder
+    initialQuantity?: SortOrder
+    quantityType?: SortOrderInput | SortOrder
     charityAmount?: SortOrderInput | SortOrder
     charityPercentage?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
@@ -43060,6 +43164,8 @@ export namespace Prisma {
     price?: FloatNullableFilter<"Post"> | number | null
     communityPrice?: FloatNullableFilter<"Post"> | number | null
     publicPrice?: FloatNullableFilter<"Post"> | number | null
+    initialQuantity?: IntFilter<"Post"> | number
+    quantityType?: StringNullableFilter<"Post"> | string | null
     charityAmount?: FloatNullableFilter<"Post"> | number | null
     charityPercentage?: FloatNullableFilter<"Post"> | number | null
     imageUrl?: StringNullableFilter<"Post"> | string | null
@@ -43102,6 +43208,8 @@ export namespace Prisma {
     price?: SortOrderInput | SortOrder
     communityPrice?: SortOrderInput | SortOrder
     publicPrice?: SortOrderInput | SortOrder
+    initialQuantity?: SortOrder
+    quantityType?: SortOrderInput | SortOrder
     charityAmount?: SortOrderInput | SortOrder
     charityPercentage?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
@@ -43149,6 +43257,8 @@ export namespace Prisma {
     price?: FloatNullableWithAggregatesFilter<"Post"> | number | null
     communityPrice?: FloatNullableWithAggregatesFilter<"Post"> | number | null
     publicPrice?: FloatNullableWithAggregatesFilter<"Post"> | number | null
+    initialQuantity?: IntWithAggregatesFilter<"Post"> | number
+    quantityType?: StringNullableWithAggregatesFilter<"Post"> | string | null
     charityAmount?: FloatNullableWithAggregatesFilter<"Post"> | number | null
     charityPercentage?: FloatNullableWithAggregatesFilter<"Post"> | number | null
     imageUrl?: StringNullableWithAggregatesFilter<"Post"> | string | null
@@ -43561,9 +43671,13 @@ export namespace Prisma {
     communityId?: StringFilter<"CatTransaction"> | string
     postId?: StringFilter<"CatTransaction"> | string
     sellerId?: StringFilter<"CatTransaction"> | string
+    quantitySold?: IntFilter<"CatTransaction"> | number
+    unitPriceAtSale?: FloatNullableFilter<"CatTransaction"> | number | null
+    totalSaleValue?: FloatNullableFilter<"CatTransaction"> | number | null
     catAmount?: FloatFilter<"CatTransaction"> | number
     catPercentage?: FloatFilter<"CatTransaction"> | number
     charityId?: StringNullableFilter<"CatTransaction"> | string | null
+    reversedAt?: DateTimeNullableFilter<"CatTransaction"> | Date | string | null
     createdAt?: DateTimeFilter<"CatTransaction"> | Date | string
     community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
     post?: XOR<PostScalarRelationFilter, PostWhereInput>
@@ -43576,9 +43690,13 @@ export namespace Prisma {
     communityId?: SortOrder
     postId?: SortOrder
     sellerId?: SortOrder
+    quantitySold?: SortOrder
+    unitPriceAtSale?: SortOrderInput | SortOrder
+    totalSaleValue?: SortOrderInput | SortOrder
     catAmount?: SortOrder
     catPercentage?: SortOrder
     charityId?: SortOrderInput | SortOrder
+    reversedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     community?: CommunityOrderByWithRelationInput
     post?: PostOrderByWithRelationInput
@@ -43594,9 +43712,13 @@ export namespace Prisma {
     communityId?: StringFilter<"CatTransaction"> | string
     postId?: StringFilter<"CatTransaction"> | string
     sellerId?: StringFilter<"CatTransaction"> | string
+    quantitySold?: IntFilter<"CatTransaction"> | number
+    unitPriceAtSale?: FloatNullableFilter<"CatTransaction"> | number | null
+    totalSaleValue?: FloatNullableFilter<"CatTransaction"> | number | null
     catAmount?: FloatFilter<"CatTransaction"> | number
     catPercentage?: FloatFilter<"CatTransaction"> | number
     charityId?: StringNullableFilter<"CatTransaction"> | string | null
+    reversedAt?: DateTimeNullableFilter<"CatTransaction"> | Date | string | null
     createdAt?: DateTimeFilter<"CatTransaction"> | Date | string
     community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
     post?: XOR<PostScalarRelationFilter, PostWhereInput>
@@ -43609,9 +43731,13 @@ export namespace Prisma {
     communityId?: SortOrder
     postId?: SortOrder
     sellerId?: SortOrder
+    quantitySold?: SortOrder
+    unitPriceAtSale?: SortOrderInput | SortOrder
+    totalSaleValue?: SortOrderInput | SortOrder
     catAmount?: SortOrder
     catPercentage?: SortOrder
     charityId?: SortOrderInput | SortOrder
+    reversedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: CatTransactionCountOrderByAggregateInput
     _avg?: CatTransactionAvgOrderByAggregateInput
@@ -43628,9 +43754,13 @@ export namespace Prisma {
     communityId?: StringWithAggregatesFilter<"CatTransaction"> | string
     postId?: StringWithAggregatesFilter<"CatTransaction"> | string
     sellerId?: StringWithAggregatesFilter<"CatTransaction"> | string
+    quantitySold?: IntWithAggregatesFilter<"CatTransaction"> | number
+    unitPriceAtSale?: FloatNullableWithAggregatesFilter<"CatTransaction"> | number | null
+    totalSaleValue?: FloatNullableWithAggregatesFilter<"CatTransaction"> | number | null
     catAmount?: FloatWithAggregatesFilter<"CatTransaction"> | number
     catPercentage?: FloatWithAggregatesFilter<"CatTransaction"> | number
     charityId?: StringNullableWithAggregatesFilter<"CatTransaction"> | string | null
+    reversedAt?: DateTimeNullableWithAggregatesFilter<"CatTransaction"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"CatTransaction"> | Date | string
   }
 
@@ -46182,6 +46312,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -46224,6 +46356,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -46262,6 +46396,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46304,6 +46440,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46344,6 +46482,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -46381,6 +46521,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46420,6 +46562,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46887,8 +47031,12 @@ export namespace Prisma {
 
   export type CatTransactionCreateInput = {
     id?: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
+    reversedAt?: Date | string | null
     createdAt?: Date | string
     community: CommunityCreateNestedOneWithoutCatTransactionsInput
     post: PostCreateNestedOneWithoutCatTransactionsInput
@@ -46901,16 +47049,24 @@ export namespace Prisma {
     communityId: string
     postId: string
     sellerId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
     charityId?: string | null
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
   export type CatTransactionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput
     post?: PostUpdateOneRequiredWithoutCatTransactionsNestedInput
@@ -46923,9 +47079,13 @@ export namespace Prisma {
     communityId?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -46934,16 +47094,24 @@ export namespace Prisma {
     communityId: string
     postId: string
     sellerId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
     charityId?: string | null
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
   export type CatTransactionUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -46952,9 +47120,13 @@ export namespace Prisma {
     communityId?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -49159,6 +49331,17 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type PostCountOrderByAggregateInput = {
     id?: SortOrder
     communityId?: SortOrder
@@ -49173,6 +49356,8 @@ export namespace Prisma {
     price?: SortOrder
     communityPrice?: SortOrder
     publicPrice?: SortOrder
+    initialQuantity?: SortOrder
+    quantityType?: SortOrder
     charityAmount?: SortOrder
     charityPercentage?: SortOrder
     imageUrl?: SortOrder
@@ -49202,6 +49387,7 @@ export namespace Prisma {
     price?: SortOrder
     communityPrice?: SortOrder
     publicPrice?: SortOrder
+    initialQuantity?: SortOrder
     charityAmount?: SortOrder
     charityPercentage?: SortOrder
     latitude?: SortOrder
@@ -49222,6 +49408,8 @@ export namespace Prisma {
     price?: SortOrder
     communityPrice?: SortOrder
     publicPrice?: SortOrder
+    initialQuantity?: SortOrder
+    quantityType?: SortOrder
     charityAmount?: SortOrder
     charityPercentage?: SortOrder
     imageUrl?: SortOrder
@@ -49261,6 +49449,8 @@ export namespace Prisma {
     price?: SortOrder
     communityPrice?: SortOrder
     publicPrice?: SortOrder
+    initialQuantity?: SortOrder
+    quantityType?: SortOrder
     charityAmount?: SortOrder
     charityPercentage?: SortOrder
     imageUrl?: SortOrder
@@ -49290,10 +49480,27 @@ export namespace Prisma {
     price?: SortOrder
     communityPrice?: SortOrder
     publicPrice?: SortOrder
+    initialQuantity?: SortOrder
     charityAmount?: SortOrder
     charityPercentage?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type CharityCountOrderByAggregateInput = {
@@ -49407,17 +49614,6 @@ export namespace Prisma {
     longitude?: SortOrder
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type CharityScalarRelationFilter = {
     is?: CharityWhereInput
     isNot?: CharityWhereInput
@@ -49477,22 +49673,6 @@ export namespace Prisma {
     finalRaised?: SortOrder
     finalPotential?: SortOrder
     itemsSold?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type CharityNullableScalarRelationFilter = {
@@ -49563,13 +49743,20 @@ export namespace Prisma {
     communityId?: SortOrder
     postId?: SortOrder
     sellerId?: SortOrder
+    quantitySold?: SortOrder
+    unitPriceAtSale?: SortOrder
+    totalSaleValue?: SortOrder
     catAmount?: SortOrder
     catPercentage?: SortOrder
     charityId?: SortOrder
+    reversedAt?: SortOrder
     createdAt?: SortOrder
   }
 
   export type CatTransactionAvgOrderByAggregateInput = {
+    quantitySold?: SortOrder
+    unitPriceAtSale?: SortOrder
+    totalSaleValue?: SortOrder
     catAmount?: SortOrder
     catPercentage?: SortOrder
   }
@@ -49579,9 +49766,13 @@ export namespace Prisma {
     communityId?: SortOrder
     postId?: SortOrder
     sellerId?: SortOrder
+    quantitySold?: SortOrder
+    unitPriceAtSale?: SortOrder
+    totalSaleValue?: SortOrder
     catAmount?: SortOrder
     catPercentage?: SortOrder
     charityId?: SortOrder
+    reversedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -49590,13 +49781,20 @@ export namespace Prisma {
     communityId?: SortOrder
     postId?: SortOrder
     sellerId?: SortOrder
+    quantitySold?: SortOrder
+    unitPriceAtSale?: SortOrder
+    totalSaleValue?: SortOrder
     catAmount?: SortOrder
     catPercentage?: SortOrder
     charityId?: SortOrder
+    reversedAt?: SortOrder
     createdAt?: SortOrder
   }
 
   export type CatTransactionSumOrderByAggregateInput = {
+    quantitySold?: SortOrder
+    unitPriceAtSale?: SortOrder
+    totalSaleValue?: SortOrder
     catAmount?: SortOrder
     catPercentage?: SortOrder
   }
@@ -52045,6 +52243,14 @@ export namespace Prisma {
     connect?: CatTransactionWhereUniqueInput | CatTransactionWhereUniqueInput[]
   }
 
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type CommunityUpdateOneRequiredWithoutPostsNestedInput = {
     create?: XOR<CommunityCreateWithoutPostsInput, CommunityUncheckedCreateWithoutPostsInput>
     connectOrCreate?: CommunityCreateOrConnectWithoutPostsInput
@@ -52257,14 +52463,6 @@ export namespace Prisma {
     create?: XOR<CharityCreateWithoutCampaignSnapshotsInput, CharityUncheckedCreateWithoutCampaignSnapshotsInput>
     connectOrCreate?: CharityCreateOrConnectWithoutCampaignSnapshotsInput
     connect?: CharityWhereUniqueInput
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type CommunityUpdateOneRequiredWithoutCampaignSnapshotsNestedInput = {
@@ -53104,6 +53302,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -53144,6 +53344,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -53768,8 +53970,12 @@ export namespace Prisma {
 
   export type CatTransactionCreateWithoutSellerInput = {
     id?: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
+    reversedAt?: Date | string | null
     createdAt?: Date | string
     community: CommunityCreateNestedOneWithoutCatTransactionsInput
     post: PostCreateNestedOneWithoutCatTransactionsInput
@@ -53780,9 +53986,13 @@ export namespace Prisma {
     id?: string
     communityId: string
     postId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
     charityId?: string | null
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -53905,6 +54115,8 @@ export namespace Prisma {
     price?: FloatNullableFilter<"Post"> | number | null
     communityPrice?: FloatNullableFilter<"Post"> | number | null
     publicPrice?: FloatNullableFilter<"Post"> | number | null
+    initialQuantity?: IntFilter<"Post"> | number
+    quantityType?: StringNullableFilter<"Post"> | string | null
     charityAmount?: FloatNullableFilter<"Post"> | number | null
     charityPercentage?: FloatNullableFilter<"Post"> | number | null
     imageUrl?: StringNullableFilter<"Post"> | string | null
@@ -54468,9 +54680,13 @@ export namespace Prisma {
     communityId?: StringFilter<"CatTransaction"> | string
     postId?: StringFilter<"CatTransaction"> | string
     sellerId?: StringFilter<"CatTransaction"> | string
+    quantitySold?: IntFilter<"CatTransaction"> | number
+    unitPriceAtSale?: FloatNullableFilter<"CatTransaction"> | number | null
+    totalSaleValue?: FloatNullableFilter<"CatTransaction"> | number | null
     catAmount?: FloatFilter<"CatTransaction"> | number
     catPercentage?: FloatFilter<"CatTransaction"> | number
     charityId?: StringNullableFilter<"CatTransaction"> | string | null
+    reversedAt?: DateTimeNullableFilter<"CatTransaction"> | Date | string | null
     createdAt?: DateTimeFilter<"CatTransaction"> | Date | string
   }
 
@@ -56127,6 +56343,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -56167,6 +56385,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -56688,8 +56908,12 @@ export namespace Prisma {
 
   export type CatTransactionCreateWithoutCommunityInput = {
     id?: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
+    reversedAt?: Date | string | null
     createdAt?: Date | string
     post: PostCreateNestedOneWithoutCatTransactionsInput
     seller: UserCreateNestedOneWithoutCatTransactionsInput
@@ -56700,9 +56924,13 @@ export namespace Prisma {
     id?: string
     postId: string
     sellerId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
     charityId?: string | null
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -59266,8 +59494,12 @@ export namespace Prisma {
 
   export type CatTransactionCreateWithoutPostInput = {
     id?: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
+    reversedAt?: Date | string | null
     createdAt?: Date | string
     community: CommunityCreateNestedOneWithoutCatTransactionsInput
     seller: UserCreateNestedOneWithoutCatTransactionsInput
@@ -59278,9 +59510,13 @@ export namespace Prisma {
     id?: string
     communityId: string
     sellerId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
     charityId?: string | null
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -59683,8 +59919,12 @@ export namespace Prisma {
 
   export type CatTransactionCreateWithoutCharityInput = {
     id?: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
+    reversedAt?: Date | string | null
     createdAt?: Date | string
     community: CommunityCreateNestedOneWithoutCatTransactionsInput
     post: PostCreateNestedOneWithoutCatTransactionsInput
@@ -59696,8 +59936,12 @@ export namespace Prisma {
     communityId: string
     postId: string
     sellerId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -60963,6 +61207,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -61004,6 +61250,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -61370,6 +61618,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61411,6 +61661,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66089,6 +66341,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -66308,9 +66562,13 @@ export namespace Prisma {
     id?: string
     communityId: string
     postId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
     charityId?: string | null
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -66434,6 +66692,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66474,6 +66734,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66513,6 +66775,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67146,8 +67410,12 @@ export namespace Prisma {
 
   export type CatTransactionUpdateWithoutSellerInput = {
     id?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput
     post?: PostUpdateOneRequiredWithoutCatTransactionsNestedInput
@@ -67158,9 +67426,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     communityId?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -67168,9 +67440,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     communityId?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -67201,6 +67477,8 @@ export namespace Prisma {
     price?: number | null
     communityPrice?: number | null
     publicPrice?: number | null
+    initialQuantity?: number
+    quantityType?: string | null
     charityAmount?: number | null
     charityPercentage?: number | null
     imageUrl?: string | null
@@ -67383,9 +67661,13 @@ export namespace Prisma {
     id?: string
     postId: string
     sellerId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
     charityId?: string | null
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -67456,6 +67738,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67496,6 +67780,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67535,6 +67821,8 @@ export namespace Prisma {
     price?: NullableFloatFieldUpdateOperationsInput | number | null
     communityPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     publicPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialQuantity?: IntFieldUpdateOperationsInput | number
+    quantityType?: NullableStringFieldUpdateOperationsInput | string | null
     charityAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     charityPercentage?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -68029,8 +68317,12 @@ export namespace Prisma {
 
   export type CatTransactionUpdateWithoutCommunityInput = {
     id?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     post?: PostUpdateOneRequiredWithoutCatTransactionsNestedInput
     seller?: UserUpdateOneRequiredWithoutCatTransactionsNestedInput
@@ -68041,9 +68333,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -68051,9 +68347,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -68162,16 +68462,24 @@ export namespace Prisma {
     id?: string
     communityId: string
     sellerId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
     charityId?: string | null
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
   export type CatTransactionUpdateWithoutPostInput = {
     id?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput
     seller?: UserUpdateOneRequiredWithoutCatTransactionsNestedInput
@@ -68182,9 +68490,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     communityId?: StringFieldUpdateOperationsInput | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -68192,9 +68504,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     communityId?: StringFieldUpdateOperationsInput | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -68217,8 +68533,12 @@ export namespace Prisma {
     communityId: string
     postId: string
     sellerId: string
+    quantitySold?: number
+    unitPriceAtSale?: number | null
+    totalSaleValue?: number | null
     catAmount: number
     catPercentage: number
+    reversedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -68279,8 +68599,12 @@ export namespace Prisma {
 
   export type CatTransactionUpdateWithoutCharityInput = {
     id?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     community?: CommunityUpdateOneRequiredWithoutCatTransactionsNestedInput
     post?: PostUpdateOneRequiredWithoutCatTransactionsNestedInput
@@ -68292,8 +68616,12 @@ export namespace Prisma {
     communityId?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -68302,8 +68630,12 @@ export namespace Prisma {
     communityId?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    quantitySold?: IntFieldUpdateOperationsInput | number
+    unitPriceAtSale?: NullableFloatFieldUpdateOperationsInput | number | null
+    totalSaleValue?: NullableFloatFieldUpdateOperationsInput | number | null
     catAmount?: FloatFieldUpdateOperationsInput | number
     catPercentage?: FloatFieldUpdateOperationsInput | number
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

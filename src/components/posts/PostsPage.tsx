@@ -40,6 +40,7 @@ import type { CommunityNotice } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { getCardBorderColor, getCardShadow } from '../../theme/cardStyles';
 import { createShadow } from '../../theme/shadows';
+import RecordSaleModal from '../market/RecordSaleModal';
 
 const PRIMARY = THEME_COLORS.primary;
 const SPACE = {
@@ -162,6 +163,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   const [mapPost, setMapPost] = useState<CommunityNotice | null>(null);
   const [highlightedNoticeId, setHighlightedNoticeId] = useState<string | null>(null);
   const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
+  const [saleListing, setSaleListing] = useState<CommunityNotice | null>(null);
   const feedListRef = useRef<FlatList<FeedSection> | null>(null);
 
   const baseLat = currentCommunity?.coverageArea?.latitude;
@@ -233,6 +235,16 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       const isSold = String(listing.status || '').toUpperCase() === 'SOLD';
       if (!isOwner || isSold) return;
 
+      const initialQuantity = Math.max(1, Number(listing.initialQuantity ?? 1));
+      const soldQuantity = Math.max(0, Number(listing.soldQuantity ?? 0));
+      const remainingQuantity = Math.max(0, Number(listing.remainingQuantity ?? (initialQuantity - soldQuantity)));
+      const isMultiItem = remainingQuantity > 1;
+
+      if (isMultiItem) {
+        setSaleListing(listing);
+        return;
+      }
+
       Alert.alert(
         'Mark as sold',
         'This will mark the listing sold and record the CAT contribution for the community.',
@@ -243,7 +255,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             onPress: async () => {
               setMarkingSoldId(listing.id);
               try {
-                const result = await markPostSold(listing.id);
+                const result = await markPostSold(listing.id, 1);
                 Alert.alert(
                   'Listing updated',
                   result.catTriggered
@@ -543,6 +555,10 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       const isAdmin = currentCommunity?.userRole === 'ADMIN';
       const isSold = String(post.status || '').toUpperCase() === 'SOLD';
       const isMarkingSold = markingSoldId === post.id;
+      const initialQuantity = Math.max(1, Number(post.initialQuantity ?? 1));
+      const soldQuantity = Math.max(0, Number(post.soldQuantity ?? 0));
+      const remainingQuantity = Math.max(0, Number(post.remainingQuantity ?? (initialQuantity - soldQuantity)));
+      const saleActionLabel = remainingQuantity > 1 ? 'Record Sale' : 'Mark as Sold';
 
       return (
         <View className="bg-surface-container-low rounded-[2rem] overflow-hidden border mb-6" style={{ ...CARD_DEPTH_HERO, ...SURFACE_BORDER_STYLE }}>
@@ -668,7 +684,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                       >
                         <CheckCircle2 size={16} color={THEME_COLORS.successStrongAlt} />
                         <Text className="text-green-600 text-sm font-bold">
-                          {isMarkingSold ? 'Marking...' : 'Mark as Sold'}
+                          {isMarkingSold ? 'Saving...' : saleActionLabel}
                         </Text>
                       </TouchableOpacity>
                     )}
@@ -1070,6 +1086,48 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
           ) : null}
         </SafeAreaView>
       </Modal>
+
+      <RecordSaleModal
+        visible={Boolean(saleListing)}
+        listingTitle={saleListing?.title || 'Listing'}
+        charityName={saleListing?.charityId ? charities.find((c) => c.id === saleListing.charityId)?.name || null : null}
+        quantityType={saleListing?.quantityType}
+        unitPrice={Number(saleListing?.communityPrice ?? saleListing?.price ?? 0)}
+        unitCatAmount={Number(saleListing?.charityAmount ?? 0)}
+        remainingQuantity={Math.max(
+          1,
+          Number(
+            saleListing?.remainingQuantity ??
+              (Math.max(1, Number(saleListing?.initialQuantity ?? 1)) -
+                Math.max(0, Number(saleListing?.soldQuantity ?? 0)))
+          )
+        )}
+        loading={markingSoldId === saleListing?.id}
+        onClose={() => setSaleListing(null)}
+        onConfirm={async (quantity) => {
+          if (!saleListing) return;
+          setMarkingSoldId(saleListing.id);
+          try {
+            const result = await markPostSold(saleListing.id, quantity);
+            Alert.alert(
+              'Listing updated',
+              result.catTriggered
+                ? `Sale recorded. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
+                : 'Sale recorded.'
+            );
+            setSaleListing(null);
+          } catch (error: any) {
+            const remaining = Number(error?.response?.data?.remainingQuantity ?? NaN);
+            if (Number.isFinite(remaining)) {
+              Alert.alert('Unable to record sale', `Only ${remaining} item(s) remaining. Please try again.`);
+            } else {
+              Alert.alert('Unable to record sale', 'Please try again.');
+            }
+          } finally {
+            setMarkingSoldId(null);
+          }
+        }}
+      />
     </View>
   );
 }

@@ -7,18 +7,26 @@ export function useCommunityBootstrap(userId?: string | null) {
     queryKey: queryKeys.communityBootstrap(userId),
     enabled: Boolean(userId),
     queryFn: async () => {
-      const [commRes, convRes, notifRes] = await Promise.allSettled([
+      const [communitiesRes, conversationsRes] = await Promise.all([
         api.get('/communities'),
         api.get('/conversations'),
-        api.get('/users/me/notifications'),
       ]);
 
+      const notifications = await api
+        .get('/users/me/notifications')
+        .then((res) => res.data)
+        .catch(() => []);
+
       return {
-        communities: commRes.status === 'fulfilled' ? commRes.value.data : [],
-        conversations: convRes.status === 'fulfilled' ? convRes.value.data : [],
-        notifications: notifRes.status === 'fulfilled' ? notifRes.value.data : [],
+        communities: communitiesRes.data ?? [],
+        conversations: conversationsRes.data ?? [],
+        notifications,
       };
     },
     initialData: { communities: [], conversations: [], notifications: [] },
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnReconnect: true,
+    retry: 2,
   });
 }

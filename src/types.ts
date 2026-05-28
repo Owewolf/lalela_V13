@@ -29,6 +29,12 @@ export interface CommunityNotice {
   changesRequestedNote?: string;
   publicPrice?: number;
   charityAmount?: number;
+  initialQuantity?: number;
+  quantityType?: string;
+  soldQuantity?: number;
+  remainingQuantity?: number;
+  percentageSold?: number;
+  stockState?: 'active' | 'low_stock' | 'nearly_sold_out' | 'sold_out';
   urgency?: 'low' | 'normal' | 'high' | 'emergency';
   urgencyLevel?: 'emergency' | 'warning' | 'info' | 'general';
   priority?: 'normal' | 'emergency';
@@ -599,7 +605,7 @@ export interface CommunityContextType {
   approveCharitySuggestion: (suggestionId: string, feedback: string, charityData: Omit<Charity, 'id' | 'createdAt'>) => Promise<void>;
   rejectCharitySuggestion: (suggestionId: string, feedback: string) => Promise<void>;
   setCatCycle: (active: boolean, featuredCharityId?: string) => Promise<void>;
-  markPostSold: (postId: string) => Promise<{ catTriggered: boolean; catAmount?: number; pooledToCharity?: boolean }>;
+  markPostSold: (postId: string, quantity?: number) => Promise<{ catTriggered: boolean; catAmount?: number; pooledToCharity?: boolean; post?: CommunityNotice }>;
   getCatHub: () => Promise<CatHubSummary>;
   getFeaturedCharity: () => Promise<FeaturedCharitySummary>;
   syncAllUsersToSearch: () => Promise<void>;

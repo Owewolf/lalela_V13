@@ -66,7 +66,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const userId = userProfile?.id ?? null;
   const currentCommunityId = userProfile?.lastCommunityId ?? null;
   const bootstrapQuery = useCommunityBootstrap(userId);
-  const bundleQuery = useCommunityBundle(currentCommunityId, userId);
+  const fallbackCommunityId = bootstrapQuery.data?.communities?.[0]?.id ?? null;
+  const activeCommunityId = currentCommunityId ?? fallbackCommunityId;
+  const bundleQuery = useCommunityBundle(activeCommunityId, userId);
 
   // ── State ─────────────────────────────────────────────────────────────────
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -88,6 +90,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const messagesQuery = useConversationMessages(activeConversationId);
 
   const socketRef = useRef<Awaited<ReturnType<typeof getSocket>> | null>(null);
+  const autoSelectAttemptedCommunityRef = useRef<string | null>(null);
   // Tracks the active conversation id so socket handlers (bound once per
   // community/user) can read the current value without closing over stale state.
   const activeConversationIdRef = useRef<string | null>(null);
@@ -100,8 +103,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [bootstrapQuery]);
 
   const currentCommunity = useMemo(
-    () => communities.find((c) => c.id === currentCommunityId) ?? EMPTY_COMMUNITY,
-    [communities, currentCommunityId],
+    () => communities.find((c) => c.id === activeCommunityId) ?? EMPTY_COMMUNITY,
+    [communities, activeCommunityId],
   );
 
   const activeConversation = useMemo(
@@ -158,7 +161,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   // If lastCommunityId is set but not yet in the communities list (e.g. just
   // created), re-fetch once to pick it up with the correct userRole.
   useEffect(() => {
-    if (!currentCommunityId) {
+    if (!activeCommunityId) {
       setMembers([]);
       setPosts([]);
       setCharities([]);
@@ -175,9 +178,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     setCharitySuggestions(bundleQuery.data?.charitySuggestions ?? []);
     const allBusinesses = bundleQuery.data?.businesses ?? [];
     setUserBusinesses(allBusinesses.filter((b: UserBusiness) => b.ownerId === userId));
-    setCommunityBusinesses(allBusinesses.filter((b: UserBusiness) => (b.communityIds ?? []).includes(currentCommunityId)));
+    setCommunityBusinesses(allBusinesses.filter((b: UserBusiness) => (b.communityIds ?? []).includes(activeCommunityId)));
     setSecurityResponders(bundleQuery.data?.locations?.security ?? []);
-  }, [currentCommunityId, bundleQuery.data, userId]);
+  }, [activeCommunityId, bundleQuery.data, userId]);
 
   useEffect(() => {
     if (!activeConversationId) {
@@ -199,7 +202,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       socketRef.current = socket;
 
       // Join rooms
-      if (currentCommunityId) socket.emit('join:community', { communityId: currentCommunityId });
+      if (activeCommunityId) socket.emit('join:community', { communityId: activeCommunityId });
 
       // ── Inbound events ──
       socket.on('post:new', (post: CommunityNotice) => {
@@ -268,7 +271,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       socketRef.current?.off('location:update');
       socketRef.current?.off('notification:new');
     };
-  }, [userId, currentCommunityId]);
+  }, [userId, activeCommunityId]);
 
     // Join conversation room when active conversation changes
   useEffect(() => {
@@ -284,10 +287,26 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     // Persist to server in background
     api.put('/users/me', { lastCommunityId: id }).catch(console.error);
     if (socketRef.current) {
-      if (currentCommunityId) socketRef.current.emit('leave:community', { communityId: currentCommunityId });
+      if (activeCommunityId) socketRef.current.emit('leave:community', { communityId: activeCommunityId });
       socketRef.current.emit('join:community', { communityId: id });
     }
-  }, [currentCommunityId, updateUserProfile]);
+  }, [activeCommunityId, updateUserProfile]);
+
+  useEffect(() => {
+    if (currentCommunityId) {
+      autoSelectAttemptedCommunityRef.current = null;
+      return;
+    }
+
+    if (!activeCommunityId) return;
+    if (autoSelectAttemptedCommunityRef.current === activeCommunityId) return;
+
+    autoSelectAttemptedCommunityRef.current = activeCommunityId;
+    setCurrentCommunity(activeCommunityId).catch((error) => {
+      autoSelectAttemptedCommunityRef.current = null;
+      console.error('Failed to persist selected community:', error);
+    });
+  }, [currentCommunityId, activeCommunityId, setCurrentCommunity]);
 
   const createCommunity = useCallback(async (name: string): Promise<string> => {
     const { data } = await api.post('/communities', { name });
@@ -496,9 +515,10 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     ));
   }, [currentCommunityId]);
 
-  const markPostSold = useCallback(async (postId: string) => {
+  const markPostSold = useCallback(async (postId: string, quantity = 1) => {
     if (!currentCommunityId) return { catTriggered: false };
-    const { data } = await api.post(`/communities/${currentCommunityId}/posts/${postId}/sold`);
+    const safeQuantity = Number.isFinite(Number(quantity)) ? Math.max(1, Math.floor(Number(quantity))) : 1;
+    const { data } = await api.post(`/communities/${currentCommunityId}/posts/${postId}/sold`, { quantity: safeQuantity });
     const soldPost = data?.post;
     if (soldPost?.id) {
       setPosts((prev) => prev.map((post) => (post.id === soldPost.id ? soldPost : post)));
@@ -507,6 +527,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       catTriggered: Boolean(data?.catTriggered),
       catAmount: data?.catAmount,
       pooledToCharity: Boolean(data?.pooledToCharity),
+      post: soldPost,
     };
   }, [currentCommunityId]);
 

@@ -344,6 +344,8 @@ exports.Prisma.PostScalarFieldEnum = {
   price: 'price',
   communityPrice: 'communityPrice',
   publicPrice: 'publicPrice',
+  initialQuantity: 'initialQuantity',
+  quantityType: 'quantityType',
   charityAmount: 'charityAmount',
   charityPercentage: 'charityPercentage',
   imageUrl: 'imageUrl',
@@ -436,9 +438,13 @@ exports.Prisma.CatTransactionScalarFieldEnum = {
   communityId: 'communityId',
   postId: 'postId',
   sellerId: 'sellerId',
+  quantitySold: 'quantitySold',
+  unitPriceAtSale: 'unitPriceAtSale',
+  totalSaleValue: 'totalSaleValue',
   catAmount: 'catAmount',
   catPercentage: 'catPercentage',
   charityId: 'charityId',
+  reversedAt: 'reversedAt',
   createdAt: 'createdAt'
 };
 

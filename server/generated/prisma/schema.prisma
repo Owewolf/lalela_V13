@@ -363,6 +363,8 @@ model Post {
   price                Float?
   communityPrice       Float?    @map("community_price")
   publicPrice          Float?    @map("public_price")
+  initialQuantity      Int       @default(1) @map("initial_quantity")
+  quantityType         String?   @map("quantity_type")
   charityAmount        Float?    @map("charity_amount")
   charityPercentage    Float?    @map("charity_percentage")
   imageUrl             String?   @map("image_url")
@@ -485,14 +487,18 @@ model CharitySuggestion {
 }
 
 model CatTransaction {
-  id            String   @id @default(cuid())
-  communityId   String   @map("community_id")
-  postId        String   @map("post_id")
-  sellerId      String   @map("seller_id")
-  catAmount     Float    @map("cat_amount")
-  catPercentage Float    @map("cat_percentage")
-  charityId     String?  @map("charity_id")
-  createdAt     DateTime @default(now()) @map("created_at")
+  id              String    @id @default(cuid())
+  communityId     String    @map("community_id")
+  postId          String    @map("post_id")
+  sellerId        String    @map("seller_id")
+  quantitySold    Int       @default(1) @map("quantity_sold")
+  unitPriceAtSale Float?    @map("unit_price_at_sale")
+  totalSaleValue  Float?    @map("total_sale_value")
+  catAmount       Float     @map("cat_amount")
+  catPercentage   Float     @map("cat_percentage")
+  charityId       String?   @map("charity_id")
+  reversedAt      DateTime? @map("reversed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
 
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)

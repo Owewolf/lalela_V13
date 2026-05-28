@@ -20,7 +20,6 @@ import {
   Info,
   MapPin,
   Send,
-  Tag,
   Siren,
   ArrowLeft,
 } from 'lucide-react-native';
@@ -79,6 +78,21 @@ const INPUT_SURFACE_STYLE = {
   borderBottomColor: getCardBorderColor('default'),
 };
 
+const UNIT_OPTIONS = [
+  'items',
+  'piece',
+  'pair',
+  'set',
+  'dozen',
+  'bunch',
+  'kg',
+  'g',
+  'litre',
+  'ml',
+  'pack',
+  'box',
+];
+
 const getCtaLabel = (postType: PostType, urgency: Urgency, isEditing: boolean): string => {
   if (isEditing) return 'Update Post';
   if (postType === 'listing') return 'Post Listing';
@@ -132,6 +146,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   );
   const [isFree, setIsFree] = useState(postToEdit?.price === 0);
   const [price, setPrice] = useState<string>(postToEdit?.price?.toString() || '');
+  const [initialQuantity, setInitialQuantity] = useState<string>(String(Math.max(1, Number(postToEdit?.initialQuantity ?? 1))));
+  const [quantityType, setQuantityType] = useState<string>(postToEdit?.quantityType || 'items');
   const [title, setTitle] = useState(postToEdit?.title || '');
   const [description, setDescription] = useState(postToEdit?.description || '');
   const [category, setCategory] = useState(postToEdit?.category || 'All');
@@ -147,6 +163,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categoryPickerVisible, setCategoryPickerVisible] = useState(false);
+  const [unitPickerVisible, setUnitPickerVisible] = useState(false);
 
   // ── Derived values ──────────────────────────────────────────────────────────
   // CAT is always active for every listing. Resolve the community's active
@@ -161,6 +178,12 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
     return BUSINESS_CATEGORIES.filter((cat) => enabledIds.includes(cat.id)).map((cat) => cat.label);
   }, [currentCommunity?.enabledCategories]);
 
+  const unitOptions = useMemo(() => {
+    const normalized = (quantityType || '').trim().toLowerCase();
+    if (!normalized) return UNIT_OPTIONS;
+    return UNIT_OPTIONS.includes(normalized) ? UNIT_OPTIONS : [normalized, ...UNIT_OPTIONS];
+  }, [quantityType]);
+
   useEffect(() => {
     if (category !== 'All' && !enabledListingCategories.includes(category)) {
       setCategory('All');
@@ -170,6 +193,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const CAT_MIN_PERCENTAGE = 15;
   const charityPercentage = Math.max(activeCharity?.percentage || 0, CAT_MIN_PERCENTAGE);
   const numericPrice = parseFloat(price) || 0;
+  const numericQuantity = Math.max(1, parseInt(initialQuantity || '1', 10) || 1);
   const charityAmount = Math.round(((numericPrice * charityPercentage) / 100) * 100) / 100;
   const publicPrice = Math.round((numericPrice + charityAmount) * 100) / 100;
   const locationDefaults = useMemo(
@@ -279,6 +303,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
       price: postType === 'listing' ? numericPrice : undefined,
       communityPrice: postType === 'listing' ? numericPrice : undefined,
       publicPrice: postType === 'listing' ? publicPrice : undefined,
+      initialQuantity: postType === 'listing' ? numericQuantity : undefined,
+      quantityType: postType === 'listing' ? (quantityType || 'items').trim() : undefined,
       urgency: postType === 'notice' ? urgencyMap[urgency] : undefined,
       urgencyLevel: postType === 'notice' ? urgency : undefined,
       locationName,
@@ -319,7 +345,11 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
 
   const ctaLabel = getCtaLabel(postType, urgency, !!postToEdit);
   const isEmergency = postType === 'notice' && urgency === 'emergency';
-  const canSubmit = isEmergency ? !!emergencyCategory : !!title && !!description;
+  const canSubmit = isEmergency
+    ? !!emergencyCategory
+    : postType === 'listing'
+    ? !!title && !!description && numericQuantity >= 1
+    : !!title && !!description;
 
   const mapRegion = {
     latitude: latitude ?? locationDefaults.mapFallback.latitude,
@@ -398,72 +428,47 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
           keyboardShouldPersistTaps="handled"
         >
           <View className="px-5 pt-5 gap-5">
-            {/* ── Type Banner ─────────────────────────────────────────────── */}
-            <View
-              className="p-5 rounded-3xl flex-row items-center gap-4 border"
-              style={{
-                backgroundColor:
-                  postType === 'listing'
-                    ? THEME_COLORS.successSurface
-                    : urgency === 'emergency'
-                    ? THEME_COLORS.neutralBg
-                    : THEME_COLORS.successSurface,
-                borderColor:
-                  postType === 'listing'
-                    ? THEME_COLORS.aliasHex_0d3d4740
-                    : urgency === 'emergency'
-                    ? THEME_COLORS.neutralBorderStrong
-                    : THEME_COLORS.aliasHex_0d3d4740,
-              }}
-            >
+            {/* ── Type Banner (notice only) ──────────────────────────────── */}
+            {postType === 'notice' && (
               <View
-                className="w-14 h-14 rounded-2xl items-center justify-center"
+                className="p-5 rounded-3xl flex-row items-center gap-4 border"
                 style={{
-                  backgroundColor:
-                    postType === 'listing'
-                      ? THEME_COLORS.primary
-                      : urgency === 'emergency'
-                      ? THEME_COLORS.neutralTextSubtle
-                      : THEME_COLORS.primary,
+                  backgroundColor: urgency === 'emergency' ? THEME_COLORS.neutralBg : THEME_COLORS.successSurface,
+                  borderColor: urgency === 'emergency' ? THEME_COLORS.neutralBorderStrong : THEME_COLORS.aliasHex_0d3d4740,
                 }}
               >
-                {postType === 'listing' ? (
-                  <Tag color="white" size={28} />
-                ) : (
+                <View
+                  className="w-14 h-14 rounded-2xl items-center justify-center"
+                  style={{
+                    backgroundColor: urgency === 'emergency' ? THEME_COLORS.neutralTextSubtle : THEME_COLORS.primary,
+                  }}
+                >
                   <Siren color="white" size={28} />
-                )}
-              </View>
-              <View className="flex-1">
-                <View className="flex-row items-center flex-wrap gap-2 mb-1">
-                  <Text
-                    className="font-bold text-xl"
-                    style={{
-                      color: urgency === 'emergency' ? THEME_COLORS.neutralTextDefault : THEME_COLORS.primary,
-                    }}
-                  >
-                    {postType === 'listing'
-                      ? 'Marketplace Listing'
-                      : urgency === 'emergency'
-                      ? 'Emergency Notice'
-                      : 'Community Notice'}
-                  </Text>
-                  {currentCommunity?.name && (
-                    <View className="px-2 py-0.5 rounded bg-surface">
-                      <Text className="text-xs font-black text-primary">
-                        {currentCommunity.name}
-                      </Text>
-                    </View>
-                  )}
                 </View>
-                <Text className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                  {postType === 'listing'
-                    ? 'Share items with your community'
-                    : urgency === 'emergency'
-                    ? "Stay calm. Report what's happening."
-                    : 'Alert neighbors about local events'}
-                </Text>
+                <View className="flex-1">
+                  <View className="flex-row items-center flex-wrap gap-2 mb-1">
+                    <Text
+                      className="font-bold text-xl"
+                      style={{
+                        color: urgency === 'emergency' ? THEME_COLORS.neutralTextDefault : THEME_COLORS.primary,
+                      }}
+                    >
+                      {urgency === 'emergency' ? 'Emergency Notice' : 'Community Notice'}
+                    </Text>
+                    {currentCommunity?.name && (
+                      <View className="px-2 py-0.5 rounded bg-surface">
+                        <Text className="text-xs font-black text-primary">
+                          {currentCommunity.name}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                    {urgency === 'emergency' ? "Stay calm. Report what's happening." : 'Alert neighbors about local events'}
+                  </Text>
+                </View>
               </View>
-            </View>
+            )}
 
             {/* ── Emergency Form ──────────────────────────────────────────── */}
             {postType === 'notice' && urgency === 'emergency' && (
@@ -608,14 +613,13 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
             {/* ── Listing Form ────────────────────────────────────────────── */}
             {postType === 'listing' && (
               <View className="gap-5">
-                {/* Photo */}
+                {/* Photo hero */}
                 <View className="rounded-3xl p-5 border shadow-sm gap-3" style={CARD_SURFACE_STYLE}>
-                  <Text className="font-bold text-primary text-base">Photos</Text>
                   <TouchableOpacity
                     onPress={handlePickImage}
                     activeOpacity={0.8}
                     className="rounded-2xl overflow-hidden border-2 border-dashed items-center justify-center"
-                    style={{ height: 180, backgroundColor: THEME_COLORS.neutralBg, borderColor: THEME_COLORS.neutralBorderSoft }}
+                    style={{ height: 210, backgroundColor: THEME_COLORS.neutralBg, borderColor: THEME_COLORS.neutralBorderSoft }}
                   >
                     {postsImage ? (
                       <>
@@ -637,50 +641,100 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         <Text className="text-sm text-gray-400">Uploading...</Text>
                       </View>
                     ) : (
-                      <View className="items-center gap-2">
-                        <Camera color={THEME_COLORS.neutralTextSoft} size={36} />
-                        <Text className="text-sm text-gray-400">Add Photo</Text>
+                      <View className="items-center gap-2 px-4">
+                        <Text className="text-3xl font-bold text-primary text-center">Tap to add photo</Text>
+                        <Text className="text-base text-gray-500 text-center">(Max 1 photo, up to 10MB)</Text>
+                        <View
+                          className="w-12 h-12 rounded-full items-center justify-center"
+                          style={{ backgroundColor: THEME_COLORS.white }}
+                        >
+                          <Camera color={THEME_COLORS.primary} size={24} />
+                        </View>
                       </View>
                     )}
                   </TouchableOpacity>
-                  <Text className="text-xs text-gray-400 ml-1">Max 1 photo, up to 10MB.</Text>
                 </View>
 
-                {/* Details */}
-                <View className="rounded-3xl p-5 border shadow-sm gap-5" style={CARD_SURFACE_STYLE}>
-                  {/* Title */}
-                  <View className="gap-1">
-                    <Text className="text-sm font-semibold text-primary ml-1">Title</Text>
-                    <TextInput
-                      value={title}
-                      onChangeText={setTitle}
-                      placeholder="e.g. Handmade Pottery"
-                      placeholderTextColor={THEME_COLORS.neutralTextSoft}
-                      className="px-4 py-3 rounded-t-xl text-gray-800"
-                      style={INPUT_SURFACE_STYLE}
-                    />
-                  </View>
+                {/* Title */}
+                <View className="gap-1">
+                  <Text className="text-sm font-semibold text-primary ml-1">Title</Text>
+                  <TextInput
+                    value={title}
+                    onChangeText={setTitle}
+                    placeholder="e.g. Handmade Pottery"
+                    placeholderTextColor={THEME_COLORS.neutralTextSoft}
+                    className="px-4 py-3 rounded-2xl text-gray-800 border"
+                    style={CARD_SURFACE_STYLE}
+                  />
+                </View>
 
-                  {/* Description */}
-                  <View className="gap-1">
-                    <Text className="text-sm font-semibold text-primary ml-1">Description</Text>
-                    <TextInput
-                      value={description}
-                      onChangeText={setDescription}
-                      placeholder="Tell the community about what you're listing..."
-                      placeholderTextColor={THEME_COLORS.neutralTextSoft}
-                      multiline
-                      numberOfLines={4}
-                      textAlignVertical="top"
-                      className="px-4 py-3 rounded-t-xl text-gray-800"
-                      style={[INPUT_SURFACE_STYLE, { minHeight: 100 }]}
-                    />
-                  </View>
+                {/* Description */}
+                <View className="gap-1">
+                  <Text className="text-sm font-semibold text-primary ml-1">Description</Text>
+                  <TextInput
+                    value={description}
+                    onChangeText={setDescription}
+                    placeholder="Tell the community about what you're listing..."
+                    placeholderTextColor={THEME_COLORS.neutralTextSoft}
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                    className="px-4 py-3 rounded-2xl text-gray-800 border"
+                    style={[CARD_SURFACE_STYLE, { minHeight: 110 }]}
+                  />
+                </View>
 
-                  {/* Price + Free toggle */}
-                  <View className="gap-3">
-                    <View className="gap-1">
-                      <Text className="text-sm font-semibold text-primary ml-1">Price (R)</Text>
+                {/* Item details row */}
+                <View className="rounded-3xl p-5 border shadow-sm gap-4" style={CARD_SURFACE_STYLE}>
+                  <Text className="text-2xl font-bold text-primary">Item Details</Text>
+                  <View className="flex-row gap-3">
+                    <View className="flex-1 gap-1">
+                      <Text className="text-xs font-bold uppercase tracking-wide text-gray-600 ml-1">Quantity</Text>
+                      <View
+                        className="h-12 rounded-2xl border px-2 flex-row items-center justify-between"
+                        style={{
+                          backgroundColor: THEME_COLORS.surface,
+                          borderColor: THEME_COLORS.neutralBorderSoft,
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => setInitialQuantity(String(Math.max(1, numericQuantity - 1)))}
+                          className="w-8 h-8 rounded-full items-center justify-center"
+                          style={{ backgroundColor: THEME_COLORS.neutralBg }}
+                        >
+                          <Text className="text-lg font-bold" style={{ color: THEME_COLORS.primary }}>-</Text>
+                        </TouchableOpacity>
+                        <Text className="text-base font-bold text-gray-800">{numericQuantity}</Text>
+                        <TouchableOpacity
+                          onPress={() => setInitialQuantity(String(numericQuantity + 1))}
+                          className="w-8 h-8 rounded-full items-center justify-center"
+                          style={{ backgroundColor: THEME_COLORS.primary }}
+                        >
+                          <Text className="text-lg font-bold text-white">+</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <View className="flex-1 gap-1">
+                      <Text className="text-xs font-bold uppercase tracking-wide text-gray-600 ml-1">Unit</Text>
+                      <TouchableOpacity
+                        onPress={() => setUnitPickerVisible(true)}
+                        className="h-12 rounded-2xl border px-3 flex-row items-center justify-between"
+                        style={{
+                          backgroundColor: THEME_COLORS.surface,
+                          borderColor: THEME_COLORS.neutralBorderSoft,
+                        }}
+                        activeOpacity={0.8}
+                      >
+                        <Text className="text-base font-semibold text-gray-800" numberOfLines={1}>
+                          {quantityType || 'items'}
+                        </Text>
+                        <Text className="text-xs text-gray-400">v</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View className="flex-1 gap-1">
+                      <Text className="text-xs font-bold uppercase tracking-wide text-gray-600 ml-1">Price Per Unit</Text>
                       <TextInput
                         value={price}
                         onChangeText={setPrice}
@@ -688,107 +742,74 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         placeholderTextColor={THEME_COLORS.neutralTextSoft}
                         keyboardType="decimal-pad"
                         editable={!isFree}
-                        className="px-4 py-3 rounded-t-xl text-gray-800"
-                        style={[INPUT_SURFACE_STYLE, isFree ? { opacity: 0.5 } : undefined]}
+                        className="h-12 px-3 rounded-2xl text-gray-800 border"
+                        style={[
+                          {
+                            backgroundColor: THEME_COLORS.surface,
+                            borderColor: THEME_COLORS.neutralBorderSoft,
+                          },
+                          isFree ? { opacity: 0.5 } : undefined,
+                        ]}
                       />
                     </View>
-                    <View className="flex-row items-center justify-between px-2">
-                      <Text className="text-sm text-gray-700">Free Item</Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setIsFree(!isFree);
-                          if (!isFree) setPrice('0');
-                        }}
-                        className="rounded-full"
-                        style={{
-                          width: 48,
-                          height: 24,
-                          backgroundColor: isFree ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft,
-                          justifyContent: 'center',
-                          paddingHorizontal: SPACE.xxs,
-                        }}
-                        activeOpacity={0.8}
-                      >
-                        <View
-                          className="w-5 h-5 bg-surface-container-low rounded-full shadow-sm"
-                          style={{
-                            alignSelf: isFree ? 'flex-end' : 'flex-start',
-                          }}
-                        />
-                      </TouchableOpacity>
-                    </View>
                   </View>
 
-                  {/* Active charity / CAT card — always shown for listings.
-                      Every listing carries CAT (or the featured charity during
-                      a CAT cycle). The user enters only the local price;
-                      the public price and contribution are derived. */}
-                  <View className="bg-surface-container-low border border-outline-variant rounded-3xl p-5 gap-4">
-                    <View className="flex-row gap-3">
-                      <Info color={THEME_COLORS.primary} size={18} />
-                      <Text className="flex-1 text-xs text-gray-700 leading-5">
-                        Every listing includes a community contribution (CAT) added on top of your local price.
-                        Funds route to the active community charity, or to CAT when no charity is featured.
-                      </Text>
-                    </View>
-
-                    {activeCharity ? (
-                      <View className="gap-1">
-                        <Text className="text-xs font-bold uppercase tracking-widest text-primary ml-1">
-                          Active Charity
-                        </Text>
-                        <View className="bg-surface-container-low border-b-2 border-outline-variant px-4 py-3 rounded-t-xl flex-row items-center justify-between">
-                          <Text className="font-semibold text-gray-800 flex-1">{activeCharity.name}</Text>
-                          <Text className="text-xs font-bold text-primary">
-                            {charityPercentage}%
-                          </Text>
-                        </View>
-                      </View>
-                    ) : (
-                      <View className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                        <Text className="text-xs text-amber-700 leading-5">
-                          No featured charity yet — the {CAT_MIN_PERCENTAGE}% CAT margin applies and represents the buyer’s potential resale earning.
-                        </Text>
-                      </View>
-                    )}
-
-                    {/* Price breakdown */}
-                    <View className="bg-surface-container-low/60 rounded-2xl p-4 gap-2">
-                      <View className="flex-row justify-between">
-                        <Text className="text-xs font-bold text-gray-500">Charity</Text>
-                        <Text className="text-xs text-gray-600 max-w-[60%]" numberOfLines={1}>
-                          {activeCharity?.name || 'CAT'}
-                        </Text>
-                      </View>
-                      <View className="flex-row justify-between">
-                        <Text className="text-xs font-bold text-gray-500">Local Price</Text>
-                        <Text className="text-xs text-gray-600">R {numericPrice.toFixed(2)}</Text>
-                      </View>
-                      <View className="flex-row justify-between">
-                        <Text className="text-xs font-bold text-primary">
-                          {activeCharity ? `To Charity (${charityPercentage}%)` : `CAT Margin (${charityPercentage}%)`}
-                        </Text>
-                        <Text className="text-xs font-bold text-primary">
-                          + R {charityAmount.toFixed(2)}
-                        </Text>
-                      </View>
-                      <View className="h-px my-1" style={{ backgroundColor: THEME_COLORS.neutralBorderSoft }} />
-                      <View className="flex-row justify-between">
-                        <Text className="text-sm font-bold text-primary">Public Price</Text>
-                        <Text className="text-sm font-bold text-primary">
-                          R {publicPrice.toFixed(2)}
-                        </Text>
-                      </View>
-                    </View>
+                  <View className="flex-row items-center justify-between px-1 pt-1">
+                    <Text className="text-xl font-semibold text-gray-700">Free Items</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsFree(!isFree);
+                        if (!isFree) setPrice('0');
+                      }}
+                      className="rounded-full"
+                      style={{
+                        width: 54,
+                        height: 30,
+                        backgroundColor: isFree ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft,
+                        justifyContent: 'center',
+                        paddingHorizontal: SPACE.xxs,
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <View
+                        className="w-6 h-6 bg-surface-container-low rounded-full shadow-sm"
+                        style={{ alignSelf: isFree ? 'flex-end' : 'flex-start' }}
+                      />
+                    </TouchableOpacity>
                   </View>
+                </View>
 
-                  {/* Category picker */}
+                {/* Community contribution + active charity */}
+                <View className="rounded-3xl p-5 border shadow-sm gap-4" style={CARD_SURFACE_STYLE}>
+                  <View className="flex-row items-start gap-3">
+                    <Info color={THEME_COLORS.primary} size={20} />
+                    <Text className="flex-1 text-xl text-gray-700 leading-7">
+                      Every listing includes a small CAT contribution to support local charities.
+                    </Text>
+                  </View>
+                  <View className="gap-1">
+                    <Text className="text-sm font-semibold text-primary ml-1">Active Charity</Text>
+                    <View
+                      className="px-4 py-3 rounded-2xl border flex-row items-center justify-between"
+                      style={{ backgroundColor: THEME_COLORS.surface, borderColor: THEME_COLORS.neutralBorderSoft }}
+                    >
+                      <Text className="text-base font-bold text-gray-800 flex-1">{activeCharity?.name || 'CAT'}</Text>
+                      <Text className="text-base font-bold text-primary">{charityPercentage}%</Text>
+                    </View>
+                    <Text className="text-xs text-gray-500 ml-1 mt-1">
+                      Buyer public price: R {publicPrice.toFixed(2)} per {quantityType || 'items'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Remaining fields */}
+                <View className="rounded-3xl p-5 border shadow-sm gap-4" style={CARD_SURFACE_STYLE}>
                   <View className="gap-1">
                     <Text className="text-sm font-semibold text-primary ml-1">Category</Text>
                     <TouchableOpacity
                       onPress={() => setCategoryPickerVisible(true)}
-                      className="px-4 py-3 rounded-t-xl flex-row items-center justify-between"
-                      style={INPUT_SURFACE_STYLE}
+                      className="px-4 py-3 rounded-2xl flex-row items-center justify-between border"
+                      style={{ backgroundColor: THEME_COLORS.surface, borderColor: THEME_COLORS.neutralBorderSoft }}
                       activeOpacity={0.8}
                     >
                       <Text className="text-gray-800 text-sm">{category}</Text>
@@ -796,7 +817,6 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     </TouchableOpacity>
                   </View>
 
-                  {/* Location — shared picker (Address + Search + Coordinates + Refine With Pin) */}
                   <LocationPickerSection
                     value={{ address: locationName, latitude, longitude }}
                     onChange={(next, source) => {
@@ -811,18 +831,6 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     }}
                     hint="Search first, then tap or drag the pin to set the exact listing location."
                   />
-                </View>
-
-                {/* Guidelines */}
-                <View className="bg-surface-container-low rounded-3xl p-5 flex-row items-start gap-4 border border-outline-variant">
-                  <Info color={THEME_COLORS.primary} size={22} />
-                  <View className="flex-1 gap-1">
-                    <Text className="font-bold text-primary text-sm">Community Guidelines</Text>
-                    <Text className="text-xs text-gray-500 leading-5">
-                      By posting, you agree to our fair-trade policy. Keep our community safe, rooted,
-                      and respectful. Listings stay active for 30 days.
-                    </Text>
-                  </View>
                 </View>
               </View>
             )}
@@ -939,6 +947,41 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       style={{ color: category === cat ? THEME_COLORS.primary : THEME_COLORS.aliasHex_1f2937, fontWeight: category === cat ? '700' : '400' }}
                     >
                       {cat}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Unit picker modal */}
+        <Modal
+          visible={unitPickerVisible}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setUnitPickerVisible(false)}
+        >
+          <View className="flex-1 bg-black/50 justify-end">
+            <View className="bg-surface-container-low rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '70%' }}>
+              <Text className="text-lg font-bold text-gray-800 mb-4 text-center">Choose Unit</Text>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {unitOptions.map((unit) => (
+                  <TouchableOpacity
+                    key={unit}
+                    onPress={() => {
+                      setQuantityType(unit);
+                      setUnitPickerVisible(false);
+                    }}
+                    className="py-3.5 border-b"
+                    style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
+                    activeOpacity={0.8}
+                  >
+                    <Text
+                      className="text-base text-gray-800"
+                      style={{ color: quantityType === unit ? THEME_COLORS.primary : THEME_COLORS.aliasHex_1f2937, fontWeight: quantityType === unit ? '700' : '400' }}
+                    >
+                      {unit}
                     </Text>
                   </TouchableOpacity>
                 ))}

@@ -27,6 +27,10 @@ export function useFeaturedCharity(communityId?: string | null) {
       const { data } = await api.get(`/communities/${communityId}/featured-charity`);
       return data ?? EMPTY_FEATURED_CHARITY;
     },
-    initialData: EMPTY_FEATURED_CHARITY,
+    placeholderData: EMPTY_FEATURED_CHARITY,
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnReconnect: true,
+    retry: 2,
   });
 }

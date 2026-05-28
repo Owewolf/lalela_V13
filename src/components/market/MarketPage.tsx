@@ -34,6 +34,7 @@ import { resolveMediaUrl } from '../../lib/config';
 import { resolveActiveCharity } from '../../lib/activeCharity';
 import type { UserBusiness } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
+import RecordSaleModal from './RecordSaleModal';
 
 const TYPE_SCALE = {
   xs: 10,
@@ -140,6 +141,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedListing, setSelectedListing] = useState<(typeof listings)[0] | null>(null);
   const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
+  const [saleListing, setSaleListing] = useState<(typeof listings)[0] | null>(null);
   const [focusedBusinessId, setFocusedBusinessId] = useState<string | null>(null);
 
   const coverageArea = currentCommunity?.coverageArea;
@@ -159,12 +161,23 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
   }, [posts]);
 
   const soldListings = useMemo(
-    () => listings.filter((listing) => String(listing.status || '').toUpperCase() === 'SOLD'),
+    () => listings.filter((listing) => {
+      const initialQuantity = Math.max(1, Number((listing as any).initialQuantity ?? 1));
+      const soldQuantity = Math.max(0, Number((listing as any).soldQuantity ?? 0));
+      const remainingQuantity = Math.max(0, Number((listing as any).remainingQuantity ?? (initialQuantity - soldQuantity)));
+      const isMarkedSold = String(listing.status || '').toUpperCase() === 'SOLD';
+      return isMarkedSold || soldQuantity > 0 || remainingQuantity === 0;
+    }),
     [listings]
   );
 
   const activeListings = useMemo(
-    () => listings.filter((listing) => String(listing.status || '').toUpperCase() !== 'SOLD'),
+    () => listings.filter((listing) => {
+      const initialQuantity = Math.max(1, Number((listing as any).initialQuantity ?? 1));
+      const soldQuantity = Math.max(0, Number((listing as any).soldQuantity ?? 0));
+      const remainingQuantity = Math.max(0, Number((listing as any).remainingQuantity ?? (initialQuantity - soldQuantity)));
+      return remainingQuantity > 0;
+    }),
     [listings]
   );
 
@@ -365,7 +378,11 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
   const renderListing = useCallback(
     ({ item: listing }: { item: (typeof listings)[0] }) => {
       const charity = charities.find(c => c.id === listing.charityId);
-      const isSold = String(listing.status || '').toUpperCase() === 'SOLD';
+      const initialQuantity = Math.max(1, Number((listing as any).initialQuantity ?? 1));
+      const soldQuantity = Math.max(0, Number((listing as any).soldQuantity ?? 0));
+      const remainingQuantity = Math.max(0, Number((listing as any).remainingQuantity ?? (initialQuantity - soldQuantity)));
+      const isSoldOut = remainingQuantity === 0 || String(listing.status || '').toUpperCase() === 'SOLD';
+      const hasSales = soldQuantity > 0;
       const hasListingImage = typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0;
       const hasAuthorImage = typeof listing.authorImage === 'string' && listing.authorImage.trim().length > 0;
       return (
@@ -426,7 +443,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
             <View className="flex-row justify-between items-end">
               <View>
                 <Text className="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">
-                  Local Price
+                  Unit Price
                 </Text>
                 <View className="flex-row items-baseline gap-1">
                   <Text className="text-primary text-[28px] font-black">
@@ -447,9 +464,29 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               ) : null}
             </View>
 
-            {isSold ? (
+            <View className="bg-surface-container px-3 py-2 rounded-xl border" style={SURFACE_BORDER_STYLE}>
+              <View className="flex-row items-center justify-between">
+                <Text className="text-[11px] font-bold text-gray-500">
+                  Initial: {initialQuantity} {listing.quantityType || 'items'}
+                </Text>
+                <Text className="text-[11px] font-black text-primary">
+                  Left: {remainingQuantity}
+                </Text>
+              </View>
+              {hasSales ? (
+                <Text className="text-[10px] font-semibold text-gray-500 mt-1">
+                  Sold so far: {soldQuantity}
+                </Text>
+              ) : null}
+            </View>
+
+            {isSoldOut ? (
               <View className="self-start bg-surface-container px-3 py-1 rounded-full">
-                <Text className="text-[10px] font-bold uppercase tracking-widest text-gray-700">Sold</Text>
+                <Text className="text-[10px] font-bold uppercase tracking-widest text-gray-700">Sold Out</Text>
+              </View>
+            ) : hasSales ? (
+              <View className="self-start bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                <Text className="text-[10px] font-bold uppercase tracking-widest text-orange-600">Partially Sold</Text>
               </View>
             ) : null}
 
@@ -542,6 +579,16 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
     const isOwner = listing.authorId && userProfile?.id && listing.authorId === userProfile.id;
     if (!isOwner) return;
 
+    const initialQuantity = Math.max(1, Number((listing as any).initialQuantity ?? 1));
+    const soldQuantity = Math.max(0, Number((listing as any).soldQuantity ?? 0));
+    const remainingQuantity = Math.max(0, Number((listing as any).remainingQuantity ?? (initialQuantity - soldQuantity)));
+    const isMultiItem = remainingQuantity > 1;
+
+    if (isMultiItem) {
+      setSaleListing(listing);
+      return;
+    }
+
     Alert.alert(
       'Mark as sold',
       'This will mark the listing sold and record the CAT contribution for the community.',
@@ -552,8 +599,17 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
           onPress: async () => {
             setMarkingSoldId(listing.id);
             try {
-              const result = await markPostSold(listing.id);
-              setSelectedListing(null);
+              const result = await markPostSold(listing.id, 1);
+              if (result.post?.id === listing.id) {
+                const nextRemaining = Number(result.post.remainingQuantity ?? 0);
+                if (nextRemaining > 0) {
+                  setSelectedListing(result.post as any);
+                } else {
+                  setSelectedListing(null);
+                }
+              } else {
+                setSelectedListing(null);
+              }
               Alert.alert(
                 'Listing updated',
                 result.catTriggered
@@ -638,7 +694,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   <View style={{ backgroundColor: THEME_COLORS.aliasHex_fff7ed, borderRadius: RADIUS.lg, padding: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_249_115_22_0_18 }}>
                     <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.aliasHex_9a3412 }}>Charity contribution</Text>
                     <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.aliasHex_7c2d12, marginTop: SPACE.xs }}>
-                      This listing supports {charity.name} with R{selectedListing.charityAmount?.toFixed(2) || '0.00'} per sale.
+                      This listing supports {charity.name} with R{selectedListing.charityAmount?.toFixed(2) || '0.00'} per item.
                     </Text>
                   </View>
                 ) : null}
@@ -675,15 +731,23 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                 </TouchableOpacity>
 
                 {isOwner && !isSold ? (
+                  (() => {
+                    const initialQuantity = Math.max(1, Number((selectedListing as any).initialQuantity ?? 1));
+                    const soldQuantity = Math.max(0, Number((selectedListing as any).soldQuantity ?? 0));
+                    const remainingQuantity = Math.max(0, Number((selectedListing as any).remainingQuantity ?? (initialQuantity - soldQuantity)));
+                    const saleActionLabel = remainingQuantity > 1 ? 'Record Sale' : 'Mark as Sold';
+                    return (
                   <TouchableOpacity
                     onPress={() => handleMarkListingSold(selectedListing)}
                     disabled={markingSoldId === selectedListing.id}
                     style={{ backgroundColor: THEME_COLORS.warningStrong, borderRadius: RADIUS.md, paddingVertical: SPACE.xl, alignItems: 'center' }}
                   >
                     <Text style={{ color: THEME_COLORS.neutralTextStrong, fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
-                      {markingSoldId === selectedListing.id ? 'Marking...' : 'Mark as Sold'}
+                      {markingSoldId === selectedListing.id ? 'Saving...' : saleActionLabel}
                     </Text>
                   </TouchableOpacity>
+                    );
+                  })()
                 ) : null}
               </View>
             </ScrollView>
@@ -706,14 +770,14 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       : activeTab === 'businesses'
       ? 'Community Businesses'
       : activeTab === 'sold'
-      ? 'Sold Items'
+      ? 'Sales Activity'
       : 'Items for Sale';
 
   const subText =
     activeTab === 'businesses'
       ? `${filteredBusinesses.length} business${filteredBusinesses.length !== 1 ? 'es' : ''} in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`
       : activeTab === 'sold'
-      ? `Showing ${soldListings.length} sold item${soldListings.length !== 1 ? 's' : ''} in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`
+      ? `Showing ${soldListings.length} listing${soldListings.length !== 1 ? 's' : ''} with sales in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`
       : `Showing ${activeListings.length} listings in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`;
 
   return (
@@ -937,11 +1001,11 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                 <MapPin size={40} color={THEME_COLORS.neutralBorderMuted} />
               </View>
               <Text className="text-primary font-bold text-lg">
-                {activeTab === 'sold' ? 'No sold items yet' : 'No listings yet'}
+                {activeTab === 'sold' ? 'No sales activity yet' : 'No listings yet'}
               </Text>
               <Text className="text-gray-400 text-sm text-center max-w-[240px]">
                 {activeTab === 'sold'
-                  ? 'Sold listings will appear here once items are marked as sold.'
+                  ? 'Listings appear here as soon as the first sale is recorded.'
                   : 'Community members haven\'t posted any listings yet.'}
               </Text>
             </View>
@@ -949,6 +1013,55 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
         />
       )}
       <ListingDetailModal />
+      <RecordSaleModal
+        visible={Boolean(saleListing)}
+        listingTitle={saleListing?.title || 'Listing'}
+        charityName={saleListing?.charityId ? charities.find((c) => c.id === saleListing.charityId)?.name || null : null}
+        quantityType={(saleListing as any)?.quantityType}
+        unitPrice={Number(saleListing?.communityPrice ?? saleListing?.price ?? 0)}
+        unitCatAmount={Number(saleListing?.charityAmount ?? 0)}
+        remainingQuantity={Math.max(
+          1,
+          Number(
+            (saleListing as any)?.remainingQuantity ??
+              (Math.max(1, Number((saleListing as any)?.initialQuantity ?? 1)) -
+                Math.max(0, Number((saleListing as any)?.soldQuantity ?? 0)))
+          )
+        )}
+        loading={markingSoldId === saleListing?.id}
+        onClose={() => setSaleListing(null)}
+        onConfirm={async (quantity) => {
+          if (!saleListing) return;
+          setMarkingSoldId(saleListing.id);
+          try {
+            const result = await markPostSold(saleListing.id, quantity);
+            if (selectedListing?.id === saleListing.id && result.post?.id === saleListing.id) {
+              const nextRemaining = Number(result.post.remainingQuantity ?? 0);
+              if (nextRemaining > 0) {
+                setSelectedListing(result.post as any);
+              } else {
+                setSelectedListing(null);
+              }
+            }
+            Alert.alert(
+              'Listing updated',
+              result.catTriggered
+                ? `Sale recorded. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
+                : 'Sale recorded.'
+            );
+            setSaleListing(null);
+          } catch (error: any) {
+            const remaining = Number(error?.response?.data?.remainingQuantity ?? NaN);
+            if (Number.isFinite(remaining)) {
+              Alert.alert('Unable to record sale', `Only ${remaining} item(s) remaining. Please try again.`);
+            } else {
+              Alert.alert('Unable to record sale', 'Please try again.');
+            }
+          } finally {
+            setMarkingSoldId(null);
+          }
+        }}
+      />
     </View>
   );
 }

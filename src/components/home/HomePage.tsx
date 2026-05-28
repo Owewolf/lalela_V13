@@ -40,6 +40,7 @@ import { useCommunityMap } from '../../hooks/useCommunityMap';
 import { CommunityNotice } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
+import RecordSaleModal from '../market/RecordSaleModal';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -261,6 +262,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
+  const [saleListing, setSaleListing] = useState<CommunityNotice | null>(null);
 
   // Progress bar animation value
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -450,6 +452,16 @@ export const HomePage: React.FC<HomePageProps> = ({
       const isSold = String(listing.status || '').toUpperCase() === 'SOLD';
       if (!isOwner || isSold) return;
 
+      const initialQuantity = Math.max(1, Number(listing.initialQuantity ?? 1));
+      const soldQuantity = Math.max(0, Number(listing.soldQuantity ?? 0));
+      const remainingQuantity = Math.max(0, Number(listing.remainingQuantity ?? (initialQuantity - soldQuantity)));
+      const isMultiItem = remainingQuantity > 1;
+
+      if (isMultiItem) {
+        setSaleListing(listing);
+        return;
+      }
+
       Alert.alert(
         'Mark as sold',
         'This will mark the listing sold and record the CAT contribution for the community.',
@@ -460,7 +472,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             onPress: async () => {
               setMarkingSoldId(listing.id);
               try {
-                const result = await markPostSold(listing.id);
+                const result = await markPostSold(listing.id, 1);
                 Alert.alert(
                   'Listing updated',
                   result.catTriggered
@@ -920,6 +932,10 @@ export const HomePage: React.FC<HomePageProps> = ({
     const isAdmin = currentCommunity?.userRole === 'ADMIN';
     const isSold = String(listing.status || '').toUpperCase() === 'SOLD';
     const isMarkingSold = markingSoldId === listing.id;
+    const initialQuantity = Math.max(1, Number(listing.initialQuantity ?? 1));
+    const soldQuantity = Math.max(0, Number(listing.soldQuantity ?? 0));
+    const remainingQuantity = Math.max(0, Number(listing.remainingQuantity ?? (initialQuantity - soldQuantity)));
+    const saleActionLabel = remainingQuantity > 1 ? 'Record Sale' : 'Mark as Sold';
     const linkedCharity = listing.charityId
       ? charities.find((c) => c.id === listing.charityId)
       : null;
@@ -1014,7 +1030,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     >
                       <CheckCircle2 size={14} color={THEME_COLORS.successStrongAlt} />
                       <Text className="text-sm font-bold text-green-600">
-                        {isMarkingSold ? 'Marking...' : 'Mark as Sold'}
+                        {isMarkingSold ? 'Saving...' : saleActionLabel}
                       </Text>
                     </TouchableOpacity>
                   )}
@@ -1050,6 +1066,16 @@ export const HomePage: React.FC<HomePageProps> = ({
               <Text className="text-xl font-black text-gray-900 tracking-tight">
                 R{localPrice.toLocaleString()}
               </Text>
+              {initialQuantity > 1 ? (
+                <View className="bg-surface-container px-2 py-1 rounded-md border" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
+                  <Text className="text-[10px] font-bold text-gray-500">
+                    Initial: {initialQuantity} {listing.quantityType || 'items'}
+                  </Text>
+                  <Text className="text-[10px] font-black text-primary">
+                    Left: {remainingQuantity}
+                  </Text>
+                </View>
+              ) : null}
               {hasPublicPrice && (
                 <View className="flex-row items-center gap-1.5 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">
                   <Heart size={10} color={THEME_COLORS.indigo} />
@@ -1657,6 +1683,47 @@ export const HomePage: React.FC<HomePageProps> = ({
       </View>
 
       {/* ── Modals ──────────────────────────────────────────────────────── */}
+      <RecordSaleModal
+        visible={Boolean(saleListing)}
+        listingTitle={saleListing?.title || 'Listing'}
+        charityName={saleListing?.charityId ? charities.find((c) => c.id === saleListing.charityId)?.name || null : null}
+        quantityType={saleListing?.quantityType}
+        unitPrice={Number(saleListing?.communityPrice ?? saleListing?.price ?? 0)}
+        unitCatAmount={Number(saleListing?.charityAmount ?? 0)}
+        remainingQuantity={Math.max(
+          1,
+          Number(
+            saleListing?.remainingQuantity ??
+              (Math.max(1, Number(saleListing?.initialQuantity ?? 1)) -
+                Math.max(0, Number(saleListing?.soldQuantity ?? 0)))
+          )
+        )}
+        loading={markingSoldId === saleListing?.id}
+        onClose={() => setSaleListing(null)}
+        onConfirm={async (quantity) => {
+          if (!saleListing) return;
+          setMarkingSoldId(saleListing.id);
+          try {
+            const result = await markPostSold(saleListing.id, quantity);
+            Alert.alert(
+              'Listing updated',
+              result.catTriggered
+                ? `Sale recorded. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
+                : 'Sale recorded.'
+            );
+            setSaleListing(null);
+          } catch (error: any) {
+            const remaining = Number(error?.response?.data?.remainingQuantity ?? NaN);
+            if (Number.isFinite(remaining)) {
+              Alert.alert('Unable to record sale', `Only ${remaining} item(s) remaining. Please try again.`);
+            } else {
+              Alert.alert('Unable to record sale', 'Please try again.');
+            }
+          } finally {
+            setMarkingSoldId(null);
+          }
+        }}
+      />
       <UrgencyPickerModal />
       <EmergencyDialog />
       <DeleteModal />
