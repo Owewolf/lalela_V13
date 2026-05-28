@@ -211,10 +211,13 @@ APNS_PRODUCTION=true
 GOOGLE_SA_PATH=/etc/lalela/google-sa.json
 FCM_PROJECT_ID=lalela-2e9d5
 
-# SMS (Africa's Talking)
-SMS_PROVIDER=africastalking
-AT_API_KEY=<your-key>
-AT_USERNAME=lalela
+# SMS (Clickatell primary, Twilio fallback)
+SMS_PROVIDER=clickatell
+CLICKATELL_API_KEY=<your-key>
+CLICKATELL_FROM=LALELA
+TWILIO_ACCOUNT_SID=<optional-fallback>
+TWILIO_AUTH_TOKEN=<optional-fallback>
+TWILIO_FROM_NUMBER=<optional-fallback>
 ```
 
 After editing `.env`, apply it:
@@ -309,8 +312,8 @@ Open `https://lalela.net` in a browser.
 
 ### Auth flow
 
-- [ ] Register a new account → verification email arrives
-- [ ] Click verification link → redirected correctly
+- [ ] Register a new account with email or phone → verification email or OTP arrives
+- [ ] Complete verification link or OTP → redirected correctly
 - [ ] Login → JWT issued, app opens to home tab
 
 ### Real-time (Socket.io)

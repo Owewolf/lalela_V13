@@ -11,6 +11,7 @@ export default ({ config }) => {
     ...config,
     plugins: [
       ...(config.plugins ?? []),
+      'expo-font',
       '@config-plugins/react-native-webrtc',
     ],
     android: {

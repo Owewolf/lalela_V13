@@ -77,7 +77,7 @@ Lalela replaces the fragmented tools most neighbourhoods rely on — group chats
 | Multer | 2.x | File upload handling |
 | MinIO SDK | 8.x | Object storage client |
 | Nodemailer | 8.x | SMTP transactional email |
-| Africa's Talking | 0.8 | SMS OTP delivery |
+| Clickatell One API (+ Twilio fallback) | API | SMS OTP delivery |
 | tsx | 4.x | TypeScript execution (dev + production) |
 
 ### Database & Storage
@@ -280,8 +280,8 @@ MinIO console runs at `http://localhost:9001`.
 
 ### Auth flow summary
 
-1. **Sign up** → email verification sent → user stored in PostgreSQL (unverified)
-2. **Click verification link** in email → account marked `emailVerified = true`
+1. **Sign up** → users can register with email/password or phone + OTP, and the account is stored in PostgreSQL
+2. **Verify** → email accounts confirm via link; phone accounts confirm via OTP; `emailVerified` / `phoneVerified` are set server-side
 3. **Sign in** → server issues JWT access token (15 min) + refresh token (30 days)
 4. **JWT stored** in AsyncStorage → attached to every API + Socket.io request
 5. **Onboarding completed** → `profileCompleted = true` → routed to `/(tabs)` main app

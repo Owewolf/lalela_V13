@@ -5,13 +5,15 @@
 **Status**: Non-destructive — Email flow remains fully intact  
 **Date**: May 2026  
 
+> Reference note: this document captures the phone/SMS auth rollout plan and examples. The live implementation now lives in [src/context/AuthContext.tsx](src/context/AuthContext.tsx) and [server/services/smsService.ts](server/services/smsService.ts), with Clickatell as the primary SMS provider and Twilio as fallback.
+
 ---
 
 ## Feature Overview
 
 This adds **phone-based authentication** as a parallel option. Users can now:
 - Sign up / log in with **either email or phone number**.
-- Receive SMS OTP via Africa's Talking (already integrated).
+- Receive SMS OTP via the configured SMS provider (Clickatell primary, Twilio fallback).
 - Send **invite codes via SMS** to neighbors.
 - New users can join using **phone number alone** (invite code optional).
 
@@ -72,28 +74,21 @@ Create this file:
 
 ```ts
 // server/services/smsService.ts
-import AfricasTalking from 'africastalking';
+import { smsService } from '../services/smsService';
 
-const at = AfricasTalking({
-  username: process.env.AT_USERNAME!,
-  apiKey: process.env.AT_API_KEY!,
-});
+// Uses SMS_PROVIDER env setting:
+// - clickatell (default)
+// - twilio (fallback)
 
-export const smsService = {
-  async sendOtp(phoneNumber: string, code: string, purpose: string = 'login') {
-    const message = `Your Lalela ${purpose} code is ${code}. Valid for 10 minutes. Do not share it.`;
-    await at.SMS.send({
-      to: phoneNumber,
-      message,
-      from: "Lalela"
-    });
-  },
+export async function sendOtp(phoneNumber: string, code: string, purpose: string = 'login') {
+  const message = `Your Lalela ${purpose} code is ${code}. Valid for 10 minutes. Do not share it.`;
+  await smsService.sendOtp(phoneNumber, message);
+}
 
-  async sendInvite(phoneNumber: string, inviteCode: string, inviterName?: string) {
-    const message = `${inviterName || 'A neighbor'} invited you to Lalela! Join with your phone number. Invite code (optional): ${inviteCode}`;
-    await at.SMS.send({ to: phoneNumber, message, from: "Lalela" });
-  }
-};
+export async function sendInvite(phoneNumber: string, inviteCode: string, inviterName?: string) {
+  const message = `${inviterName || 'A neighbor'} invited you to Lalela! Join with your phone number. Invite code (optional): ${inviteCode}`;
+  await smsService.sendSms(phoneNumber, message);
+}
 ```
 
 ### 2.2 Auth Routes (`server/routes/auth.ts`)
