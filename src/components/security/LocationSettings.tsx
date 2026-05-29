@@ -49,7 +49,7 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
   }, [locationName, latitude, longitude, isEditing]);
 
   return (
-    <View className="pt-4 border-t gap-y-4" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
+    <View style={{ gap: 16 }}>
       {/* Header with sharing toggle */}
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">

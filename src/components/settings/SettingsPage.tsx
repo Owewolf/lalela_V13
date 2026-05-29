@@ -54,9 +54,10 @@ const TYPE_SCALE = {
   md: 11,
   body: 12,
   lg: 13,
-  xl: 14,
-  h2: 18,
-  h1: 20,
+  xl: 13,
+  h2: 17,
+  h0: 22,
+  h1: 19,
 };
 
 const FONT_WEIGHT = {
@@ -105,6 +106,9 @@ const LETTER_SPACING = {
 const LINE_HEIGHT = {
   compact: 17,
 };
+
+const AVATAR_SIZE = 84;
+const AVATAR_RADIUS = AVATAR_SIZE / 2;
 
 const SETTINGS_SHADOW_HERO = getCardShadow('hero');
 const SETTINGS_SHADOW_SOFT = getCardShadow('soft');
@@ -203,31 +207,35 @@ const SettingsPage: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* ── Profile Identity Card ── */}
-        <View style={{ ...SETTINGS_CARD_SURFACE, borderRadius: 34, padding: SPACE.s20, gap: SPACE.s20, ...SETTINGS_SHADOW_SOFT }}>
-          {/* Avatar + Name row (primary account entry point) */}
+        <View style={{ ...SETTINGS_CARD_SURFACE, position: 'relative', marginTop: SPACE.s32, borderRadius: 34, padding: SPACE.s14, paddingTop: 0, gap: SPACE.md, ...SETTINGS_SHADOW_SOFT }}>
+          {/* Avatar centered and overlapping the card edge */}
           <TouchableOpacity
             onPress={() => router.push('/security')}
             activeOpacity={0.85}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s16 }}
+            style={{ position: 'relative', alignItems: 'center', gap: SPACE.md }}
           >
-            <View style={{ position: 'relative' }}>
-              <View style={{ width: 92, height: 92, borderRadius: 46, overflow: 'hidden', borderWidth: 4, borderColor: ringColor }}>
+            <View style={{ position: 'absolute', top: -AVATAR_RADIUS, left: '50%', marginLeft: -AVATAR_RADIUS }}>
+              <View style={{ width: AVATAR_SIZE, height: AVATAR_SIZE, borderRadius: AVATAR_RADIUS, overflow: 'hidden', borderWidth: 4, borderColor: ringColor, backgroundColor: THEME_COLORS.surface }}>
                 <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
               </View>
             </View>
-            <View style={{ flex: 1 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
-                <Text style={{ fontSize: TYPE_SCALE.h1, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface, flex: 1 }} numberOfLines={1}>
+            <View style={{ alignItems: 'center', width: '100%', marginTop: SPACE.s48 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                <Text style={{ fontSize: TYPE_SCALE.h0, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }} numberOfLines={1}>
                   {userProfile?.name}
                 </Text>
               </View>
 
-              {/* Community + license badge */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: SPACE.xl, marginTop: SPACE.lg }}>
+              {/* Community name */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.xs, marginTop: SPACE.xs }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xs }}>
-                  <MapPin size={14} color={THEME_COLORS.neutralTextSubtle} />
-                  <Text style={{ fontSize: TYPE_SCALE.xl, color: THEME_COLORS.neutralTextDefault }}>{currentCommunity?.name}</Text>
+                  <MapPin size={12} color={THEME_COLORS.neutralTextSubtle} />
+                  <Text style={{ fontSize: TYPE_SCALE.h2, color: THEME_COLORS.neutralTextDefault }}>{currentCommunity?.name}</Text>
                 </View>
+              </View>
+
+              {/* License + role badges */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: SPACE.sm, marginTop: SPACE.md }}>
                 {(() => {
                   // Profile pill is binary: ACTIVE (paid) vs UNLICENSED (trial /
                   // expired / never-paid). The community-switcher row below shows
@@ -241,7 +249,7 @@ const SettingsPage: React.FC = () => {
                   return (
                     <View style={{
                       flexDirection: 'row', alignItems: 'center', gap: SPACE.xs,
-                      paddingHorizontal: SPACE.xl, paddingVertical: SPACE.xs, borderRadius: RADIUS.panel, borderWidth: 1,
+                      paddingHorizontal: SPACE.md, paddingVertical: 2, borderRadius: RADIUS.panel, borderWidth: 1,
                       backgroundColor: palette.bg,
                       borderColor: palette.border,
                     }}>
@@ -252,18 +260,14 @@ const SettingsPage: React.FC = () => {
                     </View>
                   );
                 })()}
-              </View>
-
-              {/* Role badges */}
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.lg, marginTop: SPACE.xl }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: 18, backgroundColor: rc.bg }}>
-                  <View style={{ width: SPACE.lg, height: SPACE.lg, borderRadius: RADIUS.sm, backgroundColor: rc.dot }} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: rc.bg }}>
+                  <View style={{ width: 9, height: 9, borderRadius: RADIUS.sm, backgroundColor: rc.dot }} />
                   <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: rc.text, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                     {currentCommunity?.userRole || 'MEMBER'}
                   </Text>
                 </View>
                 {currentCommunity?.isSecurityMember && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
                     <Shield size={11} color={THEME_COLORS.brandBlueText} />
                     <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.brandBlueText, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>Security Responder</Text>
                   </View>
@@ -273,7 +277,7 @@ const SettingsPage: React.FC = () => {
           </TouchableOpacity>
 
           {/* Community Switcher */}
-          <View style={{ borderTopWidth: 1, borderTopColor: THEME_COLORS.overlayBorderSoft, paddingTop: SPACE.s20, gap: SPACE.xxl }}>
+          <View style={{ borderTopWidth: 1, borderTopColor: THEME_COLORS.overlayBorderSoft, paddingTop: SPACE.xl, gap: SPACE.lg }}>
             <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
               Community Switcher
             </Text>
@@ -282,25 +286,24 @@ const SettingsPage: React.FC = () => {
               onPress={() => setShowCommunitySwitcher(!showCommunitySwitcher)}
               style={{
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-                padding: SPACE.s14, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1,
-                borderColor: showCommunitySwitcher ? THEME_COLORS.alias_rgba_22_163_74_0_3 : getCardBorderColor('default'),
+                padding: SPACE.s14, backgroundColor: THEME_COLORS.surface, borderRadius: 24, borderWidth: 1,
+                borderColor: getCardBorderColor('default'),
                 ...SETTINGS_SHADOW_SOFT,
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xxxl }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, flex: 1, minWidth: 0 }}>
                 <Image source={APP_LOGO_SELECTED} style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.xxl }} resizeMode="cover" />
-                <View>
-                  <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>Active Community</Text>
-                  <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface, marginTop: SPACE.xxs }}>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }} numberOfLines={1}>
                     {currentCommunity?.name || 'Select Community'}
                   </Text>
                 </View>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, marginLeft: SPACE.sm }}>
                 {currentCommunity && (
                   <TouchableOpacity
                     onPress={() => router.push('/admin')}
-                    style={{ paddingHorizontal: SPACE.s16, paddingVertical: SPACE.lg, backgroundColor: THEME_COLORS.primary, borderRadius: 18 }}
+                    style={{ paddingHorizontal: SPACE.s14, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.primary, borderRadius: 18 }}
                   >
                     <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                       Dashboard
@@ -328,29 +331,29 @@ const SettingsPage: React.FC = () => {
                         backgroundColor: isActive ? THEME_COLORS.successTintSofter : THEME_COLORS.surfaceContainerLow,
                       }}
                     >
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl, flex: 1 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl, flex: 1, minWidth: 0 }}>
                         <Image source={isActive ? APP_LOGO_SELECTED : APP_LOGO} style={{ width: SPACE.s32, height: SPACE.s32, borderRadius: RADIUS.xl }} resizeMode="cover" />
-                        <View>
-                          <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: isActive ? THEME_COLORS.primary : THEME_COLORS.onSurface }}>{c.name}</Text>
-                          <View style={{ flexDirection: 'row', gap: SPACE.lg, marginTop: SPACE.xxs }}>
-                            <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: isAdminOrMod ? THEME_COLORS.brandBlueText : THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
-                              {c.userRole || 'MEMBER'}
-                            </Text>
-                            {(() => {
-                              const active = isCommunityLicensed(c);
-                              const trial = isCommunityTrial(c);
-                              const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
-                              const color = active ? THEME_COLORS.successStrongAlt : trial ? THEME_COLORS.warning : THEME_COLORS.error;
-                              return (
-                                <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal, color }}>
-                                  {label}
-                                </Text>
-                              );
-                            })()}
-                          </View>
-                        </View>
+                        <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: isActive ? THEME_COLORS.primary : THEME_COLORS.onSurface, flex: 1 }} numberOfLines={1}>
+                          {c.name}
+                        </Text>
                       </View>
-                      {isActive && <CheckCircle2 size={18} color={THEME_COLORS.success} />}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, marginLeft: SPACE.md }}>
+                        <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: isAdminOrMod ? THEME_COLORS.brandBlueText : THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                          {c.userRole || 'MEMBER'}
+                        </Text>
+                        {(() => {
+                          const active = isCommunityLicensed(c);
+                          const trial = isCommunityTrial(c);
+                          const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
+                          const color = active ? THEME_COLORS.successStrongAlt : trial ? THEME_COLORS.warning : THEME_COLORS.error;
+                          return (
+                            <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal, color }}>
+                              {label}
+                            </Text>
+                          );
+                        })()}
+                        {isActive && <CheckCircle2 size={18} color={THEME_COLORS.success} />}
+                      </View>
                     </TouchableOpacity>
                   );
                 })}
@@ -361,67 +364,78 @@ const SettingsPage: React.FC = () => {
 
         {/* ── General Settings ── */}
         <View style={{ gap: SPACE.xs }}>
-          <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide, paddingHorizontal: SPACE.xs, paddingBottom: SPACE.lg }}>
+          <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide, paddingHorizontal: SPACE.xs, paddingBottom: SPACE.md }}>
             General Settings
           </Text>
 
-          {/* Notifications */}
-          <View style={{
-            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-            padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
-            ...SETTINGS_SHADOW_SOFT,
-          }}>
-            <TouchableOpacity
-              onPress={() => globalNotificationsEnabled && router.push('/notifications-settings')}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s14, flex: 1 }}
-            >
-              <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
-                <BellRing size={20} color={globalNotificationsEnabled ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft} />
-              </View>
-              <View>
-                <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.onSurface }}>Notifications</Text>
-                <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSoft }}>
-                  {globalNotificationsEnabled ? 'Tap to manage' : 'All non-emergency paused'}
+          <View style={{ flexDirection: canAccessModerationCenter ? 'row' : 'column', gap: SPACE.s14 }}>
+            {/* Notifications */}
+            <View style={{
+              flex: canAccessModerationCenter ? 1 : undefined,
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              padding: SPACE.s14,
+              minHeight: 100,
+              borderRadius: 24,
+              backgroundColor: THEME_COLORS.surface,
+              borderWidth: 1,
+              borderColor: getCardBorderColor('default'),
+              ...SETTINGS_SHADOW_SOFT,
+            }}>
+              <TouchableOpacity
+                onPress={() => globalNotificationsEnabled && router.push('/notifications-settings')}
+                activeOpacity={0.85}
+                style={{ flex: 1, minWidth: 0, justifyContent: 'space-between' }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
+                    <BellRing size={20} color={globalNotificationsEnabled ? THEME_COLORS.primary : THEME_COLORS.neutralTextSoft} />
+                  </View>
+                  <Switch
+                    value={globalNotificationsEnabled}
+                    onValueChange={handleNotificationToggle}
+                    trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
+                    thumbColor={THEME_COLORS.white}
+                  />
+                </View>
+                <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.onSurface, marginTop: SPACE.md }} numberOfLines={1}>
+                  Notifications
                 </Text>
-              </View>
-            </TouchableOpacity>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
-              <Switch
-                value={globalNotificationsEnabled}
-                onValueChange={handleNotificationToggle}
-                trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
-                thumbColor={THEME_COLORS.white}
-              />
-              {globalNotificationsEnabled && (
-                <TouchableOpacity onPress={() => router.push('/notifications-settings')}>
-                  <ChevronRight size={20} color={THEME_COLORS.neutralTextSoft} />
-                </TouchableOpacity>
-              )}
+              </TouchableOpacity>
             </View>
-          </View>
 
-          {/* Moderation Center (Admin only) */}
-          {canAccessModerationCenter && (
-            <TouchableOpacity
-              onPress={() => router.push({ pathname: '/admin', params: { view: 'moderation', tab: 'members' } })}
-              style={{
-                flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-                padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
-                ...SETTINGS_SHADOW_SOFT,
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s14 }}>
-                <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
-                  <Scale size={20} color={THEME_COLORS.primary} />
+            {/* Moderation Center (Admin only) */}
+            {canAccessModerationCenter && (
+              <TouchableOpacity
+                onPress={() => router.push({ pathname: '/admin', params: { view: 'moderation', tab: 'members' } })}
+                activeOpacity={0.85}
+                style={{
+                  flex: 1,
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  padding: SPACE.s14,
+                  minHeight: 100,
+                  borderRadius: 24,
+                  backgroundColor: THEME_COLORS.surface,
+                  borderWidth: 1,
+                  borderColor: getCardBorderColor('default'),
+                  ...SETTINGS_SHADOW_SOFT,
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.panel, backgroundColor: THEME_COLORS.surface, alignItems: 'center', justifyContent: 'center' }}>
+                    <Scale size={20} color={THEME_COLORS.primary} />
+                  </View>
+                  <View style={{ width: SPACE.s40, height: SPACE.s40, alignItems: 'center', justifyContent: 'center' }}>
+                    <ChevronRight size={20} color={THEME_COLORS.neutralTextSoft} />
+                  </View>
                 </View>
-                <View>
-                  <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.onSurface }}>Moderation Center</Text>
-                  <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSoft }}>Open member management and moderation controls</Text>
-                </View>
-              </View>
-              <ChevronRight size={20} color={THEME_COLORS.neutralTextSoft} />
-            </TouchableOpacity>
-          )}
+                  <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.semibold, color: THEME_COLORS.onSurface, marginTop: SPACE.md }} numberOfLines={1}>
+                    Moderation Center
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
         </View>
 
@@ -436,30 +450,25 @@ const SettingsPage: React.FC = () => {
 
         {/* ── Community License Card (Only for Trial) ── */}
         {currentCommunity?.type === 'TRIAL' && (currentCommunity.ownerId === userProfile?.id) && (
-          <View style={{ backgroundColor: THEME_COLORS.primaryContainer, borderRadius: RADIUS.hero, padding: SPACE.s20, gap: SPACE.s16, ...SETTINGS_SHADOW_HERO }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, flex: 1 }} numberOfLines={1}>
-                {currentCommunity?.name || 'Community'}
-              </Text>
-              <View style={{
-                flexDirection: 'row', alignItems: 'center', gap: SPACE.lg,
-                paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.lg, borderRadius: RADIUS.panel,
-                borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20,
-                backgroundColor: THEME_COLORS.alias_rgba_245_158_11_0_25,
-                marginLeft: SPACE.xxxl,
-              }}>
-                <View style={{ width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.md, backgroundColor: THEME_COLORS.warningBorderStrong }} />
-                <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
-                  Trial Mode
-                </Text>
-              </View>
-            </View>
-
-            <View style={{ backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_1, borderRadius: RADIUS.card, padding: SPACE.s16, borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20, gap: SPACE.xl, ...SETTINGS_SHADOW_SOFT }}>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.xxl }}>
-                <Sparkles size={18} color={THEME_COLORS.warningBorderStrong} />
+          <View style={{ backgroundColor: THEME_COLORS.primaryContainer, borderRadius: RADIUS.hero, padding: SPACE.s16, gap: SPACE.s14 }}>
+            <View style={{ backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_1, borderRadius: RADIUS.card, padding: SPACE.s14, borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20, gap: SPACE.lg }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.md }}>
+                <Sparkles size={18} color={THEME_COLORS.warningBorderStrong} style={{ marginTop: 1 }} />
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Unlock Full Potential</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.md, flexWrap: 'wrap' }}>
+                    <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Unlock Full Potential</Text>
+                    <View style={{
+                      flexDirection: 'row', alignItems: 'center', gap: SPACE.lg,
+                      paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.xs, borderRadius: RADIUS.panel,
+                      borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20,
+                      backgroundColor: THEME_COLORS.alias_rgba_245_158_11_0_25,
+                    }}>
+                      <View style={{ width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.md, backgroundColor: THEME_COLORS.warningBorderStrong }} />
+                      <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                        Trial
+                      </Text>
+                    </View>
+                  </View>
                   <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.whiteOverlay70, marginTop: SPACE.xs, lineHeight: LINE_HEIGHT.compact }}>
                     License your community to remove member limits, enable advanced moderation tools, and unlock all features.
                   </Text>

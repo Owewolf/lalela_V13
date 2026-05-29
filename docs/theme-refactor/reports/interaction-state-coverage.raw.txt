@@ -213,8 +213,8 @@ src/components/security/AccountSecurityPage.tsx:186:                activeOpacit
 src/components/security/DangerZoneSection.tsx:183:                disabled={isDeleting}
 src/components/security/LicensingSection.tsx:324:                  disabled={busyCommunityId === community.id}
 src/components/security/LicensingSection.tsx:385:            disabled={isDeletingAccount}
-src/components/security/ProfileSection.tsx:396:            disabled={isSaving}
-src/components/security/ProfileSection.tsx:403:            disabled={isSaving || isUploading || !hasUnsavedChanges}
+src/components/security/ProfileSection.tsx:504:            disabled={isSaving}
+src/components/security/ProfileSection.tsx:517:            disabled={isSaving || isUploading || !hasUnsavedChanges}
 src/components/security/SecuritySection.tsx:478:            disabled={emailLoading || !emailValid || (!hasPassword && (emailPasswordInput.length < 8 || emailPasswordInput !== emailPasswordConfirm))}
 src/components/security/SecuritySection.tsx:543:                disabled={phoneLoading || !isLinkedPhoneValid}
 src/components/security/SecuritySection.tsx:573:                disabled={phoneLoading || phoneOtp.length !== 6}
@@ -235,8 +235,10 @@ src/components/settings/ManageUserBusinesses.tsx:247:                  <Touchabl
 src/components/settings/ManageUserBusinesses.tsx:254:                  <TouchableOpacity onPress={() => handleDelete(business)} disabled={isBusy} style={{ width: SPACE.s50, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.errorTintSoft }}>
 src/components/settings/NotificationSettingsPage.tsx:265:                  disabled={!prefs.globalEnabled}
 src/components/settings/NotificationSettingsPage.tsx:302:                      disabled={!prefs.globalEnabled}
-src/components/settings/SettingsPage.tsx:210:            activeOpacity={0.85}
-src/components/settings/SettingsPage.tsx:500:            activeOpacity={0.7}
+src/components/settings/SettingsPage.tsx:214:            activeOpacity={0.85}
+src/components/settings/SettingsPage.tsx:387:                activeOpacity={0.85}
+src/components/settings/SettingsPage.tsx:411:                activeOpacity={0.85}
+src/components/settings/SettingsPage.tsx:509:            activeOpacity={0.7}
 src/components/shared/Header.tsx:149:            <TouchableOpacity style={styles.backBtn} onPress={handleBack} activeOpacity={0.7}>
 src/components/shared/Header.tsx:156:              activeOpacity={0.85}
 src/components/shared/Header.tsx:202:          <TouchableOpacity style={styles.bellBtn} onPress={onToggleNotifications} activeOpacity={0.7}>

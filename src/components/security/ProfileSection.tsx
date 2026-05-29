@@ -9,11 +9,12 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { User, CheckCircle2, Smartphone, Camera, Siren, ShieldCheck, Mail } from 'lucide-react-native';
+import { User, CheckCircle2, Camera, Siren, ShieldCheck } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
+import CardSurface from '../shared/CardSurface';
 import { LocationSettings } from './LocationSettings';
 import { THEME_COLORS } from '../../theme/colors';
 
@@ -84,7 +85,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
       const uri = result.assets[0].uri;
       setIsUploading(true);
       try {
-        // Store URI directly — upload logic can be added later
         setFormData((prev) => ({ ...prev, profileImage: uri }));
       } finally {
         setIsUploading(false);
@@ -114,7 +114,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
         profileImage: formData.profileImage,
         defaultLocation: formData.defaultLocation,
       });
-      // If the email was changed (or added), link it and trigger verification.
       const trimmedEmail = formData.email.trim().toLowerCase();
       const currentEmail = (userProfile?.email || '').trim().toLowerCase();
       let emailLinked = false;
@@ -125,8 +124,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
           setIsSaving(false);
           return;
         }
-        // Block email add/change when the account has no password yet —
-        // otherwise the user would never be able to log in with the email.
         if (userProfile?.hasPassword === false) {
           setStatus({
             type: 'error',
@@ -169,192 +166,308 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
     ? formData.profileImage
     : `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.id}`;
 
-  return (
-    <View
-      className="bg-surface-container-low rounded-3xl border shadow-sm p-6 gap-y-5"
-      style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
-    >
-      {/* Header */}
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center gap-3">
-          <View className="w-10 h-10 rounded-2xl bg-surface-container items-center justify-center">
-            <User size={22} color={THEME_COLORS.brandBlueText} />
-          </View>
-          <Text className="text-lg font-bold text-primary">Account Information</Text>
-        </View>
-      </View>
+  // ── Shared style tokens ────────────────────────────────────────────────────
+  const card: import('react-native').ViewStyle = {
+    backgroundColor: THEME_COLORS.surfaceContainer,
+    borderRadius: 24,
+    padding: 20,
+  };
 
+  const rowLabel: import('react-native').TextStyle = {
+    fontSize: 14,
+    fontWeight: '600',
+    color: THEME_COLORS.neutralTextSubtle,
+    width: 100,
+  };
+
+  const rowValue: import('react-native').TextStyle = {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME_COLORS.onSurface,
+    flex: 1,
+  };
+
+  const inlineInput: import('react-native').TextStyle = {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME_COLORS.onSurface,
+    flex: 1,
+    padding: 0,
+  };
+
+  const divider: import('react-native').ViewStyle = {
+    height: 1,
+    backgroundColor: THEME_COLORS.neutralBorderSoft,
+    marginVertical: 12,
+  };
+
+  return (
+    <View style={{ gap: 12 }}>
+      {/* Unsaved changes banner */}
       {isEditing && hasUnsavedChanges && (
-        <View className="flex-row items-center gap-2 rounded-2xl px-3 py-2 border" style={{ backgroundColor: THEME_COLORS.warningTintSoft, borderColor: THEME_COLORS.warningStrong }}>
-          <Text className="text-xs font-black uppercase tracking-widest" style={{ color: THEME_COLORS.warningStrong }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            borderRadius: 16,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderWidth: 1,
+            backgroundColor: THEME_COLORS.warningTintSoft,
+            borderColor: THEME_COLORS.warningStrong,
+          }}
+        >
+          <Text style={{ fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, color: THEME_COLORS.warningStrong }}>
             Reminder
           </Text>
-          <Text className="text-xs font-bold" style={{ color: THEME_COLORS.warningStrong }}>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: THEME_COLORS.warningStrong, flex: 1 }}>
             You have unsaved changes. Tap Save Changes.
           </Text>
         </View>
       )}
 
-      {/* Avatar + Name */}
-      <View className="flex-row items-center gap-5">
-        <View className="relative">
-          <View className="w-24 h-24 rounded-full overflow-hidden border-4 border-outline-variant">
+      {/* ── Avatar ───────────────────────────────────────────────────────── */}
+      <View style={{ alignItems: 'center', paddingVertical: 8 }}>
+        <View>
+          <View
+            style={{
+              width: 96,
+              height: 96,
+              borderRadius: 48,
+              overflow: 'hidden',
+              borderWidth: 3,
+              borderColor: THEME_COLORS.outlineVariant,
+            }}
+          >
             {isUploading ? (
-              <View className="w-full h-full bg-surface-container items-center justify-center">
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: THEME_COLORS.surfaceContainer }}>
                 <ActivityIndicator color={THEME_COLORS.primary} />
               </View>
             ) : (
-              <Image source={{ uri: avatarUri }} className="w-full h-full" resizeMode="cover" />
+              <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
             )}
           </View>
-          {isEditing && (
-            <TouchableOpacity
-              onPress={handleImagePick}
-              className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full items-center justify-center border-2"
-              style={{ borderColor: THEME_COLORS.surface }}
-            >
-              <Camera size={14} color={THEME_COLORS.white} />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <View className="flex-1 gap-y-2">
-          {isEditing ? (
-            <View className="gap-y-2">
-              <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Full Name</Text>
-              <TextInput
-                value={formData.name}
-                onChangeText={(v) => setFormData({ ...formData, name: v })}
-                className="bg-surface-container rounded-xl px-4 py-2 text-sm font-bold text-gray-900"
-                placeholder="Enter your name"
-              />
-            </View>
-          ) : (
-            <Text className="text-xl font-bold text-gray-900">{userProfile?.name}</Text>
-          )}
+          <TouchableOpacity
+            onPress={handleImagePick}
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              backgroundColor: THEME_COLORS.primary,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderWidth: 2,
+              borderColor: THEME_COLORS.surface,
+            }}
+          >
+            <Camera size={14} color={THEME_COLORS.white} />
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Phone + Address */}
-      <View className="gap-y-4">
-        <View className="gap-y-1">
-          <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Phone Number</Text>
+      {/* ── Card B: Account Information ──────────────────────────────────── */}
+      <View style={card}>
+        {/* Section header */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 14,
+              backgroundColor: THEME_COLORS.primaryTintSoft,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <User size={22} color={THEME_COLORS.primary} />
+          </View>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.primary }}>Account Information</Text>
+        </View>
+
+        {/* Full Name */}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={rowLabel}>Full Name</Text>
+          {isEditing ? (
+            <TextInput
+              value={formData.name}
+              onChangeText={(v) => setFormData({ ...formData, name: v })}
+              style={inlineInput}
+              placeholder="Enter your name"
+              placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
+            />
+          ) : (
+            <Text style={rowValue}>{userProfile?.name || 'Not set'}</Text>
+          )}
+        </View>
+
+        <View style={divider} />
+
+        {/* Phone */}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={rowLabel}>Phone</Text>
           {isEditing ? (
             <TextInput
               value={formData.phone}
               onChangeText={(v) => setFormData({ ...formData, phone: v })}
               keyboardType="phone-pad"
-              className="bg-surface-container rounded-xl px-4 py-2 text-sm text-gray-900"
+              style={inlineInput}
               placeholder="+27 82 123 4567"
+              placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
             />
           ) : (
-            <View className="flex-row items-center gap-2 p-3 bg-surface rounded-xl">
-              <Smartphone size={16} color={THEME_COLORS.neutralTextSubtle} />
-              <Text className="text-sm font-bold text-gray-900">{userProfile?.phone || 'Not set'}</Text>
-            </View>
+            <Text style={rowValue}>{userProfile?.phone || 'Not set'}</Text>
           )}
         </View>
 
-        <View className="gap-y-1">
-          <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Email Address</Text>
-          {isEditing ? (
-            <View className="gap-y-1">
-              <TextInput
-                value={formData.email}
-                onChangeText={(v) => setFormData({ ...formData, email: v })}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={userProfile?.hasPassword !== false}
-                className={`rounded-xl px-4 py-2 text-sm ${userProfile?.hasPassword === false ? 'bg-surface-container text-gray-400' : 'bg-surface-container text-gray-900'}`}
-                placeholder="you@example.com"
-              />
-              {userProfile?.hasPassword === false ? (
-                <View className="gap-y-1">
-                  <Text className="text-[10px] text-yellow-700 italic px-1">
-                    Set a password first so you can sign in with email.
+        <View style={divider} />
+
+        {/* Email */}
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+          <Text style={[rowLabel, { paddingTop: 2 }]}>Email</Text>
+          <View style={{ flex: 1 }}>
+            {isEditing ? (
+              <>
+                <TextInput
+                  value={formData.email}
+                  onChangeText={(v) => setFormData({ ...formData, email: v })}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  editable={userProfile?.hasPassword !== false}
+                  style={[inlineInput, { flex: undefined, opacity: userProfile?.hasPassword === false ? 0.5 : 1 }]}
+                  placeholder="you@example.com"
+                  placeholderTextColor={THEME_COLORS.neutralTextPlaceholder}
+                />
+                {userProfile?.hasPassword === false ? (
+                  <View style={{ gap: 4, marginTop: 4 }}>
+                    <Text style={{ fontSize: 10, color: THEME_COLORS.warningText, fontStyle: 'italic' }}>
+                      Set a password first so you can sign in with email.
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => router.push('/security?tab=security' as any)}
+                      style={{
+                        alignSelf: 'flex-start',
+                        backgroundColor: THEME_COLORS.surfaceContainer,
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: THEME_COLORS.brandBlue }}>
+                        Go to Login & Authentication
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : userProfile?.email && formData.email.trim().toLowerCase() !== userProfile.email.toLowerCase() ? (
+                  <Text style={{ fontSize: 10, color: THEME_COLORS.warningText, fontStyle: 'italic', marginTop: 4 }}>
+                    Changing your email will require re-verification.
                   </Text>
+                ) : !userProfile?.email ? (
+                  <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, fontStyle: 'italic', marginTop: 4 }}>
+                    Add an email so you can sign in with email + password.
+                  </Text>
+                ) : null}
+              </>
+            ) : (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text style={[rowValue, { flex: 1 }]} numberOfLines={1}>
+                  {userProfile?.email || 'Not set'}
+                </Text>
+                {userProfile?.email && userProfile?.emailVerified && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: THEME_COLORS.surfaceContainerLow, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>
+                    <CheckCircle2 size={10} color={THEME_COLORS.success} />
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.primary, textTransform: 'uppercase' }}>Verified</Text>
+                  </View>
+                )}
+                {userProfile?.email && !userProfile?.emailVerified && (
                   <TouchableOpacity
-                    onPress={() => router.push('/security?tab=security' as any)}
-                    className="self-start bg-surface-container px-3 py-1.5 rounded-lg"
+                    onPress={handleResendVerification}
+                    style={{ backgroundColor: THEME_COLORS.warningSurface, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}
                   >
-                    <Text className="text-[11px] font-bold text-blue-600">Go to Login & Authentication</Text>
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.warningText, textTransform: 'uppercase' }}>Resend</Text>
                   </TouchableOpacity>
-                </View>
-              ) : userProfile?.email && formData.email.trim().toLowerCase() !== userProfile.email.toLowerCase() ? (
-                <Text className="text-[10px] text-yellow-700 italic px-1">
-                  Changing your email will require re-verification.
-                </Text>
-              ) : !userProfile?.email ? (
-                <Text className="text-[10px] text-gray-400 italic px-1">
-                  Add an email so you can sign in with email + password.
-                </Text>
-              ) : null}
-            </View>
-          ) : (
-            <View className="flex-row items-center gap-2 p-3 bg-surface rounded-xl">
-              <Mail size={16} color={THEME_COLORS.neutralTextSubtle} />
-              <Text className="text-sm font-bold text-gray-900 flex-1" numberOfLines={1}>
-                {userProfile?.email || 'Not set'}
-              </Text>
-              {userProfile?.email && userProfile?.emailVerified && (
-                <View className="flex-row items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-full">
-                  <CheckCircle2 size={10} color={THEME_COLORS.success} />
-                  <Text className="text-[10px] font-bold text-primary uppercase">Verified</Text>
-                </View>
-              )}
-              {userProfile?.email && !userProfile?.emailVerified && (
-                <TouchableOpacity onPress={handleResendVerification} className="bg-yellow-50 px-2 py-0.5 rounded-full">
-                  <Text className="text-[10px] font-bold text-yellow-700 uppercase">Resend</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
+                )}
+              </View>
+            )}
+          </View>
         </View>
-
       </View>
 
-      {/* Emergency Responder */}
-      <View className="pt-4 border-t gap-y-3" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
-        <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 rounded-full items-center justify-center bg-red-50">
+      {/* ── Card C: Emergency Responder ──────────────────────────────────── */}
+      <View style={card}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: THEME_COLORS.errorTintSoft,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Siren size={18} color={THEME_COLORS.errorStrong} />
             </View>
-            <View>
-              <Text className="text-sm font-bold text-gray-900">Emergency Responder</Text>
-              <Text className="text-[10px] text-gray-500">Receive and respond to community alerts</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Emergency Responder</Text>
+              <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft }}>Receive and respond to community alerts</Text>
             </View>
           </View>
           <TouchableOpacity
             onPress={() => setShowResponderSelector(!showResponderSelector)}
-            className={`px-3 py-1.5 rounded-xl ${showResponderSelector ? 'bg-primary' : 'bg-surface-container'}`}
+            style={{
+              paddingHorizontal: 20,
+              paddingVertical: 10,
+              borderRadius: 10,
+              backgroundColor: showResponderSelector ? THEME_COLORS.primaryContainer : THEME_COLORS.primary,
+            }}
           >
-            <Text className={`text-[10px] font-black uppercase tracking-widest ${showResponderSelector ? 'text-white' : 'text-gray-500'}`}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.white, letterSpacing: 0.5, textTransform: 'uppercase' }}>
               Manage
             </Text>
           </TouchableOpacity>
         </View>
 
         {showResponderSelector && (
-          <View className="bg-surface rounded-2xl p-4 gap-y-2">
-            <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Select Communities</Text>
-            <Text className="text-[10px] text-gray-500 mb-2">
+          <View style={{ marginTop: 16, gap: 8, backgroundColor: THEME_COLORS.surface, borderRadius: 16, padding: 16 }}>
+            <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
+              Select Communities
+            </Text>
+            <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, marginBottom: 8 }}>
               Enabling a community makes your emergency location visible in that community during emergencies. Disable to hide your location and opt out there.
             </Text>
             {communities.map((community) => (
-              <View
+              <CardSurface
                 key={community.id}
-                className="flex-row items-center justify-between p-3 bg-surface-container-low rounded-xl border"
-                style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+                surfaceVariant="subtle"
+                borderVariant="default"
+                shadowVariant="none"
+                radius={12}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: 12,
+                }}
               >
-                <View className="flex-row items-center gap-3 flex-1">
-                  <View className="w-8 h-8 rounded-lg bg-surface-container-low items-center justify-center">
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+                  <CardSurface
+                    surfaceVariant="muted"
+                    borderVariant="none"
+                    shadowVariant="none"
+                    radius={8}
+                    style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}
+                  >
                     <ShieldCheck size={16} color={THEME_COLORS.primary} />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-sm font-bold text-gray-900">{community.name}</Text>
-                    <Text className="text-[10px] text-gray-500">
+                  </CardSurface>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>{community.name}</Text>
+                    <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>
                       {community.isSecurityMember
                         ? 'Emergency location visible for this community'
                         : 'Emergency location hidden for this community'}
@@ -367,57 +480,81 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
                   trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
                   thumbColor={THEME_COLORS.white}
                 />
-              </View>
+              </CardSurface>
             ))}
           </View>
         )}
       </View>
 
-      {/* Location Settings */}
-      <LocationSettings
-        isEditing={isEditing}
-        locationName={formData.defaultLocation.name}
-        latitude={formData.defaultLocation.latitude}
-        longitude={formData.defaultLocation.longitude}
-        onLocationChange={(loc) =>
-          setFormData((prev) => ({
-            ...prev,
-            address: loc.name,
-            defaultLocation: loc,
-          }))
-        }
-      />
+      {/* ── Card D: Default Location ─────────────────────────────────────── */}
+      <View style={card}>
+        <LocationSettings
+          isEditing={isEditing}
+          locationName={formData.defaultLocation.name}
+          latitude={formData.defaultLocation.latitude}
+          longitude={formData.defaultLocation.longitude}
+          onLocationChange={(loc) =>
+            setFormData((prev) => ({
+              ...prev,
+              address: loc.name,
+              defaultLocation: loc,
+            }))
+          }
+        />
+      </View>
 
-      {/* Save / Cancel bar */}
+      {/* ── Save / Cancel bar ────────────────────────────────────────────── */}
       {isEditing && (
-        <View className="pt-4 border-t flex-row gap-3" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
+        <View style={{ flexDirection: 'row', gap: 12 }}>
           <TouchableOpacity
             onPress={handleCancelEdit}
             disabled={isSaving}
-            className="flex-1 py-3 rounded-xl bg-surface-container items-center"
+            style={{
+              flex: 1,
+              paddingVertical: 14,
+              borderRadius: 12,
+              backgroundColor: THEME_COLORS.surfaceContainer,
+              alignItems: 'center',
+            }}
           >
-            <Text className="text-sm font-bold text-gray-700">Cancel</Text>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle }}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleUpdateProfile}
             disabled={isSaving || isUploading || !hasUnsavedChanges}
-            className="flex-1 py-3 rounded-xl bg-blue-600 items-center"
-            style={{ opacity: isSaving || isUploading || !hasUnsavedChanges ? 0.6 : 1 }}
+            style={{
+              flex: 1,
+              paddingVertical: 14,
+              borderRadius: 12,
+              backgroundColor: THEME_COLORS.primary,
+              alignItems: 'center',
+              opacity: isSaving || isUploading || !hasUnsavedChanges ? 0.6 : 1,
+            }}
           >
             {isSaving ? (
               <ActivityIndicator size="small" color={THEME_COLORS.white} />
             ) : (
-              <Text className="text-sm font-bold text-white">Save Changes</Text>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.white }}>Save Changes</Text>
             )}
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Status message */}
+      {/* ── Status message ───────────────────────────────────────────────── */}
       {status && (
-        <View className={`p-4 rounded-2xl flex-row items-center justify-center gap-2 ${status.type === 'success' ? 'bg-surface-container-low' : 'bg-red-50'}`}>
+        <View
+          style={{
+            padding: 16,
+            borderRadius: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            backgroundColor: status.type === 'success' ? THEME_COLORS.surfaceContainerLow : THEME_COLORS.errorSurface,
+          }}
+        >
           {status.type === 'success' && <CheckCircle2 size={16} color={THEME_COLORS.success} />}
-          <Text className={`text-sm font-bold ${status.type === 'success' ? 'text-primary' : 'text-red-600'}`}>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: status.type === 'success' ? THEME_COLORS.primary : THEME_COLORS.errorText }}>
             {status.message}
           </Text>
         </View>
