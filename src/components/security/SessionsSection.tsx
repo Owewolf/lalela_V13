@@ -94,7 +94,7 @@ export const SessionsSection: React.FC = () => {
   };
 
   return (
-    <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.xxl, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.xxl }}>
+    <View style={{ gap: SPACE.xxl }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
@@ -130,7 +130,7 @@ export const SessionsSection: React.FC = () => {
               <View
                 key={session.id}
                 style={{
-                  backgroundColor: THEME_COLORS.neutralBg,
+                  backgroundColor: THEME_COLORS.surface,
                   borderWidth: 1,
                   borderColor: THEME_COLORS.overlayBorderSoft,
                   borderRadius: RADIUS.xl,

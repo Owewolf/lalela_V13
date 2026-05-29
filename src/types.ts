@@ -453,6 +453,7 @@ export interface CommunityMember {
   email?: string;
   isSecurityMember?: boolean;
   locationSharingEnabled?: boolean;
+  emergencyLocationOptIn?: boolean;
   latitude?: number;
   longitude?: number;
 }
@@ -569,7 +570,13 @@ export interface CommunityContextType {
   searchUsers: (query: string) => Promise<UserProfile[]>;
   communityBusinesses: UserBusiness[];
   toggleEmergencyMode: (communityId: string, alertId?: string) => Promise<void>;
-  toggleCommunityResponder: (communityId: string, isResponder: boolean) => Promise<void>;
+  toggleCommunityResponder: (
+    communityId: string,
+    isResponder: boolean,
+    options?: { emergencyLocationOptIn?: boolean },
+  ) => Promise<void>;
+  shareSecurityLocation: (communityId: string, latitude: number, longitude: number) => Promise<void>;
+  clearSecurityLocation: (communityId: string) => Promise<void>;
   updateLiveLocation: (latitude: number, longitude: number) => Promise<void>;
   securityResponders: {
     userId: string;

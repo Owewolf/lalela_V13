@@ -5,16 +5,14 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Switch,
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { User, CheckCircle2, Camera, Siren, ShieldCheck } from 'lucide-react-native';
+import { User, CheckCircle2, Camera } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
-import { useCommunity } from '../../context/CommunityContext';
-import CardSurface from '../shared/CardSurface';
+import EmergencyResponderCard from '../shared/EmergencyResponderCard';
 import { LocationSettings } from './LocationSettings';
 import { THEME_COLORS } from '../../theme/colors';
 
@@ -25,11 +23,9 @@ interface ProfileSectionProps {
 export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = true }) => {
   const { userProfile, updateUserProfile, linkEmail, resendVerification } = useAuth();
   const router = useRouter();
-  const { communities, toggleCommunityResponder } = useCommunity();
   const [isEditing, setIsEditing] = useState(initialEdit);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [showResponderSelector, setShowResponderSelector] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const [formData, setFormData] = useState({
@@ -398,93 +394,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
       </View>
 
       {/* ── Card C: Emergency Responder ──────────────────────────────────── */}
-      <View style={card}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: THEME_COLORS.errorTintSoft,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Siren size={18} color={THEME_COLORS.errorStrong} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Emergency Responder</Text>
-              <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft }}>Receive and respond to community alerts</Text>
-            </View>
-          </View>
-          <TouchableOpacity
-            onPress={() => setShowResponderSelector(!showResponderSelector)}
-            style={{
-              paddingHorizontal: 20,
-              paddingVertical: 10,
-              borderRadius: 10,
-              backgroundColor: showResponderSelector ? THEME_COLORS.primaryContainer : THEME_COLORS.primary,
-            }}
-          >
-            <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.white, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-              Manage
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {showResponderSelector && (
-          <View style={{ marginTop: 16, gap: 8, backgroundColor: THEME_COLORS.surface, borderRadius: 16, padding: 16 }}>
-            <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
-              Select Communities
-            </Text>
-            <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, marginBottom: 8 }}>
-              Enabling a community makes your emergency location visible in that community during emergencies. Disable to hide your location and opt out there.
-            </Text>
-            {communities.map((community) => (
-              <CardSurface
-                key={community.id}
-                surfaceVariant="subtle"
-                borderVariant="default"
-                shadowVariant="none"
-                radius={12}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: 12,
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
-                  <CardSurface
-                    surfaceVariant="muted"
-                    borderVariant="none"
-                    shadowVariant="none"
-                    radius={8}
-                    style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <ShieldCheck size={16} color={THEME_COLORS.primary} />
-                  </CardSurface>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>{community.name}</Text>
-                    <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>
-                      {community.isSecurityMember
-                        ? 'Emergency location visible for this community'
-                        : 'Emergency location hidden for this community'}
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={!!community.isSecurityMember}
-                  onValueChange={(val) => toggleCommunityResponder(community.id, val)}
-                  trackColor={{ false: THEME_COLORS.neutralBorderMuted, true: THEME_COLORS.primary }}
-                  thumbColor={THEME_COLORS.white}
-                />
-              </CardSurface>
-            ))}
-          </View>
-        )}
-      </View>
+      <EmergencyResponderCard />
 
       {/* ── Card D: Default Location ─────────────────────────────────────── */}
       <View style={card}>

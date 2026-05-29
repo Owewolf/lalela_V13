@@ -58,6 +58,11 @@ export const LicensingSection: React.FC = () => {
   const [busyCommunityId, setBusyCommunityId] = useState<string | null>(null);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
+  const ownedActiveCommunities = (communities || []).filter(
+    (community) => community.ownerId === userProfile?.id && community.status === 'ACTIVE'
+  );
+  const canDeleteAccount = ownedActiveCommunities.length === 0;
+
   const now = new Date();
   const licenseStatus = userProfile?.licenseStatus ?? 'TRIAL';
   const trialExpiresAt = userProfile?.trialExpiresAt ? new Date(userProfile.trialExpiresAt) : null;
@@ -184,9 +189,9 @@ export const LicensingSection: React.FC = () => {
               setIsDeletingAccount(true);
               await deleteAccount();
             } catch (err: any) {
-              const code = err?.code;
-              const msg = code === 'auth/requires-recent-login'
-                ? 'Please sign out and sign back in before deleting your account.'
+              const serverCode = err?.response?.data?.code;
+              const msg = serverCode === 'OWNED_COMMUNITIES_EXIST'
+                ? 'Delete your owned active communities first before deleting your account.'
                 : 'Failed to delete account. Please try again.';
               Alert.alert('Delete failed', msg);
             } finally {
@@ -199,7 +204,7 @@ export const LicensingSection: React.FC = () => {
   };
 
   return (
-    <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s24, gap: SPACE.s20 }}>
+    <View style={{ gap: SPACE.s20 }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
@@ -216,7 +221,7 @@ export const LicensingSection: React.FC = () => {
       </View>
 
       {/* Membership status card */}
-      <View style={{ backgroundColor: THEME_COLORS.neutralBg, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+      <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
         <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>Platform Membership</Text>
         {isActive && (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
@@ -280,23 +285,54 @@ export const LicensingSection: React.FC = () => {
             const statusInfo = getCommunityStatus(community);
             const isOwner = community.ownerId === userProfile?.id;
             return (
-              <View key={community.id} style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl }}>
-                  <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.successTintSoft, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: PRIMARY }}>{community.name.charAt(0)}</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>{community.name}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, marginTop: SPACE.xs }}>
-                      <View style={{ paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, borderRadius: RADIUS.chip, backgroundColor: statusInfo.bg }}>
-                        <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: statusInfo.color, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
-                          {statusInfo.label}
+              <View key={community.id} style={{ backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: SPACE.xl }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xl, flex: 1 }}>
+                    <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.successTintSoft, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: PRIMARY }}>{community.name.charAt(0)}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>{community.name}</Text>
+                      <View style={{ marginTop: SPACE.xs }}>
+                        <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft }}>
+                          {community.userRole || 'Member'}
                         </Text>
                       </View>
-                      <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft }}>
-                        {community.userRole || 'Member'}
+                    </View>
+                  </View>
+
+                  <View style={{ alignItems: 'flex-end', gap: SPACE.md }}>
+                    <View style={{ paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, borderRadius: RADIUS.chip, backgroundColor: statusInfo.bg }}>
+                      <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: statusInfo.color, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                        {statusInfo.label}
                       </Text>
                     </View>
+
+                    <TouchableOpacity
+                      onPress={() => handleRemoveCommunity(community)}
+                      disabled={busyCommunityId === community.id}
+                      style={{
+                        backgroundColor: THEME_COLORS.surface,
+                        borderWidth: 1,
+                        borderColor: THEME_COLORS.alias_rgba_239_68_68_0_2,
+                        paddingHorizontal: SPACE.lg,
+                        paddingVertical: SPACE.sm,
+                        borderRadius: RADIUS.chip,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: SPACE.xs,
+                        opacity: busyCommunityId === community.id ? 0.7 : 1,
+                      }}
+                    >
+                      {busyCommunityId === community.id ? (
+                        <ActivityIndicator size="small" color={THEME_COLORS.errorStrong} />
+                      ) : (
+                        <Trash2 size={12} color={THEME_COLORS.errorStrong} />
+                      )}
+                      <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.errorStrong, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                        {community.ownerId === userProfile?.id ? 'Delete' : 'Leave'}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
                 {/* Activate CTA for TRIAL community owners */}
@@ -318,33 +354,6 @@ export const LicensingSection: React.FC = () => {
                     </Text>
                   </View>
                 )}
-
-                <TouchableOpacity
-                  onPress={() => handleRemoveCommunity(community)}
-                  disabled={busyCommunityId === community.id}
-                  style={{
-                    alignSelf: 'flex-start',
-                    backgroundColor: THEME_COLORS.surfaceContainerLow,
-                    borderWidth: 1,
-                    borderColor: THEME_COLORS.alias_rgba_239_68_68_0_2,
-                    paddingHorizontal: SPACE.lg,
-                    paddingVertical: SPACE.sm,
-                    borderRadius: RADIUS.chip,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: SPACE.xs,
-                    opacity: busyCommunityId === community.id ? 0.7 : 1,
-                  }}
-                >
-                  {busyCommunityId === community.id ? (
-                    <ActivityIndicator size="small" color={THEME_COLORS.errorStrong} />
-                  ) : (
-                    <Trash2 size={12} color={THEME_COLORS.errorStrong} />
-                  )}
-                  <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.errorStrong, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
-                    {community.ownerId === userProfile?.id ? 'Delete' : 'Leave'}
-                  </Text>
-                </TouchableOpacity>
               </View>
             );
           })}
@@ -356,7 +365,7 @@ export const LicensingSection: React.FC = () => {
           Account Management
         </Text>
 
-        <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+        <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
           <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Logout Account</Text>
           <TouchableOpacity
             onPress={signOut}
@@ -375,35 +384,37 @@ export const LicensingSection: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ backgroundColor: THEME_COLORS.errorStrong, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg }}>
-          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Delete Account Permanently</Text>
-          <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.whiteOverlay70, lineHeight: LINE_HEIGHT.compact }}>
-            Permanently delete your account and associated data. This action cannot be undone.
-          </Text>
-          <TouchableOpacity
-            onPress={handleDeleteAccount}
-            disabled={isDeletingAccount}
-            style={{
-              paddingVertical: SPACE.lg,
-              borderRadius: RADIUS.lg,
-              backgroundColor: THEME_COLORS.surfaceContainerLow,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: SPACE.sm,
-              opacity: isDeletingAccount ? 0.7 : 1,
-            }}
-          >
-            {isDeletingAccount ? (
-              <ActivityIndicator size="small" color={THEME_COLORS.white} />
-            ) : (
-              <Trash2 size={16} color={THEME_COLORS.white} />
-            )}
-            <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>
-              {isDeletingAccount ? 'Deleting…' : 'Delete Permanently'}
+        {canDeleteAccount && (
+          <View style={{ backgroundColor: THEME_COLORS.errorStrong, borderRadius: RADIUS.panel, padding: SPACE.xxl, gap: SPACE.lg }}>
+            <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Delete Account Permanently</Text>
+            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.whiteOverlay70, lineHeight: LINE_HEIGHT.compact }}>
+              Permanently delete your account and associated data. This action cannot be undone.
             </Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              onPress={handleDeleteAccount}
+              disabled={isDeletingAccount}
+              style={{
+                paddingVertical: SPACE.lg,
+                borderRadius: RADIUS.lg,
+                backgroundColor: THEME_COLORS.surfaceContainerLow,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: SPACE.sm,
+                opacity: isDeletingAccount ? 0.7 : 1,
+              }}
+            >
+              {isDeletingAccount ? (
+                <ActivityIndicator size="small" color={THEME_COLORS.white} />
+              ) : (
+                <Trash2 size={16} color={THEME_COLORS.white} />
+              )}
+              <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>
+                {isDeletingAccount ? 'Deleting…' : 'Delete Permanently'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );

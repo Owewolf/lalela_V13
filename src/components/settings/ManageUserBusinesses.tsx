@@ -134,17 +134,32 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
 
   return (
     <View style={{ gap: SPACE.xxl }}>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', paddingHorizontal: SPACE.xs, gap: SPACE.xl }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextSoft, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
+      <View style={{ paddingHorizontal: SPACE.xs, gap: SPACE.xxl }}>
+        <View style={{ alignItems: 'center', gap: SPACE.sm }}>
+          <Text style={{ fontSize: TYPE_SCALE.hero, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.onSurface, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
             My Businesses
           </Text>
-          <Text style={{ fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.sm }}>
+          <Text style={{ fontSize: TYPE_SCALE.lg, color: THEME_COLORS.neutralTextSubtle, textAlign: 'center', lineHeight: LINE_HEIGHT.body }}>
             Create and manage the business profiles attached to your communities.
           </Text>
         </View>
-        <TouchableOpacity onPress={openCreate} style={{ width: SPACE.s42, height: SPACE.s42, borderRadius: RADIUS.action, backgroundColor: THEME_COLORS.primary, alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: SPACE.xxs }}>
+
+        <TouchableOpacity
+          onPress={openCreate}
+          style={{
+            backgroundColor: THEME_COLORS.primary,
+            borderRadius: RADIUS.lg,
+            paddingVertical: SPACE.s16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: SPACE.lg,
+          }}
+        >
           <Plus size={20} color={THEME_COLORS.white} />
+          <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white }}>
+            Add new business
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -186,7 +201,7 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
             const isBusy = busyBusinessId === business.id;
 
             return (
-              <View key={business.id} style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s16, gap: SPACE.xxxl }}>
+              <View key={business.id} style={{ backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s16, gap: SPACE.xxxl }}>
                 <View style={{ flexDirection: 'row', gap: SPACE.xxxl }}>
                   <View style={{ width: SPACE.s78, height: SPACE.s78, borderRadius: RADIUS.xl, overflow: 'hidden', backgroundColor: THEME_COLORS.primaryTintSoft, alignItems: 'center', justifyContent: 'center' }}>
                     {business.image ? (
@@ -197,18 +212,18 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
                   </View>
 
                   <View style={{ flex: 1, gap: SPACE.lg }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: SPACE.xl }}>
+                    <View style={{ gap: SPACE.sm }}>
                       <View style={{ flex: 1 }}>
                         <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.onSurface }} numberOfLines={1}>
                           {business.name}
                         </Text>
+                        <View style={{ marginTop: SPACE.sm, alignSelf: 'flex-start', paddingHorizontal: SPACE.xl, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill, backgroundColor: isActive ? THEME_COLORS.alias_rgba_245_158_11_0_25 : THEME_COLORS.alias_rgba_107_114_128_0_12 }}>
+                          <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: isActive ? THEME_COLORS.aliasHex_713f12 : THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                            {isActive ? 'Active' : 'Inactive'}
+                          </Text>
+                        </View>
                         <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xs }}>
                           {business.category}
-                        </Text>
-                      </View>
-                      <View style={{ paddingHorizontal: SPACE.xl, paddingVertical: SPACE.sm, borderRadius: RADIUS.pill, backgroundColor: isActive ? THEME_COLORS.successTintSoftAlt : THEME_COLORS.alias_rgba_107_114_128_0_12 }}>
-                        <Text style={{ fontSize: TYPE_SCALE.xs, fontWeight: FONT_WEIGHT.extrabold, color: isActive ? THEME_COLORS.successStrongAlt : THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
-                          {isActive ? 'Active' : 'Inactive'}
                         </Text>
                       </View>
                     </View>
@@ -236,23 +251,26 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
                   </View>
                 ) : null}
 
-                <View style={{ flexDirection: 'row', gap: SPACE.xl }}>
-                  <TouchableOpacity onPress={() => openEdit(business)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg, paddingVertical: SPACE.xxl, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow }}>
+                <View style={{ borderTopWidth: 1, borderTopColor: THEME_COLORS.overlayBorderSoft, paddingTop: SPACE.xxl, flexDirection: 'row', justifyContent: 'space-between', gap: SPACE.xl }}>
+                  <TouchableOpacity onPress={() => openEdit(business)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg, paddingVertical: SPACE.xl, borderRadius: RADIUS.lg }}>
                     <Pencil size={16} color={THEME_COLORS.primary} />
                     <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                       Edit
                     </Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => handleToggleStatus(business)} disabled={isBusy} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg, paddingVertical: SPACE.xxl, borderRadius: RADIUS.lg, backgroundColor: isActive ? THEME_COLORS.alias_rgba_245_158_11_0_12 : THEME_COLORS.alias_rgba_16_185_129_0_12 }}>
+                  <TouchableOpacity onPress={() => handleToggleStatus(business)} disabled={isBusy} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg, paddingVertical: SPACE.xl, borderRadius: RADIUS.lg, opacity: isBusy ? 0.7 : 1 }}>
                     <Power size={16} color={isActive ? THEME_COLORS.warning : THEME_COLORS.successStrongAlt} />
                     <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: isActive ? THEME_COLORS.warning : THEME_COLORS.successStrongAlt, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
                       {isBusy ? 'Saving' : isActive ? 'Pause' : 'Activate'}
                     </Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => handleDelete(business)} disabled={isBusy} style={{ width: SPACE.s50, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.errorTintSoft }}>
+                  <TouchableOpacity onPress={() => handleDelete(business)} disabled={isBusy} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg, paddingVertical: SPACE.xl, borderRadius: RADIUS.lg, opacity: isBusy ? 0.7 : 1 }}>
                     <Trash2 size={16} color={THEME_COLORS.errorStrong} />
+                    <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.errorStrong, letterSpacing: LETTER_SPACING.normal }}>
+                      Delete
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>

@@ -449,15 +449,17 @@ router.get('/:id/members', async (req, res) => {
     latitude: user?.latitude ?? null,
     longitude: user?.longitude ?? null,
     isSecurityMember: m.isSecurityMember ?? false,
+    emergencyLocationOptIn: m.emergencyLocationOptIn ?? false,
     locationSharingEnabled: user?.locationSharing ?? false,
   })));
 });
 
 router.put('/:id/members/:userId', async (req, res) => {
-  const { role, status, isSecurityMember } = req.body as {
+  const { role, status, isSecurityMember, emergencyLocationOptIn } = req.body as {
     role?: string;
     status?: string;
     isSecurityMember?: boolean;
+    emergencyLocationOptIn?: boolean;
   };
 
   const isSelfUpdate = req.auth!.userId === req.params.userId;
@@ -472,16 +474,88 @@ router.put('/:id/members/:userId', async (req, res) => {
     ...(role ? { role: role as never } : {}),
     ...(status ? { status: status as never } : {}),
     ...(typeof isSecurityMember === 'boolean' ? { isSecurityMember } : {}),
+    ...(typeof emergencyLocationOptIn === 'boolean' ? { emergencyLocationOptIn } : {}),
   };
   if (Object.keys(data).length === 0) {
     return res.status(400).json({ error: 'No valid fields provided' });
   }
 
-  const member = await prisma.communityMember.update({
-    where: { communityId_userId: { communityId: req.params.id, userId: req.params.userId } },
-    data,
+  const isResponderOnlyUpdate = !role
+    && !status
+    && (typeof isSecurityMember === 'boolean' || typeof emergencyLocationOptIn === 'boolean');
+
+  try {
+    if (isSelfUpdate && isResponderOnlyUpdate) {
+      const user = await prisma.user.findUnique({
+        where: { id: req.params.userId },
+        select: { name: true, profileImage: true, email: true },
+      });
+
+      const member = await prisma.communityMember.upsert({
+        where: { communityId_userId: { communityId: req.params.id, userId: req.params.userId } },
+        update: data,
+        create: {
+          communityId: req.params.id,
+          userId: req.params.userId,
+          isSecurityMember: typeof isSecurityMember === 'boolean' ? isSecurityMember : false,
+          emergencyLocationOptIn: typeof emergencyLocationOptIn === 'boolean' ? emergencyLocationOptIn : false,
+          name: user?.name ?? null,
+          image: user?.profileImage ?? null,
+          email: user?.email ?? null,
+        },
+      });
+      return res.json(member);
+    }
+
+    const member = await prisma.communityMember.update({
+      where: { communityId_userId: { communityId: req.params.id, userId: req.params.userId } },
+      data,
+    });
+    return res.json(member);
+  } catch (error: any) {
+    if (error?.code === 'P2025') {
+      return res.status(404).json({ error: 'Member not found in this community' });
+    }
+    return res.status(500).json({ error: error?.message || 'Failed to update member' });
+  }
+});
+
+router.put('/:id/me/responder', async (req, res) => {
+  const { isSecurityMember, emergencyLocationOptIn } = req.body as {
+    isSecurityMember?: boolean;
+    emergencyLocationOptIn?: boolean;
+  };
+
+  const data: Record<string, unknown> = {
+    ...(typeof isSecurityMember === 'boolean' ? { isSecurityMember } : {}),
+    ...(typeof emergencyLocationOptIn === 'boolean' ? { emergencyLocationOptIn } : {}),
+  };
+
+  if (Object.keys(data).length === 0) {
+    return res.status(400).json({ error: 'No valid responder fields provided' });
+  }
+
+  const userId = req.auth!.userId;
+  const communityId = req.params.id;
+
+  const existing = await prisma.communityMember.findUnique({
+    where: { communityId_userId: { communityId, userId } },
+    select: { communityId: true },
   });
-  return res.json(member);
+
+  if (!existing) {
+    return res.status(403).json({ error: 'You are not a member of this community' });
+  }
+
+  try {
+    const member = await prisma.communityMember.update({
+      where: { communityId_userId: { communityId, userId } },
+      data,
+    });
+    return res.json(member);
+  } catch (error: any) {
+    return res.status(500).json({ error: error?.message || 'Failed to update responder settings' });
+  }
 });
 
 router.delete('/:id/members/:userId', async (req, res) => {
@@ -1236,28 +1310,54 @@ router.delete('/:id/posts/:postId', async (req, res) => {
 // ─── Member locations ─────────────────────────────────────────────────────────
 
 router.put('/:id/location', async (req, res) => {
-  const { latitude, longitude, isSecurity } = req.body as { latitude: number; longitude: number; isSecurity?: boolean };
-  if (!latitude || !longitude) return res.status(400).json({ error: 'latitude and longitude are required' });
+  const { latitude, longitude, isSecurity } = req.body as { latitude?: number | string; longitude?: number | string; isSecurity?: boolean | string };
+  const parsedLatitude = Number(latitude);
+  const parsedLongitude = Number(longitude);
+  if (!Number.isFinite(parsedLatitude) || !Number.isFinite(parsedLongitude)) {
+    return res.status(400).json({ error: 'latitude and longitude are required' });
+  }
+  const isSecurityMode = isSecurity === true || isSecurity === 'true';
 
   const user = await prisma.user.findUnique({ where: { id: req.auth!.userId }, select: { name: true, profileImage: true } });
 
   const member = await prisma.communityMember.findFirst({ where: { communityId: req.params.id, userId: req.auth!.userId } });
 
-  if (isSecurity) {
+  if (isSecurityMode) {
     await prisma.securityLocation.upsert({
       where: { communityId_userId: { communityId: req.params.id, userId: req.auth!.userId } },
-      create: { communityId: req.params.id, userId: req.auth!.userId, latitude, longitude, name: user?.name, image: user?.profileImage },
-      update: { latitude, longitude, timestamp: new Date() },
+      create: { communityId: req.params.id, userId: req.auth!.userId, latitude: parsedLatitude, longitude: parsedLongitude, name: user?.name, image: user?.profileImage },
+      update: { latitude: parsedLatitude, longitude: parsedLongitude, timestamp: new Date() },
     });
   } else {
     await prisma.memberLocation.upsert({
       where: { communityId_userId: { communityId: req.params.id, userId: req.auth!.userId } },
-      create: { communityId: req.params.id, userId: req.auth!.userId, latitude, longitude, name: user?.name, image: user?.profileImage, role: member?.role ?? 'Member' },
-      update: { latitude, longitude, timestamp: new Date() },
+      create: { communityId: req.params.id, userId: req.auth!.userId, latitude: parsedLatitude, longitude: parsedLongitude, name: user?.name, image: user?.profileImage, role: member?.role ?? 'Member' },
+      update: { latitude: parsedLatitude, longitude: parsedLongitude, timestamp: new Date() },
     });
   }
 
   return res.json({ message: 'Location updated' });
+});
+
+router.delete('/:id/location', async (req, res) => {
+  const bodyFlag = (req.body as { isSecurity?: boolean | string } | undefined)?.isSecurity;
+  const queryFlag = (req.query as { isSecurity?: string | string[] }).isSecurity;
+  const isSecurity = bodyFlag === true
+    || bodyFlag === 'true'
+    || queryFlag === 'true'
+    || (Array.isArray(queryFlag) && queryFlag.includes('true'));
+
+  if (isSecurity) {
+    await prisma.securityLocation.deleteMany({
+      where: { communityId: req.params.id, userId: req.auth!.userId },
+    });
+  } else {
+    await prisma.memberLocation.deleteMany({
+      where: { communityId: req.params.id, userId: req.auth!.userId },
+    });
+  }
+
+  return res.json({ message: 'Location cleared' });
 });
 
 router.get('/:id/locations', async (req, res) => {

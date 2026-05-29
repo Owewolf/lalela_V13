@@ -32,6 +32,23 @@ import { NotificationPreferences } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 
+type NotificationTypeKey =
+  | 'generalNotices'
+  | 'listingUpdates'
+  | 'communityActivity'
+  | 'businessActivity'
+  | 'charitySuggestions'
+  | 'securityAlerts';
+
+const NOTIFICATION_TYPE_KEYS: NotificationTypeKey[] = [
+  'generalNotices',
+  'listingUpdates',
+  'communityActivity',
+  'businessActivity',
+  'charitySuggestions',
+  'securityAlerts',
+];
+
 const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
   globalEnabled: true,
   generalNotices: true,
@@ -139,30 +156,59 @@ const SettingsPage: React.FC = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newCommunityName, setNewCommunityName] = useState('');
 
-  // Sync notification toggle with userProfile changes
+  const getMergedNotificationPreferences = (): NotificationPreferences => ({
+    ...DEFAULT_NOTIFICATION_PREFERENCES,
+    ...((userProfile as any)?.notificationPreferences ?? {}),
+  });
+
+  const getSelectedCommunityAnyNotificationsEnabled = (basePrefs: NotificationPreferences): boolean => {
+    const selectedCommunityId = currentCommunity?.id;
+    const selectedOverride = selectedCommunityId
+      ? (basePrefs.communityOverrides?.[selectedCommunityId] ?? {})
+      : {};
+
+    return NOTIFICATION_TYPE_KEYS.some((key) => (selectedOverride as any)[key] ?? (basePrefs as any)[key]);
+  };
+
+  // Sync toggle with selected community notification state
   useEffect(() => {
-    const enabled = (userProfile as any)?.notificationPreferences?.globalEnabled ?? true;
+    const enabled = getSelectedCommunityAnyNotificationsEnabled(getMergedNotificationPreferences());
     setGlobalNotificationsEnabled(enabled);
-  }, [(userProfile as any)?.notificationPreferences?.globalEnabled]);
+  }, [(userProfile as any)?.notificationPreferences, currentCommunity?.id]);
 
   const handleNotificationToggle = async (val: boolean) => {
+    const selectedCommunityId = currentCommunity?.id;
+    if (!selectedCommunityId) return;
+
+    const currentPrefs = getMergedNotificationPreferences();
+    const previousValue = getSelectedCommunityAnyNotificationsEnabled(currentPrefs);
     setGlobalNotificationsEnabled(val);
-    const currentPrefs: NotificationPreferences = {
-      ...DEFAULT_NOTIFICATION_PREFERENCES,
-      ...((userProfile as any)?.notificationPreferences ?? {}),
-    };
+
+    const nextOverride: Record<string, boolean> = {};
+    NOTIFICATION_TYPE_KEYS.forEach((key) => {
+      if ((currentPrefs as any)[key] !== val) {
+        nextOverride[key] = val;
+      }
+    });
+
+    const updatedOverrides = { ...(currentPrefs.communityOverrides ?? {}) };
+    if (Object.keys(nextOverride).length === 0) {
+      delete updatedOverrides[selectedCommunityId];
+    } else {
+      updatedOverrides[selectedCommunityId] = nextOverride;
+    }
 
     try {
       await updateNotificationPreferences({
         ...currentPrefs,
-        globalEnabled: val,
+        communityOverrides: updatedOverrides,
       });
       await refreshProfile();
       if (val) {
         router.push('/notifications-settings');
       }
     } catch {
-      setGlobalNotificationsEnabled(currentPrefs.globalEnabled);
+      setGlobalNotificationsEnabled(previousValue);
     }
   };
 
@@ -383,7 +429,7 @@ const SettingsPage: React.FC = () => {
               ...SETTINGS_SHADOW_SOFT,
             }}>
               <TouchableOpacity
-                onPress={() => globalNotificationsEnabled && router.push('/notifications-settings')}
+                onPress={() => currentCommunity?.id && router.push('/notifications-settings')}
                 activeOpacity={0.85}
                 style={{ flex: 1, minWidth: 0, justifyContent: 'space-between' }}
               >
@@ -491,26 +537,41 @@ const SettingsPage: React.FC = () => {
             one trial per owner). Server enforces this via TRIAL_EXISTS as
             the backstop. */}
         {canCreateNewCommunity && (
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: SPACE.s16,
-              borderRadius: RADIUS.card,
-              borderWidth: 1,
-              borderColor: THEME_COLORS.success,
-              borderStyle: 'dashed',
-              backgroundColor: THEME_COLORS.alias_rgba_16_185_129_0_05,
-              gap: SPACE.xl,
-              ...SETTINGS_SHADOW_SOFT,
-            }}
-            onPress={() => router.push('/onboarding-create')}
-            activeOpacity={0.7}
-          >
-            <Plus size={20} color={THEME_COLORS.success} />
-            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.success }}>Create New Community</Text>
-          </TouchableOpacity>
+          <View style={{ backgroundColor: THEME_COLORS.primaryContainer, borderRadius: RADIUS.hero, padding: SPACE.s16, gap: SPACE.s14, ...SETTINGS_SHADOW_SOFT }}>
+            <View style={{ backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_1, borderRadius: RADIUS.card, padding: SPACE.s14, borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20, gap: SPACE.lg }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.md }}>
+                <Plus size={18} color={THEME_COLORS.success} style={{ marginTop: 1 }} />
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.md, flexWrap: 'wrap' }}>
+                    <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.white }}>Create New Community</Text>
+                    <View style={{
+                      flexDirection: 'row', alignItems: 'center', gap: SPACE.lg,
+                      paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.xs, borderRadius: RADIUS.panel,
+                      borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20,
+                      backgroundColor: THEME_COLORS.successTintSoft,
+                    }}>
+                      <View style={{ width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.md, backgroundColor: THEME_COLORS.success }} />
+                      <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                        Ready
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.whiteOverlay70, marginTop: SPACE.xs, lineHeight: LINE_HEIGHT.compact }}>
+                    Start a new community space with its own members, moderation, and activity feed in minutes.
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={() => router.push('/onboarding-create')}
+                activeOpacity={0.8}
+                style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, paddingVertical: SPACE.xxxl, borderRadius: RADIUS.s14, alignItems: 'center' }}
+              >
+                <Text style={{ fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primaryContainer, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                  Create Community
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
 
       </ScrollView>

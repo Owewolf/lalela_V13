@@ -288,15 +288,26 @@ export const SecuritySection: React.FC = () => {
   };
 
   const authItemCardStyle = {
-    backgroundColor: THEME_COLORS.neutralBg,
+    backgroundColor: THEME_COLORS.surface,
     borderRadius: RADIUS.xl,
-    padding: SPACE.lg,
+    padding: SPACE.xl,
     borderWidth: 1,
     borderColor: THEME_COLORS.overlayBorderSoft,
   } as const;
 
+  const authTitleStyle = {
+    fontSize: TYPE_SCALE.xxl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: THEME_COLORS.onSurface,
+  } as const;
+
+  const authMetaStyle = {
+    fontSize: TYPE_SCALE.xl,
+    color: THEME_COLORS.neutralTextSoft,
+  } as const;
+
   return (
-    <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: RADIUS.card, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.xxl, gap: SPACE.xl }}>
+    <View style={{ gap: SPACE.lg }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
         <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>
@@ -307,22 +318,20 @@ export const SecuritySection: React.FC = () => {
 
       {/* Password Card */}
       <View style={[authItemCardStyle, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
-          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
-            <Key size={22} color={THEME_COLORS.primary} />
+        <View style={{ flex: 1, marginRight: SPACE.md, gap: SPACE.xs }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm }}>
+            <Key size={24} color={THEME_COLORS.primary} />
+            <Text style={authTitleStyle}>Password</Text>
           </View>
-          <View>
-            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Password</Text>
-            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft }}>
-              {hasPassword ? `Last changed: ${lastChangedText()}` : 'Not set — add one to log in with email'}
-            </Text>
-          </View>
+          <Text style={authMetaStyle}>
+            {hasPassword ? `Last changed: ${lastChangedText()}` : 'Not set — add one to log in with email'}
+          </Text>
         </View>
         <TouchableOpacity
           onPress={() => setShowPasswordForm(!showPasswordForm)}
-          style={{ paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: RADIUS.md }}
+          style={{ minWidth: 112, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.md, alignItems: 'center' }}
         >
-          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
             {showPasswordForm ? 'Cancel' : hasPassword ? 'Change' : 'Set'}
           </Text>
         </TouchableOpacity>
@@ -389,27 +398,25 @@ export const SecuritySection: React.FC = () => {
 
       {/* Email Address Card */}
       <View style={[authItemCardStyle, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, flex: 1 }}>
-          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
-            <Mail size={22} color={THEME_COLORS.primary} />
+        <View style={{ flex: 1, marginRight: SPACE.md, gap: SPACE.xs }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm }}>
+            <Mail size={24} color={THEME_COLORS.primary} />
+            <Text style={authTitleStyle}>Email Address</Text>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Email Address</Text>
-            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft }}>
-              {userProfile?.email
-                ? `${userProfile.email}${userProfile.emailVerified ? '  • Verified' : '  • Unverified'}`
-                : 'Add an email to log in with email + password'}
-            </Text>
-          </View>
+          <Text style={authMetaStyle}>
+            {userProfile?.email
+              ? `${userProfile.email}${userProfile.emailVerified ? '  • Verified' : '  • Unverified'}`
+              : 'Add an email to log in with email + password'}
+          </Text>
         </View>
         <TouchableOpacity
           onPress={() => {
             setShowEmailLink((v) => !v);
             setEmailInput('');
           }}
-          style={{ paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: RADIUS.md }}
+          style={{ minWidth: 112, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.md, alignItems: 'center' }}
         >
-          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
             {showEmailLink ? 'Cancel' : userProfile?.email ? 'Change' : 'Link'}
           </Text>
         </TouchableOpacity>
@@ -495,18 +502,16 @@ export const SecuritySection: React.FC = () => {
 
       {/* Phone Number Card */}
       <View style={[authItemCardStyle, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md, flex: 1 }}>
-          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
-            <Phone size={22} color={THEME_COLORS.primary} />
+        <View style={{ flex: 1, marginRight: SPACE.md, gap: SPACE.xs }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm }}>
+            <Phone size={24} color={THEME_COLORS.primary} />
+            <Text style={authTitleStyle}>Phone Number</Text>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Phone Number</Text>
-            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft }}>
-              {userProfile?.phone
-                ? `${userProfile.phone}${userProfile.phoneVerified ? '  • Verified' : ''}`
-                : 'Add a phone number to log in via SMS'}
-            </Text>
-          </View>
+          <Text style={authMetaStyle}>
+            {userProfile?.phone
+              ? `${userProfile.phone}${userProfile.phoneVerified ? '  • Verified' : ''}`
+              : 'Add a phone number to log in via SMS'}
+          </Text>
         </View>
         <TouchableOpacity
           onPress={() => {
@@ -514,9 +519,9 @@ export const SecuritySection: React.FC = () => {
             setPhoneOtpSent(false);
             setPhoneOtp('');
           }}
-          style={{ paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.successTintSofterAlt, borderRadius: RADIUS.md }}
+          style={{ minWidth: 112, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.md, alignItems: 'center' }}
         >
-          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.primary, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
+          <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: SPACE.xxs }}>
             {showPhoneLink ? 'Cancel' : userProfile?.phone ? 'Change' : 'Link'}
           </Text>
         </TouchableOpacity>
@@ -590,21 +595,19 @@ export const SecuritySection: React.FC = () => {
 
       {/* 2FA Card */}
       <View style={[authItemCardStyle, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
-          <View style={{ width: SPACE.s44, height: SPACE.s44, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' }}>
-            <Smartphone size={22} color={THEME_COLORS.brandBlueText} />
+        <View style={{ flex: 1, marginRight: SPACE.md, gap: SPACE.xs }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm }}>
+            <Smartphone size={24} color={THEME_COLORS.primary} />
+            <Text style={authTitleStyle}>Two-Factor Authentication</Text>
           </View>
-          <View>
-            <Text style={{ fontSize: TYPE_SCALE.xl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.onSurface }}>Two-Factor Authentication</Text>
-            <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSoft }}>Add an extra layer of security</Text>
-          </View>
+          <Text style={authMetaStyle}>Add an extra layer of security</Text>
         </View>
         <TouchableOpacity
           onPress={handleToggle2FA}
           disabled={loading2FA}
           style={{
             width: SPACE.s52, height: TYPE_SCALE.otpLarge, borderRadius: RADIUS.pill,
-            backgroundColor: userProfile?.twoFactorEnabled ? THEME_COLORS.success : THEME_COLORS.neutralBorderMuted,
+            backgroundColor: userProfile?.twoFactorEnabled ? THEME_COLORS.primary : THEME_COLORS.primaryContainer,
             justifyContent: 'center',
             opacity: loading2FA ? 0.5 : 1,
           }}
@@ -613,7 +616,7 @@ export const SecuritySection: React.FC = () => {
             <ActivityIndicator size="small" color={THEME_COLORS.white} style={{ alignSelf: 'center' }} />
           ) : (
             <View style={{
-              width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.surfaceContainerLow,
+              width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.white,
               position: 'absolute',
               left: userProfile?.twoFactorEnabled ? undefined : SPACE.xxs,
               right: userProfile?.twoFactorEnabled ? SPACE.xxs : undefined,

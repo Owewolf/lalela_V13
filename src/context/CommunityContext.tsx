@@ -658,8 +658,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     await api.put(`/communities/${communityId}`, { emergency_mode: true });
   }, []);
 
-  const toggleCommunityResponder = useCallback(async (communityId: string, isResponder: boolean) => {
-    if (!userId) return;
+  const toggleCommunityResponder = useCallback(async (communityId: string, isResponder: boolean, options?: { emergencyLocationOptIn?: boolean }) => {
     let previousResponder: boolean | undefined;
     setCommunities((prev) => prev.map((community) => (
       community.id === communityId
@@ -670,7 +669,15 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         : community
     )));
     try {
-      await api.put(`/communities/${communityId}/members/${userId}`, { isSecurityMember: isResponder });
+      await api.put(`/communities/${communityId}/me/responder`, {
+        isSecurityMember: isResponder,
+        ...(typeof options?.emergencyLocationOptIn === 'boolean' ? { emergencyLocationOptIn: options.emergencyLocationOptIn } : {}),
+      });
+      if (communityId === activeCommunityId) {
+        await bundleQuery.refetch();
+      } else {
+        await queryClient.invalidateQueries({ queryKey: queryKeys.communityBundle(communityId) });
+      }
     } catch (error) {
       setCommunities((prev) => prev.map((community) => (
         community.id === communityId
@@ -679,7 +686,26 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       )));
       throw error;
     }
-  }, [userId]);
+  }, [activeCommunityId, bundleQuery]);
+
+  const shareSecurityLocation = useCallback(async (communityId: string, latitude: number, longitude: number) => {
+    socketRef.current?.emit('location:update', { communityId, latitude, longitude, isSecurity: true });
+    await api.put(`/communities/${communityId}/location`, { latitude, longitude, isSecurity: true });
+    if (communityId === activeCommunityId) {
+      await bundleQuery.refetch();
+    } else {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.communityBundle(communityId) });
+    }
+  }, [activeCommunityId, bundleQuery]);
+
+  const clearSecurityLocation = useCallback(async (communityId: string) => {
+    await api.delete(`/communities/${communityId}/location`, { data: { isSecurity: true } });
+    if (communityId === activeCommunityId) {
+      await bundleQuery.refetch();
+    } else {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.communityBundle(communityId) });
+    }
+  }, [activeCommunityId, bundleQuery]);
 
   const updateLiveLocation = useCallback(async (latitude: number, longitude: number) => {
     if (!currentCommunityId) return;
@@ -838,6 +864,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         communityBusinesses,
         toggleEmergencyMode,
         toggleCommunityResponder,
+        shareSecurityLocation,
+        clearSecurityLocation,
         updateLiveLocation,
         securityResponders,
         conversations,

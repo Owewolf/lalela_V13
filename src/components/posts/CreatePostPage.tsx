@@ -194,6 +194,15 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const charityPercentage = Math.max(activeCharity?.percentage || 0, CAT_MIN_PERCENTAGE);
   const numericPrice = parseFloat(price) || 0;
   const numericQuantity = Math.max(1, parseInt(initialQuantity || '1', 10) || 1);
+  const handleQuantityInput = (rawValue: string) => {
+    const digitsOnly = rawValue.replace(/\D/g, '');
+    if (!digitsOnly) {
+      setInitialQuantity('');
+      return;
+    }
+    const nextQuantity = Math.max(1, parseInt(digitsOnly, 10) || 1);
+    setInitialQuantity(String(nextQuantity));
+  };
   const charityAmount = Math.round(((numericPrice * charityPercentage) / 100) * 100) / 100;
   const publicPrice = Math.round((numericPrice + charityAmount) * 100) / 100;
   const locationDefaults = useMemo(
@@ -691,26 +700,26 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     <View className="flex-1 gap-1">
                       <Text className="text-xs font-bold uppercase tracking-wide text-gray-600 ml-1">Quantity</Text>
                       <View
-                        className="h-12 rounded-2xl border px-2 flex-row items-center justify-between"
+                        className="h-12 rounded-2xl border px-2 flex-row items-center gap-2"
                         style={{
                           backgroundColor: getCardSurfaceColor('default'),
                           borderColor: getCardBorderColor('default'),
                         }}
                       >
-                        <TouchableOpacity
-                          onPress={() => setInitialQuantity(String(Math.max(1, numericQuantity - 1)))}
-                          className="w-8 h-8 rounded-full items-center justify-center"
-                          style={{ backgroundColor: THEME_COLORS.neutralBg }}
-                        >
-                          <Text className="text-lg font-bold" style={{ color: THEME_COLORS.primary }}>-</Text>
-                        </TouchableOpacity>
-                        <Text className="text-base font-bold text-gray-800">{numericQuantity}</Text>
+                        <TextInput
+                          value={initialQuantity}
+                          onChangeText={handleQuantityInput}
+                          keyboardType="number-pad"
+                          className="flex-1 text-center text-base font-bold text-gray-800"
+                          maxLength={4}
+                          selectionColor={THEME_COLORS.primary}
+                        />
                         <TouchableOpacity
                           onPress={() => setInitialQuantity(String(numericQuantity + 1))}
-                          className="w-8 h-8 rounded-full items-center justify-center"
+                          className="h-9 min-w-10 px-2 rounded-xl items-center justify-center"
                           style={{ backgroundColor: THEME_COLORS.primary }}
                         >
-                          <Text className="text-lg font-bold text-white">+</Text>
+                          <Text className="text-xl font-bold text-white">+</Text>
                         </TouchableOpacity>
                       </View>
                     </View>

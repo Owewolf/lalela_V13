@@ -94,6 +94,54 @@ router.put('/me', async (req, res) => {
   return res.json({ ...user, defaultLocation });
 });
 
+router.delete('/me', async (req, res) => {
+  const userId = req.auth!.userId;
+
+  const ownedActiveCommunities = await prisma.community.findMany({
+    where: { ownerId: userId, status: 'ACTIVE' },
+    select: { id: true, name: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  if (ownedActiveCommunities.length > 0) {
+    return res.status(409).json({
+      code: 'OWNED_COMMUNITIES_EXIST',
+      error: 'Delete account is blocked while you still own active communities. Delete those communities first.',
+      ownedActiveCommunityCount: ownedActiveCommunities.length,
+      ownedActiveCommunities,
+    });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true },
+  });
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  await prisma.$transaction(async (tx) => {
+    if (user.email) {
+      await tx.blacklistedEmail.upsert({
+        where: { email: user.email.toLowerCase() },
+        create: {
+          email: user.email.toLowerCase(),
+          originalUid: user.id,
+        },
+        update: {
+          deletedAt: new Date(),
+          originalUid: user.id,
+        },
+      });
+    }
+
+    await tx.user.delete({ where: { id: userId } });
+  });
+
+  return res.json({ message: 'Account deleted' });
+});
+
 // ─── Push Token ───────────────────────────────────────────────────────────────
 
 router.put('/me/push-token', async (req, res) => {
