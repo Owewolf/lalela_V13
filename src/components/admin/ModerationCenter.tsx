@@ -2365,9 +2365,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACE.md,
-    backgroundColor: THEME_COLORS.surface,
+    backgroundColor: getCardSurfaceColor('default'),
     borderWidth: 1,
-    borderColor: THEME_COLORS.neutralBorder,
+    borderColor: getCardBorderColor('default'),
     paddingHorizontal: SPACE.xxxl,
     paddingVertical: SPACE.lg,
     borderRadius: RADIUS.pill,
@@ -2536,8 +2536,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: THEME_COLORS.neutralBorder,
-    backgroundColor: THEME_COLORS.surface,
+    borderColor: getCardBorderColor('default'),
+    backgroundColor: getCardSurfaceColor('default'),
   },
   themeNameMenuList: {
     gap: SPACE.md,
@@ -2545,8 +2545,8 @@ const styles = StyleSheet.create({
   themeNameMenuItem: {
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: THEME_COLORS.neutralBorder,
-    backgroundColor: THEME_COLORS.surface,
+    borderColor: getCardBorderColor('default'),
+    backgroundColor: getCardSurfaceColor('default'),
     paddingHorizontal: SPACE.xxl,
     paddingVertical: SPACE.xl,
   },
@@ -2713,8 +2713,8 @@ const styles = StyleSheet.create({
 
   categoryItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.xxxl,
-    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.round, padding: SPACE.xxxl,
-    borderWidth: 2, borderColor: THEME_COLORS.neutralBgSoft, opacity: 0.7,
+    backgroundColor: getCardSurfaceColor('muted'), borderRadius: RADIUS.round, padding: SPACE.xxxl,
+    borderWidth: 2, borderColor: getCardBorderColor('default'), opacity: 0.7,
   },
   categoryItemActive: { backgroundColor: THEME_COLORS.successSurface, borderColor: PRIMARY, opacity: 1 },
   categoryIcon: { width: 48, height: 48, borderRadius: RADIUS.card, alignItems: 'center', justifyContent: 'center' },
@@ -2732,9 +2732,9 @@ const styles = StyleSheet.create({
   },
   ruleText: { fontSize: TYPE_SCALE.xxl, color: THEME_COLORS.neutralTextHeading, fontWeight: FONT_WEIGHT.medium, flex: 1 },
   ruleInput: {
-    width: 56, backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.md, textAlign: 'center',
+    width: 56, backgroundColor: getCardSurfaceColor('default'), borderRadius: RADIUS.md, textAlign: 'center',
     fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: PRIMARY,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft, paddingVertical: SPACE.md,
+    borderWidth: 1, borderColor: getCardBorderColor('default'), paddingVertical: SPACE.md,
   },
   toggle: { width: 40, height: 20, borderRadius: RADIUS.lg, position: 'relative', justifyContent: 'center' },
   toggleThumb: {
@@ -2744,8 +2744,8 @@ const styles = StyleSheet.create({
 
   logItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl,
-    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.xxl, padding: SPACE.xxl,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    backgroundColor: getCardSurfaceColor('muted'), borderRadius: RADIUS.xxl, padding: SPACE.xxl,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
     ...createShadow(THEME_COLORS.black, 0, 1, 0.03, 4, 1),
   },
   logIcon: { width: 40, height: 40, borderRadius: RADIUS.round, alignItems: 'center', justifyContent: 'center' },

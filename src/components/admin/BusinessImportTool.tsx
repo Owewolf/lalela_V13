@@ -29,6 +29,7 @@ import { cn } from '../../lib/utils';
 import api from '../../lib/api';
 import { THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
+import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
 
 const PRIMARY = THEME_COLORS.primary;
 const SECONDARY = THEME_COLORS.secondaryContainer;
@@ -521,11 +522,11 @@ const styles = StyleSheet.create({
   bizCard: {
     flexDirection: 'row',
     gap: SPACE.xl,
-    backgroundColor: THEME_COLORS.surface,
+    backgroundColor: getCardSurfaceColor('default'),
     borderRadius: RADIUS.pill,
     padding: SPACE.xl,
     borderWidth: 1,
-    borderColor: THEME_COLORS.neutralBorderSoft,
+    borderColor: getCardBorderColor('default'),
   },
   bizCardActive: { borderColor: PRIMARY, borderWidth: 2 },
   bizImgWrap: { width: SPACE.s72, height: SPACE.s72, borderRadius: RADIUS.lg, overflow: 'hidden', backgroundColor: SURFACE_LOW },

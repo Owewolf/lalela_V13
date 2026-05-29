@@ -693,8 +693,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                       <View
                         className="h-12 rounded-2xl border px-2 flex-row items-center justify-between"
                         style={{
-                          backgroundColor: THEME_COLORS.surface,
-                          borderColor: THEME_COLORS.neutralBorderSoft,
+                          backgroundColor: getCardSurfaceColor('default'),
+                          borderColor: getCardBorderColor('default'),
                         }}
                       >
                         <TouchableOpacity
@@ -721,8 +721,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         onPress={() => setUnitPickerVisible(true)}
                         className="h-12 rounded-2xl border px-3 flex-row items-center justify-between"
                         style={{
-                          backgroundColor: THEME_COLORS.surface,
-                          borderColor: THEME_COLORS.neutralBorderSoft,
+                          backgroundColor: getCardSurfaceColor('default'),
+                          borderColor: getCardBorderColor('default'),
                         }}
                         activeOpacity={0.8}
                       >
@@ -745,8 +745,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         className="h-12 px-3 rounded-2xl text-gray-800 border"
                         style={[
                           {
-                            backgroundColor: THEME_COLORS.surface,
-                            borderColor: THEME_COLORS.neutralBorderSoft,
+                            backgroundColor: getCardSurfaceColor('default'),
+                            borderColor: getCardBorderColor('default'),
                           },
                           isFree ? { opacity: 0.5 } : undefined,
                         ]}
@@ -791,7 +791,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     <Text className="text-sm font-semibold text-primary ml-1">Active Charity</Text>
                     <View
                       className="px-4 py-3 rounded-2xl border flex-row items-center justify-between"
-                      style={{ backgroundColor: THEME_COLORS.surface, borderColor: THEME_COLORS.neutralBorderSoft }}
+                      style={{ backgroundColor: getCardSurfaceColor('default'), borderColor: getCardBorderColor('default') }}
                     >
                       <Text className="text-base font-bold text-gray-800 flex-1">{activeCharity?.name || 'CAT'}</Text>
                       <Text className="text-base font-bold text-primary">{charityPercentage}%</Text>
@@ -809,7 +809,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     <TouchableOpacity
                       onPress={() => setCategoryPickerVisible(true)}
                       className="px-4 py-3 rounded-2xl flex-row items-center justify-between border"
-                      style={{ backgroundColor: THEME_COLORS.surface, borderColor: THEME_COLORS.neutralBorderSoft }}
+                      style={{ backgroundColor: getCardSurfaceColor('default'), borderColor: getCardBorderColor('default') }}
                       activeOpacity={0.8}
                     >
                       <Text className="text-gray-800 text-sm">{category}</Text>

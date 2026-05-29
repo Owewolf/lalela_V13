@@ -1,0 +1,14 @@
+app/(tabs)/_layout.tsx:39:          borderRadius: 999,
+src/components/admin/ModerationCenter.tsx:2673:    backgroundColor: getCardSurfaceColor('default'), borderRadius: 28, paddingVertical: SPACE.s16, paddingHorizontal: SPACE.s16,
+src/components/admin/ModerationCenter.tsx:2677:  contentIcon: { width: 54, height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+src/components/auth/LandingPage.tsx:289:          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/settings/SettingsPage.tsx:206:        <View style={{ ...SETTINGS_CARD_SURFACE, borderRadius: 34, padding: SPACE.s20, gap: SPACE.s20, ...SETTINGS_SHADOW_SOFT }}>
+src/components/settings/SettingsPage.tsx:214:              <View style={{ width: 92, height: 92, borderRadius: 46, overflow: 'hidden', borderWidth: 4, borderColor: ringColor }}>
+src/components/settings/SettingsPage.tsx:259:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: 18, backgroundColor: rc.bg }}>
+src/components/settings/SettingsPage.tsx:266:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.lg, paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.md, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
+src/components/settings/SettingsPage.tsx:285:                padding: SPACE.s14, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1,
+src/components/settings/SettingsPage.tsx:303:                    style={{ paddingHorizontal: SPACE.s16, paddingVertical: SPACE.lg, backgroundColor: THEME_COLORS.primary, borderRadius: 18 }}
+src/components/settings/SettingsPage.tsx:317:              <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1, borderColor: getCardBorderColor('default'), overflow: 'hidden', ...SETTINGS_SHADOW_SOFT }}>
+src/components/settings/SettingsPage.tsx:371:            padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
+src/components/settings/SettingsPage.tsx:409:                padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
+src/theme/foundationThemes.ts:36:  borderRadius: '14px',

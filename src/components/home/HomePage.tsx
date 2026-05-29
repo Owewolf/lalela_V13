@@ -94,9 +94,9 @@ const SPACE = {
   s40: 40,
 };
 
-const CARD_DEPTH_HERO = createShadow(THEME_COLORS.black, 0, 10, 0.16, 18, 8);
-const CARD_DEPTH = createShadow(THEME_COLORS.black, 0, 7, 0.12, 14, 5);
-const CARD_DEPTH_SOFT = createShadow(THEME_COLORS.black, 0, 5, 0.09, 10, 3);
+const HOME_SHADOW_HERO = createShadow(THEME_COLORS.black, 0, 10, 0.16, 18, 8);
+const HOME_SHADOW_DEFAULT = createShadow(THEME_COLORS.black, 0, 7, 0.12, 14, 5);
+const HOME_SHADOW_SOFT = createShadow(THEME_COLORS.black, 0, 5, 0.09, 10, 3);
 
 // ─── Notice card helpers ─────────────────────────────────────────────────────
 
@@ -545,7 +545,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         style={{
           borderColor,
           backgroundColor: bgColor,
-          ...(isEmergencyOrWarning ? CARD_DEPTH_HERO : CARD_DEPTH),
+          ...(isEmergencyOrWarning ? HOME_SHADOW_HERO : HOME_SHADOW_DEFAULT),
         }}
       >
         {/* Mini map for emergency/warning with location */}
@@ -959,7 +959,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         key={listing.id}
         className="flex-1 mx-0.5 mb-3 bg-surface-container-low rounded-3xl border"
         style={{
-          ...CARD_DEPTH,
+          ...HOME_SHADOW_DEFAULT,
           borderColor: THEME_COLORS.neutralBorderSoft,
           ...(activeMenuId === listing.id ? { zIndex: 80, elevation: 20 } : null),
           overflow: 'visible',
@@ -1342,7 +1342,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               'flex-1 flex-col items-center justify-center py-3 rounded-2xl gap-1.5',
               currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
             )}
-            style={{ backgroundColor: THEME_COLORS.secondaryContainer, ...CARD_DEPTH }}
+            style={{ backgroundColor: THEME_COLORS.secondaryContainer, ...HOME_SHADOW_DEFAULT }}
           >
             <Siren
               size={20}
@@ -1367,7 +1367,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 'flex-col items-center justify-center py-3 rounded-2xl gap-1.5',
                 currentCommunity?.status === 'READ-ONLY' && 'opacity-50'
               )}
-              style={{ backgroundColor: THEME_COLORS.primaryContainer, ...CARD_DEPTH }}
+              style={{ backgroundColor: THEME_COLORS.primaryContainer, ...HOME_SHADOW_DEFAULT }}
             >
               <Plus size={20} color={THEME_COLORS.white} />
               <Text className="text-white font-bold text-base">
@@ -1379,7 +1379,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
         {/* ── Emergency Alert Banner ───────────────────────────────────── */}
         {alert && (
-          <View className="relative overflow-hidden bg-red-600 rounded-3xl p-6" style={CARD_DEPTH_HERO}>
+          <View className="relative overflow-hidden bg-red-600 rounded-3xl p-6" style={HOME_SHADOW_HERO}>
             <View className="flex-row items-start justify-between mb-4">
               <View className="flex-row items-center gap-2 bg-surface-container-low/20 px-3 py-1 rounded-full">
                 <AlertTriangle size={14} color={THEME_COLORS.white} fill={THEME_COLORS.white} />
@@ -1426,7 +1426,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             'bg-surface-container-low rounded-3xl p-5 gap-5',
             isEmergencyActive && 'border-2 border-red-300 bg-red-50/30'
           )}
-          style={CARD_DEPTH_HERO}
+          style={HOME_SHADOW_HERO}
         >
           <InteractiveCoverageMap
             center={mapCenter}
@@ -1478,7 +1478,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           {notices.length === 0 ? (
             <View
               className="items-center justify-center gap-3 py-10 px-6 bg-surface-container-low rounded-3xl border"
-              style={{ ...CARD_DEPTH_SOFT, borderColor: THEME_COLORS.neutralBorderSoft }}
+              style={{ ...HOME_SHADOW_SOFT, borderColor: THEME_COLORS.neutralBorderSoft }}
             >
               <View className="w-14 h-14 rounded-full bg-surface-container-low items-center justify-center">
                 <Shield size={28} color={THEME_COLORS.success} />
@@ -1545,7 +1545,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               'relative overflow-hidden rounded-3xl border bg-surface-container-low p-4',
               hasNoNotices ? 'border-outline-variant' : ''
             )}
-            style={{ ...CARD_DEPTH_HERO, ...(hasNoNotices ? null : { borderColor: THEME_COLORS.neutralBorderSoft }) }}
+            style={{ ...HOME_SHADOW_HERO, ...(hasNoNotices ? null : { borderColor: THEME_COLORS.neutralBorderSoft }) }}
           >
             {/* Background image */}
             {selectedCharity && charityImage && (

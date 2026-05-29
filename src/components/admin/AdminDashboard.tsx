@@ -1663,8 +1663,8 @@ const styles = StyleSheet.create({
 
   activityItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl,
-    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.card, padding: SPACE.xxl,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    backgroundColor: getCardSurfaceColor('muted'), borderRadius: RADIUS.card, padding: SPACE.xxl,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
     ...createShadow(THEME_COLORS.black, 0, 1, 0.03, 4, 1),
   },
   activityIcon: { width: 40, height: 40, borderRadius: RADIUS.panel, alignItems: 'center', justifyContent: 'center' },
@@ -1703,9 +1703,9 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', padding: SPACE.s16,
   },
   setupCompleteCard: {
-    backgroundColor: THEME_COLORS.surfaceContainer, borderRadius: RADIUS.modal, padding: SPACE.s32,
+    backgroundColor: getCardSurfaceColor('muted'), borderRadius: RADIUS.modal, padding: SPACE.s32,
     width: '100%', maxWidth: 400, alignItems: 'center', gap: SPACE.xxxl,
-    borderWidth: 1, borderColor: THEME_COLORS.neutralBgSoft,
+    borderWidth: 1, borderColor: getCardBorderColor('default'),
     ...createShadow(THEME_COLORS.black, 0, 12, 0.15, 32, 10),
   },
   setupCompleteIcon: {

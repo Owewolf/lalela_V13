@@ -5,6 +5,7 @@ import { Conversation, Message } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { resolveMediaUrl } from '../../lib/config';
 import { THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
 
 interface MessageBubbleProps {
   message: Message;
@@ -107,9 +108,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         maxWidth: isDirectConversation ? '92%' as const : '87%' as const,
       }
     : {
-        backgroundColor: THEME_COLORS.surfaceContainerLow,
+        backgroundColor: getCardSurfaceColor('subtle'),
         borderWidth: 1,
-        borderColor: THEME_COLORS.neutralBorderSoft,
+        borderColor: getCardBorderColor('default'),
         maxWidth: isDirectConversation ? '90%' as const : '82%' as const,
       };
 

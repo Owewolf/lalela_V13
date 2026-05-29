@@ -1,0 +1,8 @@
+app/(tabs)/_layout.tsx:120:            marginHorizontal: 6,
+app/(tabs)/_layout.tsx:121:            paddingHorizontal: 0,
+app/(tabs)/_layout.tsx:126:            marginBottom: 2,
+app/(tabs)/_layout.tsx:129:            marginTop: 2,
+src/components/auth/LandingPage.tsx:289:          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/market/RecordSaleModal.tsx:68:        <View className="bg-surface-container-low rounded-t-[28px] px-6 pt-5 pb-8" style={{ gap: 16 }}>
+src/components/market/RecordSaleModal.tsx:80:          <View className="bg-surface-container rounded-2xl p-4 border" style={{ borderColor: THEME_COLORS.neutralBorderSoft, gap: 10 }}>
+src/components/market/RecordSaleModal.tsx:113:          <View className="bg-orange-50 rounded-2xl p-4 border border-orange-100" style={{ gap: 6 }}>

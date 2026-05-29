@@ -38,6 +38,7 @@ import { useRouter } from 'expo-router';
 import { GOOGLE_PLACES_API_KEY, BUSINESS_CATEGORIES } from '../../constants';
 import { defaultMapViewProps } from '../../lib/mapViewProps';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
 import { LAYER_ELEVATION, LAYER_Z_INDEX } from '../../theme/layers';
 import { createShadow } from '../../theme/shadows';
 
@@ -128,8 +129,6 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     </View>
   </Modal>
 );
-
-// ─── Community Creator Onboarding ─────────────────────────────────────────────
 
 const OnboardingCreate: React.FC = () => {
   const { userProfile, loading, updateUserProfile } = useAuth();
@@ -647,7 +646,7 @@ const OnboardingCreate: React.FC = () => {
                   <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8}>
                     <View
                       className="w-24 h-24 rounded-full overflow-hidden border-2 items-center justify-center"
-                      style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderColor: THEME_COLORS.neutralBorderSoft }}
+                      style={{ backgroundColor: getCardSurfaceColor('subtle'), borderColor: getCardBorderColor('default') }}
                     >
                       {profileImage ? (
                         <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" />
@@ -1223,7 +1222,7 @@ const OnboardingCreate: React.FC = () => {
                   <View className="gap-2">
                     <Text className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Added</Text>
                     {pendingBusinesses.map((biz, i) => (
-                      <View key={i} className="flex-row items-center gap-3 p-3 rounded-xl border" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderColor: THEME_COLORS.neutralBorderSoft }}>
+                      <View key={i} className="flex-row items-center gap-3 p-3 rounded-xl border" style={{ backgroundColor: getCardSurfaceColor('subtle'), borderColor: getCardBorderColor('default') }}>
                         <Text className="flex-1 text-sm font-bold text-primary">{biz.name}</Text>
                         <Text className="text-[10px] text-gray-400">{BUSINESS_CATEGORIES.find(c => c.id === biz.category)?.label ?? biz.category}</Text>
                         <TouchableOpacity onPress={() => setPendingBusinesses(prev => prev.filter((_, idx) => idx !== i))}>

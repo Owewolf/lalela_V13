@@ -1,0 +1,4 @@
+app/(tabs)/_layout.tsx:124:            fontSize: 11,
+app/(tabs)/_layout.tsx:125:            fontWeight: '700',
+src/components/admin/ModerationCenter.tsx:2340:  sectionTitle: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, color: PRIMARY, flex: 1, lineHeight: 30 },
+src/components/admin/ModerationCenter.tsx:2568:    lineHeight: 18,

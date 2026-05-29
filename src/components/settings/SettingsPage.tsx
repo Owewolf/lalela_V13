@@ -106,8 +106,8 @@ const LINE_HEIGHT = {
   compact: 17,
 };
 
-const CARD_DEPTH_HERO = getCardShadow('hero');
-const CARD_DEPTH_SOFT = getCardShadow('soft');
+const SETTINGS_SHADOW_HERO = getCardShadow('hero');
+const SETTINGS_SHADOW_SOFT = getCardShadow('soft');
 const SETTINGS_CARD_SURFACE = {
   backgroundColor: getCardSurfaceColor('default'),
   borderWidth: 1,
@@ -203,7 +203,7 @@ const SettingsPage: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* ── Profile Identity Card ── */}
-        <View style={{ ...SETTINGS_CARD_SURFACE, borderRadius: 34, padding: SPACE.s20, gap: SPACE.s20, ...CARD_DEPTH_SOFT }}>
+        <View style={{ ...SETTINGS_CARD_SURFACE, borderRadius: 34, padding: SPACE.s20, gap: SPACE.s20, ...SETTINGS_SHADOW_SOFT }}>
           {/* Avatar + Name row (primary account entry point) */}
           <TouchableOpacity
             onPress={() => router.push('/security')}
@@ -284,7 +284,7 @@ const SettingsPage: React.FC = () => {
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
                 padding: SPACE.s14, backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1,
                 borderColor: showCommunitySwitcher ? THEME_COLORS.alias_rgba_22_163_74_0_3 : getCardBorderColor('default'),
-                ...CARD_DEPTH_SOFT,
+                ...SETTINGS_SHADOW_SOFT,
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.xxxl }}>
@@ -314,7 +314,7 @@ const SettingsPage: React.FC = () => {
             </TouchableOpacity>
 
             {showCommunitySwitcher && (
-              <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1, borderColor: getCardBorderColor('default'), overflow: 'hidden', ...CARD_DEPTH_SOFT }}>
+              <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1, borderColor: getCardBorderColor('default'), overflow: 'hidden', ...SETTINGS_SHADOW_SOFT }}>
                 {(communities || []).map((c, idx) => {
                   const isActive = c.id === currentCommunity?.id;
                   const isAdminOrMod = c.ownerId === userProfile?.id || c.userRole === 'ADMIN' || c.userRole === 'MODERATOR';
@@ -369,7 +369,7 @@ const SettingsPage: React.FC = () => {
           <View style={{
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
             padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
-            ...CARD_DEPTH_SOFT,
+            ...SETTINGS_SHADOW_SOFT,
           }}>
             <TouchableOpacity
               onPress={() => globalNotificationsEnabled && router.push('/notifications-settings')}
@@ -407,7 +407,7 @@ const SettingsPage: React.FC = () => {
               style={{
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
                 padding: SPACE.s20, borderRadius: 24, backgroundColor: THEME_COLORS.surface, borderWidth: 1, borderColor: getCardBorderColor('default'),
-                ...CARD_DEPTH_SOFT,
+                ...SETTINGS_SHADOW_SOFT,
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.s14 }}>
@@ -436,7 +436,7 @@ const SettingsPage: React.FC = () => {
 
         {/* ── Community License Card (Only for Trial) ── */}
         {currentCommunity?.type === 'TRIAL' && (currentCommunity.ownerId === userProfile?.id) && (
-          <View style={{ backgroundColor: THEME_COLORS.primaryContainer, borderRadius: RADIUS.hero, padding: SPACE.s20, gap: SPACE.s16, ...CARD_DEPTH_HERO }}>
+          <View style={{ backgroundColor: THEME_COLORS.primaryContainer, borderRadius: RADIUS.hero, padding: SPACE.s20, gap: SPACE.s16, ...SETTINGS_SHADOW_HERO }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text style={{ fontSize: TYPE_SCALE.h2, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, flex: 1 }} numberOfLines={1}>
                 {currentCommunity?.name || 'Community'}
@@ -455,7 +455,7 @@ const SettingsPage: React.FC = () => {
               </View>
             </View>
 
-            <View style={{ backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_1, borderRadius: RADIUS.card, padding: SPACE.s16, borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20, gap: SPACE.xl, ...CARD_DEPTH_SOFT }}>
+            <View style={{ backgroundColor: THEME_COLORS.alias_rgba_255_255_255_0_1, borderRadius: RADIUS.card, padding: SPACE.s16, borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20, gap: SPACE.xl, ...SETTINGS_SHADOW_SOFT }}>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.xxl }}>
                 <Sparkles size={18} color={THEME_COLORS.warningBorderStrong} />
                 <View style={{ flex: 1 }}>
@@ -494,7 +494,7 @@ const SettingsPage: React.FC = () => {
               borderStyle: 'dashed',
               backgroundColor: THEME_COLORS.alias_rgba_16_185_129_0_05,
               gap: SPACE.xl,
-              ...CARD_DEPTH_SOFT,
+              ...SETTINGS_SHADOW_SOFT,
             }}
             onPress={() => router.push('/onboarding-create')}
             activeOpacity={0.7}

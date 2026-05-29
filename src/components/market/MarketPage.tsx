@@ -404,7 +404,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               />
               <View
                 className="absolute inset-0"
-                style={{ backgroundColor: 'rgba(0, 0, 0, 0.14)' }}
+                style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_15 }}
                 pointerEvents="none"
               />
               {listing.isCommunityPick && (
@@ -418,21 +418,21 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               {isSoldOut ? (
                 <View
                   className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(10, 20, 34, 0.78)' }}
+                  style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
                 >
                   <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
                 </View>
               ) : hasSales ? (
                 <View
                   className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(217, 119, 6, 0.88)' }}
+                  style={{ backgroundColor: THEME_COLORS.warning }}
                 >
                   <Text className="text-white text-[10px] font-black uppercase tracking-widest">Partially Sold</Text>
                 </View>
               ) : null}
               <View
                 className="absolute bottom-0 left-0 right-0 h-36"
-                style={{ backgroundColor: 'rgba(0, 0, 0, 0.34)' }}
+                style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_4 }}
                 pointerEvents="none"
               />
               <View className="absolute bottom-4 left-4 right-4">
@@ -462,7 +462,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   {isSoldOut ? (
                     <View
                       className="px-3 py-1 rounded-full"
-                      style={{ backgroundColor: 'rgba(10, 20, 34, 0.78)' }}
+                      style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
                     >
                       <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
                     </View>

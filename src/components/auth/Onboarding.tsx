@@ -27,6 +27,7 @@ import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/uploadImage';
 import { useInvitePreview } from '../../hooks/queries/useInvitePreview';
+import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LocationPickerSection from '../shared/LocationPickerSection';
@@ -354,7 +355,7 @@ const OnboardingInvite: React.FC = () => {
               <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8}>
                 <View
                   className="w-24 h-24 rounded-full overflow-hidden border-2 items-center justify-center"
-                  style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderColor: THEME_COLORS.neutralBorderSoft }}
+                  style={{ backgroundColor: getCardSurfaceColor('subtle'), borderColor: getCardBorderColor('default') }}
                 >
                   {profileImage ? (
                     <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" />

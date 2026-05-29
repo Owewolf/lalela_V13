@@ -47,9 +47,9 @@ const SPACE = {
   s24: 24,
   s120: 120,
 };
-const CARD_DEPTH_HERO = getCardShadow('hero');
-const CARD_DEPTH = getCardShadow('default');
-const CARD_DEPTH_SOFT = getCardShadow('soft');
+const POSTS_SHADOW_HERO = getCardShadow('hero');
+const POSTS_SHADOW_DEFAULT = getCardShadow('default');
+const POSTS_SHADOW_SOFT = getCardShadow('soft');
 const SURFACE_BORDER_STYLE = { borderColor: getCardBorderColor('default') };
 
 interface PostsPageProps {
@@ -350,7 +350,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             borderColor: highlightedNoticeId === notice.id ? PRIMARY : borderColor,
             ...(highlightedNoticeId === notice.id
               ? createShadow(THEME_COLORS.black, 0, 12, 0.22, 20, 9)
-              : CARD_DEPTH),
+              : POSTS_SHADOW_DEFAULT),
           }}
         >
           {/* Inline map for emergency/warning */}
@@ -564,7 +564,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       const saleActionLabel = remainingQuantity > 1 ? 'Record Sale' : 'Mark as Sold';
 
       return (
-        <View className="bg-surface-container-low rounded-[2.2rem] overflow-hidden border mb-6" style={{ ...CARD_DEPTH_HERO, ...SURFACE_BORDER_STYLE }}>
+        <View className="bg-surface-container-low rounded-[2.2rem] overflow-hidden border mb-6" style={{ ...POSTS_SHADOW_HERO, ...SURFACE_BORDER_STYLE }}>
           {/* Map (emergency) or image */}
           {isEmergency && post.latitude && post.longitude ? (
             <View className="w-full aspect-video overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
@@ -599,27 +599,27 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               />
               <View
                 className="absolute inset-0"
-                style={{ backgroundColor: 'rgba(0, 0, 0, 0.14)' }}
+                style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_15 }}
                 pointerEvents="none"
               />
               {isSold ? (
                 <View
                   className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(10, 20, 34, 0.78)' }}
+                  style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
                 >
                   <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
                 </View>
               ) : soldQuantity > 0 ? (
                 <View
                   className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(217, 119, 6, 0.88)' }}
+                  style={{ backgroundColor: THEME_COLORS.warning }}
                 >
                   <Text className="text-white text-[10px] font-black uppercase tracking-widest">Partially Sold</Text>
                 </View>
               ) : null}
               <View
                 className="absolute bottom-0 left-0 right-0 h-36"
-                style={{ backgroundColor: 'rgba(0, 0, 0, 0.34)' }}
+                style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_4 }}
                 pointerEvents="none"
               />
               <View className="absolute bottom-4 left-4 right-4">
@@ -669,7 +669,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                     {isSold ? (
                       <View
                         className="px-3 py-1 rounded-full"
-                        style={{ backgroundColor: 'rgba(10, 20, 34, 0.78)' }}
+                        style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
                       >
                         <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
                       </View>
@@ -757,7 +757,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
 
             {/* Price block */}
             {post.type === 'listing' && post.price !== undefined ? (
-              <View className="bg-surface-container p-5 rounded-2xl border gap-4" style={{ ...CARD_DEPTH_SOFT, ...SURFACE_BORDER_STYLE }}>
+              <View className="bg-surface-container p-5 rounded-2xl border gap-4" style={{ ...POSTS_SHADOW_SOFT, ...SURFACE_BORDER_STYLE }}>
                 <View className="flex-row justify-between items-end">
                   <View>
                     <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
@@ -991,7 +991,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       case 'emptyListings':
         return (
           <View className="items-center justify-center py-20 gap-4">
-            <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center" style={CARD_DEPTH_SOFT}>
+            <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center" style={POSTS_SHADOW_SOFT}>
               <Tag size={40} color={THEME_COLORS.neutralBorderMuted} />
             </View>
             <Text className="text-lg font-bold text-primary">No listings found</Text>
@@ -1020,7 +1020,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         style={{ backgroundColor: APP_SHELL_COLORS.body, borderBottomColor: THEME_COLORS.neutralBorderSoft }}
       >
         {/* Search */}
-        <View className="flex-row items-center bg-surface-container rounded-2xl px-4 py-3 gap-3" style={CARD_DEPTH_SOFT}>
+        <View className="flex-row items-center bg-surface-container rounded-2xl px-4 py-3 gap-3" style={POSTS_SHADOW_SOFT}>
           <Search size={16} color={THEME_COLORS.neutralTextSoft} />
           <TextInput
             value={searchQuery}
