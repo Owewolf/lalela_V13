@@ -2,28 +2,27 @@ app/(tabs)/_layout.tsx:39:          borderRadius: 999,
 src/components/admin/ModerationCenter.tsx:2673:    backgroundColor: getCardSurfaceColor('default'), borderRadius: 28, paddingVertical: SPACE.s16, paddingHorizontal: SPACE.s16,
 src/components/admin/ModerationCenter.tsx:2677:  contentIcon: { width: 54, height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
 src/components/auth/LandingPage.tsx:289:          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
-src/components/security/ProfileSection.tsx:171:    borderRadius: 24,
-src/components/security/ProfileSection.tsx:212:            borderRadius: 16,
-src/components/security/ProfileSection.tsx:236:              borderRadius: 48,
-src/components/security/ProfileSection.tsx:258:              borderRadius: 16,
-src/components/security/ProfileSection.tsx:279:              borderRadius: 14,
-src/components/security/ProfileSection.tsx:356:                        borderRadius: 8,
-src/components/security/ProfileSection.tsx:380:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: THEME_COLORS.surfaceContainerLow, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>
-src/components/security/ProfileSection.tsx:388:                    style={{ backgroundColor: THEME_COLORS.warningSurface, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}
-src/components/security/ProfileSection.tsx:407:                borderRadius: 20,
-src/components/security/ProfileSection.tsx:425:              borderRadius: 10,
-src/components/security/ProfileSection.tsx:436:          <View style={{ marginTop: 16, gap: 8, backgroundColor: THEME_COLORS.surface, borderRadius: 16, padding: 16 }}>
-src/components/security/ProfileSection.tsx:452:                  borderRadius: 12,
-src/components/security/ProfileSection.tsx:458:                  <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: THEME_COLORS.surfaceContainer, alignItems: 'center', justifyContent: 'center' }}>
-src/components/security/ProfileSection.tsx:508:              borderRadius: 12,
-src/components/security/ProfileSection.tsx:521:              borderRadius: 12,
-src/components/security/ProfileSection.tsx:541:            borderRadius: 16,
-src/components/settings/SettingsPage.tsx:210:        <View style={{ ...SETTINGS_CARD_SURFACE, position: 'relative', marginTop: SPACE.s32, borderRadius: 34, padding: SPACE.s14, paddingTop: 0, gap: SPACE.md, ...SETTINGS_SHADOW_SOFT }}>
-src/components/settings/SettingsPage.tsx:263:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: rc.bg }}>
-src/components/settings/SettingsPage.tsx:270:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
-src/components/settings/SettingsPage.tsx:289:                padding: SPACE.s14, backgroundColor: THEME_COLORS.surface, borderRadius: 24, borderWidth: 1,
-src/components/settings/SettingsPage.tsx:306:                    style={{ paddingHorizontal: SPACE.s14, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.primary, borderRadius: 18 }}
-src/components/settings/SettingsPage.tsx:320:              <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1, borderColor: getCardBorderColor('default'), overflow: 'hidden', ...SETTINGS_SHADOW_SOFT }}>
-src/components/settings/SettingsPage.tsx:379:              borderRadius: 24,
-src/components/settings/SettingsPage.tsx:418:                  borderRadius: 24,
+src/components/security/ProfileSection.tsx:168:    borderRadius: 24,
+src/components/security/ProfileSection.tsx:209:            borderRadius: 16,
+src/components/security/ProfileSection.tsx:233:              borderRadius: 48,
+src/components/security/ProfileSection.tsx:255:              borderRadius: 16,
+src/components/security/ProfileSection.tsx:276:              borderRadius: 14,
+src/components/security/ProfileSection.tsx:353:                        borderRadius: 8,
+src/components/security/ProfileSection.tsx:377:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: THEME_COLORS.surfaceContainerLow, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>
+src/components/security/ProfileSection.tsx:385:                    style={{ backgroundColor: THEME_COLORS.warningSurface, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}
+src/components/security/ProfileSection.tsx:425:              borderRadius: 12,
+src/components/security/ProfileSection.tsx:438:              borderRadius: 12,
+src/components/security/ProfileSection.tsx:458:            borderRadius: 16,
+src/components/settings/SettingsPage.tsx:256:        <View style={{ ...SETTINGS_CARD_SURFACE, position: 'relative', marginTop: SPACE.s32, borderRadius: 34, padding: SPACE.s14, paddingTop: 0, gap: SPACE.md, ...SETTINGS_SHADOW_SOFT }}>
+src/components/settings/SettingsPage.tsx:309:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: rc.bg }}>
+src/components/settings/SettingsPage.tsx:316:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
+src/components/settings/SettingsPage.tsx:335:                padding: SPACE.s14, backgroundColor: THEME_COLORS.surface, borderRadius: 24, borderWidth: 1,
+src/components/settings/SettingsPage.tsx:352:                    style={{ paddingHorizontal: SPACE.s14, paddingVertical: SPACE.sm, backgroundColor: THEME_COLORS.primary, borderRadius: 18 }}
+src/components/settings/SettingsPage.tsx:366:              <View style={{ backgroundColor: THEME_COLORS.surfaceContainerLow, borderRadius: 24, borderWidth: 1, borderColor: getCardBorderColor('default'), overflow: 'hidden', ...SETTINGS_SHADOW_SOFT }}>
+src/components/settings/SettingsPage.tsx:425:              borderRadius: 24,
+src/components/settings/SettingsPage.tsx:464:                  borderRadius: 24,
+src/components/shared/EmergencyResponderCard.tsx:96:          borderRadius: 24,
+src/components/shared/EmergencyResponderCard.tsx:108:              borderRadius: 20,
+src/components/shared/EmergencyResponderCard.tsx:126:            borderRadius: 10,
+src/components/shared/EmergencyResponderCard.tsx:137:        <View style={{ marginTop: 16, gap: 8, backgroundColor: THEME_COLORS.surface, borderRadius: 16, padding: 16 }}>
 src/theme/foundationThemes.ts:36:  borderRadius: '14px',

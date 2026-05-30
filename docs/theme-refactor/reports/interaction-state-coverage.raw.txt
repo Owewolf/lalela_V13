@@ -59,12 +59,12 @@ src/components/admin/ModerationCenter.tsx:2034:            <TouchableOpacity sty
 src/components/admin/ModerationCenter.tsx:2091:                      activeOpacity={0.85}
 src/components/admin/ModerationCenter.tsx:2150:                    activeOpacity={0.85}
 src/components/admin/ModerationCenter.tsx:2188:            <TouchableOpacity style={styles.backBtn} onPress={onBack} activeOpacity={0.7}>
-src/components/auth/LandingPage.tsx:322:                  disabled={isSubmitting}
-src/components/auth/LandingPage.tsx:425:                      disabled={isSubmitting || otpCode.length !== 6}
-src/components/auth/LandingPage.tsx:587:                      disabled={isSubmitting}
-src/components/auth/LandingPage.tsx:664:          activeOpacity={1}
-src/components/auth/LandingPage.tsx:668:            activeOpacity={1}
-src/components/auth/LandingPage.tsx:722:                    disabled={forgotSubmitting || !forgotEmail}
+src/components/auth/LandingPage.tsx:315:                  disabled={isSubmitting}
+src/components/auth/LandingPage.tsx:418:                      disabled={isSubmitting || otpCode.length !== 6}
+src/components/auth/LandingPage.tsx:580:                      disabled={isSubmitting}
+src/components/auth/LandingPage.tsx:657:          activeOpacity={1}
+src/components/auth/LandingPage.tsx:661:            activeOpacity={1}
+src/components/auth/LandingPage.tsx:715:                    disabled={forgotSubmitting || !forgotEmail}
 src/components/auth/Onboarding.tsx:355:              <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8}>
 src/components/auth/Onboarding.tsx:484:              disabled={!isProfileValid || isSubmitting}
 src/components/auth/OnboardingCreate.tsx:646:                  <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8}>
@@ -122,26 +122,26 @@ src/components/home/HomePage.tsx:1022:                      activeOpacity={0.7}
 src/components/home/HomePage.tsx:1037:                      activeOpacity={0.7}
 src/components/home/HomePage.tsx:1038:                      disabled={isMarkingSold}
 src/components/home/HomePage.tsx:1053:                      activeOpacity={0.7}
-src/components/home/HomePage.tsx:1093:              activeOpacity={0.7}
-src/components/home/HomePage.tsx:1103:              activeOpacity={0.7}
-src/components/home/HomePage.tsx:1104:              disabled={!hasCoordinates}
-src/components/home/HomePage.tsx:1173:              activeOpacity={0.85}
-src/components/home/HomePage.tsx:1180:              activeOpacity={0.7}
-src/components/home/HomePage.tsx:1204:        activeOpacity={1}
-src/components/home/HomePage.tsx:1207:        <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-src/components/home/HomePage.tsx:1218:                activeOpacity={0.7}
-src/components/home/HomePage.tsx:1270:              activeOpacity={0.85}
-src/components/home/HomePage.tsx:1286:              activeOpacity={0.8}
-src/components/home/HomePage.tsx:1298:              activeOpacity={0.7}
-src/components/home/HomePage.tsx:1332:            activeOpacity={0.85}
-src/components/home/HomePage.tsx:1340:            disabled={currentCommunity?.status === 'READ-ONLY'}
-src/components/home/HomePage.tsx:1363:              activeOpacity={0.85}
-src/components/home/HomePage.tsx:1365:              disabled={currentCommunity?.status === 'READ-ONLY'}
-src/components/home/HomePage.tsx:1404:                activeOpacity={0.85}
-src/components/home/HomePage.tsx:1412:                activeOpacity={0.7}
-src/components/home/HomePage.tsx:1467:              activeOpacity={0.7}
-src/components/home/HomePage.tsx:1496:                  activeOpacity={0.8}
-src/components/home/HomePage.tsx:1664:                activeOpacity={0.7}
+src/components/home/HomePage.tsx:1099:                  activeOpacity={0.7}
+src/components/home/HomePage.tsx:1115:              activeOpacity={0.7}
+src/components/home/HomePage.tsx:1116:              disabled={!hasCoordinates}
+src/components/home/HomePage.tsx:1185:              activeOpacity={0.85}
+src/components/home/HomePage.tsx:1192:              activeOpacity={0.7}
+src/components/home/HomePage.tsx:1216:        activeOpacity={1}
+src/components/home/HomePage.tsx:1219:        <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
+src/components/home/HomePage.tsx:1230:                activeOpacity={0.7}
+src/components/home/HomePage.tsx:1282:              activeOpacity={0.85}
+src/components/home/HomePage.tsx:1298:              activeOpacity={0.8}
+src/components/home/HomePage.tsx:1310:              activeOpacity={0.7}
+src/components/home/HomePage.tsx:1344:            activeOpacity={0.85}
+src/components/home/HomePage.tsx:1352:            disabled={currentCommunity?.status === 'READ-ONLY'}
+src/components/home/HomePage.tsx:1375:              activeOpacity={0.85}
+src/components/home/HomePage.tsx:1377:              disabled={currentCommunity?.status === 'READ-ONLY'}
+src/components/home/HomePage.tsx:1416:                activeOpacity={0.85}
+src/components/home/HomePage.tsx:1424:                activeOpacity={0.7}
+src/components/home/HomePage.tsx:1479:              activeOpacity={0.7}
+src/components/home/HomePage.tsx:1508:                  activeOpacity={0.8}
+src/components/home/HomePage.tsx:1678:                activeOpacity={0.7}
 src/components/home/InteractiveCoverageMap.tsx:618:            activeOpacity={1}
 src/components/home/InteractiveCoverageMap.tsx:628:            activeOpacity={0.85}
 src/components/home/InteractiveCoverageMap.tsx:654:              activeOpacity={0.9}
@@ -153,18 +153,18 @@ src/components/market/BusinessCard.tsx:286:                activeOpacity={0.8}
 src/components/market/BusinessCard.tsx:296:                activeOpacity={0.8}
 src/components/market/BusinessCard.tsx:306:                  activeOpacity={0.8}
 src/components/market/BusinessCard.tsx:311:                <TouchableOpacity activeOpacity={0.8}>
-src/components/market/MarketPage.tsx:393:          activeOpacity={0.92}
-src/components/market/MarketPage.tsx:593:                  activeOpacity={0.8}
-src/components/market/MarketPage.tsx:600:                  activeOpacity={0.8}
-src/components/market/MarketPage.tsx:777:                    disabled={markingSoldId === selectedListing.id}
-src/components/market/MarketPage.tsx:838:            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-src/components/market/MarketPage.tsx:855:            activeOpacity={0.8}
-src/components/market/MarketPage.tsx:877:              activeOpacity={0.8}
-src/components/market/MarketPage.tsx:906:                activeOpacity={0.8}
-src/components/market/MarketPage.tsx:928:              activeOpacity={0.8}
-src/components/market/MarketPage.tsx:938:              activeOpacity={0.8}
-src/components/market/MarketPage.tsx:956:                activeOpacity={0.8}
-src/components/market/MarketPage.tsx:964:            <TouchableOpacity className="flex-row items-center gap-1" activeOpacity={0.8}>
+src/components/market/MarketPage.tsx:396:          activeOpacity={0.92}
+src/components/market/MarketPage.tsx:572:                  activeOpacity={0.8}
+src/components/market/MarketPage.tsx:579:                  activeOpacity={0.8}
+src/components/market/MarketPage.tsx:765:                    disabled={markingSoldId === selectedListing.id}
+src/components/market/MarketPage.tsx:826:            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
+src/components/market/MarketPage.tsx:843:            activeOpacity={0.8}
+src/components/market/MarketPage.tsx:865:              activeOpacity={0.8}
+src/components/market/MarketPage.tsx:894:                activeOpacity={0.8}
+src/components/market/MarketPage.tsx:916:              activeOpacity={0.8}
+src/components/market/MarketPage.tsx:926:              activeOpacity={0.8}
+src/components/market/MarketPage.tsx:944:                activeOpacity={0.8}
+src/components/market/MarketPage.tsx:952:            <TouchableOpacity className="flex-row items-center gap-1" activeOpacity={0.8}>
 src/components/market/RecordSaleModal.tsx:71:            <TouchableOpacity onPress={onClose} disabled={loading}>
 src/components/market/RecordSaleModal.tsx:87:                disabled={loading}
 src/components/market/RecordSaleModal.tsx:105:                disabled={loading || safeQuantity >= remainingQuantity}
@@ -176,50 +176,51 @@ src/components/posts/CreateNoticeForm.tsx:557:          activeOpacity={0.8}
 src/components/posts/CreateNoticeForm.tsx:587:                disabled={isSubmitting}
 src/components/posts/CreateNoticeForm.tsx:590:                activeOpacity={0.8}
 src/components/posts/CreateNoticeForm.tsx:604:                activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:415:          activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:576:                        activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:620:                    activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:727:                        activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:772:                      activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:813:                      activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:847:            disabled={!canSubmit}
-src/components/posts/CreatePostPage.tsx:859:            activeOpacity={0.85}
-src/components/posts/CreatePostPage.tsx:892:                  disabled={isSubmitting}
-src/components/posts/CreatePostPage.tsx:902:                  activeOpacity={0.85}
-src/components/posts/CreatePostPage.tsx:914:                  activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:943:                    activeOpacity={0.8}
-src/components/posts/CreatePostPage.tsx:978:                    activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:360:              activeOpacity={0.9}
-src/components/posts/PostsPage.tsx:421:                  activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:437:                        activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:450:                        activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:459:                      activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:528:                    activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:535:                  activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:685:                  activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:701:                        activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:714:                        activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:727:                        activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:728:                        disabled={isMarkingSold}
-src/components/posts/PostsPage.tsx:743:                        activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:866:                <TouchableOpacity className="p-2" activeOpacity={0.8}>
-src/components/posts/PostsPage.tsx:869:                <TouchableOpacity className="p-2" activeOpacity={0.8} onPress={() => handleOpenContextChat(post)}>
-src/components/posts/PostsPage.tsx:1002:              <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-src/components/posts/PostsPage.tsx:1033:            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-src/components/posts/PostsPage.tsx:1052:              activeOpacity={0.8}
-src/components/posts/PostsPage.tsx:1093:        activeOpacity={0.85}
-src/components/posts/PostsPage.tsx:1118:              activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:442:          activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:603:                        activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:647:                    activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:741:                          disabled={isQuantityLocked}
+src/components/posts/CreatePostPage.tsx:762:                        activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:808:                      activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:850:                      activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:884:            disabled={!canSubmit}
+src/components/posts/CreatePostPage.tsx:896:            activeOpacity={0.85}
+src/components/posts/CreatePostPage.tsx:929:                  disabled={isSubmitting}
+src/components/posts/CreatePostPage.tsx:939:                  activeOpacity={0.85}
+src/components/posts/CreatePostPage.tsx:951:                  activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:980:                    activeOpacity={0.8}
+src/components/posts/CreatePostPage.tsx:1015:                    activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:363:              activeOpacity={0.9}
+src/components/posts/PostsPage.tsx:424:                  activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:440:                        activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:453:                        activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:462:                      activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:531:                    activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:538:                  activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:661:                  activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:677:                        activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:690:                        activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:703:                        activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:704:                        disabled={isMarkingSold}
+src/components/posts/PostsPage.tsx:719:                        activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:820:                <TouchableOpacity className="p-2" activeOpacity={0.8}>
+src/components/posts/PostsPage.tsx:823:                <TouchableOpacity className="p-2" activeOpacity={0.8} onPress={() => handleOpenContextChat(post)}>
+src/components/posts/PostsPage.tsx:962:              <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
+src/components/posts/PostsPage.tsx:993:            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
+src/components/posts/PostsPage.tsx:1012:              activeOpacity={0.8}
+src/components/posts/PostsPage.tsx:1053:        activeOpacity={0.85}
+src/components/posts/PostsPage.tsx:1078:              activeOpacity={0.8}
 src/components/security/AccountSecurityPage.tsx:186:                activeOpacity={0.7}
 src/components/security/DangerZoneSection.tsx:183:                disabled={isDeleting}
-src/components/security/LicensingSection.tsx:324:                  disabled={busyCommunityId === community.id}
-src/components/security/LicensingSection.tsx:385:            disabled={isDeletingAccount}
-src/components/security/ProfileSection.tsx:504:            disabled={isSaving}
-src/components/security/ProfileSection.tsx:517:            disabled={isSaving || isUploading || !hasUnsavedChanges}
-src/components/security/SecuritySection.tsx:478:            disabled={emailLoading || !emailValid || (!hasPassword && (emailPasswordInput.length < 8 || emailPasswordInput !== emailPasswordConfirm))}
-src/components/security/SecuritySection.tsx:543:                disabled={phoneLoading || !isLinkedPhoneValid}
-src/components/security/SecuritySection.tsx:573:                disabled={phoneLoading || phoneOtp.length !== 6}
-src/components/security/SecuritySection.tsx:604:          disabled={loading2FA}
-src/components/security/SecuritySection.tsx:696:              disabled={loading2FA || verificationCode.length !== 6}
+src/components/security/LicensingSection.tsx:313:                      disabled={busyCommunityId === community.id}
+src/components/security/LicensingSection.tsx:395:              disabled={isDeletingAccount}
+src/components/security/ProfileSection.tsx:421:            disabled={isSaving}
+src/components/security/ProfileSection.tsx:434:            disabled={isSaving || isUploading || !hasUnsavedChanges}
+src/components/security/SecuritySection.tsx:485:            disabled={emailLoading || !emailValid || (!hasPassword && (emailPasswordInput.length < 8 || emailPasswordInput !== emailPasswordConfirm))}
+src/components/security/SecuritySection.tsx:548:                disabled={phoneLoading || !isLinkedPhoneValid}
+src/components/security/SecuritySection.tsx:578:                disabled={phoneLoading || phoneOtp.length !== 6}
+src/components/security/SecuritySection.tsx:607:          disabled={loading2FA}
+src/components/security/SecuritySection.tsx:699:              disabled={loading2FA || verificationCode.length !== 6}
 src/components/security/SessionsSection.tsx:107:          <TouchableOpacity onPress={handleLogoutAll} disabled={isRevokingAll}>
 src/components/settings/CreateBusinessForm.tsx:276:                activeOpacity={0.8}
 src/components/settings/CreateBusinessForm.tsx:286:                disabled={isSubmitting || isUploadingImage}
@@ -230,15 +231,15 @@ src/components/settings/ManageCommunityCharity.tsx:600:              activeOpaci
 src/components/settings/ManageCommunityCharity.tsx:775:                activeOpacity={0.85}
 src/components/settings/ManageCommunityCharity.tsx:951:                      disabled={savingCharity}
 src/components/settings/ManageCommunityCharity.tsx:1046:                  disabled={savingSuggestion}
-src/components/settings/ManageUserBusinesses.tsx:154:          activeOpacity={0.8}
-src/components/settings/ManageUserBusinesses.tsx:247:                  <TouchableOpacity onPress={() => handleToggleStatus(business)} disabled={isBusy} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg, paddingVertical: SPACE.xxl, borderRadius: RADIUS.lg, backgroundColor: isActive ? THEME_COLORS.alias_rgba_245_158_11_0_12 : THEME_COLORS.alias_rgba_16_185_129_0_12 }}>
-src/components/settings/ManageUserBusinesses.tsx:254:                  <TouchableOpacity onPress={() => handleDelete(business)} disabled={isBusy} style={{ width: SPACE.s50, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.errorTintSoft }}>
-src/components/settings/NotificationSettingsPage.tsx:265:                  disabled={!prefs.globalEnabled}
-src/components/settings/NotificationSettingsPage.tsx:302:                      disabled={!prefs.globalEnabled}
-src/components/settings/SettingsPage.tsx:214:            activeOpacity={0.85}
-src/components/settings/SettingsPage.tsx:387:                activeOpacity={0.85}
-src/components/settings/SettingsPage.tsx:411:                activeOpacity={0.85}
-src/components/settings/SettingsPage.tsx:509:            activeOpacity={0.7}
+src/components/settings/ManageUserBusinesses.tsx:169:          activeOpacity={0.8}
+src/components/settings/ManageUserBusinesses.tsx:262:                  <TouchableOpacity onPress={() => handleToggleStatus(business)} disabled={isBusy} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg, paddingVertical: SPACE.xl, borderRadius: RADIUS.lg, opacity: isBusy ? 0.7 : 1 }}>
+src/components/settings/ManageUserBusinesses.tsx:269:                  <TouchableOpacity onPress={() => handleDelete(business)} disabled={isBusy} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg, paddingVertical: SPACE.xl, borderRadius: RADIUS.lg, opacity: isBusy ? 0.7 : 1 }}>
+src/components/settings/NotificationSettingsPage.tsx:237:                  disabled={!canConfigure}
+src/components/settings/SettingsPage.tsx:260:            activeOpacity={0.85}
+src/components/settings/SettingsPage.tsx:433:                activeOpacity={0.85}
+src/components/settings/SettingsPage.tsx:457:                activeOpacity={0.85}
+src/components/settings/SettingsPage.tsx:566:                activeOpacity={0.8}
+src/components/shared/EmergencyResponderCard.tsx:182:                disabled={pendingCommunityId === community.id}
 src/components/shared/Header.tsx:149:            <TouchableOpacity style={styles.backBtn} onPress={handleBack} activeOpacity={0.7}>
 src/components/shared/Header.tsx:156:              activeOpacity={0.85}
 src/components/shared/Header.tsx:202:          <TouchableOpacity style={styles.bellBtn} onPress={onToggleNotifications} activeOpacity={0.7}>

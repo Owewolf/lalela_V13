@@ -371,6 +371,7 @@ model Post {
   postsImage           String?   @map("posts_image")
   isCommunityPick      Boolean   @default(false) @map("is_community_pick")
   isCharity            Boolean   @default(false) @map("is_charity")
+  isOpenExchange       Boolean   @default(false) @map("is_open_exchange")
   charityId            String?   @map("charity_id")
   authorName           String?   @map("author_name")
   authorRole           String?   @map("author_role")

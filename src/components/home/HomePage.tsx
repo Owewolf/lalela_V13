@@ -22,7 +22,6 @@ import {
   Info,
   Compass,
   Plus,
-  Heart,
   MoreVertical,
   Share2,
   MapPin,
@@ -42,6 +41,7 @@ import { CommunityNotice } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
 import RecordSaleModal from '../market/RecordSaleModal';
+import { OpenExchangeBadge } from '../shared/OpenExchangeBadge';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -975,7 +975,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           </View>
         ) : null}
 
-        <View className="p-3 gap-1.5">
+        <View className="p-3 gap-1.5 flex-1">
           <View className="flex-row items-start justify-between gap-2">
             <Text
               className="flex-1 text-[16px] font-bold text-primary leading-tight"
@@ -1076,28 +1076,40 @@ export const HomePage: React.FC<HomePageProps> = ({
           </Text>
 
           <View className="flex-row items-end justify-between mt-1 gap-2">
-            <Text className="text-[22px] font-black text-primary tracking-tight leading-none">
-              R{localPrice.toLocaleString()}
-            </Text>
             {initialQuantity > 1 ? (
               <View className="bg-surface-container px-2.5 py-1 rounded-lg border" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
                 <Text className="text-[10px] font-black text-primary">
-                  Left: {remainingQuantity}
+                  {remainingQuantity}
                 </Text>
               </View>
             ) : null}
+            <View className="flex-1 items-end">
+              <Text className="text-[22px] font-black text-primary tracking-tight leading-none text-right">
+                R{localPrice.toLocaleString()}
+              </Text>
+            </View>
           </View>
 
           <View className="flex-row items-center justify-between mt-1 gap-3">
-            <TouchableOpacity
-              activeOpacity={0.7}
-              className="h-8 rounded-full bg-indigo-50 border border-indigo-100 px-3 flex-row items-center justify-center"
-              onPress={() => router.push(`/market?listingId=${listing.id}`)}
-            >
-              <Text className="text-[11px] font-bold text-indigo-700" numberOfLines={1}>
-                {catPullLabel}
-              </Text>
-            </TouchableOpacity>
+            <View className="flex-row items-center gap-2 flex-1 flex-wrap">
+              {listing.isOpenExchange ? (
+                <OpenExchangeBadge compact />
+              ) : (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="h-8 rounded-full border px-3 flex-row items-center justify-center"
+                  style={{
+                    backgroundColor: THEME_COLORS.primaryTintSoft,
+                    borderColor: THEME_COLORS.primary,
+                  }}
+                  onPress={() => router.push(`/market?listingId=${listing.id}`)}
+                >
+                  <Text className="text-[11px] font-bold" style={{ color: THEME_COLORS.primary }} numberOfLines={1}>
+                    {catPullLabel}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
 
             <TouchableOpacity
               activeOpacity={0.7}
@@ -1118,7 +1130,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </TouchableOpacity>
           </View>
 
-          <View className="flex-row items-center gap-2 mt-1">
+          <View className="flex-row items-center gap-2 mt-auto pt-1">
             <View className="w-7 h-7 rounded-full bg-surface-container overflow-hidden border" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
               {listing.authorImage ? (
                 <Image
@@ -1568,15 +1580,17 @@ export const HomePage: React.FC<HomePageProps> = ({
                       resizeMode="cover"
                     />
                   ) : (
-                    <View className="w-full h-full items-center justify-center">
-                      <Heart size={20} color={THEME_COLORS.neutralTextSoft} />
-                    </View>
+                    <Image
+                      source={require('../../../assets/charity_white-gree.png')}
+                      className="w-full h-full"
+                      resizeMode="contain"
+                    />
                   )}
                 </View>
 
                 <View className="flex-1 gap-2">
                   <Text
-                    className="text-base font-bold text-primary"
+                    className="text-[22px] font-black text-primary tracking-tight leading-none"
                     numberOfLines={1}
                   >
                     {selectedCharity.name}
@@ -1592,11 +1606,11 @@ export const HomePage: React.FC<HomePageProps> = ({
                   {/* Progress bar */}
                   <View className="gap-1 pt-1">
                     <View className="flex-row items-center justify-between">
-                      <Text className="text-[10px] font-semibold text-primary">
-                        Raised: {totalRaisedLabel}
+                      <Text className="text-[22px] font-black text-primary tracking-tight leading-none">
+                        Raised
                       </Text>
-                      <Text className="text-[10px] font-semibold text-primary">
-                        {progressPercentLabel}
+                      <Text className="text-[22px] font-black text-primary tracking-tight leading-none">
+                        {totalRaisedLabel}
                       </Text>
                     </View>
                     <View className="flex-row items-center gap-2">
@@ -1627,7 +1641,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               </View>
             ) : (
               <View className="gap-3">
-                <Text className="text-base font-bold text-primary">
+                <Text className="text-[22px] font-black text-primary tracking-tight leading-none">
                   CAT is in effect
                 </Text>
                 <Text className="text-sm text-gray-500">

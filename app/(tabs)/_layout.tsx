@@ -19,7 +19,7 @@ const SPACE = {
 };
 
 const PILL_SIDE_INSET = 20;
-const PILL_HEIGHT = 56;
+const PILL_HEIGHT = 58;
 
 function FloatingTabBar(props: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
@@ -30,7 +30,7 @@ function FloatingTabBar(props: BottomTabBarProps) {
         position: 'absolute',
         left: PILL_SIDE_INSET,
         right: PILL_SIDE_INSET,
-        bottom: insets.bottom + SPACE.md,
+        bottom: insets.bottom + SPACE.sm,
       }}
     >
       <View

@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { isUserLicensed, isCommunityLicensed, isCommunityTrial } from '../../lib/licensing';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
-const APP_LOGO_PATH = require('../../../assets/lalela_logo.png');
+const APP_LOGO_PATH = require('../../../assets/icon.png');
 const PRIMARY = THEME_COLORS.primary;
 const TYPE_SCALE = {
   xs: 8,

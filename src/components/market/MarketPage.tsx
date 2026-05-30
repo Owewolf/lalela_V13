@@ -35,6 +35,7 @@ import { resolveActiveCharity } from '../../lib/activeCharity';
 import type { UserBusiness } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import RecordSaleModal from './RecordSaleModal';
+import { OpenExchangeBadge } from '../shared/OpenExchangeBadge';
 
 const TYPE_SCALE = {
   xs: 10,
@@ -222,6 +223,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
             location: listing.locationName,
             description: listing.description,
             price: listing.price !== undefined ? `R${(listing.communityPrice || listing.price).toLocaleString()}` : undefined,
+            exchangePreference: listing.isOpenExchange ? 'Exchange' : undefined,
           },
         });
         setActiveConversation(conversationId);
@@ -388,6 +390,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       const hasSales = soldQuantity > 0;
       const hasListingImage = typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0;
       const hasAuthorImage = typeof listing.authorImage === 'string' && listing.authorImage.trim().length > 0;
+      const publicPrice = Number(listing.publicPrice ?? listing.price ?? 0);
       return (
         <TouchableOpacity
           activeOpacity={0.92}
@@ -430,70 +433,43 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   <Text className="text-white text-[10px] font-black uppercase tracking-widest">Partially Sold</Text>
                 </View>
               ) : null}
-              <View
-                className="absolute bottom-0 left-0 right-0 h-36"
-                style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_4 }}
-                pointerEvents="none"
-              />
-              <View className="absolute bottom-4 left-4 right-4">
-                <Text className="text-white text-[48px] font-black leading-none" numberOfLines={2}>
-                  {listing.title}
-                </Text>
-              </View>
             </View>
           ) : null}
 
           {/* Details */}
           <View className="p-4 gap-3">
-            {!hasListingImage ? (
-              <View className="gap-2">
-                {listing.isCommunityPick ? (
-                  <View className="self-start bg-orange-500 px-3 py-1 rounded-full flex-row items-center gap-1">
-                    <View className="w-2 h-2 bg-surface-container-low rounded-full" />
-                    <Text className="text-white text-[10px] font-bold uppercase tracking-widest">
-                      Community Pick
-                    </Text>
-                  </View>
-                ) : null}
-                <View className="flex-row items-start justify-between gap-3">
-                  <Text className="text-primary text-xl font-bold leading-tight flex-1" numberOfLines={2}>
-                    {listing.title}
-                  </Text>
-                  {isSoldOut ? (
-                    <View
-                      className="px-3 py-1 rounded-full"
-                      style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
-                    >
-                      <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
-                    </View>
-                  ) : null}
-                </View>
-              </View>
-            ) : null}
-
-            {/* Price row */}
-            <View className="flex-row justify-between items-end">
-              <View>
-                <Text className="text-gray-400 text-[10px] uppercase font-black tracking-widest mb-1">
-                  Unit Price
-                </Text>
-                <View className="flex-row items-baseline gap-0.5">
-                  <Text className="text-primary text-[58px] font-black leading-none">
-                    R{(listing.communityPrice || listing.price || 0).toLocaleString()}
-                  </Text>
-                  <Text className="text-primary/60 font-extrabold text-lg">.00</Text>
-                </View>
-              </View>
-              {listing.publicPrice ? (
-                <View className="items-end">
-                  <Text className="text-gray-400 text-[10px] uppercase font-black tracking-widest mb-1">
-                    Public Price
-                  </Text>
-                  <Text className="text-gray-400 font-black text-[38px] leading-none">
-                    R{listing.publicPrice.toLocaleString()}
+            <View className="gap-2">
+              {!hasListingImage && listing.isCommunityPick ? (
+                <View className="self-start bg-orange-500 px-3 py-1 rounded-full flex-row items-center gap-1">
+                  <View className="w-2 h-2 bg-surface-container-low rounded-full" />
+                  <Text className="text-white text-[10px] font-bold uppercase tracking-widest">
+                    Community Pick
                   </Text>
                 </View>
               ) : null}
+              <View className="flex-row items-start justify-between gap-3">
+                <Text className="text-primary text-[34px] font-black leading-tight flex-1" numberOfLines={2}>
+                  {listing.title}
+                </Text>
+                {!hasListingImage && isSoldOut ? (
+                  <View
+                    className="px-3 py-1 rounded-full"
+                    style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
+                  >
+                    <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
+
+            {/* Price row */}
+            <View className="self-end items-end">
+              <Text className="text-gray-400 text-[10px] uppercase font-black tracking-widest mb-1">
+                Public Price
+              </Text>
+              <Text className="text-primary text-[32px] font-black leading-none">
+                R{publicPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </Text>
             </View>
 
             {initialQuantity > 1 ? (
@@ -530,8 +506,11 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   <Heart size={20} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
                 </View>
                 <View className="flex-1">
-                  <View className="flex-row justify-between items-center mb-1">
-                    <Text className="text-primary font-bold text-sm">Charity Impact</Text>
+                  <View className="flex-row justify-between items-start gap-3 mb-1">
+                    <View className="gap-2 flex-1">
+                      <Text className="text-primary font-bold text-sm">CAT: R{perUnitCharityImpact.toFixed(2)}</Text>
+                      {listing.isOpenExchange ? <OpenExchangeBadge /> : null}
+                    </View>
                     <Text className="text-orange-500 font-black text-sm">
                       R{(activeTab === 'sold' ? totalSoldCharityImpact : totalAvailableCharityImpact).toFixed(2)}
                     </Text>
@@ -701,6 +680,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                       ) : null}
                     </View>
                     <Text style={{ fontSize: TYPE_SCALE.h3, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.neutralTextStrong, lineHeight: LINE_HEIGHT.title }}>{selectedListing.title}</Text>
+                    {selectedListing.isOpenExchange ? <OpenExchangeBadge /> : null}
                   </View>
 
                   <TouchableOpacity
@@ -727,7 +707,10 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
 
                 {charity ? (
                   <View style={{ backgroundColor: THEME_COLORS.aliasHex_fff7ed, borderRadius: RADIUS.lg, padding: SPACE.xl, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_249_115_22_0_18 }}>
-                    <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.aliasHex_9a3412 }}>Charity contribution</Text>
+                    <View style={{ gap: SPACE.sm }}>
+                      <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.aliasHex_9a3412 }}>Charity contribution</Text>
+                      {selectedListing.isOpenExchange ? <OpenExchangeBadge /> : null}
+                    </View>
                     <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.aliasHex_7c2d12, marginTop: SPACE.xs }}>
                       This listing supports {charity.name} with R{selectedListing.charityAmount?.toFixed(2) || '0.00'} per item.
                     </Text>
@@ -761,9 +744,14 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   style={{ backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.md, paddingVertical: SPACE.xl, alignItems: 'center' }}
                 >
                   <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
-                    Open Chat
+                    {selectedListing.isOpenExchange ? 'Exchange Chat' : 'Open Chat'}
                   </Text>
                 </TouchableOpacity>
+                {selectedListing.isOpenExchange ? (
+                  <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.neutralTextSubtle, textAlign: 'center' }}>
+                    Trades, swaps, gifts, or mixed offers are welcome while keeping the listed value intact.
+                  </Text>
+                ) : null}
 
                 {isOwner && !isSold ? (
                   (() => {

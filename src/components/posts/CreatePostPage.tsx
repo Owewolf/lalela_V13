@@ -144,7 +144,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
         : undefined) ||
       'info',
   );
-  const [isFree, setIsFree] = useState(postToEdit?.price === 0);
+  const [isOpenExchange, setIsOpenExchange] = useState(Boolean(postToEdit?.isOpenExchange));
   const [price, setPrice] = useState<string>(postToEdit?.price?.toString() || '');
   const [initialQuantity, setInitialQuantity] = useState<string>(String(Math.max(1, Number(postToEdit?.initialQuantity ?? 1))));
   const [quantityType, setQuantityType] = useState<string>(postToEdit?.quantityType || 'items');
@@ -194,6 +194,8 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
   const charityPercentage = Math.max(activeCharity?.percentage || 0, CAT_MIN_PERCENTAGE);
   const numericPrice = parseFloat(price) || 0;
   const numericQuantity = Math.max(1, parseInt(initialQuantity || '1', 10) || 1);
+  // Quantity becomes locked once the listing has any recorded sales.
+  const isQuantityLocked = !!postToEdit && postType === 'listing' && Number(postToEdit.soldQuantity ?? 0) > 0;
   const handleQuantityInput = (rawValue: string) => {
     const digitsOnly = rawValue.replace(/\D/g, '');
     if (!digitsOnly) {
@@ -275,6 +277,15 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
     const isEmergency = postType === 'notice' && urgency === 'emergency';
     if (isEmergency && !emergencyCategory) return;
     if (!isEmergency && (!title || !description)) return;
+    if (postType === 'listing' && numericPrice <= 0) {
+      Alert.alert(
+        'Value required',
+        isOpenExchange
+          ? 'Exchange listings must keep a listed value above R0.00.'
+          : 'Listings must include a value above R0.00.',
+      );
+      return;
+    }
 
     const urgencyMap: Record<Urgency, NonNullable<CommunityNotice['urgency']>> = {
       emergency: 'emergency',
@@ -312,7 +323,14 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
       price: postType === 'listing' ? numericPrice : undefined,
       communityPrice: postType === 'listing' ? numericPrice : undefined,
       publicPrice: postType === 'listing' ? publicPrice : undefined,
-      initialQuantity: postType === 'listing' ? numericQuantity : undefined,
+      isOpenExchange: postType === 'listing' ? isOpenExchange : undefined,
+      // In edit mode, only send initialQuantity when the user actually changed it.
+      // Sending an unchanged value would trip the backend lock guard once sales exist.
+      initialQuantity: postType === 'listing'
+        ? (postToEdit
+            ? (numericQuantity !== Math.max(1, Number(postToEdit.initialQuantity ?? 1)) ? numericQuantity : undefined)
+            : numericQuantity)
+        : undefined,
       quantityType: postType === 'listing' ? (quantityType || 'items').trim() : undefined,
       urgency: postType === 'notice' ? urgencyMap[urgency] : undefined,
       urgencyLevel: postType === 'notice' ? urgency : undefined,
@@ -704,6 +722,7 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         style={{
                           backgroundColor: getCardSurfaceColor('default'),
                           borderColor: getCardBorderColor('default'),
+                          opacity: isQuantityLocked ? 0.5 : 1,
                         }}
                       >
                         <TextInput
@@ -713,15 +732,22 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                           className="flex-1 text-center text-base font-bold text-gray-800"
                           maxLength={4}
                           selectionColor={THEME_COLORS.primary}
+                          editable={!isQuantityLocked}
                         />
                         <TouchableOpacity
-                          onPress={() => setInitialQuantity(String(numericQuantity + 1))}
+                          onPress={() => !isQuantityLocked && setInitialQuantity(String(numericQuantity + 1))}
                           className="h-9 min-w-10 px-2 rounded-xl items-center justify-center"
-                          style={{ backgroundColor: THEME_COLORS.primary }}
+                          style={{ backgroundColor: isQuantityLocked ? THEME_COLORS.neutralBorderSoft : THEME_COLORS.primary }}
+                          disabled={isQuantityLocked}
                         >
                           <Text className="text-xl font-bold text-white">+</Text>
                         </TouchableOpacity>
                       </View>
+                      {isQuantityLocked ? (
+                        <Text className="text-[10px] text-gray-400 ml-1 mt-0.5">
+                          Locked after first sale
+                        </Text>
+                      ) : null}
                     </View>
 
                     <View className="flex-1 gap-1">
@@ -750,31 +776,32 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                         placeholder="0.00"
                         placeholderTextColor={THEME_COLORS.neutralTextSoft}
                         keyboardType="decimal-pad"
-                        editable={!isFree}
                         className="h-12 px-3 rounded-2xl text-gray-800 border"
-                        style={[
-                          {
-                            backgroundColor: getCardSurfaceColor('default'),
-                            borderColor: getCardBorderColor('default'),
-                          },
-                          isFree ? { opacity: 0.5 } : undefined,
-                        ]}
+                        style={{
+                          backgroundColor: getCardSurfaceColor('default'),
+                          borderColor: getCardBorderColor('default'),
+                        }}
                       />
                     </View>
                   </View>
 
-                  <View className="flex-row items-center justify-between px-1 pt-1">
-                    <Text className="text-xl font-semibold text-gray-700">Free Items</Text>
+                  <View className="px-1 pt-1 gap-3">
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-1 pr-4">
+                        <Text className="text-xl font-semibold text-gray-700">Exchange</Text>
+                        <Text className="text-sm text-gray-500 mt-1 leading-5">
+                          Allow members to offer trades, swaps, gifts, or other exchange arrangements while keeping the item's listed value.
+                        </Text>
+                      </View>
                     <TouchableOpacity
                       onPress={() => {
-                        setIsFree(!isFree);
-                        if (!isFree) setPrice('0');
+                        setIsOpenExchange((currentValue) => !currentValue);
                       }}
                       className="rounded-full"
                       style={{
                         width: 54,
                         height: 30,
-                        backgroundColor: isFree ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft,
+                        backgroundColor: isOpenExchange ? THEME_COLORS.primary : THEME_COLORS.neutralBorderSoft,
                         justifyContent: 'center',
                         paddingHorizontal: SPACE.xxs,
                       }}
@@ -782,9 +809,10 @@ const CreatePostPage: React.FC<CreatePostPageProps> = ({
                     >
                       <View
                         className="w-6 h-6 bg-surface-container-low rounded-full shadow-sm"
-                        style={{ alignSelf: isFree ? 'flex-end' : 'flex-start' }}
+                        style={{ alignSelf: isOpenExchange ? 'flex-end' : 'flex-start' }}
                       />
                     </TouchableOpacity>
+                  </View>
                   </View>
                 </View>
 

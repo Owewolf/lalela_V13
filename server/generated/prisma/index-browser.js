@@ -352,6 +352,7 @@ exports.Prisma.PostScalarFieldEnum = {
   postsImage: 'postsImage',
   isCommunityPick: 'isCommunityPick',
   isCharity: 'isCharity',
+  isOpenExchange: 'isOpenExchange',
   charityId: 'charityId',
   authorName: 'authorName',
   authorRole: 'authorRole',

@@ -41,6 +41,7 @@ import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { getCardBorderColor, getCardShadow } from '../../theme/cardStyles';
 import { createShadow } from '../../theme/shadows';
 import RecordSaleModal from '../market/RecordSaleModal';
+import { OpenExchangeBadge } from '../shared/OpenExchangeBadge';
 
 const PRIMARY = THEME_COLORS.primary;
 const SPACE = {
@@ -156,7 +157,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   const router = useRouter();
   const { posts, currentCommunity, removePost, charities, startConversation, setActiveConversation, members, markPostSold } = useCommunity();
   const { userProfile } = useAuth();
-  const [filter, setFilter] = useState<'all' | 'listing' | 'notice'>('all');
+  const [filter, setFilter] = useState<'all' | 'listing' | 'notice' | 'openExchange'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
@@ -186,6 +187,8 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         p.description.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+  const openExchangeListings = listings.filter((post) => post.isOpenExchange);
 
   const confirmDelete = useCallback(() => {
     if (!postToDelete) return;
@@ -548,9 +551,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
 
   const renderListing = useCallback(
     ({ item: post }: { item: CommunityNotice }) => {
-      const urgencyColors = getUrgencyColors(post.urgency);
       const isEmergency = post.urgency === 'emergency';
-      const charity = charities.find(c => c.id === post.charityId);
       const isOwner = post.authorId === userProfile?.id;
       const isAdmin = currentCommunity?.userRole === 'ADMIN';
       const isSold = String(post.status || '').toUpperCase() === 'SOLD';
@@ -559,9 +560,13 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       const soldQuantity = Math.max(0, Number(post.soldQuantity ?? 0));
       const remainingQuantity = Math.max(0, Number(post.remainingQuantity ?? (initialQuantity - soldQuantity)));
       const perUnitCharityImpact = Math.max(0, Number(post.charityAmount ?? 0));
-      const totalAvailableCharityImpact = perUnitCharityImpact * remainingQuantity;
+      const remainingPotentialCat = perUnitCharityImpact * remainingQuantity;
       const hasListingImage = post.type === 'listing' && typeof post.postsImage === 'string' && post.postsImage.trim().length > 0;
       const saleActionLabel = remainingQuantity > 1 ? 'Record Sale' : 'Mark as Sold';
+      const localPrice = Number(post.price ?? 0);
+      const publicPrice = Number(post.publicPrice ?? localPrice);
+      const formattedLocalPrice = localPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const formattedPublicPrice = publicPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
       return (
         <View className="bg-surface-container-low rounded-[2.2rem] overflow-hidden border mb-6" style={{ ...POSTS_SHADOW_HERO, ...SURFACE_BORDER_STYLE }}>
@@ -590,7 +595,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 </Text>
               </View>
             </View>
-          ) : post.postsImage ? (
+          ) : hasListingImage ? (
             <View className="w-full aspect-[4/3] overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
               <Image
                 source={{ uri: resolveMediaUrl(post.postsImage) }}
@@ -617,41 +622,14 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                   <Text className="text-white text-[10px] font-black uppercase tracking-widest">Partially Sold</Text>
                 </View>
               ) : null}
-              <View
-                className="absolute bottom-0 left-0 right-0 h-36"
-                style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_4 }}
-                pointerEvents="none"
-              />
-              <View className="absolute bottom-4 left-4 right-4">
-                <Text className="text-white text-[48px] font-black leading-none" numberOfLines={2}>
-                  {post.title}
-                </Text>
-              </View>
             </View>
           ) : null}
 
           <View className="p-6 gap-6">
             {/* Title + menu */}
-            <View className="flex-row justify-between items-start">
+            <View className="flex-row justify-between items-start gap-3">
               <View className="flex-1">
                 <View className="flex-row items-center gap-2 mb-3 flex-wrap">
-                  {post.urgency && post.urgency !== 'normal' ? (
-                    <View
-                      className="px-3 py-1 rounded-full border flex-row items-center gap-1"
-                      style={{
-                        backgroundColor: urgencyColors.bg,
-                        borderColor: urgencyColors.border,
-                      }}
-                    >
-                      <UrgencyIcon urgency={post.urgency} size={10} />
-                      <Text
-                        className="text-[10px] font-black uppercase tracking-widest"
-                        style={{ color: urgencyColors.text }}
-                      >
-                        {post.urgency}
-                      </Text>
-                    </View>
-                  ) : null}
                   {post.isCommunityPick ? (
                     <View className="bg-orange-500 px-3 py-1 rounded-full flex-row items-center gap-1">
                       <View className="w-1.5 h-1.5 bg-surface-container-low rounded-full" />
@@ -661,21 +639,19 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                     </View>
                   ) : null}
                 </View>
-                {!hasListingImage ? (
-                  <View className="flex-row items-start justify-between gap-3">
-                    <Text className="text-2xl font-black text-primary leading-tight flex-1" numberOfLines={2}>
-                      {post.title}
-                    </Text>
-                    {isSold ? (
-                      <View
-                        className="px-3 py-1 rounded-full"
-                        style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
-                      >
-                        <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
-                      </View>
-                    ) : null}
-                  </View>
-                ) : null}
+                <View className="flex-row items-start justify-between gap-3">
+                  <Text className="text-[30px] font-black text-primary leading-tight flex-1" numberOfLines={2}>
+                    {post.title}
+                  </Text>
+                  {isSold ? (
+                    <View
+                      className="px-3 py-1 rounded-full"
+                      style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
+                    >
+                      <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
+                    </View>
+                  ) : null}
+                </View>
               </View>
 
               <View className="relative">
@@ -751,79 +727,57 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               </View>
             </View>
 
-            <Text className="text-gray-500 font-medium text-sm leading-relaxed">
+            <Text className="text-gray-500 font-medium text-[12px] leading-relaxed -mt-2">
               {post.description}
             </Text>
 
             {/* Price block */}
             {post.type === 'listing' && post.price !== undefined ? (
-              <View className="bg-surface-container p-5 rounded-2xl border gap-4" style={{ ...POSTS_SHADOW_SOFT, ...SURFACE_BORDER_STYLE }}>
-                <View className="flex-row justify-between items-end">
-                  <View>
-                    <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                      Unit Price
-                    </Text>
-                    <View className="flex-row items-baseline gap-0.5">
-                      <Text className="text-primary text-[54px] font-black leading-none">
-                        R{(post.communityPrice || post.price).toLocaleString()}
-                      </Text>
-                      <Text className="text-primary/60 font-extrabold text-lg">.00</Text>
-                    </View>
-                  </View>
-                  {post.publicPrice ? (
-                    <View className="items-end">
-                      <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                        Public Price
-                      </Text>
-                      <Text className="text-gray-400 font-black text-[34px] leading-none">
-                        R{post.publicPrice.toLocaleString()}
-                      </Text>
-                    </View>
-                  ) : null}
+              <View className="bg-surface-container p-5 rounded-2xl border gap-5" style={{ ...POSTS_SHADOW_SOFT, ...SURFACE_BORDER_STYLE }}>
+                <View className="items-center">
+                  <Text className="text-primary text-[30px] font-black leading-none text-center">
+                    R{formattedLocalPrice}
+                  </Text>
                 </View>
 
-                {initialQuantity > 1 ? (
+                {post.charityId && perUnitCharityImpact > 0 ? (
+                  <View className="bg-surface-container-low px-4 py-3 rounded-2xl border gap-2" style={SURFACE_BORDER_STYLE}>
+                    <Text className="text-[13px] font-black text-primary text-center">
+                      CAT Potential: R{remainingPotentialCat.toFixed(2)}
+                    </Text>
+                    {(post.isOpenExchange || initialQuantity > 1) ? (
+                      <View className="flex-row items-center justify-center gap-3">
+                        {post.isOpenExchange ? <OpenExchangeBadge /> : null}
+                        {initialQuantity > 1 && remainingQuantity > 0 ? (
+                          <Text className="text-[12px] font-black text-primary text-center">
+                            Qty: {remainingQuantity}
+                          </Text>
+                        ) : null}
+                      </View>
+                    ) : null}
+                  </View>
+                ) : null}
+
+                <View className="items-center">
+                  <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                    Public Price
+                  </Text>
+                  <Text className="text-gray-500 font-black text-[30px] leading-none text-center">
+                    R{formattedPublicPrice}
+                  </Text>
+                </View>
+
+                {initialQuantity > 1 && !(post.charityId && perUnitCharityImpact > 0) ? (
                   <View className="bg-surface-container-low px-4 py-3 rounded-2xl border" style={SURFACE_BORDER_STYLE}>
                     <View className="flex-row items-center justify-between">
                       <Text className="text-[12px] font-bold text-gray-500">
                         Initial: {initialQuantity} {post.quantityType || 'items'}
                       </Text>
                       <Text className="text-[12px] font-black text-primary">
-                        Left: {remainingQuantity}
+                        {initialQuantity > 1 ? 'Qty' : 'Left'}: {remainingQuantity}
                       </Text>
                     </View>
-                    <View className="h-1.5 bg-surface-container rounded-full mt-2 overflow-hidden">
-                      <View
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${Math.max(0, Math.min(100, (soldQuantity / initialQuantity) * 100))}%`,
-                          backgroundColor: THEME_COLORS.primary,
-                        }}
-                      />
-                    </View>
-                    {soldQuantity > 0 ? (
-                      <Text className="text-[11px] font-semibold text-gray-500 mt-2">
-                        Sold so far: {soldQuantity}
-                      </Text>
-                    ) : null}
                   </View>
-                ) : null}
-
-                {post.charityId && perUnitCharityImpact > 0 ? (
-                  <View className="flex-row items-center justify-between px-1">
-                    <View className="flex-row items-center gap-2">
-                      <Heart size={16} color={THEME_COLORS.secondaryContainer} fill={THEME_COLORS.secondaryContainer} />
-                      <Text className="text-primary font-bold text-sm">{charity?.name || 'Charity Impact'}</Text>
-                    </View>
-                    <Text className="text-orange-500 font-black text-base">
-                      R{totalAvailableCharityImpact.toFixed(2)}
-                    </Text>
-                  </View>
-                ) : null}
-                {post.charityId && perUnitCharityImpact > 0 ? (
-                  <Text className="text-gray-400 text-[11px] px-1 -mt-2">
-                    {`${remainingQuantity} available × R${perUnitCharityImpact.toFixed(2)} per unit.`}
-                  </Text>
                 ) : null}
               </View>
             ) : null}
@@ -891,6 +845,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   const filterTabs = [
     { id: 'all', label: 'All Feed' },
     { id: 'listing', label: 'Listings' },
+    { id: 'openExchange', label: 'Exchange' },
     { id: 'notice', label: 'Notices' },
   ] as const;
 
@@ -915,17 +870,18 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
     if (filter === 'all' && notices.length > 0 && listings.length > 0) {
       data.push({ kind: 'divider' });
     }
-    if (filter === 'all' || filter === 'listing') {
+    if (filter === 'all' || filter === 'listing' || filter === 'openExchange') {
       data.push({ kind: 'listingHeader' });
-      if (listings.length > 0) {
-        listings.forEach(l => data.push({ kind: 'listing', item: l }));
+      const visibleListings = filter === 'openExchange' ? openExchangeListings : listings;
+      if (visibleListings.length > 0) {
+        visibleListings.forEach(l => data.push({ kind: 'listing', item: l }));
       } else {
         data.push({ kind: 'emptyListings' });
       }
     }
 
     return data;
-  }, [filter, listings, notices]);
+  }, [filter, listings, notices, openExchangeListings]);
 
   useEffect(() => {
     if (!initialNoticeId || notices.length === 0) return;
@@ -982,7 +938,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
           <View className="flex-row items-center gap-2 px-2 mb-4 mt-2">
             <Tag size={16} color={THEME_COLORS.secondaryContainer} />
             <Text className="text-sm font-black text-primary uppercase tracking-widest">
-              Community Listing
+              {filter === 'openExchange' ? 'Exchange Listings' : 'Community Listing'}
             </Text>
           </View>
         );
@@ -994,9 +950,13 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center" style={POSTS_SHADOW_SOFT}>
               <Tag size={40} color={THEME_COLORS.neutralBorderMuted} />
             </View>
-            <Text className="text-lg font-bold text-primary">No listings found</Text>
+            <Text className="text-lg font-bold text-primary">
+              {filter === 'openExchange' ? 'No Exchange listings found' : 'No listings found'}
+            </Text>
             <Text className="text-sm text-gray-400 text-center max-w-[240px]">
-              Try adjusting your search query to find what you're looking for.
+              {filter === 'openExchange'
+                ? 'Try another search or switch back to all listings to browse the full feed.'
+                : 'Try adjusting your search query to find what you\'re looking for.'}
             </Text>
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>

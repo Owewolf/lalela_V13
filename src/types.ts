@@ -16,6 +16,7 @@ export interface CommunityNotice {
   timestamp: string;
   isLarge?: boolean;
   isCommunityPick?: boolean;
+  isOpenExchange?: boolean;
   // Charity integration
   charityId?: string;
   charityPercentage?: number;

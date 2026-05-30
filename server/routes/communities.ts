@@ -34,6 +34,17 @@ function normalizeQuantity(value: unknown): number {
   return Math.floor(parsed);
 }
 
+function normalizeBoolean(value: unknown): boolean {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'off', ''].includes(normalized)) return false;
+  }
+  if (typeof value === 'number') return value !== 0;
+  return Boolean(value);
+}
+
 async function getSoldQuantityForPost(tx: any, communityId: string, postId: string): Promise<number> {
   const catTx = tx?.catTransaction;
   if (!catTx?.aggregate) return 0;
@@ -802,7 +813,7 @@ router.get('/:id/posts', async (req, res) => {
 router.post('/:id/posts', async (req, res) => {
   const { type, category, subtype, postSubtype, title, description, image_url, imageUrl, postsImage, urgency, urgencyLevel,
     latitude, longitude, price, communityPrice, initialQuantity, quantityType,
-    is_charity, expires_at, locationName, source,
+    is_charity, isOpenExchange, is_open_exchange, expires_at, locationName, source,
     authorName: bodyAuthorName, authorRole: bodyAuthorRole, authorImage: bodyAuthorImage } = req.body;
   if (!type || !title?.trim()) return res.status(400).json({ error: 'type and title are required' });
 
@@ -834,8 +845,16 @@ router.post('/:id/posts', async (req, res) => {
   const resolvedQuantityType = type === 'listing'
     ? (typeof quantityType === 'string' && quantityType.trim().length > 0 ? quantityType.trim() : 'items')
     : null;
+  const resolvedOpenExchange = type === 'listing'
+    ? normalizeBoolean(isOpenExchange ?? is_open_exchange)
+    : false;
 
   if (type === 'listing') {
+    const nextListingPrice = Number(resolvedCommunityPrice ?? price ?? 0);
+    if (!Number.isFinite(nextListingPrice) || nextListingPrice <= 0) {
+      return res.status(400).json({ error: 'Listings must include a value above R0.00' });
+    }
+
     const activeCharity = await getActiveCharityForCommunity(prisma, req.params.id);
 
     if (activeCharity?.id) {
@@ -887,6 +906,7 @@ router.post('/:id/posts', async (req, res) => {
       publicPrice: resolvedPublicPrice,
       initialQuantity: resolvedInitialQuantity,
       quantityType: resolvedQuantityType,
+      isOpenExchange: resolvedOpenExchange,
       isCharity: is_charity ?? false,
       charityId: resolvedCharityId,
       charityPercentage: resolvedCharityPercentage,
@@ -991,7 +1011,7 @@ router.put('/:id/posts/:postId', async (req, res) => {
 
   const allowed = [
     'title', 'description', 'imageUrl', 'postsImage', 'status', 'urgency', 'urgencyLevel',
-    'price', 'communityPrice', 'initialQuantity', 'quantityType',
+    'price', 'communityPrice', 'initialQuantity', 'quantityType', 'isOpenExchange',
     'category', 'subtype', 'locationName', 'latitude', 'longitude', 'source', 'expiresAt',
   ];
   const data: Record<string, unknown> = {};
@@ -1002,6 +1022,9 @@ router.put('/:id/posts/:postId', async (req, res) => {
   if (!('subtype' in data) && 'postSubtype' in req.body) {
     data.subtype = req.body.postSubtype;
   }
+  if (!('isOpenExchange' in data) && 'is_open_exchange' in req.body) {
+    data.isOpenExchange = req.body.is_open_exchange;
+  }
 
   if ('initialQuantity' in data) {
     data.initialQuantity = Math.max(1, Math.floor(Number(data.initialQuantity) || 1));
@@ -1009,28 +1032,54 @@ router.put('/:id/posts/:postId', async (req, res) => {
   if ('quantityType' in data && typeof data.quantityType === 'string') {
     data.quantityType = data.quantityType.trim() || 'items';
   }
+  if ('isOpenExchange' in data) {
+    data.isOpenExchange = normalizeBoolean(data.isOpenExchange);
+  }
+  if ('price' in data && !('communityPrice' in data)) {
+    data.communityPrice = data.price;
+  }
+  if ('communityPrice' in data && !('price' in data)) {
+    data.price = data.communityPrice;
+  }
 
   if (existingPost.type === 'listing' && 'initialQuantity' in data) {
-    const catTx = (prisma as any).catTransaction;
-    const soldAggregate = catTx?.aggregate
-      ? await catTx.aggregate({
-          where: {
-            communityId: req.params.id,
-            postId: req.params.postId,
-            reversedAt: null,
-          },
-          _sum: { quantitySold: true },
-        })
-      : null;
-    const soldQuantity = Number(soldAggregate?._sum?.quantitySold ?? 0);
-    if (Number.isFinite(soldQuantity) && soldQuantity > 0) {
-      return res.status(409).json({ error: 'Initial quantity cannot be changed after sales are recorded' });
+    // Only block if the incoming value actually differs from the stored quantity.
+    // Key-presence alone (e.g. description-only edit) must not trigger this guard.
+    const incomingQty = Number(data.initialQuantity); // already normalized above
+    const storedQty = Math.max(1, Math.floor(Number(existingPost.initialQuantity) || 1));
+    const quantityChanged = incomingQty !== storedQty;
+    if (quantityChanged) {
+      const catTx = (prisma as any).catTransaction;
+      const soldAggregate = catTx?.aggregate
+        ? await catTx.aggregate({
+            where: {
+              communityId: req.params.id,
+              postId: req.params.postId,
+              reversedAt: null,
+            },
+            _sum: { quantitySold: true },
+          })
+        : null;
+      const soldQuantity = Number(soldAggregate?._sum?.quantitySold ?? 0);
+      if (Number.isFinite(soldQuantity) && soldQuantity > 0) {
+        return res.status(409).json({ error: 'Quantity cannot be changed after sales have been recorded' });
+      }
     }
   }
 
   // For listings, re-derive charity link + public price whenever the
   // community price is being updated. The client never sets these directly.
   if (existingPost.type === 'listing') {
+    const nextListingPrice = 'communityPrice' in data
+      ? Number(data.communityPrice ?? 0)
+      : 'price' in data
+      ? Number(data.price ?? 0)
+      : Number(existingPost.communityPrice ?? existingPost.price ?? 0);
+
+    if (!Number.isFinite(nextListingPrice) || nextListingPrice <= 0) {
+      return res.status(400).json({ error: 'Listings must include a value above R0.00' });
+    }
+
     const active = await getActiveCharityForCommunity(prisma, req.params.id);
     const charityRow = active?.id
       ? await prisma.charity.findUnique({ where: { id: active.id }, select: { percentage: true } })
@@ -1042,7 +1091,7 @@ router.put('/:id/posts/:postId', async (req, res) => {
     );
     const nextCommunityPrice = 'communityPrice' in data
       ? Number(data.communityPrice ?? 0)
-      : Number(existingPost.communityPrice ?? existingPost.price ?? 0);
+      : nextListingPrice;
     const nextCharityAmount = nextCommunityPrice > 0
       ? Math.round(((nextCommunityPrice * nextPercentage) / 100) * 100) / 100
       : 0;

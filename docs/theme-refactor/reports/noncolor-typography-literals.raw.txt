@@ -2,28 +2,28 @@ app/(tabs)/_layout.tsx:124:            fontSize: 11,
 app/(tabs)/_layout.tsx:125:            fontWeight: '700',
 src/components/admin/ModerationCenter.tsx:2340:  sectionTitle: { fontSize: TYPE_SCALE.display, fontWeight: FONT_WEIGHT.black, color: PRIMARY, flex: 1, lineHeight: 30 },
 src/components/admin/ModerationCenter.tsx:2568:    lineHeight: 18,
-src/components/security/ProfileSection.tsx:176:    fontSize: 14,
-src/components/security/ProfileSection.tsx:177:    fontWeight: '600',
-src/components/security/ProfileSection.tsx:183:    fontSize: 14,
-src/components/security/ProfileSection.tsx:184:    fontWeight: '700',
-src/components/security/ProfileSection.tsx:190:    fontSize: 14,
-src/components/security/ProfileSection.tsx:191:    fontWeight: '700',
-src/components/security/ProfileSection.tsx:220:          <Text style={{ fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, color: THEME_COLORS.warningStrong }}>
-src/components/security/ProfileSection.tsx:223:          <Text style={{ fontSize: 11, fontWeight: '700', color: THEME_COLORS.warningStrong, flex: 1 }}>
-src/components/security/ProfileSection.tsx:287:          <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.primary }}>Account Information</Text>
-src/components/security/ProfileSection.tsx:346:                    <Text style={{ fontSize: 10, color: THEME_COLORS.warningText, fontStyle: 'italic' }}>
-src/components/security/ProfileSection.tsx:359:                      <Text style={{ fontSize: 11, fontWeight: '700', color: THEME_COLORS.brandBlue }}>
-src/components/security/ProfileSection.tsx:365:                  <Text style={{ fontSize: 10, color: THEME_COLORS.warningText, fontStyle: 'italic', marginTop: 4 }}>
-src/components/security/ProfileSection.tsx:369:                  <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, fontStyle: 'italic', marginTop: 4 }}>
-src/components/security/ProfileSection.tsx:382:                    <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.primary, textTransform: 'uppercase' }}>Verified</Text>
-src/components/security/ProfileSection.tsx:390:                    <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.warningText, textTransform: 'uppercase' }}>Resend</Text>
-src/components/security/ProfileSection.tsx:416:              <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Emergency Responder</Text>
-src/components/security/ProfileSection.tsx:417:              <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft }}>Receive and respond to community alerts</Text>
-src/components/security/ProfileSection.tsx:429:            <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.white, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-src/components/security/ProfileSection.tsx:437:            <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
-src/components/security/ProfileSection.tsx:440:            <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, marginBottom: 8 }}>
-src/components/security/ProfileSection.tsx:462:                    <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>{community.name}</Text>
-src/components/security/ProfileSection.tsx:463:                    <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>
-src/components/security/ProfileSection.tsx:513:            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle }}>Cancel</Text>
-src/components/security/ProfileSection.tsx:530:              <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.white }}>Save Changes</Text>
-src/components/security/ProfileSection.tsx:550:          <Text style={{ fontSize: 14, fontWeight: '700', color: status.type === 'success' ? THEME_COLORS.primary : THEME_COLORS.errorText }}>
+src/components/security/ProfileSection.tsx:173:    fontSize: 14,
+src/components/security/ProfileSection.tsx:174:    fontWeight: '600',
+src/components/security/ProfileSection.tsx:180:    fontSize: 14,
+src/components/security/ProfileSection.tsx:181:    fontWeight: '700',
+src/components/security/ProfileSection.tsx:187:    fontSize: 14,
+src/components/security/ProfileSection.tsx:188:    fontWeight: '700',
+src/components/security/ProfileSection.tsx:217:          <Text style={{ fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, color: THEME_COLORS.warningStrong }}>
+src/components/security/ProfileSection.tsx:220:          <Text style={{ fontSize: 11, fontWeight: '700', color: THEME_COLORS.warningStrong, flex: 1 }}>
+src/components/security/ProfileSection.tsx:284:          <Text style={{ fontSize: 18, fontWeight: '700', color: THEME_COLORS.primary }}>Account Information</Text>
+src/components/security/ProfileSection.tsx:343:                    <Text style={{ fontSize: 10, color: THEME_COLORS.warningText, fontStyle: 'italic' }}>
+src/components/security/ProfileSection.tsx:356:                      <Text style={{ fontSize: 11, fontWeight: '700', color: THEME_COLORS.brandBlue }}>
+src/components/security/ProfileSection.tsx:362:                  <Text style={{ fontSize: 10, color: THEME_COLORS.warningText, fontStyle: 'italic', marginTop: 4 }}>
+src/components/security/ProfileSection.tsx:366:                  <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, fontStyle: 'italic', marginTop: 4 }}>
+src/components/security/ProfileSection.tsx:379:                    <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.primary, textTransform: 'uppercase' }}>Verified</Text>
+src/components/security/ProfileSection.tsx:387:                    <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.warningText, textTransform: 'uppercase' }}>Resend</Text>
+src/components/security/ProfileSection.tsx:430:            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle }}>Cancel</Text>
+src/components/security/ProfileSection.tsx:447:              <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.white }}>Save Changes</Text>
+src/components/security/ProfileSection.tsx:467:          <Text style={{ fontSize: 14, fontWeight: '700', color: status.type === 'success' ? THEME_COLORS.primary : THEME_COLORS.errorText }}>
+src/components/shared/EmergencyResponderCard.tsx:117:            <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>Emergency Responder</Text>
+src/components/shared/EmergencyResponderCard.tsx:118:            <Text style={{ fontSize: 11, color: THEME_COLORS.neutralTextSoft }}>Receive and respond to community alerts</Text>
+src/components/shared/EmergencyResponderCard.tsx:130:          <Text style={{ fontSize: 12, fontWeight: '700', color: THEME_COLORS.white, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+src/components/shared/EmergencyResponderCard.tsx:138:          <Text style={{ fontSize: 10, fontWeight: '700', color: THEME_COLORS.neutralTextSubtle, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
+src/components/shared/EmergencyResponderCard.tsx:141:          <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, marginBottom: 8 }}>
+src/components/shared/EmergencyResponderCard.tsx:169:                  <Text style={{ fontSize: 14, fontWeight: '700', color: THEME_COLORS.onSurface }}>{community.name}</Text>
+src/components/shared/EmergencyResponderCard.tsx:170:                  <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft }}>

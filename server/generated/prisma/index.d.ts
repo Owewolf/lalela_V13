@@ -20579,6 +20579,7 @@ export namespace Prisma {
     postsImage: string | null
     isCommunityPick: boolean | null
     isCharity: boolean | null
+    isOpenExchange: boolean | null
     charityId: string | null
     authorName: string | null
     authorRole: string | null
@@ -20620,6 +20621,7 @@ export namespace Prisma {
     postsImage: string | null
     isCommunityPick: boolean | null
     isCharity: boolean | null
+    isOpenExchange: boolean | null
     charityId: string | null
     authorName: string | null
     authorRole: string | null
@@ -20661,6 +20663,7 @@ export namespace Prisma {
     postsImage: number
     isCommunityPick: number
     isCharity: number
+    isOpenExchange: number
     charityId: number
     authorName: number
     authorRole: number
@@ -20726,6 +20729,7 @@ export namespace Prisma {
     postsImage?: true
     isCommunityPick?: true
     isCharity?: true
+    isOpenExchange?: true
     charityId?: true
     authorName?: true
     authorRole?: true
@@ -20767,6 +20771,7 @@ export namespace Prisma {
     postsImage?: true
     isCommunityPick?: true
     isCharity?: true
+    isOpenExchange?: true
     charityId?: true
     authorName?: true
     authorRole?: true
@@ -20808,6 +20813,7 @@ export namespace Prisma {
     postsImage?: true
     isCommunityPick?: true
     isCharity?: true
+    isOpenExchange?: true
     charityId?: true
     authorName?: true
     authorRole?: true
@@ -20936,6 +20942,7 @@ export namespace Prisma {
     postsImage: string | null
     isCommunityPick: boolean
     isCharity: boolean
+    isOpenExchange: boolean
     charityId: string | null
     authorName: string | null
     authorRole: string | null
@@ -20996,6 +21003,7 @@ export namespace Prisma {
     postsImage?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: boolean
     authorName?: boolean
     authorRole?: boolean
@@ -21041,6 +21049,7 @@ export namespace Prisma {
     postsImage?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: boolean
     authorName?: boolean
     authorRole?: boolean
@@ -21084,6 +21093,7 @@ export namespace Prisma {
     postsImage?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: boolean
     authorName?: boolean
     authorRole?: boolean
@@ -21127,6 +21137,7 @@ export namespace Prisma {
     postsImage?: boolean
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: boolean
     authorName?: boolean
     authorRole?: boolean
@@ -21146,7 +21157,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "authorId" | "type" | "title" | "description" | "category" | "subtype" | "urgency" | "urgencyLevel" | "price" | "communityPrice" | "publicPrice" | "initialQuantity" | "quantityType" | "charityAmount" | "charityPercentage" | "imageUrl" | "postsImage" | "isCommunityPick" | "isCharity" | "charityId" | "authorName" | "authorRole" | "authorImage" | "locationName" | "latitude" | "longitude" | "source" | "status" | "rejectionReason" | "changesRequestedNote" | "expiresAt" | "soldAt" | "expiredAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
+  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "communityId" | "authorId" | "type" | "title" | "description" | "category" | "subtype" | "urgency" | "urgencyLevel" | "price" | "communityPrice" | "publicPrice" | "initialQuantity" | "quantityType" | "charityAmount" | "charityPercentage" | "imageUrl" | "postsImage" | "isCommunityPick" | "isCharity" | "isOpenExchange" | "charityId" | "authorName" | "authorRole" | "authorImage" | "locationName" | "latitude" | "longitude" | "source" | "status" | "rejectionReason" | "changesRequestedNote" | "expiresAt" | "soldAt" | "expiredAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
   export type PostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     community?: boolean | CommunityDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
@@ -21191,6 +21202,7 @@ export namespace Prisma {
       postsImage: string | null
       isCommunityPick: boolean
       isCharity: boolean
+      isOpenExchange: boolean
       charityId: string | null
       authorName: string | null
       authorRole: string | null
@@ -21655,6 +21667,7 @@ export namespace Prisma {
     readonly postsImage: FieldRef<"Post", 'String'>
     readonly isCommunityPick: FieldRef<"Post", 'Boolean'>
     readonly isCharity: FieldRef<"Post", 'Boolean'>
+    readonly isOpenExchange: FieldRef<"Post", 'Boolean'>
     readonly charityId: FieldRef<"Post", 'String'>
     readonly authorName: FieldRef<"Post", 'String'>
     readonly authorRole: FieldRef<"Post", 'String'>
@@ -41262,6 +41275,7 @@ export namespace Prisma {
     postsImage: 'postsImage',
     isCommunityPick: 'isCommunityPick',
     isCharity: 'isCharity',
+    isOpenExchange: 'isOpenExchange',
     charityId: 'charityId',
     authorName: 'authorName',
     authorRole: 'authorRole',
@@ -43081,6 +43095,7 @@ export namespace Prisma {
     postsImage?: StringNullableFilter<"Post"> | string | null
     isCommunityPick?: BoolFilter<"Post"> | boolean
     isCharity?: BoolFilter<"Post"> | boolean
+    isOpenExchange?: BoolFilter<"Post"> | boolean
     charityId?: StringNullableFilter<"Post"> | string | null
     authorName?: StringNullableFilter<"Post"> | string | null
     authorRole?: StringNullableFilter<"Post"> | string | null
@@ -43125,6 +43140,7 @@ export namespace Prisma {
     postsImage?: SortOrderInput | SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
+    isOpenExchange?: SortOrder
     charityId?: SortOrderInput | SortOrder
     authorName?: SortOrderInput | SortOrder
     authorRole?: SortOrderInput | SortOrder
@@ -43172,6 +43188,7 @@ export namespace Prisma {
     postsImage?: StringNullableFilter<"Post"> | string | null
     isCommunityPick?: BoolFilter<"Post"> | boolean
     isCharity?: BoolFilter<"Post"> | boolean
+    isOpenExchange?: BoolFilter<"Post"> | boolean
     charityId?: StringNullableFilter<"Post"> | string | null
     authorName?: StringNullableFilter<"Post"> | string | null
     authorRole?: StringNullableFilter<"Post"> | string | null
@@ -43216,6 +43233,7 @@ export namespace Prisma {
     postsImage?: SortOrderInput | SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
+    isOpenExchange?: SortOrder
     charityId?: SortOrderInput | SortOrder
     authorName?: SortOrderInput | SortOrder
     authorRole?: SortOrderInput | SortOrder
@@ -43265,6 +43283,7 @@ export namespace Prisma {
     postsImage?: StringNullableWithAggregatesFilter<"Post"> | string | null
     isCommunityPick?: BoolWithAggregatesFilter<"Post"> | boolean
     isCharity?: BoolWithAggregatesFilter<"Post"> | boolean
+    isOpenExchange?: BoolWithAggregatesFilter<"Post"> | boolean
     charityId?: StringNullableWithAggregatesFilter<"Post"> | string | null
     authorName?: StringNullableWithAggregatesFilter<"Post"> | string | null
     authorRole?: StringNullableWithAggregatesFilter<"Post"> | string | null
@@ -46320,6 +46339,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -46364,6 +46384,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -46404,6 +46425,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46448,6 +46470,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46490,6 +46513,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -46529,6 +46553,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46570,6 +46595,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49364,6 +49390,7 @@ export namespace Prisma {
     postsImage?: SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
+    isOpenExchange?: SortOrder
     charityId?: SortOrder
     authorName?: SortOrder
     authorRole?: SortOrder
@@ -49416,6 +49443,7 @@ export namespace Prisma {
     postsImage?: SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
+    isOpenExchange?: SortOrder
     charityId?: SortOrder
     authorName?: SortOrder
     authorRole?: SortOrder
@@ -49457,6 +49485,7 @@ export namespace Prisma {
     postsImage?: SortOrder
     isCommunityPick?: SortOrder
     isCharity?: SortOrder
+    isOpenExchange?: SortOrder
     charityId?: SortOrder
     authorName?: SortOrder
     authorRole?: SortOrder
@@ -53310,6 +53339,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -53352,6 +53382,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -54123,6 +54154,7 @@ export namespace Prisma {
     postsImage?: StringNullableFilter<"Post"> | string | null
     isCommunityPick?: BoolFilter<"Post"> | boolean
     isCharity?: BoolFilter<"Post"> | boolean
+    isOpenExchange?: BoolFilter<"Post"> | boolean
     charityId?: StringNullableFilter<"Post"> | string | null
     authorName?: StringNullableFilter<"Post"> | string | null
     authorRole?: StringNullableFilter<"Post"> | string | null
@@ -56351,6 +56383,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -56393,6 +56426,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -61215,6 +61249,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -61258,6 +61293,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -61626,6 +61662,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61669,6 +61706,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66349,6 +66387,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -66700,6 +66739,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66742,6 +66782,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66783,6 +66824,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67485,6 +67527,7 @@ export namespace Prisma {
     postsImage?: string | null
     isCommunityPick?: boolean
     isCharity?: boolean
+    isOpenExchange?: boolean
     charityId?: string | null
     authorName?: string | null
     authorRole?: string | null
@@ -67746,6 +67789,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67788,6 +67832,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67829,6 +67874,7 @@ export namespace Prisma {
     postsImage?: NullableStringFieldUpdateOperationsInput | string | null
     isCommunityPick?: BoolFieldUpdateOperationsInput | boolean
     isCharity?: BoolFieldUpdateOperationsInput | boolean
+    isOpenExchange?: BoolFieldUpdateOperationsInput | boolean
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     authorName?: NullableStringFieldUpdateOperationsInput | string | null
     authorRole?: NullableStringFieldUpdateOperationsInput | string | null

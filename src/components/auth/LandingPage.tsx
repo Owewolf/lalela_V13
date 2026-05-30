@@ -287,13 +287,6 @@ const LandingPage: React.FC = () => {
           className="mx-6 mb-6"
         >
           <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
-            {/* CTA */}
-            <View className="mb-6">
-              <Text className="text-3xl font-black text-primary leading-tight">
-                Start your community today
-              </Text>
-            </View>
-
             {/* Verification email sent — replaces form */}
             {verificationEmailSent ? (
               <View className="gap-6 items-center py-4">
