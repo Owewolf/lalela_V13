@@ -366,9 +366,16 @@ export const HomePage: React.FC<HomePageProps> = ({
     lastUpdated: null,
   };
 
-  const totalRaisedLabel = `R${featuredCharityTotals.raisedEarnings.toLocaleString()}`;
-  const potentialEarningsLabel = `R${featuredCharityTotals.potentialEarnings.toLocaleString()}`;
-  const lifetimeRaisedLabel = `R${(featuredCharityTotals.lifetimeRaised ?? 0).toLocaleString()}`;
+  const formatTwoDecimals = (value: number) => value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const totalRaisedLabel = `R${formatTwoDecimals(Number(featuredCharityTotals.raisedEarnings ?? 0))}`;
+  const potentialEarningsLabel = `R${formatTwoDecimals(Number(featuredCharityTotals.potentialEarnings ?? 0))}`;
+  const lifetimeRaisedLabel = `R${formatTwoDecimals(Number(featuredCharityTotals.lifetimeRaised ?? 0))}`;
+  const itemsAvailableCount = Number(featuredCharityTotals.itemsAvailable ?? 0);
+  const itemsAvailableLabel = formatTwoDecimals(itemsAvailableCount);
   const fundraisingGoal = featuredCharityTotals.goalAmount > 0 ? featuredCharityTotals.goalAmount : undefined;
   const hasFundraisingGoal = Boolean(fundraisingGoal);
   const computedProgressPercentage = hasFundraisingGoal
@@ -377,7 +384,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const progressBarPercentage = Math.min(computedProgressPercentage, 100);
   const progressPercentLabel = `${computedProgressPercentage}%`;
   const progressTargetLabel = hasFundraisingGoal
-    ? `R${fundraisingGoal!.toLocaleString()}`
+    ? `R${formatTwoDecimals(Number(fundraisingGoal ?? 0))}`
     : totalRaisedLabel;
 
   const charityDescription =
@@ -1661,7 +1668,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     </Text>
                   </View>
                   <Text className="text-[10px] font-semibold text-primary/70">
-                    {featuredCharityTotals.itemsAvailable} active listing{featuredCharityTotals.itemsAvailable === 1 ? '' : 's'}
+                    {itemsAvailableLabel} active listing{itemsAvailableCount === 1 ? '' : 's'}
                   </Text>
                 </View>
               </View>
