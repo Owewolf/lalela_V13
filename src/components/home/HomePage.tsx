@@ -1580,11 +1580,13 @@ export const HomePage: React.FC<HomePageProps> = ({
                       resizeMode="cover"
                     />
                   ) : (
-                    <Image
-                      source={require('../../../assets/charity_white-gree.png')}
-                      className="w-full h-full"
-                      resizeMode="contain"
-                    />
+                    <View className="w-full h-full items-center justify-center bg-surface-container">
+                      <Image
+                        source={require('../../../assets/charity_white-gree.png')}
+                        className="w-full h-full"
+                        resizeMode="contain"
+                      />
+                    </View>
                   )}
                 </View>
 

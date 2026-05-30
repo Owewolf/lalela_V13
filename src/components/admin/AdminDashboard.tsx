@@ -34,7 +34,6 @@ import {
   Siren,
   Navigation,
   CheckCircle2,
-  AlertTriangle,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -131,7 +130,7 @@ const RADIUS = {
   pill: 99,
 } as const;
 
-const APP_LOGO = require('../../../assets/lalela_logo.png');
+const APP_LOGO = require('../../../assets/icon.png');
 
 interface AdminDashboardProps {
   onBack?: () => void;
@@ -686,6 +685,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     ? Math.max(0, Math.round((featuredRaisedAmount / featuredGoalAmount) * 100))
     : Math.max(0, Math.round(featuredCharitySummary?.progressPercentage ?? 0));
   const featuredProgressBarPercentage = Math.min(featuredDisplayPercentage, 100);
+  const formatCurrencyTwoDecimals = (value: number) => value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   // Potential CAT running total across all approved listings (every listing
   // carries CAT now), shown whether or not a charity is currently featured.
@@ -777,55 +780,96 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <Animated.View
         style={[
           styles.bentoCard,
+          styles.securityPanelCard,
           hasAnyIncidents && { backgroundColor: securityPulseBg },
           hasEmergencies && { borderColor: THEME_COLORS.errorBorder },
           !hasEmergencies && hasWarnings && { borderColor: THEME_COLORS.warningBorder },
         ]}
       >
-        <View style={styles.bentoHeader}>
-          <Shield
-            size={22}
-            color={hasEmergencies ? ERROR : hasWarnings ? THEME_COLORS.warning : SECONDARY}
-          />
+        <View style={styles.securityPanelBadgeWrap}>
+          <View style={styles.securityPanelBadge}>
+            <Image
+              source={require('../../../assets/security.jpg')}
+              style={styles.securityPanelBadgeImage}
+              resizeMode="cover"
+            />
+          </View>
+        </View>
+
+        <View style={styles.securityPanelHeader}>
           <Text
             style={[
-              styles.bentoTitle,
+              styles.securityPanelTitle,
               hasEmergencies && { color: ERROR },
               !hasEmergencies && hasWarnings && { color: THEME_COLORS.warning },
             ]}
           >
             Security Panel
           </Text>
-          {hasEmergencies && (
-            <View style={styles.emergencyBadge}>
-              <View style={styles.emergencyDot} />
-              <Text style={styles.emergencyText}>Emergency</Text>
-            </View>
-          )}
-          {!hasEmergencies && hasWarnings && (
-            <View style={styles.warningBadge}>
-              <View style={styles.warningDot} />
-              <Text style={styles.warningText}>Warning</Text>
-            </View>
-          )}
+          <Text style={styles.securityPanelSubtitle}>
+            Real-time responder posture and incident health.
+          </Text>
         </View>
 
-        <View style={styles.securityStats}>
-          <View style={styles.securityStat}>
-            <Text style={styles.securityStatLabel}>EMERGENCIES</Text>
-            <Text style={[styles.securityStatValue, hasEmergencies && { color: ERROR }]}>
-              {emergencyCount}
+        <View style={styles.securityTileGrid}>
+          <View style={styles.securityMetricTile}>
+            <Text style={styles.securityMetricLabel}>EMERGENCIES</Text>
+            <Text style={[styles.securityMetricValue, hasEmergencies && { color: ERROR }]}>{emergencyCount}</Text>
+            <Text style={styles.securityMetricMeta}>{hasEmergencies ? 'Active now' : 'All clear'}</Text>
+          </View>
+
+          <View style={styles.securityMetricTile}>
+            <Text style={styles.securityMetricLabel}>WARNINGS</Text>
+            <Text style={[styles.securityMetricValue, hasWarnings && { color: THEME_COLORS.warning }]}>{warningCount}</Text>
+            <Text style={styles.securityMetricMeta}>{hasWarnings ? 'Monitor closely' : 'No warnings'}</Text>
+          </View>
+
+          <View style={styles.securityMetricTile}>
+            <Text style={styles.securityMetricLabel}>RESPONDERS</Text>
+            <Text style={styles.securityMetricValue}>{responderTotal}</Text>
+            <Text style={styles.securityMetricMeta}>
+              {respondersOnline > 0 ? `${respondersOnline} on duty` : 'No active duty'}
             </Text>
           </View>
-          <View style={styles.securityStat}>
-            <Text style={styles.securityStatLabel}>WARNINGS</Text>
-            <Text style={[styles.securityStatValue, hasWarnings && { color: THEME_COLORS.warning }]}>
-              {warningCount}
-            </Text>
+
+          <View style={styles.securityMetricTile}>
+            <Text style={styles.securityMetricLabel}>OPEN ALERTS</Text>
+            <Text style={[styles.securityMetricValue, activeAlertsCount > 0 && { color: ERROR }]}>{openAlertsDisplay}</Text>
+            <Text style={styles.securityMetricMeta}>{activeAlertsCount > 0 ? 'Needs review' : 'All monitored'}</Text>
           </View>
-          <View style={styles.securityStat}>
-            <Text style={styles.securityStatLabel}>RESPONDERS</Text>
-            <Text style={styles.securityStatValue}>{responderTotal}</Text>
+        </View>
+
+        <View style={styles.securityStatusCard}>
+          <View style={styles.securityStatusIconWrap}>
+            <Users size={20} color={PRIMARY} />
+          </View>
+          <View style={styles.securityStatusCopy}>
+            <Text style={styles.securityStatusLabel}>SECURITY MEMBERS</Text>
+            <Text style={styles.securityStatusValue}>{activeVolunteersCount}</Text>
+          </View>
+          <View
+            style={[
+              styles.securityStatusPill,
+              hasEmergencies && styles.securityStatusPillEmergency,
+              !hasEmergencies && hasWarnings && styles.securityStatusPillWarning,
+            ]}
+          >
+            <View style={styles.securityStatusPillAvatarWrap}>
+              <Image
+                source={require('../../../assets/security.jpg')}
+                style={styles.securityStatusPillAvatar}
+                resizeMode="cover"
+              />
+            </View>
+            <Text
+              style={[
+                styles.securityStatusPillText,
+                hasEmergencies && styles.securityStatusPillTextEmergency,
+                !hasEmergencies && hasWarnings && styles.securityStatusPillTextWarning,
+              ]}
+            >
+              {hasAnyIncidents ? 'Monitor Active' : 'All Secure'}
+            </Text>
           </View>
         </View>
 
@@ -886,38 +930,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             )}
           </View>
         )}
-
-        {!hasAnyIncidents && (
-          <View style={styles.securityStats}>
-            <View style={styles.securityStat}>
-              <Text style={styles.securityStatLabel}>SECURITY MEMBERS</Text>
-              <View style={styles.securityValueRow}>
-                <Text style={styles.securityStatValue}>{activeVolunteersCount}</Text>
-                {respondersOnline > 0 && (
-                  <View style={styles.onlinePulseDot} />
-                )}
-              </View>
-              {respondersOnline > 0 && (
-                <Text style={styles.onlineHint}>
-                  {respondersOnline} online now
-                </Text>
-              )}
-            </View>
-            <View style={styles.securityStat}>
-              <Text style={styles.securityStatLabel}>OPEN ALERTS</Text>
-              <Text style={[styles.securityStatValue, activeAlertsCount > 0 && { color: ERROR }]}> 
-                {openAlertsDisplay}
-              </Text>
-            </View>
-          </View>
-        )}
       </Animated.View>
 
       {/* Charity Hub */}
       <View style={styles.bentoCard}>
         <View style={styles.bentoHeader}>
           <View style={[styles.bentoIcon, { backgroundColor: THEME_COLORS.successSurface }]}>
-            <HeartHandshake size={24} color={PRIMARY} />
+            <Image
+              source={require('../../../assets/charity_white-gree.png')}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="contain"
+            />
           </View>
           {canManageCharity ? (
             <TouchableOpacity style={styles.manageFundsBtn} onPress={handleOpenManageCharity} activeOpacity={0.8}>
@@ -935,7 +958,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           )}
         </View>
         <Text style={styles.bentoTitle}>Charity Hub</Text>
-        <Text style={styles.bentoDesc}>Community-driven support for rural upliftment projects.</Text>
+        <Text style={styles.bentoDesc}>Community-driven support for upliftment projects.</Text>
 
         {featuredCharity ? (
           <>
@@ -952,10 +975,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               )}
               <View style={styles.activeRow}>
                 <Text style={styles.activeRowStrong}>
-                  R{featuredRaisedAmount.toLocaleString()} raised
+                  R{formatCurrencyTwoDecimals(featuredRaisedAmount)} raised
                 </Text>
                 <Text style={styles.activeRowMuted}>
-                  Goal: R{featuredGoalAmount.toLocaleString()} • {featuredDisplayPercentage}%
+                  Goal: R{formatCurrencyTwoDecimals(featuredGoalAmount)} • {featuredDisplayPercentage}%
                 </Text>
               </View>
               <View style={styles.activeProgressTrack}>
@@ -968,7 +991,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </View>
               <View style={styles.activeRow}>
                 <Text style={styles.activeRowStrong}>
-                  Potential: R{(featuredCharitySummary?.potentialEarnings ?? 0).toLocaleString()}
+                  Potential: R{formatCurrencyTwoDecimals(Number(featuredCharitySummary?.potentialEarnings ?? 0))}
                 </Text>
                 <Text style={styles.activeRowMuted}>
                   {featuredCharitySummary?.itemsAvailable ?? 0} active listing{(featuredCharitySummary?.itemsAvailable ?? 0) === 1 ? '' : 's'}
@@ -978,7 +1001,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <View style={styles.donorTickerRow}>
                   {donationTicker.map((d) => (
                     <View key={d.id} style={styles.donorChip}>
-                      <Text style={styles.donorChipText}>+R{d.amount.toLocaleString()}</Text>
+                      <Text style={styles.donorChipText}>+R{formatCurrencyTwoDecimals(Number(d.amount ?? 0))}</Text>
                     </View>
                   ))}
                 </View>
@@ -996,7 +1019,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </Text>
                 </View>
                 <Text style={styles.catPreviousValue}>
-                  Lifetime total: R{catPreviousCampaign.finalRaised.toLocaleString()}
+                  Lifetime total: R{formatCurrencyTwoDecimals(Number(catPreviousCampaign.finalRaised ?? 0))}
                 </Text>
               </View>
             ) : null}
@@ -1099,7 +1122,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <View style={styles.communityLifetimeCard}>
           <Text style={styles.communityLifetimeLabel}>Community Lifetime Total</Text>
           <Text style={styles.communityLifetimeValue}>
-            R{(featuredCharitySummary?.lifetimeRaised ?? 0).toLocaleString()}
+            R{formatCurrencyTwoDecimals(Number(featuredCharitySummary?.lifetimeRaised ?? 0))}
           </Text>
           <Text style={styles.communityLifetimeMeta}>Across all CAT and featured cycles</Text>
         </View>
@@ -1590,6 +1613,161 @@ const styles = StyleSheet.create({
   },
   warningDot: { width: 6, height: 6, borderRadius: RADIUS.sm, backgroundColor: THEME_COLORS.warning },
   warningText: { fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.warning, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide },
+  securityPanelCard: {
+    paddingHorizontal: SPACE.s16,
+    paddingTop: SPACE.xl,
+    paddingBottom: SPACE.xl,
+    gap: SPACE.xxl,
+  },
+  securityPanelBadgeWrap: {
+    alignItems: 'center',
+    marginTop: -SPACE.md,
+  },
+  securityPanelBadge: {
+    width: 116,
+    height: 116,
+    borderRadius: RADIUS.circle * 1.45,
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: THEME_COLORS.whiteOverlay90,
+    ...createShadow(THEME_COLORS.black, 0, 5, 0.18, 10, 5),
+  },
+  securityPanelBadgeImage: {
+    width: '100%',
+    height: '100%',
+  },
+  securityPanelHeader: {
+    alignItems: 'center',
+    gap: SPACE.xs,
+    marginTop: SPACE.sm,
+  },
+  securityPanelTitle: {
+    fontSize: TYPE_SCALE.hero,
+    fontWeight: FONT_WEIGHT.black,
+    color: PRIMARY,
+    letterSpacing: LETTER_SPACING.normal,
+  },
+  securityPanelSubtitle: {
+    fontSize: TYPE_SCALE.xl,
+    color: THEME_COLORS.neutralTextSubtle,
+    textAlign: 'center',
+  },
+  securityTileGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: SPACE.xxl,
+    marginTop: SPACE.xl,
+  },
+  securityMetricTile: {
+    width: '48%',
+    borderRadius: RADIUS.card,
+    backgroundColor: THEME_COLORS.neutralBgSoft,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.neutralBorderSoft,
+    paddingVertical: SPACE.xxl,
+    paddingHorizontal: SPACE.xl,
+    alignItems: 'center',
+    gap: SPACE.xs,
+    ...createShadow(THEME_COLORS.black, 0, 2, 0.06, 4, 2),
+  },
+  securityMetricLabel: {
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
+    textTransform: 'uppercase',
+    letterSpacing: LETTER_SPACING.widest,
+    textAlign: 'center',
+  },
+  securityMetricValue: {
+    fontSize: TYPE_SCALE.display,
+    fontWeight: FONT_WEIGHT.black,
+    color: PRIMARY,
+    textAlign: 'center',
+  },
+  securityMetricMeta: {
+    fontSize: TYPE_SCALE.lg,
+    color: THEME_COLORS.neutralTextSubtle,
+    textAlign: 'center',
+  },
+  securityStatusCard: {
+    marginTop: SPACE.xxl,
+    borderRadius: RADIUS.cardLg,
+    borderWidth: 1,
+    borderColor: getCardBorderColor('default'),
+    backgroundColor: getCardSurfaceColor('default'),
+    paddingHorizontal: SPACE.xxl,
+    paddingVertical: SPACE.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACE.xl,
+  },
+  securityStatusIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: RADIUS.xxl,
+    backgroundColor: THEME_COLORS.primaryTintSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  securityStatusCopy: {
+    flex: 1,
+    gap: SPACE.xxxs,
+  },
+  securityStatusLabel: {
+    fontSize: TYPE_SCALE.xs,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.neutralTextMuted,
+    textTransform: 'uppercase',
+    letterSpacing: LETTER_SPACING.widest,
+  },
+  securityStatusValue: {
+    fontSize: TYPE_SCALE.display,
+    fontWeight: FONT_WEIGHT.black,
+    color: PRIMARY,
+  },
+  securityStatusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACE.sm,
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: SPACE.xxl,
+    paddingVertical: SPACE.md,
+    backgroundColor: THEME_COLORS.successSurface,
+    borderWidth: 1,
+    borderColor: THEME_COLORS.successBorder,
+  },
+  securityStatusPillAvatarWrap: {
+    width: 18,
+    height: 18,
+    borderRadius: RADIUS.pill,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: THEME_COLORS.whiteOverlay70,
+  },
+  securityStatusPillAvatar: {
+    width: '100%',
+    height: '100%',
+  },
+  securityStatusPillEmergency: {
+    backgroundColor: THEME_COLORS.errorSurface,
+    borderColor: THEME_COLORS.errorBorder,
+  },
+  securityStatusPillWarning: {
+    backgroundColor: THEME_COLORS.warningSurface,
+    borderColor: THEME_COLORS.warningBorder,
+  },
+  securityStatusPillText: {
+    fontSize: TYPE_SCALE.md,
+    fontWeight: FONT_WEIGHT.black,
+    color: THEME_COLORS.successText,
+  },
+  securityStatusPillTextEmergency: {
+    color: ERROR,
+  },
+  securityStatusPillTextWarning: {
+    color: THEME_COLORS.warningText,
+  },
   securityStats: { flexDirection: 'row', justifyContent: 'space-between', marginTop: SPACE.lg },
   securityStat: { flex: 1, gap: SPACE.sm, alignItems: 'center' },
   securityStatLabel: {

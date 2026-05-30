@@ -29,6 +29,7 @@ import api from '../../lib/api';
 import { accountService } from '../../services/accountService';
 import { TwoFASetupResponse } from '../../types';
 import { THEME_COLORS } from '../../theme/colors';
+import { SecurityShieldHero } from './SecurityShieldHero';
 
 const TYPE_SCALE = {
   sm: 10,
@@ -308,6 +309,14 @@ export const SecuritySection: React.FC = () => {
 
   return (
     <View style={{ gap: SPACE.lg }}>
+      <SecurityShieldHero
+        height={150}
+        borderRadius={RADIUS.card}
+        badgeSize={52}
+        badgeOffset={SPACE.s18}
+        containerStyle={{ marginBottom: SPACE.sm }}
+      />
+
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
         <View style={{ width: SPACE.s40, height: SPACE.s40, borderRadius: RADIUS.lg, backgroundColor: THEME_COLORS.infoTintSoft, alignItems: 'center', justifyContent: 'center' }}>

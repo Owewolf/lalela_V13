@@ -241,22 +241,24 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
           {/* Section A: Navigation */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Navigation</Text>
-            {navItems.map((item) => {
-              const isActive = activeTab === item.id;
-              return (
-                <TouchableOpacity
-                  key={item.id}
-                  style={[styles.navItem, isActive && styles.navItemActive]}
-                  onPress={() => handleNavigate(item.id)}
-                  activeOpacity={0.7}
-                >
-                  <item.icon size={20} color={isActive ? PRIMARY : THEME_COLORS.neutralTextHeading} />
-                  <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+            <View style={styles.navItemsList}>
+              {navItems.map((item) => {
+                const isActive = activeTab === item.id;
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={[styles.navItem, isActive && styles.navItemActive]}
+                    onPress={() => handleNavigate(item.id)}
+                    activeOpacity={0.7}
+                  >
+                    <item.icon size={20} color={isActive ? PRIMARY : THEME_COLORS.neutralTextHeading} />
+                    <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
 
           <View style={styles.separator} />
@@ -537,7 +539,7 @@ const styles = StyleSheet.create({
     height: SPACE.s28,
   },
   menuLabel: {
-    fontSize: TYPE_SCALE.xxl,
+    fontSize: TYPE_SCALE.title,
     fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
     letterSpacing: LETTER_SPACING.tightNegative,
@@ -574,8 +576,11 @@ const styles = StyleSheet.create({
   navItemActive: {
     backgroundColor: THEME_COLORS.successSurface,
   },
+  navItemsList: {
+    gap: SPACE.xs,
+  },
   navLabel: {
-    fontSize: TYPE_SCALE.xl,
+    fontSize: TYPE_SCALE.xxl,
     fontWeight: FONT_WEIGHT.bold,
     color: THEME_COLORS.neutralTextHeading,
   },
@@ -636,7 +641,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   communityName: {
-    fontSize: TYPE_SCALE.md,
+    fontSize: TYPE_SCALE.lg,
     fontWeight: FONT_WEIGHT.bold,
     color: THEME_COLORS.neutralTextHeading,
   },
@@ -678,7 +683,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   createCommunityText: {
-    fontSize: TYPE_SCALE.md,
+    fontSize: TYPE_SCALE.lg,
     fontWeight: FONT_WEIGHT.black,
   },
   upgradeHint: {
@@ -704,7 +709,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   adminName: {
-    fontSize: TYPE_SCALE.xl,
+    fontSize: TYPE_SCALE.xxl,
     fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
   },
@@ -751,7 +756,7 @@ const styles = StyleSheet.create({
     gap: SPACE.sm,
   },
   settingsName: {
-    fontSize: TYPE_SCALE.xl,
+    fontSize: TYPE_SCALE.xxl,
     fontWeight: FONT_WEIGHT.black,
     color: PRIMARY,
     flex: 1,
@@ -772,7 +777,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
   },
   signOutText: {
-    fontSize: TYPE_SCALE.xl,
+    fontSize: TYPE_SCALE.xxl,
     fontWeight: FONT_WEIGHT.bold,
     color: THEME_COLORS.errorStrong,
   },
@@ -785,7 +790,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
   },
   authBtnText: {
-    fontSize: TYPE_SCALE.xl,
+    fontSize: TYPE_SCALE.xxl,
     fontWeight: FONT_WEIGHT.bold,
   },
   dialogOverlay: {

@@ -5,7 +5,6 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
-  TextInput,
   Image,
   StatusBar,
   Modal,
@@ -16,12 +15,11 @@ import {
   SlidersHorizontal,
   Map as MapIcon,
   List as ListIcon,
-  Search,
-  X,
   MessageSquare,
   MapPin,
   Clock,
   Heart,
+  X,
 } from 'lucide-react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { BusinessCard } from './BusinessCard';
@@ -109,6 +107,7 @@ interface MarketBusiness {
   hasCall?: boolean;
   isExternal?: boolean;
   isFeatured?: boolean;
+  moderationStatus?: string;
   distance: string;
   isExplicitlyLinked: boolean;
   isMemberBusiness: boolean;
@@ -139,7 +138,6 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
   const [activeTab, setActiveTab] = useState<'featured' | 'listings' | 'businesses' | 'sold'>('businesses');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedListing, setSelectedListing] = useState<(typeof listings)[0] | null>(null);
   const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
   const [saleListing, setSaleListing] = useState<(typeof listings)[0] | null>(null);
@@ -200,7 +198,6 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
     setActiveTab('businesses');
     setViewMode('list');
     setSelectedCategory(null);
-    setSearchQuery(target.name || '');
     setFocusedBusinessId(target.id);
   }, [initialBusinessId, communityBusinesses]);
 
@@ -243,6 +240,36 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
     );
   }, [currentCommunity?.enabledCategories]);
 
+  const selectedCategoryDef = useMemo(() => {
+    if (!selectedCategory) return null;
+    return enabledCategories.find((cat) => cat.id === selectedCategory) ?? null;
+  }, [enabledCategories, selectedCategory]);
+
+  const matchesSelectedCategory = useCallback((value?: string | null) => {
+    if (!selectedCategory) return true;
+    const normalized = String(value || '').trim().toLowerCase();
+    if (!normalized) return false;
+
+    if (!selectedCategoryDef) {
+      return normalized === selectedCategory.toLowerCase();
+    }
+
+    return (
+      normalized === selectedCategoryDef.label.toLowerCase() ||
+      selectedCategoryDef.types.some((type) => type.toLowerCase() === normalized)
+    );
+  }, [selectedCategory, selectedCategoryDef]);
+
+  const featuredPosts = useMemo(() => {
+    return posts
+      .filter((post) => {
+        const status = String(post.status || '').toUpperCase();
+        return post.type === 'listing' && status !== 'DELETED';
+      })
+      .filter((post) => matchesSelectedCategory(post.category))
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [matchesSelectedCategory, posts]);
+
   const filteredBusinesses = useMemo((): MarketBusiness[] => {
     if (!coverageArea) return [];
 
@@ -250,6 +277,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       ...b,
       isExternal: false,
       isFeatured: b.isFeatured ?? true,
+      moderationStatus: (b as any).status,
       isExplicitlyLinked: true,
       isMemberBusiness: false,
       status: (b.status as 'Open' | 'Closed') || 'Open',
@@ -276,6 +304,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       website: undefined,
       isExternal: false,
       isFeatured: false,
+      moderationStatus: b.status,
       isMemberBusiness: b.source !== 'IMPORT',
       label: b.ownerId === userProfile?.id ? 'My Business' : undefined,
       labelType: 'new' as const,
@@ -299,22 +328,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
 
     // Filter by category
     if (selectedCategory) {
-      combined = combined.filter(b => {
-        const cat = enabledCategories.find(c => c.id === selectedCategory);
-        if (!cat) return b.category === selectedCategory;
-        return b.category === cat.label || cat.types.includes(b.category.toLowerCase());
-      });
-    }
-
-    // Filter by search
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      combined = combined.filter(
-        b =>
-          b.name.toLowerCase().includes(q) ||
-          b.category.toLowerCase().includes(q) ||
-          (b.description && b.description.toLowerCase().includes(q))
-      );
+      combined = combined.filter((b) => matchesSelectedCategory(b.category));
     }
 
     // Sort: member businesses first, then by distance
@@ -328,7 +342,13 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       return parseFloat(a.distance || '0') - parseFloat(b.distance || '0');
     });
 
-    if (activeTab === 'featured') return combined.filter(b => b.isFeatured);
+    // Featured only shows admin-picked businesses.
+    if (activeTab === 'featured') {
+      return combined.filter((b) => {
+        const isPinned = String(b.moderationStatus || '').toUpperCase() === 'PINNED';
+        return b.isFeatured || isPinned;
+      });
+    }
     return combined;
   }, [
     currentCommunity,
@@ -337,7 +357,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
     activeTab,
     coverageArea,
     selectedCategory,
-    searchQuery,
+    matchesSelectedCategory,
     enabledCategories,
     userProfile?.id,
     focusedBusinessId,
@@ -796,39 +816,15 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       ? 'Sales Activity'
       : 'Items for Sale';
 
-  const subText =
-    activeTab === 'businesses'
-      ? `${filteredBusinesses.length} business${filteredBusinesses.length !== 1 ? 'es' : ''} in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`
-      : activeTab === 'sold'
-      ? `Showing ${soldListings.length} listing${soldListings.length !== 1 ? 's' : ''} with sales in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`
-      : `Showing ${activeListings.length} listings in ${coverageArea?.locationName || currentCommunity?.name || 'your area'}`;
-
   return (
     <View className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Search + filters header */}
+      {/* Filters header */}
       <View
         className="px-5 pt-4 pb-2 gap-4 border-b"
         style={{ backgroundColor: APP_SHELL_COLORS.body, borderBottomColor: THEME_COLORS.neutralBorderSoft }}
       >
-        {/* Search bar */}
-        <View className="relative flex-row items-center bg-surface-container rounded-2xl px-4 py-3 gap-3">
-          <Search size={16} color={THEME_COLORS.neutralTextSoft} />
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search businesses..."
-            placeholderTextColor={THEME_COLORS.neutralTextSoft}
-            className="flex-1 text-sm font-medium text-gray-800"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-              <X size={16} color={THEME_COLORS.neutralTextSoft} />
-            </TouchableOpacity>
-          )}
-        </View>
-
         {/* Category chips */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="gap-3">
           <TouchableOpacity
@@ -934,7 +930,6 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
         <View className="flex-row justify-between items-end">
           <View className="flex-1">
             <Text className="text-2xl font-bold text-primary">{headingText}</Text>
-            <Text className="text-gray-400 text-sm opacity-70">{subText}</Text>
           </View>
           <View className="flex-row items-center gap-2">
             {selectedCategory && (
@@ -991,7 +986,46 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
             </View>
           )}
         </View>
-      ) : activeTab === 'businesses' || activeTab === 'featured' ? (
+      ) : activeTab === 'featured' ? (
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: SPACE.xxxl, paddingTop: SPACE.sm, paddingBottom: SPACE.s120 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {filteredBusinesses.length > 0 ? (
+            <View>
+              <Text className="text-xs font-black uppercase tracking-widest text-gray-400" style={{ marginBottom: SPACE.md }}>
+                Businesses
+              </Text>
+              {filteredBusinesses.map((biz) => (
+                <View key={biz.id}>{renderBusiness({ item: biz })}</View>
+              ))}
+            </View>
+          ) : null}
+
+          {featuredPosts.length > 0 ? (
+            <View style={{ marginTop: filteredBusinesses.length > 0 ? SPACE.xxl : 0 }}>
+              <Text className="text-xs font-black uppercase tracking-widest text-gray-400" style={{ marginBottom: SPACE.md }}>
+                Listings
+              </Text>
+              {featuredPosts.map((post) => {
+                return <View key={post.id}>{renderListing({ item: post as any })}</View>;
+              })}
+            </View>
+          ) : null}
+
+          {featuredPosts.length === 0 && filteredBusinesses.length === 0 ? (
+            <View className="items-center justify-center py-20 gap-4">
+              <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center">
+                <SlidersHorizontal size={40} color={THEME_COLORS.neutralBorderMuted} />
+              </View>
+              <Text className="text-primary font-bold text-lg">No featured items found</Text>
+              <Text className="text-gray-400 text-sm text-center max-w-[240px]">
+                Try adjusting your category filter.
+              </Text>
+            </View>
+          ) : null}
+        </ScrollView>
+      ) : activeTab === 'businesses' ? (
         <FlatList
           data={filteredBusinesses}
           keyExtractor={item => item.id}
@@ -1005,7 +1039,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               </View>
               <Text className="text-primary font-bold text-lg">No businesses found</Text>
               <Text className="text-gray-400 text-sm text-center max-w-[240px]">
-                Try adjusting your search or category filter.
+                Try adjusting your category filter.
               </Text>
             </View>
           }
