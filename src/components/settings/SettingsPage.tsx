@@ -219,7 +219,7 @@ const SettingsPage: React.FC = () => {
   const roleColor = () => {
     switch (currentCommunity?.userRole) {
       case 'ADMIN': return { bg: THEME_COLORS.errorTintSoft, text: THEME_COLORS.errorStrong, dot: THEME_COLORS.errorStrong };
-      case 'MODERATOR': return { bg: THEME_COLORS.infoTintSoft, text: THEME_COLORS.brandBlueText, dot: THEME_COLORS.brandBlueText };
+      case 'MODERATOR': return { bg: THEME_COLORS.secondary, text: THEME_COLORS.white, dot: THEME_COLORS.white };
       default: return { bg: THEME_COLORS.successTintSoft, text: THEME_COLORS.primary, dot: THEME_COLORS.primary };
     }
   };

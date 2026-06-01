@@ -14,6 +14,10 @@ import { startCronJobs } from './billing/cronService.js';
 const app = express();
 const httpServer = createServer(app);
 
+// 1x1 transparent PNG (base64) for business placeholder fallback.
+const DEFAULT_BUSINESS_PLACEHOLDER_PNG_BASE64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7+6i8AAAAASUVORK5CYII=';
+
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 //
 // Browsers reject `Access-Control-Allow-Origin: *` whenever the response also
@@ -39,6 +43,14 @@ const corsOriginFn: cors.CorsOptions['origin'] = (origin, callback) => {
 
 app.use(cors({ origin: corsOriginFn, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
+
+app.get('/defaults/business-placeholder.png', (_req, res) => {
+  const pngBuffer = Buffer.from(DEFAULT_BUSINESS_PLACEHOLDER_PNG_BASE64, 'base64');
+  res.setHeader('Content-Type', 'image/png');
+  res.setHeader('Content-Length', String(pngBuffer.length));
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  return res.status(200).send(pngBuffer);
+});
 
 // ─── REST API ─────────────────────────────────────────────────────────────────
 

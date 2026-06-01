@@ -121,7 +121,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const roleColors: Record<string, { bg: string; text: string }> = {
     Admin: { bg: THEME_COLORS.errorSurface, text: THEME_COLORS.errorStrong },
-    Moderator: { bg: THEME_COLORS.brandPurpleSurface, text: THEME_COLORS.md3Primary },
+    Moderator: { bg: THEME_COLORS.secondary, text: THEME_COLORS.white },
     Member: { bg: THEME_COLORS.successSurface, text: primaryColor },
   };
   const roleColor = roleColors[userRole] ?? roleColors.Member;

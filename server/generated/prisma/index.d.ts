@@ -27348,6 +27348,8 @@ export namespace Prisma {
     website: string | null
     rating: number | null
     imageUrl: string | null
+    imageImportedAt: Date | null
+    googlePlaceId: string | null
     charityId: string | null
     subcategory: string | null
     charityPercentage: number | null
@@ -27370,6 +27372,8 @@ export namespace Prisma {
     website: string | null
     rating: number | null
     imageUrl: string | null
+    imageImportedAt: Date | null
+    googlePlaceId: string | null
     charityId: string | null
     subcategory: string | null
     charityPercentage: number | null
@@ -27392,6 +27396,8 @@ export namespace Prisma {
     website: number
     rating: number
     imageUrl: number
+    imageImportedAt: number
+    googlePlaceId: number
     charityId: number
     communityIds: number
     subcategory: number
@@ -27431,6 +27437,8 @@ export namespace Prisma {
     website?: true
     rating?: true
     imageUrl?: true
+    imageImportedAt?: true
+    googlePlaceId?: true
     charityId?: true
     subcategory?: true
     charityPercentage?: true
@@ -27453,6 +27461,8 @@ export namespace Prisma {
     website?: true
     rating?: true
     imageUrl?: true
+    imageImportedAt?: true
+    googlePlaceId?: true
     charityId?: true
     subcategory?: true
     charityPercentage?: true
@@ -27475,6 +27485,8 @@ export namespace Prisma {
     website?: true
     rating?: true
     imageUrl?: true
+    imageImportedAt?: true
+    googlePlaceId?: true
     charityId?: true
     communityIds?: true
     subcategory?: true
@@ -27585,6 +27597,8 @@ export namespace Prisma {
     website: string | null
     rating: number | null
     imageUrl: string | null
+    imageImportedAt: Date | null
+    googlePlaceId: string | null
     charityId: string | null
     communityIds: string[]
     subcategory: string | null
@@ -27627,6 +27641,8 @@ export namespace Prisma {
     website?: boolean
     rating?: boolean
     imageUrl?: boolean
+    imageImportedAt?: boolean
+    googlePlaceId?: boolean
     charityId?: boolean
     communityIds?: boolean
     subcategory?: boolean
@@ -27651,6 +27667,8 @@ export namespace Prisma {
     website?: boolean
     rating?: boolean
     imageUrl?: boolean
+    imageImportedAt?: boolean
+    googlePlaceId?: boolean
     charityId?: boolean
     communityIds?: boolean
     subcategory?: boolean
@@ -27675,6 +27693,8 @@ export namespace Prisma {
     website?: boolean
     rating?: boolean
     imageUrl?: boolean
+    imageImportedAt?: boolean
+    googlePlaceId?: boolean
     charityId?: boolean
     communityIds?: boolean
     subcategory?: boolean
@@ -27699,6 +27719,8 @@ export namespace Prisma {
     website?: boolean
     rating?: boolean
     imageUrl?: boolean
+    imageImportedAt?: boolean
+    googlePlaceId?: boolean
     charityId?: boolean
     communityIds?: boolean
     subcategory?: boolean
@@ -27709,7 +27731,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type BusinessOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "name" | "category" | "description" | "latitude" | "longitude" | "address" | "phone" | "website" | "rating" | "imageUrl" | "charityId" | "communityIds" | "subcategory" | "charityPercentage" | "status" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
+  export type BusinessOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "name" | "category" | "description" | "latitude" | "longitude" | "address" | "phone" | "website" | "rating" | "imageUrl" | "imageImportedAt" | "googlePlaceId" | "charityId" | "communityIds" | "subcategory" | "charityPercentage" | "status" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
   export type BusinessInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -27738,6 +27760,8 @@ export namespace Prisma {
       website: string | null
       rating: number | null
       imageUrl: string | null
+      imageImportedAt: Date | null
+      googlePlaceId: string | null
       charityId: string | null
       communityIds: string[]
       subcategory: string | null
@@ -28182,6 +28206,8 @@ export namespace Prisma {
     readonly website: FieldRef<"Business", 'String'>
     readonly rating: FieldRef<"Business", 'Float'>
     readonly imageUrl: FieldRef<"Business", 'String'>
+    readonly imageImportedAt: FieldRef<"Business", 'DateTime'>
+    readonly googlePlaceId: FieldRef<"Business", 'String'>
     readonly charityId: FieldRef<"Business", 'String'>
     readonly communityIds: FieldRef<"Business", 'String[]'>
     readonly subcategory: FieldRef<"Business", 'String'>
@@ -41422,6 +41448,8 @@ export namespace Prisma {
     website: 'website',
     rating: 'rating',
     imageUrl: 'imageUrl',
+    imageImportedAt: 'imageImportedAt',
+    googlePlaceId: 'googlePlaceId',
     charityId: 'charityId',
     communityIds: 'communityIds',
     subcategory: 'subcategory',
@@ -43823,6 +43851,8 @@ export namespace Prisma {
     website?: StringNullableFilter<"Business"> | string | null
     rating?: FloatNullableFilter<"Business"> | number | null
     imageUrl?: StringNullableFilter<"Business"> | string | null
+    imageImportedAt?: DateTimeNullableFilter<"Business"> | Date | string | null
+    googlePlaceId?: StringNullableFilter<"Business"> | string | null
     charityId?: StringNullableFilter<"Business"> | string | null
     communityIds?: StringNullableListFilter<"Business">
     subcategory?: StringNullableFilter<"Business"> | string | null
@@ -43847,6 +43877,8 @@ export namespace Prisma {
     website?: SortOrderInput | SortOrder
     rating?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
+    imageImportedAt?: SortOrderInput | SortOrder
+    googlePlaceId?: SortOrderInput | SortOrder
     charityId?: SortOrderInput | SortOrder
     communityIds?: SortOrder
     subcategory?: SortOrderInput | SortOrder
@@ -43874,6 +43906,8 @@ export namespace Prisma {
     website?: StringNullableFilter<"Business"> | string | null
     rating?: FloatNullableFilter<"Business"> | number | null
     imageUrl?: StringNullableFilter<"Business"> | string | null
+    imageImportedAt?: DateTimeNullableFilter<"Business"> | Date | string | null
+    googlePlaceId?: StringNullableFilter<"Business"> | string | null
     charityId?: StringNullableFilter<"Business"> | string | null
     communityIds?: StringNullableListFilter<"Business">
     subcategory?: StringNullableFilter<"Business"> | string | null
@@ -43898,6 +43932,8 @@ export namespace Prisma {
     website?: SortOrderInput | SortOrder
     rating?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
+    imageImportedAt?: SortOrderInput | SortOrder
+    googlePlaceId?: SortOrderInput | SortOrder
     charityId?: SortOrderInput | SortOrder
     communityIds?: SortOrder
     subcategory?: SortOrderInput | SortOrder
@@ -43929,6 +43965,8 @@ export namespace Prisma {
     website?: StringNullableWithAggregatesFilter<"Business"> | string | null
     rating?: FloatNullableWithAggregatesFilter<"Business"> | number | null
     imageUrl?: StringNullableWithAggregatesFilter<"Business"> | string | null
+    imageImportedAt?: DateTimeNullableWithAggregatesFilter<"Business"> | Date | string | null
+    googlePlaceId?: StringNullableWithAggregatesFilter<"Business"> | string | null
     charityId?: StringNullableWithAggregatesFilter<"Business"> | string | null
     communityIds?: StringNullableListFilter<"Business">
     subcategory?: StringNullableWithAggregatesFilter<"Business"> | string | null
@@ -47202,6 +47240,8 @@ export namespace Prisma {
     website?: string | null
     rating?: number | null
     imageUrl?: string | null
+    imageImportedAt?: Date | string | null
+    googlePlaceId?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
     subcategory?: string | null
@@ -47226,6 +47266,8 @@ export namespace Prisma {
     website?: string | null
     rating?: number | null
     imageUrl?: string | null
+    imageImportedAt?: Date | string | null
+    googlePlaceId?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
     subcategory?: string | null
@@ -47248,6 +47290,8 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageImportedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    googlePlaceId?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47272,6 +47316,8 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageImportedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    googlePlaceId?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47295,6 +47341,8 @@ export namespace Prisma {
     website?: string | null
     rating?: number | null
     imageUrl?: string | null
+    imageImportedAt?: Date | string | null
+    googlePlaceId?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
     subcategory?: string | null
@@ -47317,6 +47365,8 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageImportedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    googlePlaceId?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47340,6 +47390,8 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageImportedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    googlePlaceId?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49889,6 +49941,8 @@ export namespace Prisma {
     website?: SortOrder
     rating?: SortOrder
     imageUrl?: SortOrder
+    imageImportedAt?: SortOrder
+    googlePlaceId?: SortOrder
     charityId?: SortOrder
     communityIds?: SortOrder
     subcategory?: SortOrder
@@ -49919,6 +49973,8 @@ export namespace Prisma {
     website?: SortOrder
     rating?: SortOrder
     imageUrl?: SortOrder
+    imageImportedAt?: SortOrder
+    googlePlaceId?: SortOrder
     charityId?: SortOrder
     subcategory?: SortOrder
     charityPercentage?: SortOrder
@@ -49941,6 +49997,8 @@ export namespace Prisma {
     website?: SortOrder
     rating?: SortOrder
     imageUrl?: SortOrder
+    imageImportedAt?: SortOrder
+    googlePlaceId?: SortOrder
     charityId?: SortOrder
     subcategory?: SortOrder
     charityPercentage?: SortOrder
@@ -53329,6 +53387,8 @@ export namespace Prisma {
     website?: string | null
     rating?: number | null
     imageUrl?: string | null
+    imageImportedAt?: Date | string | null
+    googlePlaceId?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
     subcategory?: string | null
@@ -53351,6 +53411,8 @@ export namespace Prisma {
     website?: string | null
     rating?: number | null
     imageUrl?: string | null
+    imageImportedAt?: Date | string | null
+    googlePlaceId?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
     subcategory?: string | null
@@ -54155,6 +54217,8 @@ export namespace Prisma {
     website?: StringNullableFilter<"Business"> | string | null
     rating?: FloatNullableFilter<"Business"> | number | null
     imageUrl?: StringNullableFilter<"Business"> | string | null
+    imageImportedAt?: DateTimeNullableFilter<"Business"> | Date | string | null
+    googlePlaceId?: StringNullableFilter<"Business"> | string | null
     charityId?: StringNullableFilter<"Business"> | string | null
     communityIds?: StringNullableListFilter<"Business">
     subcategory?: StringNullableFilter<"Business"> | string | null
@@ -66424,6 +66488,8 @@ export namespace Prisma {
     website?: string | null
     rating?: number | null
     imageUrl?: string | null
+    imageImportedAt?: Date | string | null
+    googlePlaceId?: string | null
     charityId?: string | null
     communityIds?: BusinessCreatecommunityIdsInput | string[]
     subcategory?: string | null
@@ -66733,6 +66799,8 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageImportedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    googlePlaceId?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66755,6 +66823,8 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageImportedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    googlePlaceId?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66777,6 +66847,8 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageImportedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    googlePlaceId?: NullableStringFieldUpdateOperationsInput | string | null
     charityId?: NullableStringFieldUpdateOperationsInput | string | null
     communityIds?: BusinessUpdatecommunityIdsInput | string[]
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null

@@ -27,6 +27,7 @@ import { BUSINESS_CATEGORIES as CATEGORIES } from '../../constants';
 import { Business } from '../../types';
 import { cn } from '../../lib/utils';
 import api from '../../lib/api';
+import { resolveMediaUrl } from '../../lib/config';
 import { THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
 import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
@@ -86,6 +87,10 @@ interface BusinessImportToolProps {
   onBack: () => void;
 }
 
+type DiscoverBusiness = Business & {
+  googlePlaceId?: string;
+};
+
 export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }) => {
   const { currentCommunity, bulkAddCommunityBusinesses } = useCommunity() as any;
   const [categorySearch, setCategorySearch] = useState('');
@@ -93,7 +98,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const [results, setResults] = useState<Business[]>([]);
+  const [results, setResults] = useState<DiscoverBusiness[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
 
@@ -147,8 +152,8 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
         radius: coverageArea.radius,
       });
 
-      const businesses: Business[] = (data as any[]).map(b => ({
-        id: `google_${Math.random().toString(36).substr(2, 9)}`,
+      const businesses: DiscoverBusiness[] = (data as any[]).map((b) => ({
+        id: b.placeId || `google_${Math.random().toString(36).substr(2, 9)}`,
         name: b.name,
         address: b.address,
         latitude: b.latitude,
@@ -160,7 +165,9 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
         website: b.website,
         status: 'Open' as const,
         isExternal: true,
-        image: `https://picsum.photos/seed/${encodeURIComponent(b.name)}/400/300`,
+        image: resolveMediaUrl('/defaults/business-placeholder.png') || '/defaults/business-placeholder.png',
+        imageUrl: resolveMediaUrl('/defaults/business-placeholder.png') || '/defaults/business-placeholder.png',
+        googlePlaceId: b.placeId,
       }));
       setResults(businesses);
     } catch (err: any) {
@@ -193,7 +200,8 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
           longitude: r.longitude ?? undefined,
           phone: (r as any).phone ?? undefined,
           website: (r as any).website ?? undefined,
-          image_url: r.image ?? undefined,
+          imageUrl: r.imageUrl ?? r.image ?? undefined,
+          googlePlaceId: (r as any).googlePlaceId ?? undefined,
         }));
 
       await bulkAddCommunityBusinesses(currentCommunity.id, toImport);
@@ -215,7 +223,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>Smart Business Import</Text>
-          <Text style={styles.headerSub}>AI-powered discovery via Gemini</Text>
+          <Text style={styles.headerSub}>Google Places discovery and import</Text>
         </View>
         {coverageArea && (
           <View style={styles.coveragePill}>
@@ -348,7 +356,7 @@ export const BusinessImportTool: React.FC<BusinessImportToolProps> = ({ onBack }
                 >
                   <View style={styles.bizImgWrap}>
                     <Image
-                      source={{ uri: biz.image }}
+                      source={{ uri: biz.imageUrl || biz.image }}
                       style={styles.bizImg}
                       resizeMode="cover"
                     />

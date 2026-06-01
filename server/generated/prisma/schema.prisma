@@ -517,8 +517,8 @@ model CatTransaction {
 // BUSINESSES
 // =============================================
 model Business {
-  id                String   @id @default(cuid())
-  ownerId           String   @map("owner_id")
+  id                String    @id @default(cuid())
+  ownerId           String    @map("owner_id")
   name              String
   category          String
   description       String?
@@ -528,15 +528,17 @@ model Business {
   phone             String?
   website           String?
   rating            Float?
-  imageUrl          String?  @map("image_url")
-  charityId         String?  @map("charity_id")
-  communityIds      String[] @default([]) @map("community_ids")
-  subcategory       String?  @map("subcategory")
-  charityPercentage Float?   @map("charity_percentage")
-  status            String   @default("ACTIVE")
-  source            String   @default("MEMBER")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  imageUrl          String?   @map("image_url")
+  imageImportedAt   DateTime? @map("image_imported_at")
+  googlePlaceId     String?   @map("google_place_id")
+  charityId         String?   @map("charity_id")
+  communityIds      String[]  @default([]) @map("community_ids")
+  subcategory       String?   @map("subcategory")
+  charityPercentage Float?    @map("charity_percentage")
+  status            String    @default("ACTIVE")
+  source            String    @default("MEMBER")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
   owner User @relation(fields: [ownerId], references: [id])
 

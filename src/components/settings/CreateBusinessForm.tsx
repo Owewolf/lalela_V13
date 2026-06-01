@@ -23,6 +23,8 @@ import LocationPickerSection from '../shared/LocationPickerSection';
 import { Community, UserBusiness } from '../../types';
 import { THEME_COLORS } from '../../theme/colors';
 
+const BUSINESS_PLACEHOLDER_IMAGE = '/defaults/business-placeholder.png';
+
 const TYPE_SCALE = {
   base: 11,
   body: 12,
@@ -153,7 +155,7 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
     setLongitude(defaultLocation.longitude);
     setContactPhone(business?.contactPhone ?? '');
     setContactEmail(business?.contactEmail ?? '');
-    setImage(business?.image);
+    setImage(business?.imageUrl ?? business?.image);
     setCommunityIds(
       business?.communityIds?.length
         ? business.communityIds
@@ -228,6 +230,8 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
       return;
     }
 
+    const normalizedImage = String(image ?? '').trim() || BUSINESS_PLACEHOLDER_IMAGE;
+
     const payload = {
       name: name.trim(),
       category,
@@ -237,7 +241,8 @@ const CreateBusinessForm: React.FC<CreateBusinessFormProps> = ({
       longitude: parsedLongitude,
       contactPhone: contactPhone.trim() || undefined,
       contactEmail: contactEmail.trim() || undefined,
-      image,
+      image: normalizedImage,
+      imageUrl: normalizedImage,
       ownerId: business?.ownerId ?? userProfile.id,
       communityIds,
       status: isActive ? 'ACTIVE' as const : 'INACTIVE' as const,

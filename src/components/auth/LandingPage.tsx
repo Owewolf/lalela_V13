@@ -19,6 +19,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '../../lib/api';
 import { Users } from 'lucide-react-native';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
+import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
 import { useInvitePreview } from '../../hooks/queries/useInvitePreview';
 
 const TYPE_SCALE = {
@@ -280,7 +281,7 @@ const LandingPage: React.FC = () => {
           className="w-full px-5 mb-6"
           style={{ maxWidth: 560 }}
         >
-          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 34, padding: 24, shadowColor: THEME_COLORS.black, shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 3, borderWidth: 1, borderColor: THEME_COLORS.neutralBorderSoft }}>
+          <View style={{ backgroundColor: getCardSurfaceColor('default'), borderRadius: 34, padding: 24, shadowColor: THEME_COLORS.black, shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 3, borderWidth: 1, borderColor: getCardBorderColor('default') }}>
             {/* Verification email sent — replaces form */}
             {verificationEmailSent ? (
               <View className="gap-6 items-center py-4">

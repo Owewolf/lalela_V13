@@ -70,6 +70,7 @@ import { BUSINESS_CATEGORIES, GOOGLE_PLACES_API_KEY, POST_SUBTYPE_CONFIG } from 
 import { PostConfirmationModal } from '../shared/PostConfirmationModal';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
+import { resolveMediaUrl } from '../../lib/config';
 import { Share } from 'react-native';
 import type { UserRole, UserProfile } from '../../types';
 import { BusinessImportTool } from './BusinessImportTool';
@@ -327,6 +328,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
     const [pendingDeleteMember, setPendingDeleteMember] = useState<{ id: string; name: string } | null>(null);
     const [pendingDeletePost, setPendingDeletePost] = useState<{ id: string; title: string } | null>(null);
     const [pendingRemoveBusiness, setPendingRemoveBusiness] = useState<any>(null);
+    const [reloadingBusinessId, setReloadingBusinessId] = useState<string | null>(null);
     const [bizFilter, setBizFilter] = useState<'user' | 'ai'>('user');
     const [pendingCancelInvitation, setPendingCancelInvitation] = useState<{ id: string; label: string } | null>(null);
     const [isProcessingDestructiveAction, setIsProcessingDestructiveAction] = useState(false);
@@ -615,6 +617,27 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         await updateUserBusiness({ ...business, status: nextStatus } as any);
       } catch (e) {
         console.error('Failed to toggle business pin:', e);
+      }
+    };
+
+    const handleReloadBusinessImage = async (business: any) => {
+      if (!business?.id) return;
+      if (!business?.googlePlaceId) {
+        Alert.alert('Reload unavailable', 'This business does not have a Google Place ID.');
+        return;
+      }
+
+      setReloadingBusinessId(business.id);
+      try {
+        await api.post(`/businesses/${business.id}/reload-image`);
+        if (currentCommunity?.id) {
+          await queryClient.invalidateQueries({ queryKey: ['community-bundle', currentCommunity.id] });
+        }
+      } catch (error: any) {
+        const message = error?.response?.data?.error || 'Unable to reload image right now.';
+        Alert.alert('Reload failed', message);
+      } finally {
+        setReloadingBusinessId(null);
       }
     };
 
@@ -1811,10 +1834,16 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
 
       const renderBizCard = (biz: any, idx: number) => (
         <View key={biz.id || idx} style={styles.bizCard}>
+          {(() => {
+            const businessImage = resolveMediaUrl(biz.imageUrl || biz.image || '/defaults/business-placeholder.png')
+              || '/defaults/business-placeholder.png';
+            return (
           <Image
-            source={{ uri: biz.image || `https://picsum.photos/seed/${biz.name}/400/400` }}
+            source={{ uri: businessImage }}
             style={styles.bizImg}
           />
+            );
+          })()}
           <View style={{ flex: 1 }}>
             <Text style={styles.bizName}>{biz.name}</Text>
             <Text style={styles.bizCategory}>{biz.category}</Text>
@@ -1851,6 +1880,17 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             </View>
             {biz.description ? (
               <Text style={styles.memberSub} numberOfLines={2}>{biz.description}</Text>
+            ) : null}
+            {biz.source === 'IMPORT' ? (
+              <TouchableOpacity
+                style={{ marginTop: SPACE.sm, alignSelf: 'flex-start' }}
+                onPress={() => handleReloadBusinessImage(biz)}
+                disabled={reloadingBusinessId === biz.id}
+              >
+                <Text style={{ fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.brandBlueText }}>
+                  {reloadingBusinessId === biz.id ? 'Reloading image...' : 'Delete and Reload Business Image'}
+                </Text>
+              </TouchableOpacity>
             ) : null}
           </View>
           <View style={styles.bizActions}>

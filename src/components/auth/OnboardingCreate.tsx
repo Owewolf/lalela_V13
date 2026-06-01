@@ -182,6 +182,7 @@ const OnboardingCreate: React.FC = () => {
   type PendingBusiness = {
     name: string;
     category: string;
+    googlePlaceId?: string;
     address?: string;
     latitude?: number;
     longitude?: number;
@@ -196,6 +197,7 @@ const OnboardingCreate: React.FC = () => {
   const [discoveredBusinesses, setDiscoveredBusinesses] = useState<Array<{
     name: string; address: string; category: string;
     latitude: number; longitude: number;
+    placeId?: string;
     rating?: number | null; phone?: string | null; website?: string | null;
   }>>([]);
   const [selectedDiscovered, setSelectedDiscovered] = useState<Set<number>>(new Set());
@@ -325,6 +327,7 @@ const OnboardingCreate: React.FC = () => {
       .map(b => ({
         name: b.name,
         category: b.category,
+        googlePlaceId: b.placeId,
         address: b.address,
         latitude: b.latitude,
         longitude: b.longitude,
@@ -458,6 +461,7 @@ const OnboardingCreate: React.FC = () => {
               phone: b.phone ?? undefined,
               website: b.website ?? undefined,
               imageUrl: b.imageUrl,
+              googlePlaceId: b.googlePlaceId,
             })),
           });
         } catch (importErr) {

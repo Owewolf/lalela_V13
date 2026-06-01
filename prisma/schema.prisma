@@ -529,6 +529,8 @@ model Business {
   website           String?
   rating            Float?
   imageUrl          String?  @map("image_url")
+  imageImportedAt   DateTime? @map("image_imported_at")
+  googlePlaceId     String?  @map("google_place_id")
   charityId         String?  @map("charity_id")
   communityIds      String[] @default([]) @map("community_ids")
   subcategory       String?  @map("subcategory")

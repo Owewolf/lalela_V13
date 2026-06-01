@@ -199,13 +199,14 @@ const ManageUserBusinesses: React.FC<ManageUserBusinessesProps> = ({ communities
             const communityNames = getCommunityNames(business);
             const isActive = (business.status ?? 'ACTIVE') === 'ACTIVE';
             const isBusy = busyBusinessId === business.id;
+            const businessImage = business.imageUrl ?? business.image;
 
             return (
               <View key={business.id} style={{ backgroundColor: THEME_COLORS.surface, borderRadius: RADIUS.panel, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft, padding: SPACE.s16, gap: SPACE.xxxl }}>
                 <View style={{ flexDirection: 'row', gap: SPACE.xxxl }}>
                   <View style={{ width: SPACE.s78, height: SPACE.s78, borderRadius: RADIUS.xl, overflow: 'hidden', backgroundColor: THEME_COLORS.primaryTintSoft, alignItems: 'center', justifyContent: 'center' }}>
-                    {business.image ? (
-                      <Image source={{ uri: business.image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                    {businessImage ? (
+                      <Image source={{ uri: businessImage }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
                     ) : (
                       <Text style={{ fontSize: TYPE_SCALE.hero }}>{business.name.charAt(0).toUpperCase()}</Text>
                     )}

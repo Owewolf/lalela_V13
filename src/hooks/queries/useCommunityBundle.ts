@@ -3,6 +3,8 @@ import api from '../../lib/api';
 import { resolveMediaUrl } from '../../lib/config';
 import { queryKeys } from '../../lib/queryKeys';
 
+const BUSINESS_PLACEHOLDER_IMAGE = '/defaults/business-placeholder.png';
+
 export function useCommunityBundle(communityId?: string | null, userId?: string | null) {
   return useQuery({
     queryKey: queryKeys.communityBundle(communityId),
@@ -49,7 +51,20 @@ export function useCommunityBundle(communityId?: string | null, userId?: string 
         }),
         charities: charitiesRes.data ?? [],
         charitySuggestions,
-        businesses,
+        businesses: (businesses ?? []).map((business: any) => {
+          const imageValue = [business?.imageUrl, business?.image]
+            .map((value) => String(value ?? '').trim())
+            .find(Boolean) ?? BUSINESS_PLACEHOLDER_IMAGE;
+          const resolvedImage = resolveMediaUrl(imageValue);
+          const normalizedImage = (typeof resolvedImage === 'string' && resolvedImage.trim())
+            ? resolvedImage
+            : imageValue;
+          return {
+            ...business,
+            image: normalizedImage,
+            imageUrl: normalizedImage,
+          };
+        }),
         locations: {
           members: (locations?.members ?? []).map((row: any) => ({
             ...row,

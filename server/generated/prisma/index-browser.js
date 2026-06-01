@@ -462,6 +462,8 @@ exports.Prisma.BusinessScalarFieldEnum = {
   website: 'website',
   rating: 'rating',
   imageUrl: 'imageUrl',
+  imageImportedAt: 'imageImportedAt',
+  googlePlaceId: 'googlePlaceId',
   charityId: 'charityId',
   communityIds: 'communityIds',
   subcategory: 'subcategory',

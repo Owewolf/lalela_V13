@@ -49,6 +49,7 @@ const EMPTY_UNREAD: ChatUnreadTotals = {
 
 const CONVERSATION_CACHE_LIMIT = 80;
 const MESSAGE_CACHE_LIMIT = 200;
+const BUSINESS_PLACEHOLDER_IMAGE = '/defaults/business-placeholder.png';
 
 function conversationsCacheKey(userId: string) {
   return `chat:conversations:${userId}`;
@@ -98,6 +99,23 @@ function normalizePostMedia(post: CommunityNotice): CommunityNotice {
 
 function normalizePostsMedia(posts: CommunityNotice[]): CommunityNotice[] {
   return posts.map(normalizePostMedia);
+}
+
+function normalizeBusinessMedia<T extends Record<string, any>>(business: T): T {
+  const raw = [business?.imageUrl, business?.image]
+    .map((value) => String(value ?? '').trim())
+    .find(Boolean) ?? BUSINESS_PLACEHOLDER_IMAGE;
+  const resolved = resolveMediaUrl(raw);
+  const normalized = (typeof resolved === 'string' && resolved.trim()) ? resolved : raw;
+  return {
+    ...business,
+    image: normalized,
+    imageUrl: normalized,
+  };
+}
+
+function normalizeBusinessesMedia<T extends Record<string, any>>(businesses: T[]): T[] {
+  return businesses.map(normalizeBusinessMedia);
 }
 
 function appendUniqueMessages(existing: Message[], incoming: Message[]): Message[] {
@@ -279,9 +297,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     setPosts(normalizePostsMedia(bundleQuery.data?.posts ?? []));
     setCharities(bundleQuery.data?.charities ?? []);
     setCharitySuggestions(bundleQuery.data?.charitySuggestions ?? []);
-    const allBusinesses = bundleQuery.data?.businesses ?? [];
-    setUserBusinesses(allBusinesses.filter((b: UserBusiness) => b.ownerId === userId));
-    setCommunityBusinesses(allBusinesses.filter((b: UserBusiness) => (b.communityIds ?? []).includes(activeCommunityId)));
+    const allBusinesses = normalizeBusinessesMedia(bundleQuery.data?.businesses ?? []) as UserBusiness[];
+    setUserBusinesses(allBusinesses.filter((b) => b.ownerId === userId));
+    setCommunityBusinesses(allBusinesses.filter((b) => (b.communityIds ?? []).includes(activeCommunityId)));
     setSecurityResponders(bundleQuery.data?.locations?.security ?? []);
   }, [activeCommunityId, bundleQuery.data, userId]);
 
@@ -502,12 +520,14 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   // ── Businesses ────────────────────────────────────────────────────────────
   const addCommunityBusiness = useCallback(async (communityId: string, business: Business) => {
     const { data } = await api.post('/businesses', { ...business, communityId: communityId });
-    setCommunityBusinesses((prev) => [...prev, data]);
+    const normalized = normalizeBusinessMedia(data);
+    setCommunityBusinesses((prev) => [...prev, normalized]);
   }, []);
 
   const updateCommunityBusiness = useCallback(async (_communityId: string, business: Business) => {
     const { data } = await api.put(`/businesses/${business.id}`, business);
-    setCommunityBusinesses((prev) => prev.map((b) => b.id === business.id ? data : b));
+    const normalized = normalizeBusinessMedia(data);
+    setCommunityBusinesses((prev) => prev.map((b) => b.id === business.id ? normalized : b));
   }, []);
 
   const removeCommunityBusiness = useCallback(async (_communityId: string, businessId: string) => {
@@ -542,16 +562,18 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const addUserBusiness = useCallback(async (business: Omit<UserBusiness, 'id'>) => {
     const { data } = await api.post('/businesses', business);
-    setUserBusinesses((prev) => [...prev, data]);
+    const normalized = normalizeBusinessMedia(data);
+    setUserBusinesses((prev) => [...prev, normalized]);
     if (currentCommunityId && (data.communityIds ?? []).includes(currentCommunityId)) {
-      setCommunityBusinesses((prev) => [...prev, data]);
+      setCommunityBusinesses((prev) => [...prev, normalized]);
     }
   }, [currentCommunityId]);
 
   const updateUserBusiness = useCallback(async (business: UserBusiness) => {
     const { data } = await api.put(`/businesses/${business.id}`, business);
-    setUserBusinesses((prev) => prev.map((b) => b.id === business.id ? data : b));
-    setCommunityBusinesses((prev) => prev.map((b) => b.id === business.id ? data : b));
+    const normalized = normalizeBusinessMedia(data);
+    setUserBusinesses((prev) => prev.map((b) => b.id === business.id ? normalized : b));
+    setCommunityBusinesses((prev) => prev.map((b) => b.id === business.id ? normalized : b));
   }, []);
 
   const removeUserBusiness = useCallback(async (id: string) => {

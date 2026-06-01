@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { ArrowRight, Phone, Star, Clock, MessageSquare, Globe, MapPin } from 'lucide-react-native';
 import { showMapOptions } from '../../lib/maps';
+import { resolveMediaUrl } from '../../lib/config';
 import { THEME_COLORS } from '../../theme/colors';
 import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
 import { createShadow } from '../../theme/shadows';
@@ -77,6 +78,8 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
 }) => {
   const [imgError, setImgError] = useState(false);
   const [ownerImgError, setOwnerImgError] = useState(false);
+  const businessImageUri = resolveMediaUrl(image) ?? image ?? (resolveMediaUrl('/defaults/business-placeholder.png') || '/defaults/business-placeholder.png');
+  const ownerImageUri = resolveMediaUrl(ownerImage) ?? ownerImage;
   const safeWebsite = website ? sanitizeUrl(website) : null;
   const removedOwnerLabel = ['my', 'business'].join(' ');
   const visibleLabel = label?.trim().toLowerCase() === removedOwnerLabel ? undefined : label;
@@ -118,10 +121,10 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 items-center justify-center"
         style={{ backgroundColor: iconBg || THEME_COLORS.neutralBgSofter }}
       >
-        {image && !imgError ? (
+        {businessImageUri && !imgError ? (
           <Image
             className="w-full h-full"
-            source={{ uri: image }}
+            source={{ uri: businessImageUri }}
             resizeMode="cover"
             onError={() => setImgError(true)}
           />
@@ -208,9 +211,9 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
             {isMemberBusiness && ownerName ? (
               <View className="flex-row items-center gap-2 flex-1 min-w-0">
                 <View className="w-7 h-7 rounded-full overflow-hidden bg-surface-container items-center justify-center flex-shrink-0">
-                  {ownerImage && !ownerImgError ? (
+                  {ownerImageUri && !ownerImgError ? (
                     <Image
-                      source={{ uri: ownerImage }}
+                      source={{ uri: ownerImageUri }}
                       className="w-full h-full"
                       resizeMode="cover"
                       onError={() => setOwnerImgError(true)}

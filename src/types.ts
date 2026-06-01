@@ -77,6 +77,9 @@ export interface Business {
   subcategory?: string;
   status: 'Open' | 'Closed';
   image?: string;
+  imageUrl?: string;
+  imageImportedAt?: string;
+  googlePlaceId?: string;
   icon?: string;
   iconBg?: string;
   iconColor?: string;
@@ -332,6 +335,9 @@ export interface UserBusiness {
   subcategory?: string;
   description: string;
   image?: string;
+  imageUrl?: string;
+  imageImportedAt?: string;
+  googlePlaceId?: string;
   ownerId: string;
   communityIds: string[];
   latitude: number;

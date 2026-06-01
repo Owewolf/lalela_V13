@@ -372,7 +372,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                                   c.userRole === "ADMIN"
                                     ? THEME_COLORS.errorSurface
                                     : c.userRole === "MODERATOR"
-                                    ? THEME_COLORS.brandPurpleSurface
+                                    ? THEME_COLORS.secondary
                                     : THEME_COLORS.successSurface,
                               },
                             ]}
@@ -385,7 +385,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                                     c.userRole === "ADMIN"
                                       ? THEME_COLORS.errorStrong
                                       : c.userRole === "MODERATOR"
-                                      ? THEME_COLORS.md3Primary
+                                      ? THEME_COLORS.white
                                       : PRIMARY,
                                 },
                               ]}

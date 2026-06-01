@@ -86,7 +86,7 @@ type ChatMemberListItem = {
 const getRoleBadgeBg = (role: string) => {
   switch (role) {
     case 'ADMIN': return THEME_COLORS.primary;
-    case 'MODERATOR': return THEME_COLORS.aliasHex_8b5cf6;
+    case 'MODERATOR': return THEME_COLORS.secondary;
     default: return THEME_COLORS.neutralTextSoft;
   }
 };

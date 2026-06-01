@@ -96,6 +96,7 @@ interface MarketBusiness {
   longitude?: number;
   address?: string;
   image?: string;
+  imageUrl?: string;
   description?: string;
   phone?: string;
   website?: string;
@@ -310,7 +311,8 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
       latitude: b.latitude,
       longitude: b.longitude,
       address: b.address,
-      image: b.image,
+      image: b.imageUrl ?? b.image,
+      imageUrl: b.imageUrl ?? b.image,
       description: b.description,
       phone: b.contactPhone,
       website: undefined,
@@ -383,7 +385,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
           distance={biz.distance}
           category={biz.category}
           status={biz.status}
-          image={biz.image}
+          image={biz.imageUrl ?? biz.image}
           iconBg={biz.iconBg}
           iconColor={biz.iconColor}
           label={biz.label || (biz.isExternal ? 'Suggest to Add' : undefined)}
