@@ -10,6 +10,7 @@ import React, {
   createContext, useContext, useState, useEffect, useCallback,
   useRef, useMemo, ReactNode,
 } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from './AuthContext';
 import api from '../lib/api';
 import { resolveMediaUrl } from '../lib/config';
@@ -17,7 +18,7 @@ import { queryClient } from '../lib/queryClient';
 import { queryKeys } from '../lib/queryKeys';
 import { useCommunityBootstrap } from '../hooks/queries/useCommunityBootstrap';
 import { useCommunityBundle } from '../hooks/queries/useCommunityBundle';
-import { useConversationMessages } from '../hooks/queries/useConversationMessages';
+import { prefetchConversationMessages, useConversationMessages } from '../hooks/queries/useConversationMessages';
 import { getSocket, disconnectSocket } from '../lib/socket';
 import type {
   Community, CommunityContextType, UserBusiness, CoverageArea, Business,
@@ -45,6 +46,27 @@ const EMPTY_UNREAD: ChatUnreadTotals = {
   direct: 0, listing: 0, notice: 0, marketplace: 0,
   community: 0, emergency: 0, totalMessages: 0, unreadFilterTotal: 0,
 };
+
+const CONVERSATION_CACHE_LIMIT = 80;
+const MESSAGE_CACHE_LIMIT = 200;
+
+function conversationsCacheKey(userId: string) {
+  return `chat:conversations:${userId}`;
+}
+
+function messagesCacheKey(userId: string, conversationId: string) {
+  return `chat:messages:${userId}:${conversationId}`;
+}
+
+function parseCachedArray<T>(raw: string | null): T[] | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed as T[] : null;
+  } catch {
+    return null;
+  }
+}
 
 /** Map raw Prisma/REST response to the client-side Community shape. */
 function mapServerCommunity(raw: any): Community {
@@ -130,6 +152,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const socketRef = useRef<Awaited<ReturnType<typeof getSocket>> | null>(null);
   const autoSelectAttemptedCommunityRef = useRef<string | null>(null);
+  const hydratedConversationsForUserRef = useRef<string | null>(null);
   // Tracks the active conversation id so socket handlers (bound once per
   // community/user) can read the current value without closing over stale state.
   const activeConversationIdRef = useRef<string | null>(null);
@@ -189,16 +212,52 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   // ─── Bootstrap queries ───────────────────────────────────────────────────
   useEffect(() => {
     if (!userId) {
+      hydratedConversationsForUserRef.current = null;
+      return;
+    }
+
+    let cancelled = false;
+
+    AsyncStorage.getItem(conversationsCacheKey(userId))
+      .then((raw) => {
+        if (cancelled) return;
+        const cached = parseCachedArray<Conversation>(raw);
+        if (!cached || cached.length === 0) return;
+        setConversations((prev) => (prev.length > 0 ? prev : cached));
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) hydratedConversationsForUserRef.current = userId;
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) {
       setCommunities([]);
       setConversations([]);
       setNotifications([]);
       return;
     }
 
+    if (!bootstrapQuery.data) return;
+
     setCommunities((bootstrapQuery.data?.communities ?? []).map(mapServerCommunity));
     setConversations(bootstrapQuery.data?.conversations ?? []);
     setNotifications(bootstrapQuery.data?.notifications ?? []);
   }, [userId, bootstrapQuery.data]);
+
+  useEffect(() => {
+    if (!userId) return;
+    if (hydratedConversationsForUserRef.current !== userId) return;
+    AsyncStorage.setItem(
+      conversationsCacheKey(userId),
+      JSON.stringify(conversations.slice(0, CONVERSATION_CACHE_LIMIT))
+    ).catch(() => undefined);
+  }, [userId, conversations]);
 
   // If lastCommunityId is set but not yet in the communities list (e.g. just
   // created), re-fetch once to pick it up with the correct userRole.
@@ -213,6 +272,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       setSecurityResponders([]);
       return;
     }
+
+    if (!bundleQuery.data) return;
 
     setMembers(bundleQuery.data?.members ?? []);
     setPosts(normalizePostsMedia(bundleQuery.data?.posts ?? []));
@@ -229,8 +290,41 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       setMessages([]);
       return;
     }
-    setMessages(messagesQuery.data ?? []);
+    if (!userId) {
+      setMessages([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    AsyncStorage.getItem(messagesCacheKey(userId, activeConversationId))
+      .then((raw) => {
+        if (cancelled) return;
+        const cached = parseCachedArray<Message>(raw) ?? [];
+        setMessages(cached);
+      })
+      .catch(() => {
+        if (!cancelled) setMessages([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, activeConversationId]);
+
+  useEffect(() => {
+    if (!activeConversationId) return;
+    if (messagesQuery.data === undefined) return;
+    setMessages(messagesQuery.data);
   }, [activeConversationId, messagesQuery.data]);
+
+  useEffect(() => {
+    if (!userId || !activeConversationId) return;
+    AsyncStorage.setItem(
+      messagesCacheKey(userId, activeConversationId),
+      JSON.stringify(messages.slice(-MESSAGE_CACHE_LIMIT))
+    ).catch(() => undefined);
+  }, [userId, activeConversationId, messages]);
 
   // ── Socket.io realtime ────────────────────────────────────────────────────
   useEffect(() => {
@@ -263,6 +357,11 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         const convId = (msg as any).conversationId as string | undefined;
         const senderId = (msg as any).userId as string | undefined;
         const activeId = activeConversationIdRef.current;
+        if (convId) {
+          queryClient.setQueryData(queryKeys.conversationMessages(convId), (existing: Message[] | undefined) => {
+            return appendUniqueMessages(existing ?? [], [msg]);
+          });
+        }
         // Only append to in-memory messages list if it belongs to the open conversation.
         setMessages((prev) => (convId && convId === activeId ? appendUniqueMessages(prev, [msg]) : prev));
         setConversations((prev) =>
@@ -809,6 +908,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   // ── Conversations / Chat ──────────────────────────────────────────────────
   const setActiveConversation = useCallback((conversationId: string | null) => {
     setActiveConversationIdState(conversationId);
+    if (conversationId) {
+      prefetchConversationMessages(queryClient, conversationId).catch(() => undefined);
+    }
   }, []);
 
   const startConversation = useCallback(async (params: Parameters<CommunityContextType['startConversation']>[0]): Promise<string> => {
@@ -859,6 +961,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     const { data } = await api.post(`/conversations/${activeConversationId}/messages`, msg);
     const persistedMessage = data as Message;
 
+    queryClient.setQueryData(queryKeys.conversationMessages(activeConversationId), (existing: Message[] | undefined) => {
+      return appendUniqueMessages(existing ?? [], [persistedMessage]);
+    });
     setMessages((prev) => appendUniqueMessages(prev, [persistedMessage]));
     socketRef.current?.emit('message:send', {
       conversationId: activeConversationId,

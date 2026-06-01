@@ -297,8 +297,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       message: string;
     } | null>(null);
     const [contentFilter, setContentFilter] = useState<
-      'all' | 'notices' | 'listings'
-    >('all');
+      'featured' | 'notices' | 'listings'
+    >('featured');
     const [themeDraft, setThemeDraft] = useState<ThemeDraft>({
       presetId: 'lalela-light',
       mode: 'light',
@@ -586,8 +586,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         await updatePost({ ...post, status: newStatus });
         if (newStatus === 'Pinned' && post.authorId && currentCommunity?.id) {
           await addNotification(post.authorId, {
-            title: 'Post Pinned',
-            message: `Your post "${post.title}" has been pinned by an admin.`,
+            title: 'Post Featured',
+            message: `Your post "${post.title}" has been featured by an admin.`,
             type: 'system',
             metadata: { action: 'post_pinned', postId: post.id, communityId: currentCommunity.id },
           });
@@ -1147,10 +1147,17 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                   onPress={() => { setSelectedMember(member); setMemberSubView('details'); }}
                   activeOpacity={0.7}
                 >
-                  <Image
-                    source={{ uri: member.image || `https://picsum.photos/seed/${member.userId}/100/100` }}
-                    style={styles.memberImg}
-                  />
+                  <View style={styles.memberImgWrap}>
+                    <Image
+                      source={{ uri: member.image || `https://picsum.photos/seed/${member.userId}/100/100` }}
+                      style={styles.memberImg}
+                    />
+                    {!!member.isSecurityMember && (
+                      <View style={styles.memberSecurityBadge}>
+                        <Shield size={8} color={THEME_COLORS.white} />
+                      </View>
+                    )}
+                  </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.memberName}>{member.name || 'Unknown'}</Text>
                     <View style={styles.memberStatusRow}>
@@ -1406,10 +1413,17 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         </View>
 
         <View style={[styles.card, { alignItems: 'center' }]}>
-          <Image
-            source={{ uri: selectedMember.image || `https://picsum.photos/seed/${selectedMember.userId}/200/200` }}
-            style={styles.profileImg}
-          />
+          <View style={styles.profileImgWrap}>
+            <Image
+              source={{ uri: selectedMember.image || `https://picsum.photos/seed/${selectedMember.userId}/200/200` }}
+              style={styles.profileImg}
+            />
+            {!!selectedMember.isSecurityMember && (
+              <View style={styles.memberSecurityBadge}>
+                <Shield size={8} color={THEME_COLORS.white} />
+              </View>
+            )}
+          </View>
           <Text style={[styles.sectionTitle, { marginTop: SPACE.xxl }]}>{selectedMember.name}</Text>
           <Text style={styles.memberSub}>{selectedMember.email}</Text>
           <View style={styles.badgeRow}>
@@ -1570,10 +1584,39 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       const allPosts = Array.isArray(posts) ? posts : [];
       const isDeleted = (p: any) => String(p?.status || '').toUpperCase() === 'DELETED';
       const isSold = (p: any) => String(p?.status || '').toUpperCase() === 'SOLD';
+      const isPinned = (p: any) => String(p?.status || '').toUpperCase() === 'PINNED';
+      const getPinnedNoticeChipColors = (post: any) => {
+        const subtype = String(post?.postSubtype || '').toLowerCase();
+        const urgencyLevel = String(post?.urgencyLevel || '').toLowerCase();
+        const urgency = String(post?.urgency || '').toLowerCase();
+
+        const isInfo = subtype === 'information' || urgencyLevel === 'info' || urgency === 'low';
+        if (isInfo) {
+          return {
+            bg: THEME_COLORS.aliasHex_dbeafe,
+            fg: THEME_COLORS.aliasHex_1e40af,
+          };
+        }
+
+        const isGeneral = subtype === 'normal' || urgencyLevel === 'general' || urgency === 'normal';
+        if (isGeneral) {
+          return {
+            bg: THEME_COLORS.aliasHex_d1fae5,
+            fg: THEME_COLORS.aliasHex_065f46,
+          };
+        }
+
+        return {
+          bg: THEME_COLORS.warningSurfaceAlt,
+          fg: THEME_COLORS.aliasHex_92400e,
+        };
+      };
       const activePosts = allPosts.filter((p: any) => !isDeleted(p));
+      const featuredPosts = activePosts.filter((p: any) => isPinned(p));
 
       const filteredItems = (() => {
         switch (contentFilter) {
+          case 'featured': return featuredPosts;
           case 'notices': return activePosts.filter((p: any) => p.type === 'notice');
           case 'listings': return activePosts.filter((p: any) => p.type === 'listing');
           default: return activePosts;
@@ -1584,7 +1627,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       const listingsSold = listingsAll.filter(isSold).length;
 
       const filterTabs = [
-        { key: 'all' as const, label: 'All', count: activePosts.length },
+        { key: 'featured' as const, label: 'Featured', count: featuredPosts.length },
         { key: 'notices' as const, label: 'Notices', count: activePosts.filter((p: any) => p.type === 'notice').length },
         { key: 'listings' as const, label: 'Listings', count: listingsAll.length, sublabel: listingsSold > 0 ? `${listingsSold} sold` : undefined },
       ];
@@ -1624,6 +1667,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             filteredItems.map((notice: any, index: number) => {
               const rawStatus = String(notice?.status || '').toUpperCase();
               const isListing = notice?.type === 'listing';
+              const isPinnedRow = rawStatus === 'PINNED';
+              const pinnedNoticeChip = getPinnedNoticeChipColors(notice);
               const isPending = notice?.status === 'PendingPublic';
               const isSoldRow = rawStatus === 'SOLD';
               const initialQty = Math.max(1, Number(notice?.initialQuantity ?? 1) || 1);
@@ -1640,7 +1685,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
               const priceLabel = hasPrice ? `R${priceValue.toLocaleString()}` : null;
               const statusLabel = isPending ? 'Pending'
                 : isSoldRow ? 'Sold out'
-                : rawStatus === 'PINNED' ? 'Pinned'
+                : rawStatus === 'PINNED' ? 'Featured'
                 : isListing ? 'Active'
                 : (notice?.urgencyLevel || notice?.urgency || 'Notice');
               const statusBg = isPending ? THEME_COLORS.warningSurface
@@ -1686,6 +1731,12 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                         {`${remainingQty} left`}
                       </Text>
                     </View>
+                  ) : isPinnedRow ? (
+                    <View style={styles.contentMetaRow}>
+                      <View style={[styles.statusChip, { backgroundColor: pinnedNoticeChip.bg }]}> 
+                        <Text style={[styles.statusChipText, { color: pinnedNoticeChip.fg }]}>Featured</Text>
+                      </View>
+                    </View>
                   ) : null}
                 </View>
                 <View style={styles.contentActions}>
@@ -1704,7 +1755,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
                         style={styles.iconBtn}
                         onPress={() => handleTogglePin(notice)}
                       >
-                          <Bookmark size={18} color={notice?.status === 'Pinned' ? PRIMARY : THEME_COLORS.neutralTextMuted} />
+                          <Bookmark size={18} color={isPinned(notice) ? PRIMARY : THEME_COLORS.neutralTextMuted} />
                       </TouchableOpacity>
                         <TouchableOpacity
                           style={styles.iconBtn}
@@ -2486,7 +2537,23 @@ const styles = StyleSheet.create({
     width: 40, height: 40, borderRadius: RADIUS.round, backgroundColor: THEME_COLORS.neutralBgSoft,
     alignItems: 'center', justifyContent: 'center',
   },
+  memberImgWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.round,
+    position: 'relative',
+  },
   memberImg: { width: 40, height: 40, borderRadius: RADIUS.round },
+  memberSecurityBadge: {
+    position: 'absolute',
+    bottom: -3,
+    right: -3,
+    padding: 3,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: THEME_COLORS.surfaceContainerLow,
+    backgroundColor: THEME_COLORS.brandBlueText,
+  },
   memberName: { fontSize: TYPE_SCALE.xxl, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong },
   memberSub: { fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, marginTop: SPACE.xxxs },
   memberStatusRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, marginTop: SPACE.xxs },
@@ -2511,7 +2578,14 @@ const styles = StyleSheet.create({
   statusBanner: { padding: SPACE.xl, borderRadius: RADIUS.lg },
   buttonRow: { flexDirection: 'row', gap: SPACE.xl, marginTop: SPACE.sm },
 
-  profileImg: { width: 80, height: 80, borderRadius: RADIUS.circle, marginTop: SPACE.lg },
+  profileImgWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: RADIUS.circle,
+    marginTop: SPACE.lg,
+    position: 'relative',
+  },
+  profileImg: { width: 80, height: 80, borderRadius: RADIUS.circle },
   badgeRow: { flexDirection: 'row', gap: SPACE.lg, marginTop: SPACE.lg },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   inlineLoader: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },

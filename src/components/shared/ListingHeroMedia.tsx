@@ -21,7 +21,7 @@ export function ListingHeroMedia({
   longitude,
   imageAspectClassName = 'aspect-[4/3]',
   imageHeight,
-  showLocationBadge = true,
+  showLocationBadge = false,
   soldStateLabel,
 }: ListingHeroMediaProps) {
   const hasImage = typeof imageUrl === 'string' && imageUrl.trim().length > 0;

@@ -69,6 +69,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
     setActiveConversation,
   } = useCommunity();
   const [isContextCardCollapsed, setIsContextCardCollapsed] = useState(false);
+  const [scrollToBottomRequest, setScrollToBottomRequest] = useState(0);
 
   // Find the conversation by id
   const chat = useMemo(
@@ -314,7 +315,11 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
                   <Search size={20} color={THEME_COLORS.neutralTextWhatsapp} />
                 </TouchableOpacity>
               )}
-              <TouchableOpacity className="p-1.5 rounded-full" activeOpacity={0.8}>
+              <TouchableOpacity
+                className="p-1.5 rounded-full"
+                activeOpacity={0.8}
+                onPress={() => setScrollToBottomRequest((prev) => prev + 1)}
+              >
                 <ChevronDown size={20} color={THEME_COLORS.neutralTextWhatsapp} />
               </TouchableOpacity>
             </View>
@@ -346,6 +351,7 @@ export const ChatDetailPage: React.FC<ChatDetailPageProps> = ({ conversationId }
             conversation={chat || { id: conversationId, participants: [], type: 'direct', lastMessage: '', lastMessageAt: '', priority: 'normal', unreadCount: 0 }}
             isTyping={isTyping}
             onScrollOffsetChange={handleChatScrollOffsetChange}
+            scrollToBottomRequest={scrollToBottomRequest}
           />
         </View>
 

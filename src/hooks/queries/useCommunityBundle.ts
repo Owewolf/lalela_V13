@@ -62,11 +62,10 @@ export function useCommunityBundle(communityId?: string | null, userId?: string 
         },
       };
     },
-    initialData: {
-      members: [], posts: [], charities: [], charitySuggestions: [], businesses: [], locations: { members: [], security: [] },
-    },
-    staleTime: 0,
-    refetchOnMount: 'always',
+    placeholderData: (previous) => previous,
+    staleTime: 30_000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnMount: true,
     refetchOnReconnect: true,
     retry: 2,
   });

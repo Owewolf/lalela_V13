@@ -30,7 +30,7 @@ function FloatingTabBar(props: BottomTabBarProps) {
         position: 'absolute',
         left: PILL_SIDE_INSET,
         right: PILL_SIDE_INSET,
-        bottom: insets.bottom + SPACE.sm,
+        bottom: insets.bottom,
       }}
     >
       <View

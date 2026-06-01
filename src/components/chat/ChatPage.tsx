@@ -57,6 +57,239 @@ function formatRelativeTime(dateStr: string): string {
   }
 }
 
+type ChatMemberListItem = {
+  member: CommunityMember;
+  hasBusiness: boolean;
+  isSecurity: boolean;
+  isEmergencyAuthor: boolean;
+  latestActivityMs: number;
+  emergencyDistance: number | null;
+  unread: {
+    direct: number;
+    listing: number;
+    notice: number;
+    marketplace: number;
+    directConv?: Conversation;
+    listingConv?: Conversation;
+    noticeConv?: Conversation;
+    marketplaceConv?: Conversation;
+    lastMessagePreview?: string;
+    lastMessageTime?: string;
+    lastMessageConv?: Conversation | null;
+    latestConversationAtMs?: number;
+  };
+  lastMessage: string;
+  lastMessageTime: string;
+  lastMessageConv: Conversation | null;
+};
+
+const getRoleBadgeBg = (role: string) => {
+  switch (role) {
+    case 'ADMIN': return THEME_COLORS.primary;
+    case 'MODERATOR': return THEME_COLORS.aliasHex_8b5cf6;
+    default: return THEME_COLORS.neutralTextSoft;
+  }
+};
+
+interface ChatMemberRowProps {
+  item: ChatMemberListItem;
+  onOpenConversation: (conversation: Conversation) => void;
+  onMemberTap: (item: ChatMemberListItem) => void;
+  isEmergency: boolean;
+}
+
+const ChatMemberRow = React.memo(
+  ({ item, onOpenConversation, onMemberTap, isEmergency }: ChatMemberRowProps) => {
+    const { member, hasBusiness, isSecurity, isEmergencyAuthor, emergencyDistance, unread, lastMessage, lastMessageTime } = item;
+    const normalizedLastMessage = (lastMessage || '').trim();
+    const isPhotoPreview = normalizedLastMessage === '📷 Photo' || normalizedLastMessage === 'Photo';
+
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => onMemberTap(item)}
+          activeOpacity={0.6}
+          className={[
+            'flex-row items-center gap-3 px-4 py-3',
+            isEmergencyAuthor ? 'bg-red-50' : 'bg-surface-container-low',
+          ].join(' ')}
+        >
+          <View className="relative w-14 h-14 rounded-full flex-shrink-0">
+            {member.image ? (
+              <Image
+                source={{ uri: member.image }}
+                className="w-14 h-14 rounded-full"
+                resizeMode="cover"
+              />
+            ) : (
+              <View className="w-14 h-14 rounded-full bg-surface-container items-center justify-center">
+                <Text className="text-primary font-bold text-base">
+                  {(member.name || '?')[0].toUpperCase()}
+                </Text>
+              </View>
+            )}
+            {isSecurity && (
+              <View
+                className={[
+                  'absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full items-center justify-center',
+                  'bg-primary',
+                ].join(' ')}
+                style={{ backgroundColor: THEME_COLORS.brandBlueText }}
+              >
+                <Shield size={10} color="white" />
+              </View>
+            )}
+          </View>
+
+          <View className="flex-1 min-w-0">
+            <View className="flex-row items-center gap-2 mb-1">
+              <View className="flex-1 min-w-0">
+                <View className="flex-row items-center gap-2">
+                  <Text
+                    numberOfLines={1}
+                    className={[
+                      'font-bold text-sm flex-shrink',
+                      isEmergencyAuthor ? 'text-red-600' : 'text-gray-900',
+                    ].join(' ')}
+                  >
+                    {member.name || 'Community Member'}
+                  </Text>
+                  {isEmergencyAuthor && (
+                    <View className="bg-red-100 px-1.5 py-0.5 rounded">
+                      <Text className="text-[10px] font-black uppercase tracking-wider text-red-600">
+                        Alert
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                <View className="flex-row items-center gap-1 mt-0.5">
+                  <View
+                    style={{ backgroundColor: getRoleBadgeBg(member.role) }}
+                    className="px-1.5 py-0.5 rounded"
+                  >
+                    <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
+                      {member.role}
+                    </Text>
+                  </View>
+                  {hasBusiness && (
+                    <View className="flex-row items-center gap-0.5 bg-amber-100 px-1.5 py-0.5 rounded">
+                      <Store size={9} color={THEME_COLORS.warning} />
+                      <Text className="text-[10px] font-bold uppercase tracking-wider text-amber-600">
+                        Biz
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </View>
+
+            {normalizedLastMessage ? (
+              isPhotoPreview ? (
+                <View className="flex-row items-center gap-1">
+                  <Camera size={12} color={THEME_COLORS.neutralTextSubtle} />
+                  <Text
+                    numberOfLines={1}
+                    className="text-xs text-gray-500 leading-tight"
+                  >
+                    Photo
+                  </Text>
+                </View>
+              ) : (
+                <Text
+                  numberOfLines={1}
+                  className="text-xs text-gray-500 leading-tight"
+                >
+                  {normalizedLastMessage}
+                </Text>
+              )
+            ) : (
+              <Text className="text-xs text-gray-400 italic">No messages yet</Text>
+            )}
+          </View>
+
+          <View className="items-end gap-2 flex-shrink-0 ml-2 self-stretch">
+            <Text className="text-[11px] text-green-600 font-semibold flex-shrink-0">
+              {lastMessageTime}
+            </Text>
+            {(() => {
+              const totalUnread =
+                unread.direct + unread.listing + unread.notice + unread.marketplace;
+              if (totalUnread <= 0) return null;
+              const targetConv =
+                unread.directConv ||
+                unread.marketplaceConv ||
+                unread.listingConv ||
+                unread.noticeConv ||
+                null;
+              const onPress = targetConv
+                ? () => onOpenConversation(targetConv)
+                : () => onMemberTap(item);
+              return (
+                <TouchableOpacity
+                  onPress={onPress}
+                  activeOpacity={0.7}
+                  className="rounded-full h-6 min-w-[24px] px-1.5 items-center justify-center"
+                  style={{ backgroundColor: THEME_COLORS.primary }}
+                >
+                  <Text className="text-[9px] text-white font-black">
+                    {totalUnread > 99 ? '99+' : totalUnread}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })()}
+
+            {isEmergency && isSecurity && emergencyDistance != null ? (
+              <View className="flex-row items-center gap-1">
+                <Navigation size={11} color={THEME_COLORS.errorStrong} />
+                <Text className="text-[10px] font-bold text-red-500">
+                  {emergencyDistance.toFixed(1)}km
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        </TouchableOpacity>
+
+        <View className="h-px bg-surface-container ml-14" />
+      </View>
+    );
+  },
+  (prev, next) => {
+    const prevItem = prev.item;
+    const nextItem = next.item;
+
+    return (
+      prev.isEmergency === next.isEmergency &&
+      prev.onOpenConversation === next.onOpenConversation &&
+      prev.onMemberTap === next.onMemberTap &&
+      prevItem.member.userId === nextItem.member.userId &&
+      prevItem.member.name === nextItem.member.name &&
+      prevItem.member.image === nextItem.member.image &&
+      prevItem.member.role === nextItem.member.role &&
+      prevItem.member.joinedAt === nextItem.member.joinedAt &&
+      prevItem.member.isSecurityMember === nextItem.member.isSecurityMember &&
+      prevItem.member.latitude === nextItem.member.latitude &&
+      prevItem.member.longitude === nextItem.member.longitude &&
+      prevItem.hasBusiness === nextItem.hasBusiness &&
+      prevItem.isSecurity === nextItem.isSecurity &&
+      prevItem.isEmergencyAuthor === nextItem.isEmergencyAuthor &&
+      prevItem.latestActivityMs === nextItem.latestActivityMs &&
+      prevItem.emergencyDistance === nextItem.emergencyDistance &&
+      prevItem.lastMessage === nextItem.lastMessage &&
+      prevItem.lastMessageTime === nextItem.lastMessageTime &&
+      prevItem.lastMessageConv?.id === nextItem.lastMessageConv?.id &&
+      prevItem.unread.direct === nextItem.unread.direct &&
+      prevItem.unread.listing === nextItem.unread.listing &&
+      prevItem.unread.notice === nextItem.unread.notice &&
+      prevItem.unread.marketplace === nextItem.unread.marketplace &&
+      prevItem.unread.directConv?.id === nextItem.unread.directConv?.id &&
+      prevItem.unread.listingConv?.id === nextItem.unread.listingConv?.id &&
+      prevItem.unread.noticeConv?.id === nextItem.unread.noticeConv?.id &&
+      prevItem.unread.marketplaceConv?.id === nextItem.unread.marketplaceConv?.id
+    );
+  }
+);
+
 export const ChatPage: React.FC = () => {
   const router = useRouter();
   const {
@@ -83,7 +316,7 @@ export const ChatPage: React.FC = () => {
   );
 
   // Build enriched member list
-  const enrichedMembers = useMemo(() => {
+  const enrichedMembers = useMemo<ChatMemberListItem[]>(() => {
     const otherMembers = members.filter((m) => m.userId !== userProfile?.id);
 
     const businessOwnerIds = new Set(communityBusinesses.map((b) => b.ownerId));
@@ -241,7 +474,7 @@ export const ChatPage: React.FC = () => {
     [setActiveConversation, markAsRead, router]
   );
 
-  const handleMemberTap = async (item: EnrichedItem) => {
+  const handleMemberTap = async (item: ChatMemberListItem) => {
     const { member, lastMessageConv } = item;
 
     if (lastMessageConv?.id) {
@@ -263,178 +496,17 @@ export const ChatPage: React.FC = () => {
     }
   };
 
-  const roleBadgeBg = (role: string) => {
-    switch (role) {
-      case 'ADMIN': return THEME_COLORS.primary;
-      case 'MODERATOR': return THEME_COLORS.aliasHex_8b5cf6;
-      default: return THEME_COLORS.neutralTextSoft;
-    }
-  };
-
-  type EnrichedItem = (typeof sorted)[0];
-
-  const renderItem = ({ item }: { item: EnrichedItem }) => {
-    const { member, hasBusiness, isSecurity, isEmergencyAuthor, emergencyDistance, unread, lastMessage, lastMessageTime, lastMessageConv } = item;
-    const normalizedLastMessage = (lastMessage || '').trim();
-    const isPhotoPreview = normalizedLastMessage === '📷 Photo' || normalizedLastMessage === 'Photo';
-
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => handleMemberTap(item)}
-          activeOpacity={0.6}
-          className={[
-            'flex-row items-center gap-3 px-4 py-3',
-            isEmergencyAuthor ? 'bg-red-50' : 'bg-surface-container-low',
-          ].join(' ')}
-        >
-          {/* Avatar */}
-          <View className="relative w-14 h-14 rounded-full flex-shrink-0">
-            {member.image ? (
-              <Image
-                source={{ uri: member.image }}
-                className="w-14 h-14 rounded-full"
-                resizeMode="cover"
-              />
-            ) : (
-              <View className="w-14 h-14 rounded-full bg-surface-container items-center justify-center">
-                <Text className="text-primary font-bold text-base">
-                  {(member.name || '?')[0].toUpperCase()}
-                </Text>
-              </View>
-            )}
-            {isSecurity && (
-              <View
-                className={[
-                  'absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full items-center justify-center',
-                  'bg-primary',
-                ].join(' ')}
-                style={{ backgroundColor: THEME_COLORS.brandBlueText }}
-              >
-                <Shield size={10} color="white" />
-              </View>
-            )}
-          </View>
-
-          {/* Center: Name, badges, and last message */}
-          <View className="flex-1 min-w-0">
-            <View className="flex-row items-center gap-2 mb-1">
-              <View className="flex-1 min-w-0">
-                <View className="flex-row items-center gap-2">
-                  <Text
-                    numberOfLines={1}
-                    className={[
-                      'font-bold text-sm flex-shrink',
-                      isEmergencyAuthor ? 'text-red-600' : 'text-gray-900',
-                    ].join(' ')}
-                  >
-                    {member.name || 'Community Member'}
-                  </Text>
-                  {isEmergencyAuthor && (
-                    <View className="bg-red-100 px-1.5 py-0.5 rounded">
-                      <Text className="text-[10px] font-black uppercase tracking-wider text-red-600">
-                        Alert
-                      </Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* Role and Business badges */}
-                <View className="flex-row items-center gap-1 mt-0.5">
-                  <View
-                    style={{ backgroundColor: roleBadgeBg(member.role) }}
-                    className="px-1.5 py-0.5 rounded"
-                  >
-                    <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
-                      {member.role}
-                    </Text>
-                  </View>
-                  {hasBusiness && (
-                    <View className="flex-row items-center gap-0.5 bg-amber-100 px-1.5 py-0.5 rounded">
-                      <Store size={9} color={THEME_COLORS.warning} />
-                      <Text className="text-[10px] font-bold uppercase tracking-wider text-amber-600">
-                        Biz
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              </View>
-            </View>
-
-            {/* Last message preview */}
-            {normalizedLastMessage ? (
-              isPhotoPreview ? (
-                <View className="flex-row items-center gap-1">
-                  <Camera size={12} color={THEME_COLORS.neutralTextSubtle} />
-                  <Text
-                    numberOfLines={1}
-                    className="text-xs text-gray-500 leading-tight"
-                  >
-                    Photo
-                  </Text>
-                </View>
-              ) : (
-                <Text
-                  numberOfLines={1}
-                  className="text-xs text-gray-500 leading-tight"
-                >
-                  {normalizedLastMessage}
-                </Text>
-              )
-            ) : (
-              <Text className="text-xs text-gray-400 italic">No messages yet</Text>
-            )}
-          </View>
-
-          {/* Right side: time, unread badge, and distance */}
-          <View className="items-end gap-2 flex-shrink-0 ml-2 self-stretch">
-            <Text className="text-[11px] text-green-600 font-semibold flex-shrink-0">
-              {lastMessageTime}
-            </Text>
-            {(() => {
-              const totalUnread =
-                unread.direct + unread.listing + unread.notice + unread.marketplace;
-              if (totalUnread <= 0) return null;
-              // Prefer opening the conversation that actually has unread messages.
-              const targetConv =
-                unread.directConv ||
-                unread.marketplaceConv ||
-                unread.listingConv ||
-                unread.noticeConv ||
-                null;
-              const onPress = targetConv
-                ? () => openConversation(targetConv)
-                : () => handleMemberTap(item);
-              return (
-                <TouchableOpacity
-                  onPress={onPress}
-                  activeOpacity={0.7}
-                  className="rounded-full h-6 min-w-[24px] px-1.5 items-center justify-center"
-                  style={{ backgroundColor: THEME_COLORS.primary }}
-                >
-                  <Text className="text-[9px] text-white font-black">
-                    {totalUnread > 99 ? '99+' : totalUnread}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })()}
-
-            {isEmergency && isSecurity && emergencyDistance != null ? (
-              <View className="flex-row items-center gap-1">
-                <Navigation size={11} color={THEME_COLORS.errorStrong} />
-                <Text className="text-[10px] font-bold text-red-500">
-                  {emergencyDistance.toFixed(1)}km
-                </Text>
-              </View>
-            ) : null}
-          </View>
-        </TouchableOpacity>
-
-        {/* Line separator */}
-        <View className="h-px bg-surface-container ml-14" />
-      </View>
-    );
-  };
+  const renderItem = useCallback(
+    ({ item }: { item: ChatMemberListItem }) => (
+      <ChatMemberRow
+        item={item}
+        onOpenConversation={openConversation}
+        onMemberTap={handleMemberTap}
+        isEmergency={isEmergency}
+      />
+    ),
+    [handleMemberTap, isEmergency, openConversation]
+  );
 
   const ListHeaderComponent = () => (
     <View className="px-4 mb-3">
@@ -538,6 +610,10 @@ export const ChatPage: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: SPACE.s100 }}
         scrollIndicatorInsets={{ right: SPACE.xxs }}
+        initialNumToRender={12}
+        maxToRenderPerBatch={12}
+        windowSize={7}
+        removeClippedSubviews
       />
     </View>
   );

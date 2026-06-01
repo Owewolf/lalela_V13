@@ -48,7 +48,7 @@ const getSenderNameColor = (message: Message) => {
   return SENDER_NAME_COLORS[hash % SENDER_NAME_COLORS.length];
 };
 
-export const MessageBubble: React.FC<MessageBubbleProps> = ({
+const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   message,
   isSequential,
   isFirstInCluster,
@@ -70,6 +70,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const senderNameColor = getSenderNameColor(message);
   const imageCaption = (message.content || '').trim();
   const showImageCaption = imageCaption.length > 0 && imageCaption.toLowerCase() !== 'photo';
+  const resolvedAttachmentUrl = message.attachmentUrl ? resolveMediaUrl(message.attachmentUrl) : undefined;
   const metadataLabel =
     typeof message.metadataLabel === 'string' && message.metadataLabel.trim().length > 0
       ? message.metadataLabel.trim()
@@ -167,17 +168,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               </View>
             )}
 
-            {message.messageType === 'image' && message.attachmentUrl ? (
+            {message.messageType === 'image' && resolvedAttachmentUrl ? (
               <>
                 <TouchableOpacity
                   onPress={() => {
-                    const u = resolveMediaUrl(message.attachmentUrl);
-                    if (u) Linking.openURL(u);
+                    if (resolvedAttachmentUrl) Linking.openURL(resolvedAttachmentUrl);
                   }}
                   activeOpacity={0.85}
                 >
                   <Image
-                    source={{ uri: resolveMediaUrl(message.attachmentUrl) }}
+                    source={{ uri: resolvedAttachmentUrl }}
                     className="w-60 h-44"
                     resizeMode="cover"
                   />
@@ -188,6 +188,17 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                   </Text>
                 ) : null}
               </>
+            ) : message.messageType === 'image' ? (
+              <View className="px-3 py-2">
+                <Text className="text-sm text-neutralTextMuted italic">
+                  Image unavailable
+                </Text>
+                {showImageCaption ? (
+                  <Text className="text-[16px] leading-5 pt-1.5 text-neutralTextStrong">
+                    {imageCaption}
+                  </Text>
+                ) : null}
+              </View>
             ) : (
               <>
                 <Text
@@ -265,3 +276,30 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     </View>
   );
 };
+
+const areMessageBubblePropsEqual = (prev: MessageBubbleProps, next: MessageBubbleProps) => {
+  const prevMessage = prev.message;
+  const nextMessage = next.message;
+
+  return (
+    prev.conversationType === next.conversationType &&
+    prev.conversationMetadata === next.conversationMetadata &&
+    prev.isSequential === next.isSequential &&
+    prev.isFirstInCluster === next.isFirstInCluster &&
+    prev.isMiddleInCluster === next.isMiddleInCluster &&
+    prev.isLastInCluster === next.isLastInCluster &&
+    prevMessage.id === nextMessage.id &&
+    prevMessage.messageType === nextMessage.messageType &&
+    prevMessage.content === nextMessage.content &&
+    prevMessage.createdAt === nextMessage.createdAt &&
+    prevMessage.status === nextMessage.status &&
+    prevMessage.userId === nextMessage.userId &&
+    prevMessage.senderName === nextMessage.senderName &&
+    prevMessage.senderImage === nextMessage.senderImage &&
+    prevMessage.attachmentUrl === nextMessage.attachmentUrl &&
+    prevMessage.isListingIntro === nextMessage.isListingIntro &&
+    prevMessage.metadataLabel === nextMessage.metadataLabel
+  );
+};
+
+export const MessageBubble = React.memo(MessageBubbleComponent, areMessageBubblePropsEqual);

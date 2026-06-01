@@ -50,6 +50,8 @@ const ICON_SIZE = {
   md: 40,
 };
 
+const LANDING_ARTWORK = require('../../../assets/landing_icon.png');
+
 
 // Simple checkbox component
 const Checkbox: React.FC<{ checked: boolean; onChange: (val: boolean) => void }> = ({ checked, onChange }) => (
@@ -232,49 +234,53 @@ const LandingPage: React.FC = () => {
       <ScrollView
         ref={scrollRef}
         className="flex-1"
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: SPACE.xl }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: SPACE.xl, alignItems: 'center' }}
         keyboardShouldPersistTaps="handled"
           keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
           nestedScrollEnabled
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Header / Nav ── */}
-        <View
-          className="px-6 py-4 flex-row items-center justify-between border-b"
-          style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}
-        >
-          <View className="flex-row items-center gap-2">
-            <Image 
-              source={require('../../../assets/lalela_logo.png')} 
-              style={{ width: ICON_SIZE.md, height: ICON_SIZE.md, borderRadius: RADIUS.md }}
+        <View className="w-full px-5" style={{ maxWidth: 560 }}>
+          {/* ── Header / Nav ── */}
+          <View
+            className="pt-4 pb-3 flex-row items-center justify-between"
+          >
+            <Text className="text-4xl font-black tracking-tight" style={{ color: THEME_COLORS.onSurface }}>lalela</Text>
+            <View className="flex-row gap-2">
+              <TouchableOpacity
+                onPress={() => switchTab('start')}
+                className="px-5 py-2.5 rounded-2xl"
+                style={{ backgroundColor: THEME_COLORS.secondaryContainer }}
+              >
+                <Text className="text-white font-black text-xs uppercase tracking-widest">Sign Up</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => switchTab('login')}
+                className="px-5 py-2.5 rounded-2xl"
+                style={{ backgroundColor: THEME_COLORS.primary }}
+              >
+                <Text className="text-white font-black text-xs uppercase tracking-widest">Log In</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* ── Artwork Hero ── */}
+          <View className="items-center pt-2 pb-4">
+            <Image
+              source={LANDING_ARTWORK}
+              style={{ width: 188, height: 188 }}
               resizeMode="contain"
             />
-            <Text className="text-2xl font-black text-primary tracking-tight">lalela</Text>
-          </View>
-          <View className="flex-row gap-2">
-            <TouchableOpacity
-              onPress={() => switchTab('start')}
-              className="px-4 py-2 rounded-full"
-              style={{ backgroundColor: THEME_COLORS.secondaryContainer }}
-            >
-              <Text className="text-white font-black text-xs uppercase tracking-widest">Sign Up</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => switchTab('login')}
-              className="px-4 py-2 rounded-full"
-              style={{ backgroundColor: THEME_COLORS.primary }}
-            >
-              <Text className="text-white font-black text-xs uppercase tracking-widest">Log In</Text>
-            </TouchableOpacity>
           </View>
         </View>
 
         {/* ── Auth Form ── */}
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          className="mx-6 mb-6"
+          className="w-full px-5 mb-6"
+          style={{ maxWidth: 560 }}
         >
-          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 34, padding: 24, shadowColor: THEME_COLORS.black, shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 3, borderWidth: 1, borderColor: THEME_COLORS.neutralBorderSoft }}>
             {/* Verification email sent — replaces form */}
             {verificationEmailSent ? (
               <View className="gap-6 items-center py-4">
@@ -317,13 +323,13 @@ const LandingPage: React.FC = () => {
             ) : (
               <>
                 {/* Tab switcher */}
-                <View className="flex-row p-1.5 rounded-3xl mb-6" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
+                <View className="flex-row p-1.5 rounded-2xl mb-6" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }}>
                   {(['start', 'login'] as JoinMode[]).map((m) => (
                     <TouchableOpacity
                       key={m}
                       onPress={() => { switchTab(m); setEmailJustVerified(false); }}
-                      className="flex-1 py-3 rounded-2xl items-center"
-                      style={{ backgroundColor: joinMode === m ? 'white' : 'transparent' }}
+                      className="flex-1 py-3 rounded-xl items-center"
+                      style={{ backgroundColor: joinMode === m ? THEME_COLORS.white : 'transparent' }}
                     >
                       <Text
                         className="font-black uppercase tracking-widest text-xs"
@@ -567,7 +573,7 @@ const LandingPage: React.FC = () => {
                       onPress={handleAuthSubmit}
                       disabled={isSubmitting}
                       className="py-4 rounded-2xl items-center"
-                      style={{ backgroundColor: THEME_COLORS.secondaryContainer, opacity: isSubmitting ? 0.5 : 1 }}
+                      style={{ backgroundColor: THEME_COLORS.secondaryContainer, opacity: isSubmitting ? 0.5 : 1, shadowColor: THEME_COLORS.secondaryContainer, shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 2 }}
                     >
                       {isSubmitting
                         ? <ActivityIndicator color="white" size="small" />
@@ -590,24 +596,26 @@ const LandingPage: React.FC = () => {
         </KeyboardAvoidingView>
 
         {Platform.OS === 'web' && (
-          <View className="bg-primary px-6 py-12">
-            <View className="flex-row items-center gap-2 mb-4">
-              <Image 
-                source={require('../../../assets/lalela_logo.png')} 
-                style={{ width: ICON_SIZE.sm, height: ICON_SIZE.sm, borderRadius: RADIUS.sm }}
-                resizeMode="contain"
-              />
-              <Text className="text-2xl font-black text-white tracking-tight">lalela</Text>
+          <View className="bg-primary px-6 py-12 w-full" style={{ alignItems: 'center' }}>
+            <View style={{ width: '100%', maxWidth: 560 }}>
+              <View className="flex-row items-center gap-2 mb-4">
+                <Image
+                  source={LANDING_ARTWORK}
+                  style={{ width: ICON_SIZE.sm, height: ICON_SIZE.sm, borderRadius: RADIUS.sm }}
+                  resizeMode="cover"
+                />
+                <Text className="text-2xl font-black text-white tracking-tight">lalela</Text>
+              </View>
+              <Text className="text-xs text-white/50 font-medium leading-relaxed mb-6">
+                Build your own community — access your stage in some days.
+              </Text>
+              <View className="flex-row flex-wrap gap-x-6 gap-y-2">
+                {['About', 'Privacy', 'Terms', 'Support', 'Contact'].map((link) => (
+                  <Text key={link} className="text-xs font-bold text-white/50">{link}</Text>
+                ))}
+              </View>
+              <Text className="text-xs text-white/30 mt-6">© 2026 Lalela. All rights reserved.</Text>
             </View>
-            <Text className="text-xs text-white/50 font-medium leading-relaxed mb-6">
-              Build your own community — access your stage in some days.
-            </Text>
-            <View className="flex-row flex-wrap gap-x-6 gap-y-2">
-              {['About', 'Privacy', 'Terms', 'Support', 'Contact'].map((link) => (
-                <Text key={link} className="text-xs font-bold text-white/50">{link}</Text>
-              ))}
-            </View>
-            <Text className="text-xs text-white/30 mt-6">© 2026 Lalela. All rights reserved.</Text>
           </View>
         )}
       </ScrollView>

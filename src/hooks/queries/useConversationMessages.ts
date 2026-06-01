@@ -11,8 +11,8 @@ export function useConversationMessages(conversationId?: string | null) {
       const { data } = await api.get(`/conversations/${conversationId}/messages`);
       return Array.isArray(data) ? data : [];
     },
-    initialData: [],
     staleTime: 30_000,
+    gcTime: 30 * 60 * 1000,
   });
 }
 

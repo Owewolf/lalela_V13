@@ -10,7 +10,7 @@ import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { CommunityProvider, useCommunity } from '../src/context/CommunityContext';
 import { ThemeProvider } from '../src/context/ThemeContext';
@@ -19,7 +19,7 @@ import { CallProvider } from '../src/context/CallContext';
 import { IncomingCallOverlay } from '../src/components/call/IncomingCallOverlay';
 import { TopicChatGateProvider } from '../src/components/chat/TopicChatGateProvider';
 import { THEME_COLORS } from '../src/theme/colors';
-import { queryClient } from '../src/lib/queryClient';
+import { asyncStoragePersister, queryClient } from '../src/lib/queryClient';
 import { useRealtimeSync } from '../src/hooks/useRealtimeSync';
 
 
@@ -317,7 +317,14 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{
+            persister: asyncStoragePersister,
+            buster: 'v1',
+            maxAge: 12 * 60 * 60 * 1000,
+          }}
+        >
           <AuthProvider>
             <CommunityProvider>
               <ThemeProvider>
@@ -351,7 +358,7 @@ export default function RootLayout() {
               </ThemeProvider>
             </CommunityProvider>
           </AuthProvider>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

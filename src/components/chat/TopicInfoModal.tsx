@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Modal, Text, TouchableOpacity, View, Image, ScrollView } from 'react-native';
-import { AlertTriangle, Info, MapPin, RefreshCw, Tag } from 'lucide-react-native';
+import { AlertTriangle, Info, RefreshCw, Tag } from 'lucide-react-native';
 import { CommunityNotice } from '../../types';
 import { resolveMediaUrl } from '../../lib/config';
 import { ListingHeroMedia } from '../shared/ListingHeroMedia';
@@ -10,8 +10,12 @@ type TopicInfoModalProps = {
   visible: boolean;
   post: CommunityNotice | null;
   loading?: boolean;
+  isOwnerMode?: boolean;
+  ownerActionLoading?: boolean;
   onClose: () => void;
   onOpenChat: () => Promise<void> | void;
+  onRecordSale?: () => Promise<void> | void;
+  onDelete?: () => void;
 };
 
 const formatPrice = (value?: number) => {
@@ -76,7 +80,17 @@ const getPillIcon = (label: string, color: string) => {
   return <Tag size={12} color={color} />;
 };
 
-export function TopicInfoModal({ visible, post, loading = false, onClose, onOpenChat }: TopicInfoModalProps) {
+export function TopicInfoModal({
+  visible,
+  post,
+  loading = false,
+  isOwnerMode = false,
+  ownerActionLoading = false,
+  onClose,
+  onOpenChat,
+  onRecordSale,
+  onDelete,
+}: TopicInfoModalProps) {
   const safePost = post;
   if (!safePost) return null;
 
@@ -97,7 +111,11 @@ export function TopicInfoModal({ visible, post, loading = false, onClose, onOpen
           <ScrollView bounces={false}>
             <View className="px-6 pt-5 pb-6" style={{ gap: 14 }}>
               <View className="flex-row items-center justify-between">
-                <Text className="text-base font-black text-primary">{safePost.type === 'listing' ? 'Listing' : 'Notice'} Details</Text>
+                <Text className="text-base font-black text-primary">
+                  {isOwnerMode
+                    ? `${safePost.type === 'listing' ? 'Listing' : 'Notice'} Owner Actions`
+                    : `${safePost.type === 'listing' ? 'Listing' : 'Notice'} Details`}
+                </Text>
                 <TouchableOpacity onPress={onClose} disabled={loading}>
                   <Text className="text-xl font-bold text-gray-500">×</Text>
                 </TouchableOpacity>
@@ -116,6 +134,12 @@ export function TopicInfoModal({ visible, post, loading = false, onClose, onOpen
                   <Text className="text-[24px] leading-8 font-black text-neutralTextStrong" numberOfLines={2}>
                     {safePost.title}
                   </Text>
+
+                  {safePost.description ? (
+                    <Text className="text-[14px] leading-5 text-neutralTextSubtle" numberOfLines={4}>
+                      {safePost.description}
+                    </Text>
+                  ) : null}
 
                   <View className="flex-row items-center justify-between">
                     <View
@@ -137,20 +161,6 @@ export function TopicInfoModal({ visible, post, loading = false, onClose, onOpen
                 </View>
               </View>
 
-              <View className="rounded-2xl border p-4" style={{ borderColor: THEME_COLORS.neutralBorderSoft, gap: 8 }}>
-                <Text className="text-[11px] font-bold uppercase tracking-widest text-neutralTextMuted">Topic information</Text>
-                <Text className="text-[14px] font-semibold text-neutralTextStrong">By {safePost.authorName} · {safePost.authorRole || 'Member'}</Text>
-                {safePost.description ? (
-                  <Text className="text-[14px] leading-5 text-neutralTextSubtle" numberOfLines={4}>{safePost.description}</Text>
-                ) : null}
-                {safePost.locationName ? (
-                  <View className="flex-row items-center gap-1.5">
-                    <MapPin size={14} color={THEME_COLORS.neutralTextSubtle} />
-                    <Text className="text-[13px] text-neutralTextSubtle">{safePost.locationName}</Text>
-                  </View>
-                ) : null}
-              </View>
-
               {safePost.type === 'listing' ? (
                 <View className="rounded-2xl border p-4" style={{ borderColor: THEME_COLORS.neutralBorderSoft, gap: 6 }}>
                   <Text className="text-[11px] font-bold uppercase tracking-widest text-neutralTextMuted">Pricing</Text>
@@ -160,20 +170,52 @@ export function TopicInfoModal({ visible, post, loading = false, onClose, onOpen
                 </View>
               ) : null}
 
-              <TouchableOpacity
-                onPress={() => {
-                  Promise.resolve(onOpenChat()).catch(() => {
-                    Alert.alert('Chat unavailable', 'Unable to open this conversation right now.');
-                  });
-                }}
-                disabled={loading}
-                className="rounded-full py-4 items-center"
-                style={{ backgroundColor: THEME_COLORS.primary }}
-              >
-                <Text className="text-[13px] font-black uppercase tracking-widest" style={{ color: THEME_COLORS.white }}>
-                  {loading ? 'Opening chat...' : 'Open Chat'}
-                </Text>
-              </TouchableOpacity>
+              {isOwnerMode ? (
+                <View style={{ gap: 10 }}>
+                  {safePost.type === 'listing' ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        Promise.resolve(onRecordSale?.()).catch(() => {
+                          Alert.alert('Unable to record sale', 'Please try again.');
+                        });
+                      }}
+                      disabled={ownerActionLoading}
+                      className="rounded-full py-4 items-center"
+                      style={{ backgroundColor: THEME_COLORS.warningStrong }}
+                    >
+                      <Text className="text-[13px] font-black uppercase tracking-widest" style={{ color: THEME_COLORS.neutralTextStrong }}>
+                        {ownerActionLoading ? 'Saving...' : 'Record a Sale'}
+                      </Text>
+                    </TouchableOpacity>
+                  ) : null}
+
+                  <TouchableOpacity
+                    onPress={onDelete}
+                    disabled={ownerActionLoading}
+                    className="rounded-full py-4 items-center"
+                    style={{ backgroundColor: THEME_COLORS.errorStrong }}
+                  >
+                    <Text className="text-[13px] font-black uppercase tracking-widest" style={{ color: THEME_COLORS.white }}>
+                      {ownerActionLoading ? 'Working...' : 'Delete'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    Promise.resolve(onOpenChat()).catch(() => {
+                      Alert.alert('Chat unavailable', 'Unable to open this conversation right now.');
+                    });
+                  }}
+                  disabled={loading}
+                  className="rounded-full py-4 items-center"
+                  style={{ backgroundColor: THEME_COLORS.primary }}
+                >
+                  <Text className="text-[13px] font-black uppercase tracking-widest" style={{ color: THEME_COLORS.white }}>
+                    {loading ? 'Opening chat...' : 'Open Chat'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </ScrollView>
         </View>

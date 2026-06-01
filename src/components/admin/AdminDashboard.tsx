@@ -51,6 +51,7 @@ import { useCharityCampaignHistory } from '../../hooks/queries/useCharityCampaig
 import { useCatHub } from '../../hooks/queries/useCatHub';
 import { useModerationLogs } from '../../hooks/queries/useModerationLogs';
 import { useSecurityEvents } from '../../hooks/queries/useSecurityEvents';
+import { isUserPaidMembershipActive } from '../../lib/licensing';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
 import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
@@ -234,12 +235,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const hasEmergencies = activeEmergencyPosts.length > 0 || isEmergencyActive;
   const hasWarnings = activeWarningPosts.length > 0;
   const hasAnyIncidents = hasEmergencies || hasWarnings;
-  const adminAvatarLabel = (userProfile?.name || userProfile?.email || 'A')
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join('') || 'A';
+  const adminAvatarUri =
+    userProfile?.profileImage ||
+    `https://picsum.photos/seed/${userProfile?.id ?? 'user'}/100/100`;
+  // Keep moderation avatar behavior aligned with the shared app header.
+  const isSecurityMemberForSelectedCommunity = !!currentCommunity?.isSecurityMember;
+  const userHasPaidMembership = isUserPaidMembershipActive(userProfile);
+  const adminAvatarRingColor = userHasPaidMembership ? THEME_COLORS.primary : THEME_COLORS.errorStrong;
 
   const formatInsightTime = React.useCallback((value?: string) => {
     if (!value) return 'No time';
@@ -1218,8 +1220,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )}
 
         {activeView === 'moderation' && (
-          <View style={styles.adminAvatar}>
-            <Text style={styles.adminAvatarText}>{adminAvatarLabel}</Text>
+          <View style={styles.adminAvatarWrapper}>
+            <View style={[styles.adminAvatarRing, { borderColor: adminAvatarRingColor }]}>
+              <View style={styles.adminAvatarInner}>
+                <Image source={{ uri: adminAvatarUri }} style={styles.adminAvatarImage} resizeMode="cover" />
+              </View>
+              {isSecurityMemberForSelectedCommunity && (
+                <View style={styles.adminAvatarSecurityBadge}>
+                  <Shield size={8} color={THEME_COLORS.white} />
+                </View>
+              )}
+            </View>
           </View>
         )}
       </View>
@@ -1321,21 +1332,39 @@ const styles = StyleSheet.create({
     borderColor: getCardBorderColor('default'),
   },
   viewSwitcherBtnActive: { backgroundColor: THEME_COLORS.successSurface },
-  adminAvatar: {
+  adminAvatarWrapper: {
+    paddingLeft: SPACE.md,
+    borderLeftWidth: 1,
+    borderLeftColor: THEME_COLORS.neutralBorder,
+  },
+  adminAvatarRing: {
     width: 44,
     height: 44,
     borderRadius: RADIUS.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: THEME_COLORS.secondaryContainer,
     borderWidth: 2,
-    borderColor: THEME_COLORS.surface,
+    padding: SPACE.xxs,
+    position: 'relative',
     ...createShadow(THEME_COLORS.black, 0, 2, 0.08, 6, 2),
   },
-  adminAvatarText: {
-    fontSize: TYPE_SCALE.xl,
-    fontWeight: FONT_WEIGHT.black,
-    color: THEME_COLORS.white,
+  adminAvatarInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: RADIUS.pill,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: THEME_COLORS.surfaceContainerLow,
+    backgroundColor: THEME_COLORS.neutralBorder,
+  },
+  adminAvatarImage: { width: '100%', height: '100%' },
+  adminAvatarSecurityBadge: {
+    position: 'absolute',
+    bottom: -3,
+    right: -3,
+    padding: SPACE.xs,
+    borderRadius: RADIUS.lg,
+    borderWidth: 2,
+    borderColor: THEME_COLORS.surfaceContainerLow,
+    backgroundColor: THEME_COLORS.brandBlueText,
   },
 
   dashScroll: { flex: 1 },

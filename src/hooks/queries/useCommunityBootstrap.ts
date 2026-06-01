@@ -35,8 +35,9 @@ export function useCommunityBootstrap(userId?: string | null) {
         notifications,
       };
     },
-    initialData: { communities: [], conversations: [], notifications: [] },
+    placeholderData: (previous) => previous,
     staleTime: 60_000,
+    gcTime: 30 * 60 * 1000,
     refetchOnMount: false,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,

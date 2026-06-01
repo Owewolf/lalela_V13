@@ -17,6 +17,7 @@ import {
 import {
   Plus,
   Tag,
+  Hand,
   CheckCircle2,
   AlertTriangle,
   Siren,
@@ -322,6 +323,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         (isEmergency || isWarning) && notice.latitude && notice.longitude;
       const dist = calculateDistance(notice.latitude, notice.longitude, baseLat, baseLng);
       const isOwner = notice.authorId === userProfile?.id;
+      const isOwnerNoticeAction = isOwner && !isEmergency && !isWarning;
       const isAdmin = currentCommunity?.userRole === 'ADMIN';
 
       return (
@@ -388,6 +390,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 latitude={notice.latitude}
                 longitude={notice.longitude}
                 imageHeight={160}
+                showLocationBadge={isWarning}
               />
             </View>
           ) : null}
@@ -524,7 +527,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                   activeOpacity={0.8}
                   onPress={() => handleOpenContextChat(notice)}
                 >
-                  <MessageSquare size={16} color={PRIMARY} />
+                  {isOwnerNoticeAction ? <Hand size={16} color={PRIMARY} /> : <MessageSquare size={16} color={PRIMARY} />}
                 </TouchableOpacity>
               </View>
             </View>
@@ -599,6 +602,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 imageUrl={post.postsImage}
                 latitude={post.latitude}
                 longitude={post.longitude}
+                showLocationBadge={false}
                 soldStateLabel={isSold ? 'Sold Out' : soldQuantity > 0 ? 'Partially Sold' : null}
               />
             </View>
@@ -817,7 +821,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                   <Heart size={20} color={THEME_COLORS.neutralTextSoft} />
                 </TouchableOpacity>
                 <TouchableOpacity className="p-2" activeOpacity={0.8} onPress={() => handleOpenContextChat(post)}>
-                  <MessageSquare size={20} color={THEME_COLORS.neutralTextSoft} />
+                  {isOwner ? <Hand size={20} color={THEME_COLORS.neutralTextSoft} /> : <MessageSquare size={20} color={THEME_COLORS.neutralTextSoft} />}
                 </TouchableOpacity>
               </View>
             </View>

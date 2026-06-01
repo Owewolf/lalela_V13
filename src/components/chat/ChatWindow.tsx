@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, FlatList, Animated, Platform } from 'react-native';
 import { Message, Conversation } from '../../types';
 import { MessageBubble } from './MessageBubble';
@@ -10,6 +10,7 @@ interface ChatWindowProps {
   isTyping?: boolean;
   emptyStateText?: string;
   onScrollOffsetChange?: (offsetY: number) => void;
+  scrollToBottomRequest?: number;
 }
 
 type TimelineItem =
@@ -30,6 +31,18 @@ const SPACE = {
   md: 10,
   lg: 18,
 };
+
+const INITIAL_ANCHOR_WINDOW_MS = Platform.select({
+  ios: 1500,
+  android: 1300,
+  default: 900,
+}) ?? 1200;
+
+const COMPOSER_CLEARANCE_BOTTOM = Platform.select({
+  ios: 52,
+  android: 44,
+  default: 44,
+}) ?? 44;
 
 const isSameClusterMessage = (left?: Message, right?: Message) => {
   if (!left || !right) return false;
@@ -108,8 +121,25 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   isTyping,
   emptyStateText,
   onScrollOffsetChange,
+  scrollToBottomRequest,
 }) => {
   const flatListRef = useRef<FlatList>(null);
+  const initialAnchorUntilRef = useRef(0);
+  const previousMessageCountRef = useRef(0);
+
+  useEffect(() => {
+    initialAnchorUntilRef.current = Date.now() + INITIAL_ANCHOR_WINDOW_MS;
+    previousMessageCountRef.current = 0;
+  }, [conversation.id]);
+
+  const shouldForceInitialAnchor = useCallback(() => {
+    return Date.now() < initialAnchorUntilRef.current;
+  }, []);
+
+  const tryInitialScrollToBottom = useCallback(() => {
+    if (messages.length === 0) return;
+    flatListRef.current?.scrollToEnd({ animated: false });
+  }, [messages.length]);
   const timelineItems = useMemo<TimelineItem[]>(() => {
     const items: TimelineItem[] = [];
     let previousDateKey: string | undefined;
@@ -152,14 +182,35 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     return items;
   }, [messages]);
 
-  // Scroll to end when new messages arrive
+  // Start at the latest message without visible jump; animate only after initial layout.
   useEffect(() => {
-    if (messages.length > 0) {
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+    if (messages.length === 0) {
+      previousMessageCountRef.current = 0;
+      initialAnchorUntilRef.current = 0;
+      return;
     }
-  }, [messages.length, isTyping]);
 
-  const renderItem = ({ item }: { item: TimelineItem }) => {
+    const hasNewMessage = messages.length > previousMessageCountRef.current;
+
+    if (shouldForceInitialAnchor()) {
+      requestAnimationFrame(() => {
+        tryInitialScrollToBottom();
+      });
+    } else if (hasNewMessage || isTyping) {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }
+
+    previousMessageCountRef.current = messages.length;
+  }, [conversation.id, messages.length, isTyping, shouldForceInitialAnchor, tryInitialScrollToBottom]);
+
+  useEffect(() => {
+    if (!scrollToBottomRequest || messages.length === 0) return;
+    requestAnimationFrame(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    });
+  }, [scrollToBottomRequest, messages.length]);
+
+  const renderItem = useCallback(({ item }: { item: TimelineItem }) => {
     if (item.type === 'date') {
       return (
         <View className="items-center my-3">
@@ -187,7 +238,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         conversationMetadata={conversation.metadata}
       />
     );
-  };
+  }, [conversation.metadata, conversation.type]);
 
   const ListEmptyComponent = () => (
     <View className="flex-1 items-center justify-center py-20 opacity-50">
@@ -214,21 +265,27 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         data={timelineItems}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        initialNumToRender={12}
+        maxToRenderPerBatch={12}
+        windowSize={7}
         ListEmptyComponent={ListEmptyComponent}
         ListFooterComponent={ListFooterComponent}
         contentContainerStyle={{
           paddingLeft: SPACE.md,
           paddingRight: SPACE.xxs,
           paddingTop: SPACE.lg,
-          paddingBottom: SPACE.md,
+          paddingBottom: SPACE.md + COMPOSER_CLEARANCE_BOTTOM,
           flexGrow: 1,
         }}
         showsVerticalScrollIndicator={false}
+        onLayout={() => {
+          if (shouldForceInitialAnchor()) tryInitialScrollToBottom();
+        }}
         onScroll={(event) => onScrollOffsetChange?.(event.nativeEvent.contentOffset.y)}
         scrollEventThrottle={16}
         onContentSizeChange={() => {
-          if (messages.length > 0) {
-            flatListRef.current?.scrollToEnd({ animated: false });
+          if (messages.length > 0 && shouldForceInitialAnchor()) {
+            tryInitialScrollToBottom();
           }
         }}
       />

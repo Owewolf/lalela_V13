@@ -7,6 +7,7 @@ import { useCommunity } from '../../context/CommunityContext';
 import { CommunityNotice, ConversationMetadata } from '../../types';
 import { prefetchConversationMessages } from '../../hooks/queries/useConversationMessages';
 import { TopicInfoModal } from './TopicInfoModal';
+import RecordSaleModal from '../market/RecordSaleModal';
 
 type TopicChatRequest = {
   post: CommunityNotice;
@@ -56,18 +57,103 @@ export function TopicChatGateProvider({ children }: { children: React.ReactNode 
   const router = useRouter();
   const queryClient = useQueryClient();
   const { userProfile } = useAuth();
-  const { charities, startConversation, setActiveConversation } = useCommunity();
+  const { charities, startConversation, setActiveConversation, markPostSold, removePost } = useCommunity();
   const [pending, setPending] = useState<TopicChatRequest | null>(null);
   const [openingChat, setOpeningChat] = useState(false);
+  const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
+  const [saleListing, setSaleListing] = useState<CommunityNotice | null>(null);
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
+
+  const isOwnerPending = Boolean(
+    pending?.post?.authorId && userProfile?.id && pending.post.authorId === userProfile.id
+  );
+
+  const getRemainingQuantity = useCallback((post: CommunityNotice) => {
+    const initialQuantity = Math.max(1, Number(post.initialQuantity ?? 1));
+    const soldQuantity = Math.max(0, Number(post.soldQuantity ?? 0));
+    return Math.max(0, Number(post.remainingQuantity ?? (initialQuantity - soldQuantity)));
+  }, []);
 
   const openTopicChat = useCallback((request: TopicChatRequest) => {
     setPending(request);
   }, []);
 
   const closeModal = useCallback(() => {
-    if (openingChat) return;
+    if (openingChat || deletingPostId || markingSoldId) return;
     setPending(null);
-  }, [openingChat]);
+  }, [deletingPostId, markingSoldId, openingChat]);
+
+  const completeSale = useCallback(async (post: CommunityNotice, quantity: number) => {
+    setMarkingSoldId(post.id);
+    try {
+      const result = await markPostSold(post.id, quantity);
+      Alert.alert(
+        'Listing updated',
+        result.catTriggered
+          ? `Sale recorded. CAT recorded: R${Number(result.catAmount || 0).toFixed(2)}${result.pooledToCharity ? ' (pooled to charity).' : '.'}`
+          : 'Sale recorded.'
+      );
+      setSaleListing(null);
+      setPending(null);
+    } catch (error: any) {
+      const remaining = Number(error?.response?.data?.remainingQuantity ?? NaN);
+      if (Number.isFinite(remaining)) {
+        Alert.alert('Unable to record sale', `Only ${remaining} item(s) remaining. Please try again.`);
+      } else {
+        Alert.alert('Unable to record sale', 'Please try again.');
+      }
+    } finally {
+      setMarkingSoldId(null);
+    }
+  }, [markPostSold]);
+
+  const handleRecordSale = useCallback(async () => {
+    if (!pending || pending.post.type !== 'listing') return;
+    if (!isOwnerPending) return;
+
+    const remainingQuantity = getRemainingQuantity(pending.post);
+    if (remainingQuantity > 1) {
+      setSaleListing(pending.post);
+      return;
+    }
+
+    Alert.alert(
+      'Mark as sold',
+      'This will mark the listing sold and record the CAT contribution for the community.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm',
+          onPress: () => {
+            void completeSale(pending.post, 1);
+          },
+        },
+      ]
+    );
+  }, [completeSale, getRemainingQuantity, isOwnerPending, pending]);
+
+  const handleDeletePost = useCallback(() => {
+    if (!pending || !isOwnerPending) return;
+
+    Alert.alert('Delete item', 'Are you sure you want to delete this item?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          setDeletingPostId(pending.post.id);
+          try {
+            await removePost(pending.post.id);
+            setPending(null);
+          } catch {
+            Alert.alert('Unable to delete', 'Please try again.');
+          } finally {
+            setDeletingPostId(null);
+          }
+        },
+      },
+    ]);
+  }, [isOwnerPending, pending, removePost]);
 
   const handleOpenChat = useCallback(async () => {
     if (!pending) return;
@@ -123,8 +209,27 @@ export function TopicChatGateProvider({ children }: { children: React.ReactNode 
         visible={!!pending}
         post={pending?.post ?? null}
         loading={openingChat}
+        isOwnerMode={isOwnerPending}
+        ownerActionLoading={Boolean(deletingPostId) || Boolean(markingSoldId)}
         onClose={closeModal}
         onOpenChat={handleOpenChat}
+        onRecordSale={handleRecordSale}
+        onDelete={handleDeletePost}
+      />
+      <RecordSaleModal
+        visible={Boolean(saleListing)}
+        listingTitle={saleListing?.title || 'Listing'}
+        charityName={saleListing?.charityId ? charities.find((entry) => entry.id === saleListing.charityId)?.name || null : null}
+        quantityType={saleListing?.quantityType}
+        unitPrice={Number(saleListing?.communityPrice ?? saleListing?.price ?? 0)}
+        unitCatAmount={Number(saleListing?.charityAmount ?? 0)}
+        remainingQuantity={saleListing ? Math.max(1, getRemainingQuantity(saleListing)) : 1}
+        loading={markingSoldId === saleListing?.id}
+        onClose={() => setSaleListing(null)}
+        onConfirm={async (quantity) => {
+          if (!saleListing) return;
+          await completeSale(saleListing, quantity);
+        }}
       />
     </TopicChatGateContext.Provider>
   );

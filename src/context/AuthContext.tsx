@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../lib/api';
 import { disconnectSocket, updateSocketAuth } from '../lib/socket';
 import { migrateAsyncStorageKeys } from '../lib/migrateStorage';
-import { queryClient } from '../lib/queryClient';
+import { asyncStoragePersister, queryClient } from '../lib/queryClient';
 import { queryKeys } from '../lib/queryKeys';
 import { resolveMediaUrl } from '../lib/config';
 import { UserProfile } from '../types';
@@ -171,10 +171,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       await clearTokens();
       setUserProfile(null);
-      queryClient.removeQueries({ queryKey: queryKeys.currentUserProfile() });
-      queryClient.removeQueries({ queryKey: queryKeys.currentUserSessions() });
-      queryClient.removeQueries({ queryKey: queryKeys.currentUserTwoFA() });
-      queryClient.removeQueries({ queryKey: queryKeys.currentUserAuditLogs() });
+      queryClient.clear();
+      await asyncStoragePersister.removeClient();
     }
   }, []);
 

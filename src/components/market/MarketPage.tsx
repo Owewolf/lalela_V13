@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
+  Hand,
   SlidersHorizontal,
   Map as MapIcon,
   List as ListIcon,
@@ -246,11 +247,40 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
     return posts
       .filter((post) => {
         const status = String(post.status || '').toUpperCase();
-        return post.type === 'listing' && status !== 'DELETED';
+        const isPinned = status === 'PINNED';
+        const isVisibleType = post.type === 'listing' || post.type === 'notice';
+        return isVisibleType && status !== 'DELETED' && isPinned;
       })
       .filter((post) => matchesSelectedCategory(post.category))
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [matchesSelectedCategory, posts]);
+
+  const getPinnedNoticeChipColors = useCallback((post: any) => {
+    const subtype = String(post?.postSubtype || '').toLowerCase();
+    const urgencyLevel = String(post?.urgencyLevel || '').toLowerCase();
+    const urgency = String(post?.urgency || '').toLowerCase();
+
+    const isInfo = subtype === 'information' || urgencyLevel === 'info' || urgency === 'low';
+    if (isInfo) {
+      return {
+        bg: THEME_COLORS.aliasHex_dbeafe,
+        fg: THEME_COLORS.aliasHex_1e40af,
+      };
+    }
+
+    const isGeneral = subtype === 'normal' || urgencyLevel === 'general' || urgency === 'normal';
+    if (isGeneral) {
+      return {
+        bg: THEME_COLORS.aliasHex_d1fae5,
+        fg: THEME_COLORS.aliasHex_065f46,
+      };
+    }
+
+    return {
+      bg: THEME_COLORS.warningSurfaceAlt,
+      fg: THEME_COLORS.aliasHex_92400e,
+    };
+  }, []);
 
   const filteredBusinesses = useMemo((): MarketBusiness[] => {
     if (!coverageArea) return [];
@@ -382,6 +412,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
   const renderListing = useCallback(
     ({ item: listing }: { item: (typeof listings)[0] }) => {
       const charity = charities.find(c => c.id === listing.charityId);
+      const isOwner = listing.authorId === userProfile?.id;
       const initialQuantity = Math.max(1, Number((listing as any).initialQuantity ?? 1));
       const soldQuantity = Math.max(0, Number((listing as any).soldQuantity ?? 0));
       const remainingQuantity = Math.max(0, Number((listing as any).remainingQuantity ?? (initialQuantity - soldQuantity)));
@@ -408,6 +439,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
               imageUrl={listing.postsImage}
               latitude={listing.latitude}
               longitude={listing.longitude}
+              showLocationBadge={false}
               soldStateLabel={isSoldOut ? 'Sold Out' : hasSales ? 'Partially Sold' : null}
             />
             {hasListingImage && listing.isCommunityPick ? (
@@ -551,7 +583,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   activeOpacity={0.8}
                   onPress={() => handleOpenListingChat(listing)}
                 >
-                  <MessageSquare size={20} color={PRIMARY} />
+                  {isOwner ? <Hand size={20} color={PRIMARY} /> : <MessageSquare size={20} color={PRIMARY} />}
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="w-10 h-10 rounded-full items-center justify-center"
@@ -651,6 +683,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                 latitude={selectedListing.latitude}
                 longitude={selectedListing.longitude}
                 imageHeight={SPACE.imageHeight}
+                showLocationBadge={false}
                 soldStateLabel={isSold ? 'Sold Out' : null}
               />
 
@@ -736,7 +769,7 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
                   style={{ backgroundColor: THEME_COLORS.primary, borderRadius: RADIUS.md, paddingVertical: SPACE.xl, alignItems: 'center' }}
                 >
                   <Text style={{ color: THEME_COLORS.white, fontSize: TYPE_SCALE.md, fontWeight: FONT_WEIGHT.extrabold, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.wide }}>
-                    {selectedListing.isOpenExchange ? 'Exchange Chat' : 'Open Chat'}
+                    {isOwner ? 'Manage Listing' : selectedListing.isOpenExchange ? 'Exchange Chat' : 'Open Chat'}
                   </Text>
                 </TouchableOpacity>
                 {selectedListing.isOpenExchange ? (
@@ -963,29 +996,61 @@ export default function MarketPage({ initialListingId, initialBusinessId }: Mark
           contentContainerStyle={{ paddingHorizontal: SPACE.xxxl, paddingTop: SPACE.sm, paddingBottom: SPACE.s120 }}
           showsVerticalScrollIndicator={false}
         >
-          {filteredBusinesses.length > 0 ? (
+          {featuredPosts.length > 0 ? (
             <View>
               <Text className="text-xs font-black uppercase tracking-widest text-gray-400" style={{ marginBottom: SPACE.md }}>
-                Businesses
-              </Text>
-              {filteredBusinesses.map((biz) => (
-                <View key={biz.id}>{renderBusiness({ item: biz })}</View>
-              ))}
-            </View>
-          ) : null}
-
-          {featuredPosts.length > 0 ? (
-            <View style={{ marginTop: filteredBusinesses.length > 0 ? SPACE.xxl : 0 }}>
-              <Text className="text-xs font-black uppercase tracking-widest text-gray-400" style={{ marginBottom: SPACE.md }}>
-                Listings
+                Featured Content
               </Text>
               {featuredPosts.map((post) => {
-                return <View key={post.id}>{renderListing({ item: post as any })}</View>;
+                if (post.type === 'listing') {
+                  return <View key={post.id}>{renderListing({ item: post as any })}</View>;
+                }
+
+                const pinnedNoticeChip = getPinnedNoticeChipColors(post);
+
+                return (
+                  <View
+                    key={post.id}
+                    className="mb-5 bg-surface-container-low rounded-[2.2rem] overflow-hidden border"
+                    style={SURFACE_BORDER_STYLE}
+                  >
+                    <View className="p-4 gap-3">
+                      <View className="flex-row items-center gap-2">
+                        <View className="self-start px-3 py-1 rounded-full" style={{ backgroundColor: THEME_COLORS.infoSurfaceSoft }}>
+                          <Text className="text-[10px] font-black uppercase tracking-widest" style={{ color: THEME_COLORS.brandBlueText }}>
+                            Notice
+                          </Text>
+                        </View>
+                        <View className="self-start px-3 py-1 rounded-full" style={{ backgroundColor: pinnedNoticeChip.bg }}>
+                          <Text className="text-[10px] font-black uppercase tracking-widest" style={{ color: pinnedNoticeChip.fg }}>
+                            Featured
+                          </Text>
+                        </View>
+                      </View>
+                      <Text className="text-primary text-[24px] font-black leading-tight" numberOfLines={2}>
+                        {post.title || 'Untitled'}
+                      </Text>
+                      {!!post.description && (
+                        <Text className="text-sm" style={{ color: THEME_COLORS.neutralTextSubtle }} numberOfLines={3}>
+                          {post.description}
+                        </Text>
+                      )}
+                      <View className="flex-row items-center justify-between pt-2 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
+                        <Text className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: THEME_COLORS.neutralTextSoft }}>
+                          {new Date(post.timestamp).toLocaleDateString()}
+                        </Text>
+                        <Text className="text-xs font-bold" style={{ color: THEME_COLORS.neutralTextMuted }}>
+                          {post.authorName || 'Community Member'}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                );
               })}
             </View>
           ) : null}
 
-          {featuredPosts.length === 0 && filteredBusinesses.length === 0 ? (
+          {featuredPosts.length === 0 ? (
             <View className="items-center justify-center py-20 gap-4">
               <View className="w-20 h-20 bg-surface-container rounded-full items-center justify-center">
                 <SlidersHorizontal size={40} color={THEME_COLORS.neutralBorderMuted} />

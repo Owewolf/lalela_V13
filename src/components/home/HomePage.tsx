@@ -15,6 +15,7 @@ import {
   Siren,
   AlertTriangle,
   ArrowRight,
+  Hand,
   MessageSquare,
   Shield,
   Navigation,
@@ -521,6 +522,9 @@ export const HomePage: React.FC<HomePageProps> = ({
   const renderNoticeCard = ({ item: notice }: { item: CommunityNotice }) => {
     const isEmergencyNotice =
       notice.urgency === 'emergency' || notice.urgencyLevel === 'emergency';
+    const noticeLevel = resolvedUrgency(notice.urgencyLevel, notice.urgency);
+    const isOwnerNoticeAction =
+      notice.authorId === userProfile?.id && (noticeLevel === 'general' || noticeLevel === 'info');
 
     const borderColor = urgencyBorderColor(notice.urgencyLevel, notice.urgency);
     const bgColor = urgencyBgColor(notice.urgencyLevel, notice.urgency);
@@ -595,6 +599,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               latitude={notice.latitude}
               longitude={notice.longitude}
               imageHeight={96}
+              showLocationBadge={noticeLevel === 'warning'}
             />
           </View>
         )}
@@ -783,7 +788,11 @@ export const HomePage: React.FC<HomePageProps> = ({
                 className="p-2 rounded-full bg-surface-container-low"
                 onPress={() => handleNoticeCommunicationTap(notice)}
               >
-                <MessageSquare size={16} color={THEME_COLORS.primary} />
+                {isOwnerNoticeAction ? (
+                  <Hand size={16} color={THEME_COLORS.primary} />
+                ) : (
+                  <MessageSquare size={16} color={THEME_COLORS.primary} />
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -925,7 +934,11 @@ export const HomePage: React.FC<HomePageProps> = ({
               className="w-7 h-7 rounded-full bg-surface-container-low items-center justify-center"
               onPress={() => handleNoticeCommunicationTap(notice)}
             >
-              <MessageSquare size={14} color={THEME_COLORS.primary} />
+              {isOwnerNoticeAction ? (
+                <Hand size={14} color={THEME_COLORS.primary} />
+              ) : (
+                <MessageSquare size={14} color={THEME_COLORS.primary} />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -978,6 +991,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             imageUrl={listing.postsImage}
             latitude={listing.latitude}
             longitude={listing.longitude}
+            showLocationBadge={false}
             soldStateLabel={isSold ? 'Sold Out' : soldQuantity > 0 ? 'Partially Sold' : null}
           />
         </View>
@@ -1137,7 +1151,8 @@ export const HomePage: React.FC<HomePageProps> = ({
             </TouchableOpacity>
           </View>
 
-          <View className="flex-row items-center gap-2 mt-auto pt-1">
+          <View className="flex-row items-center justify-between gap-2 mt-auto pt-1">
+            <View className="flex-row items-center gap-2 flex-1">
             <View className="w-7 h-7 rounded-full bg-surface-container overflow-hidden border" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
               {hasAuthorImage ? (
                 <Image
@@ -1160,6 +1175,18 @@ export const HomePage: React.FC<HomePageProps> = ({
             >
               {listing.authorName || 'Community Seller'}
             </Text>
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              className="w-7 h-7 rounded-full bg-surface-container-low items-center justify-center"
+              onPress={() => handleOpenContextChat(listing)}
+            >
+              {isOwner ? (
+                <Hand size={14} color={THEME_COLORS.primary} />
+              ) : (
+                <MessageSquare size={14} color={THEME_COLORS.primary} />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
