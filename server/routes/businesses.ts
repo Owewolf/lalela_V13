@@ -97,8 +97,27 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const existing = await prisma.business.findFirst({ where: { id: req.params.id, ownerId: req.auth!.userId } });
-  if (!existing) return res.status(403).json({ error: 'Not found or unauthorized' });
+  const existing = await prisma.business.findUnique({ where: { id: req.params.id } });
+  if (!existing) return res.status(404).json({ error: 'Business not found' });
+
+  const isOwner = existing.ownerId === req.auth!.userId;
+  let isCommunityAdmin = false;
+  if (!isOwner && Array.isArray(existing.communityIds) && existing.communityIds.length > 0) {
+    const adminMembership = await prisma.communityMember.findFirst({
+      where: {
+        userId: req.auth!.userId,
+        communityId: { in: existing.communityIds },
+        role: { in: ['ADMIN', 'OWNER'] },
+        status: 'ACTIVE',
+      },
+      select: { communityId: true },
+    });
+    isCommunityAdmin = Boolean(adminMembership);
+  }
+
+  if (!isOwner && !isCommunityAdmin) {
+    return res.status(403).json({ error: 'Not found or unauthorized' });
+  }
 
   const {
     name, category, description, address,
@@ -133,7 +152,29 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  await prisma.business.deleteMany({ where: { id: req.params.id, ownerId: req.auth!.userId } });
+  const existing = await prisma.business.findUnique({ where: { id: req.params.id } });
+  if (!existing) return res.status(404).json({ error: 'Business not found' });
+
+  const isOwner = existing.ownerId === req.auth!.userId;
+  let isCommunityAdmin = false;
+  if (!isOwner && Array.isArray(existing.communityIds) && existing.communityIds.length > 0) {
+    const adminMembership = await prisma.communityMember.findFirst({
+      where: {
+        userId: req.auth!.userId,
+        communityId: { in: existing.communityIds },
+        role: { in: ['ADMIN', 'OWNER'] },
+        status: 'ACTIVE',
+      },
+      select: { communityId: true },
+    });
+    isCommunityAdmin = Boolean(adminMembership);
+  }
+
+  if (!isOwner && !isCommunityAdmin) {
+    return res.status(403).json({ error: 'Not found or unauthorized' });
+  }
+
+  await prisma.business.delete({ where: { id: req.params.id } });
   return res.json({ message: 'Business deleted' });
 });
 

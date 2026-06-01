@@ -32069,6 +32069,7 @@ export namespace Prisma {
   export type ConversationMinAggregateOutputType = {
     id: string | null
     type: string | null
+    pairKey: string | null
     listingId: string | null
     noticeId: string | null
     communityId: string | null
@@ -32081,6 +32082,7 @@ export namespace Prisma {
   export type ConversationMaxAggregateOutputType = {
     id: string | null
     type: string | null
+    pairKey: string | null
     listingId: string | null
     noticeId: string | null
     communityId: string | null
@@ -32093,9 +32095,11 @@ export namespace Prisma {
   export type ConversationCountAggregateOutputType = {
     id: number
     type: number
+    pairKey: number
     listingId: number
     noticeId: number
     communityId: number
+    metadata: number
     lastMessage: number
     lastMessageAt: number
     createdAt: number
@@ -32107,6 +32111,7 @@ export namespace Prisma {
   export type ConversationMinAggregateInputType = {
     id?: true
     type?: true
+    pairKey?: true
     listingId?: true
     noticeId?: true
     communityId?: true
@@ -32119,6 +32124,7 @@ export namespace Prisma {
   export type ConversationMaxAggregateInputType = {
     id?: true
     type?: true
+    pairKey?: true
     listingId?: true
     noticeId?: true
     communityId?: true
@@ -32131,9 +32137,11 @@ export namespace Prisma {
   export type ConversationCountAggregateInputType = {
     id?: true
     type?: true
+    pairKey?: true
     listingId?: true
     noticeId?: true
     communityId?: true
+    metadata?: true
     lastMessage?: true
     lastMessageAt?: true
     createdAt?: true
@@ -32216,9 +32224,11 @@ export namespace Prisma {
   export type ConversationGroupByOutputType = {
     id: string
     type: string
+    pairKey: string | null
     listingId: string | null
     noticeId: string | null
     communityId: string | null
+    metadata: JsonValue | null
     lastMessage: string | null
     lastMessageAt: Date | null
     createdAt: Date
@@ -32245,9 +32255,11 @@ export namespace Prisma {
   export type ConversationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
+    pairKey?: boolean
     listingId?: boolean
     noticeId?: boolean
     communityId?: boolean
+    metadata?: boolean
     lastMessage?: boolean
     lastMessageAt?: boolean
     createdAt?: boolean
@@ -32260,9 +32272,11 @@ export namespace Prisma {
   export type ConversationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
+    pairKey?: boolean
     listingId?: boolean
     noticeId?: boolean
     communityId?: boolean
+    metadata?: boolean
     lastMessage?: boolean
     lastMessageAt?: boolean
     createdAt?: boolean
@@ -32272,9 +32286,11 @@ export namespace Prisma {
   export type ConversationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
+    pairKey?: boolean
     listingId?: boolean
     noticeId?: boolean
     communityId?: boolean
+    metadata?: boolean
     lastMessage?: boolean
     lastMessageAt?: boolean
     createdAt?: boolean
@@ -32284,16 +32300,18 @@ export namespace Prisma {
   export type ConversationSelectScalar = {
     id?: boolean
     type?: boolean
+    pairKey?: boolean
     listingId?: boolean
     noticeId?: boolean
     communityId?: boolean
+    metadata?: boolean
     lastMessage?: boolean
     lastMessageAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ConversationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "listingId" | "noticeId" | "communityId" | "lastMessage" | "lastMessageAt" | "createdAt" | "updatedAt", ExtArgs["result"]["conversation"]>
+  export type ConversationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "pairKey" | "listingId" | "noticeId" | "communityId" | "metadata" | "lastMessage" | "lastMessageAt" | "createdAt" | "updatedAt", ExtArgs["result"]["conversation"]>
   export type ConversationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     participants?: boolean | Conversation$participantsArgs<ExtArgs>
     messages?: boolean | Conversation$messagesArgs<ExtArgs>
@@ -32311,9 +32329,11 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       type: string
+      pairKey: string | null
       listingId: string | null
       noticeId: string | null
       communityId: string | null
+      metadata: Prisma.JsonValue | null
       lastMessage: string | null
       lastMessageAt: Date | null
       createdAt: Date
@@ -32745,9 +32765,11 @@ export namespace Prisma {
   interface ConversationFieldRefs {
     readonly id: FieldRef<"Conversation", 'String'>
     readonly type: FieldRef<"Conversation", 'String'>
+    readonly pairKey: FieldRef<"Conversation", 'String'>
     readonly listingId: FieldRef<"Conversation", 'String'>
     readonly noticeId: FieldRef<"Conversation", 'String'>
     readonly communityId: FieldRef<"Conversation", 'String'>
+    readonly metadata: FieldRef<"Conversation", 'Json'>
     readonly lastMessage: FieldRef<"Conversation", 'String'>
     readonly lastMessageAt: FieldRef<"Conversation", 'DateTime'>
     readonly createdAt: FieldRef<"Conversation", 'DateTime'>
@@ -41462,9 +41484,11 @@ export namespace Prisma {
   export const ConversationScalarFieldEnum: {
     id: 'id',
     type: 'type',
+    pairKey: 'pairKey',
     listingId: 'listingId',
     noticeId: 'noticeId',
     communityId: 'communityId',
+    metadata: 'metadata',
     lastMessage: 'lastMessage',
     lastMessageAt: 'lastMessageAt',
     createdAt: 'createdAt',
@@ -44165,9 +44189,11 @@ export namespace Prisma {
     NOT?: ConversationWhereInput | ConversationWhereInput[]
     id?: StringFilter<"Conversation"> | string
     type?: StringFilter<"Conversation"> | string
+    pairKey?: StringNullableFilter<"Conversation"> | string | null
     listingId?: StringNullableFilter<"Conversation"> | string | null
     noticeId?: StringNullableFilter<"Conversation"> | string | null
     communityId?: StringNullableFilter<"Conversation"> | string | null
+    metadata?: JsonNullableFilter<"Conversation">
     lastMessage?: StringNullableFilter<"Conversation"> | string | null
     lastMessageAt?: DateTimeNullableFilter<"Conversation"> | Date | string | null
     createdAt?: DateTimeFilter<"Conversation"> | Date | string
@@ -44179,9 +44205,11 @@ export namespace Prisma {
   export type ConversationOrderByWithRelationInput = {
     id?: SortOrder
     type?: SortOrder
+    pairKey?: SortOrderInput | SortOrder
     listingId?: SortOrderInput | SortOrder
     noticeId?: SortOrderInput | SortOrder
     communityId?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
     lastMessage?: SortOrderInput | SortOrder
     lastMessageAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -44192,6 +44220,7 @@ export namespace Prisma {
 
   export type ConversationWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    pairKey?: string
     AND?: ConversationWhereInput | ConversationWhereInput[]
     OR?: ConversationWhereInput[]
     NOT?: ConversationWhereInput | ConversationWhereInput[]
@@ -44199,20 +44228,23 @@ export namespace Prisma {
     listingId?: StringNullableFilter<"Conversation"> | string | null
     noticeId?: StringNullableFilter<"Conversation"> | string | null
     communityId?: StringNullableFilter<"Conversation"> | string | null
+    metadata?: JsonNullableFilter<"Conversation">
     lastMessage?: StringNullableFilter<"Conversation"> | string | null
     lastMessageAt?: DateTimeNullableFilter<"Conversation"> | Date | string | null
     createdAt?: DateTimeFilter<"Conversation"> | Date | string
     updatedAt?: DateTimeFilter<"Conversation"> | Date | string
     participants?: ConversationParticipantListRelationFilter
     messages?: MessageListRelationFilter
-  }, "id">
+  }, "id" | "pairKey">
 
   export type ConversationOrderByWithAggregationInput = {
     id?: SortOrder
     type?: SortOrder
+    pairKey?: SortOrderInput | SortOrder
     listingId?: SortOrderInput | SortOrder
     noticeId?: SortOrderInput | SortOrder
     communityId?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
     lastMessage?: SortOrderInput | SortOrder
     lastMessageAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -44228,9 +44260,11 @@ export namespace Prisma {
     NOT?: ConversationScalarWhereWithAggregatesInput | ConversationScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Conversation"> | string
     type?: StringWithAggregatesFilter<"Conversation"> | string
+    pairKey?: StringNullableWithAggregatesFilter<"Conversation"> | string | null
     listingId?: StringNullableWithAggregatesFilter<"Conversation"> | string | null
     noticeId?: StringNullableWithAggregatesFilter<"Conversation"> | string | null
     communityId?: StringNullableWithAggregatesFilter<"Conversation"> | string | null
+    metadata?: JsonNullableWithAggregatesFilter<"Conversation">
     lastMessage?: StringNullableWithAggregatesFilter<"Conversation"> | string | null
     lastMessageAt?: DateTimeNullableWithAggregatesFilter<"Conversation"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Conversation"> | Date | string
@@ -47571,9 +47605,11 @@ export namespace Prisma {
   export type ConversationCreateInput = {
     id?: string
     type?: string
+    pairKey?: string | null
     listingId?: string | null
     noticeId?: string | null
     communityId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: string | null
     lastMessageAt?: Date | string | null
     createdAt?: Date | string
@@ -47585,9 +47621,11 @@ export namespace Prisma {
   export type ConversationUncheckedCreateInput = {
     id?: string
     type?: string
+    pairKey?: string | null
     listingId?: string | null
     noticeId?: string | null
     communityId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: string | null
     lastMessageAt?: Date | string | null
     createdAt?: Date | string
@@ -47599,9 +47637,11 @@ export namespace Prisma {
   export type ConversationUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
+    pairKey?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     noticeId?: NullableStringFieldUpdateOperationsInput | string | null
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: NullableStringFieldUpdateOperationsInput | string | null
     lastMessageAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -47613,9 +47653,11 @@ export namespace Prisma {
   export type ConversationUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
+    pairKey?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     noticeId?: NullableStringFieldUpdateOperationsInput | string | null
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: NullableStringFieldUpdateOperationsInput | string | null
     lastMessageAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -47627,9 +47669,11 @@ export namespace Prisma {
   export type ConversationCreateManyInput = {
     id?: string
     type?: string
+    pairKey?: string | null
     listingId?: string | null
     noticeId?: string | null
     communityId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: string | null
     lastMessageAt?: Date | string | null
     createdAt?: Date | string
@@ -47639,9 +47683,11 @@ export namespace Prisma {
   export type ConversationUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
+    pairKey?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     noticeId?: NullableStringFieldUpdateOperationsInput | string | null
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: NullableStringFieldUpdateOperationsInput | string | null
     lastMessageAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -47651,9 +47697,11 @@ export namespace Prisma {
   export type ConversationUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
+    pairKey?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     noticeId?: NullableStringFieldUpdateOperationsInput | string | null
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: NullableStringFieldUpdateOperationsInput | string | null
     lastMessageAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -50060,9 +50108,11 @@ export namespace Prisma {
   export type ConversationCountOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
+    pairKey?: SortOrder
     listingId?: SortOrder
     noticeId?: SortOrder
     communityId?: SortOrder
+    metadata?: SortOrder
     lastMessage?: SortOrder
     lastMessageAt?: SortOrder
     createdAt?: SortOrder
@@ -50072,6 +50122,7 @@ export namespace Prisma {
   export type ConversationMaxOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
+    pairKey?: SortOrder
     listingId?: SortOrder
     noticeId?: SortOrder
     communityId?: SortOrder
@@ -50084,6 +50135,7 @@ export namespace Prisma {
   export type ConversationMinOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
+    pairKey?: SortOrder
     listingId?: SortOrder
     noticeId?: SortOrder
     communityId?: SortOrder
@@ -58704,9 +58756,11 @@ export namespace Prisma {
   export type ConversationCreateWithoutMessagesInput = {
     id?: string
     type?: string
+    pairKey?: string | null
     listingId?: string | null
     noticeId?: string | null
     communityId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: string | null
     lastMessageAt?: Date | string | null
     createdAt?: Date | string
@@ -58717,9 +58771,11 @@ export namespace Prisma {
   export type ConversationUncheckedCreateWithoutMessagesInput = {
     id?: string
     type?: string
+    pairKey?: string | null
     listingId?: string | null
     noticeId?: string | null
     communityId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: string | null
     lastMessageAt?: Date | string | null
     createdAt?: Date | string
@@ -59063,9 +59119,11 @@ export namespace Prisma {
   export type ConversationUpdateWithoutMessagesInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
+    pairKey?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     noticeId?: NullableStringFieldUpdateOperationsInput | string | null
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: NullableStringFieldUpdateOperationsInput | string | null
     lastMessageAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -59076,9 +59134,11 @@ export namespace Prisma {
   export type ConversationUncheckedUpdateWithoutMessagesInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
+    pairKey?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     noticeId?: NullableStringFieldUpdateOperationsInput | string | null
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: NullableStringFieldUpdateOperationsInput | string | null
     lastMessageAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -64069,9 +64129,11 @@ export namespace Prisma {
   export type ConversationCreateWithoutParticipantsInput = {
     id?: string
     type?: string
+    pairKey?: string | null
     listingId?: string | null
     noticeId?: string | null
     communityId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: string | null
     lastMessageAt?: Date | string | null
     createdAt?: Date | string
@@ -64082,9 +64144,11 @@ export namespace Prisma {
   export type ConversationUncheckedCreateWithoutParticipantsInput = {
     id?: string
     type?: string
+    pairKey?: string | null
     listingId?: string | null
     noticeId?: string | null
     communityId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: string | null
     lastMessageAt?: Date | string | null
     createdAt?: Date | string
@@ -64254,9 +64318,11 @@ export namespace Prisma {
   export type ConversationUpdateWithoutParticipantsInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
+    pairKey?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     noticeId?: NullableStringFieldUpdateOperationsInput | string | null
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: NullableStringFieldUpdateOperationsInput | string | null
     lastMessageAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -64267,9 +64333,11 @@ export namespace Prisma {
   export type ConversationUncheckedUpdateWithoutParticipantsInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
+    pairKey?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     noticeId?: NullableStringFieldUpdateOperationsInput | string | null
     communityId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     lastMessage?: NullableStringFieldUpdateOperationsInput | string | null
     lastMessageAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

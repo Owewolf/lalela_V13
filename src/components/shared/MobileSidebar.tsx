@@ -439,7 +439,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
               <View
                 style={[
                   styles.avatarRing,
-                  { borderColor: isLicensed ? THEME_COLORS.success : THEME_COLORS.neutralBorder },
+                  { borderColor: isLicensed ? THEME_COLORS.primary : THEME_COLORS.neutralBorder },
                 ]}
               >
                 <Image

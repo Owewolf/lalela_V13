@@ -225,6 +225,10 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
 
   const handlePost = async () => {
     if (!title) return;
+    if (postSubtype === 'warning' && (!latitude || !longitude)) {
+      Alert.alert('Location required', 'Please select a warning location so neighbors can see the location preview.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const postData = {
@@ -277,7 +281,8 @@ export const CreateNoticeForm: React.FC<CreateNoticeFormProps> = ({ postSubtype,
     );
   }
 
-  const canSubmit = !!title && (postSubtype === 'warning' || !!expiresAt);
+  const hasWarningCoordinates = Boolean(latitude && longitude);
+  const canSubmit = !!title && (postSubtype === 'warning' ? hasWarningCoordinates : !!expiresAt);
   const mapRegion = {
     latitude: latitude || locationDefaults.mapFallback.latitude,
     longitude: longitude || locationDefaults.mapFallback.longitude,

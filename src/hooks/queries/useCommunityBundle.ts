@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../../lib/api';
+import { resolveMediaUrl } from '../../lib/config';
 import { queryKeys } from '../../lib/queryKeys';
 
 export function useCommunityBundle(communityId?: string | null, userId?: string | null) {
@@ -31,12 +32,34 @@ export function useCommunityBundle(communityId?: string | null, userId?: string 
       ]);
 
       return {
-        members: membersRes.data ?? [],
-        posts: postsRes.data ?? [],
+        members: (membersRes.data ?? []).map((member: any) => ({
+          ...member,
+          image: resolveMediaUrl(member?.image) ?? member?.image,
+        })),
+        posts: (postsRes.data ?? []).map((post: any) => {
+          const listingImage = post?.type === 'listing'
+            ? (post?.postsImage ?? post?.imageUrl ?? null)
+            : (post?.postsImage ?? null);
+          const normalizedAuthorImage = resolveMediaUrl(post?.authorImage ?? null) ?? post?.authorImage ?? null;
+          return {
+            ...post,
+            postsImage: resolveMediaUrl(listingImage) ?? listingImage,
+            authorImage: normalizedAuthorImage,
+          };
+        }),
         charities: charitiesRes.data ?? [],
         charitySuggestions,
         businesses,
-        locations,
+        locations: {
+          members: (locations?.members ?? []).map((row: any) => ({
+            ...row,
+            image: resolveMediaUrl(row?.image) ?? row?.image,
+          })),
+          security: (locations?.security ?? []).map((row: any) => ({
+            ...row,
+            image: resolveMediaUrl(row?.image) ?? row?.image,
+          })),
+        },
       };
     },
     initialData: {

@@ -88,14 +88,6 @@ export const ChatPage: React.FC = () => {
 
     const businessOwnerIds = new Set(communityBusinesses.map((b) => b.ownerId));
     const responderIds = new Set(securityResponders.map((r) => r.userId));
-    const authorPostMap = new Map<string, string>();
-    for (const p of posts) {
-      if (!p.authorId) continue;
-      const existing = authorPostMap.get(p.authorId);
-      if (!existing || p.timestamp > existing) {
-        authorPostMap.set(p.authorId, p.timestamp);
-      }
-    }
 
     type UnreadInfo = {
       direct: number;
@@ -106,8 +98,12 @@ export const ChatPage: React.FC = () => {
       listingConv?: Conversation;
       noticeConv?: Conversation;
       marketplaceConv?: Conversation;
+      lastMessagePreview?: string;
+      lastMessageTime?: string;
+      lastMessageConv?: Conversation | null;
+      latestConversationAtMs?: number;
     };
-    const unreadInfoMap = new Map<string, UnreadInfo>();
+    const conversationInfoMap = new Map<string, UnreadInfo>();
 
     for (const conv of conversations) {
       if (!userProfile) continue;
@@ -115,15 +111,24 @@ export const ChatPage: React.FC = () => {
       const otherId = otherParticipantId(conv, userProfile.id);
       if (!otherId) continue;
       const myUnread = conv.unreadCount || 0;
-      const info = unreadInfoMap.get(otherId) || {
+      const info = conversationInfoMap.get(otherId) || {
         direct: 0,
         listing: 0,
         notice: 0,
         marketplace: 0,
       };
+      const contextType = conv.metadata?.type;
       if (conv.type === 'direct') {
-        info.direct += myUnread;
-        if (myUnread > 0 && !info.directConv) info.directConv = conv;
+        if (contextType === 'listing') {
+          info.listing += myUnread;
+          if (myUnread > 0 && !info.listingConv) info.listingConv = conv;
+        } else if (contextType === 'notice') {
+          info.notice += myUnread;
+          if (myUnread > 0 && !info.noticeConv) info.noticeConv = conv;
+        } else {
+          info.direct += myUnread;
+          if (myUnread > 0 && !info.directConv) info.directConv = conv;
+        }
       } else if (conv.type === 'listing' && conv.metadata?.source === 'marketplace') {
         info.marketplace += myUnread;
         if (myUnread > 0 && !info.marketplaceConv) info.marketplaceConv = conv;
@@ -134,41 +139,41 @@ export const ChatPage: React.FC = () => {
         info.notice += myUnread;
         if (myUnread > 0 && !info.noticeConv) info.noticeConv = conv;
       }
-      unreadInfoMap.set(otherId, info);
+
+      const convTimeMs = conv.lastMessageAt ? new Date(conv.lastMessageAt).getTime() : 0;
+      if (!info.latestConversationAtMs || convTimeMs > info.latestConversationAtMs) {
+        info.latestConversationAtMs = convTimeMs;
+        info.lastMessagePreview = conv.lastMessage || '';
+        info.lastMessageTime = formatRelativeTime(conv.lastMessageAt);
+        info.lastMessageConv = conv;
+      }
+
+      conversationInfoMap.set(otherId, info);
     }
 
     return otherMembers.map((m) => {
-      const info = unreadInfoMap.get(m.userId) || {
+      const info = conversationInfoMap.get(m.userId) || {
         direct: 0,
         listing: 0,
         notice: 0,
         marketplace: 0,
       };
 
-      // Find most recent conversation with this member (any type except emergency/community)
-      let lastMessagePreview = '';
-      let lastMessageTime = '';
-      let lastMessageConv: Conversation | null = null;
-
-      for (const conv of conversations) {
-        if (conv.type === 'community' || conv.type === 'emergency') continue;
-        const otherId = userProfile ? otherParticipantId(conv, userProfile.id) : null;
-        if (otherId === m.userId) {
-          if (!lastMessageConv || new Date(conv.lastMessageAt).getTime() > new Date(lastMessageConv.lastMessageAt).getTime()) {
-            lastMessageConv = conv;
-            lastMessagePreview = conv.lastMessage || '';
-            lastMessageTime = formatRelativeTime(conv.lastMessageAt);
-          }
-        }
-      }
+      const postActivityMs = (() => {
+        return 0;
+      })();
+      const joinedAtMs = (() => {
+        const value = m.joinedAt ? new Date(m.joinedAt).getTime() : 0;
+        return Number.isFinite(value) ? value : 0;
+      })();
+      const latestActivityMs = Math.max(info.latestConversationAtMs ?? 0, postActivityMs, joinedAtMs);
 
       return {
         member: m,
-        hasActivePost: authorPostMap.has(m.userId),
         hasBusiness: businessOwnerIds.has(m.userId),
         isSecurity: m.isSecurityMember || responderIds.has(m.userId),
         isEmergencyAuthor: isEmergency && emergencyPost?.authorId === m.userId,
-        latestActivity: authorPostMap.get(m.userId) || m.joinedAt || '',
+        latestActivityMs,
         emergencyDistance:
           isEmergency &&
           emergencyPost?.latitude &&
@@ -183,12 +188,12 @@ export const ChatPage: React.FC = () => {
               )
             : null,
         unread: info,
-        lastMessage: lastMessagePreview,
-        lastMessageTime,
-        lastMessageConv,
+        lastMessage: info.lastMessagePreview || '',
+        lastMessageTime: info.lastMessageTime || '',
+        lastMessageConv: info.lastMessageConv || null,
       };
     });
-  }, [members, userProfile, posts, communityBusinesses, securityResponders, isEmergency, emergencyPost, conversations]);
+  }, [members, userProfile, communityBusinesses, securityResponders, isEmergency, emergencyPost, conversations]);
 
   // Filter by search first
   const searchFiltered = useMemo(() => {
@@ -223,9 +228,7 @@ export const ChatPage: React.FC = () => {
       const bTotal = b.unread.direct + b.unread.listing + b.unread.notice + b.unread.marketplace;
       if (aTotal > 0 && bTotal === 0) return -1;
       if (aTotal === 0 && bTotal > 0) return 1;
-      const aTime = typeof a.latestActivity === 'string' ? a.latestActivity : '';
-      const bTime = typeof b.latestActivity === 'string' ? b.latestActivity : '';
-      return bTime.localeCompare(aTime);
+      return (b.latestActivityMs ?? 0) - (a.latestActivityMs ?? 0);
     });
   }, [chipFiltered, isEmergency]);
 
@@ -238,7 +241,14 @@ export const ChatPage: React.FC = () => {
     [setActiveConversation, markAsRead, router]
   );
 
-  const handleMemberTap = async (member: CommunityMember) => {
+  const handleMemberTap = async (item: EnrichedItem) => {
+    const { member, lastMessageConv } = item;
+
+    if (lastMessageConv?.id) {
+      openConversation(lastMessageConv);
+      return;
+    }
+
     if (!userProfile) return;
     try {
       const convId = await startConversation({
@@ -264,14 +274,14 @@ export const ChatPage: React.FC = () => {
   type EnrichedItem = (typeof sorted)[0];
 
   const renderItem = ({ item }: { item: EnrichedItem }) => {
-    const { member, hasActivePost, hasBusiness, isSecurity, isEmergencyAuthor, emergencyDistance, unread, lastMessage, lastMessageTime, lastMessageConv } = item;
+    const { member, hasBusiness, isSecurity, isEmergencyAuthor, emergencyDistance, unread, lastMessage, lastMessageTime, lastMessageConv } = item;
     const normalizedLastMessage = (lastMessage || '').trim();
     const isPhotoPreview = normalizedLastMessage === '📷 Photo' || normalizedLastMessage === 'Photo';
 
     return (
       <View>
         <TouchableOpacity
-          onPress={() => handleMemberTap(member)}
+          onPress={() => handleMemberTap(item)}
           activeOpacity={0.6}
           className={[
             'flex-row items-center gap-3 px-4 py-3',
@@ -279,17 +289,7 @@ export const ChatPage: React.FC = () => {
           ].join(' ')}
         >
           {/* Avatar */}
-          <View
-            className={[
-              'relative w-14 h-14 rounded-full flex-shrink-0',
-              hasActivePost ? 'ring-2 ring-orange-500' : '',
-            ].join(' ')}
-            style={
-              hasActivePost
-                ? { borderWidth: 2, borderColor: THEME_COLORS.secondaryContainer, borderRadius: RADIUS.pill }
-                : undefined
-            }
-          >
+          <View className="relative w-14 h-14 rounded-full flex-shrink-0">
             {member.image ? (
               <Image
                 source={{ uri: member.image }}
@@ -307,8 +307,9 @@ export const ChatPage: React.FC = () => {
               <View
                 className={[
                   'absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full items-center justify-center',
-                  isEmergency ? 'bg-red-500' : 'bg-primary',
+                  'bg-primary',
                 ].join(' ')}
+                style={{ backgroundColor: THEME_COLORS.brandBlueText }}
               >
                 <Shield size={10} color="white" />
               </View>
@@ -403,14 +404,15 @@ export const ChatPage: React.FC = () => {
                 null;
               const onPress = targetConv
                 ? () => openConversation(targetConv)
-                : () => handleMemberTap(member);
+                : () => handleMemberTap(item);
               return (
                 <TouchableOpacity
                   onPress={onPress}
                   activeOpacity={0.7}
-                  className="bg-green-500 rounded-full h-6 min-w-[24px] px-1.5 items-center justify-center"
+                  className="rounded-full h-6 min-w-[24px] px-1.5 items-center justify-center"
+                  style={{ backgroundColor: THEME_COLORS.primary }}
                 >
-                  <Text className="text-[11px] text-white font-black">
+                  <Text className="text-[9px] text-white font-black">
                     {totalUnread > 99 ? '99+' : totalUnread}
                   </Text>
                 </TouchableOpacity>

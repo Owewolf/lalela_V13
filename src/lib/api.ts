@@ -15,6 +15,17 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
+    if (error?.response?.status >= 500) {
+      const method = (error.config?.method ?? 'GET').toUpperCase();
+      const path = error.config?.url ?? '';
+      console.error('[api] server error', {
+        method,
+        url: `${API_BASE_URL}${path}`,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+
     const original = error.config;
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;

@@ -13,6 +13,7 @@ import { disconnectSocket, updateSocketAuth } from '../lib/socket';
 import { migrateAsyncStorageKeys } from '../lib/migrateStorage';
 import { queryClient } from '../lib/queryClient';
 import { queryKeys } from '../lib/queryKeys';
+import { resolveMediaUrl } from '../lib/config';
 import { UserProfile } from '../types';
 
 // ─── Context shape ─────────────────────────────────────────────────────────────
@@ -66,6 +67,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function normalizeUserProfile(profile: UserProfile): UserProfile {
+  return {
+    ...profile,
+    profileImage: resolveMediaUrl(profile.profileImage) ?? profile.profileImage,
+  };
+}
+
 // ─── Storage helpers ──────────────────────────────────────────────────────────
 
 async function storeTokens(accessToken: string, refreshToken: string) {
@@ -95,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         queryKey: queryKeys.currentUserProfile(),
         queryFn: async (): Promise<UserProfile> => {
           const { data } = await api.get<UserProfile>('/users/me');
-          return data;
+          return normalizeUserProfile(data);
         },
       });
       setUserProfile(fresh);
@@ -193,7 +201,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── Update profile ────────────────────────────────────────────────────────
   const updateUserProfile = useCallback(async (data: Partial<UserProfile>) => {
-    const { data: updated } = await api.put<UserProfile>('/users/me', data);
+    const { data: updatedRaw } = await api.put<UserProfile>('/users/me', data);
+    const updated = normalizeUserProfile(updatedRaw);
     setUserProfile(updated);
     await AsyncStorage.setItem('userProfile', JSON.stringify(updated));
     queryClient.setQueryData(queryKeys.currentUserProfile(), updated);
@@ -248,8 +257,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const verifyLinkPhone = useCallback(async (phone: string, code: string) => {
     const { data } = await api.post<{ user: UserProfile }>('/auth/verify-link-phone', { phone, code });
     if (data?.user) {
-      setUserProfile(data.user);
-      await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
+      const normalized = normalizeUserProfile(data.user);
+      setUserProfile(normalized);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(normalized));
     }
   }, []);
 

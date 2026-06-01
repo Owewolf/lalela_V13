@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, Linking, Platform } from 'react-native';
 import { Check, CheckCheck } from 'lucide-react-native';
-import { Conversation, Message } from '../../types';
+import { Conversation, ConversationMetadata, Message } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { resolveMediaUrl } from '../../lib/config';
 import { THEME_COLORS } from '../../theme/colors';
-import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
 
 interface MessageBubbleProps {
   message: Message;
@@ -14,6 +13,7 @@ interface MessageBubbleProps {
   isMiddleInCluster?: boolean;
   isLastInCluster?: boolean;
   conversationType: Conversation['type'];
+  conversationMetadata?: ConversationMetadata;
 }
 
 const AVATAR_SIZE = 32;
@@ -55,6 +55,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   isMiddleInCluster,
   isLastInCluster,
   conversationType,
+  conversationMetadata,
 }) => {
   const { userProfile } = useAuth();
   const isMe = message.userId === userProfile?.id;
@@ -69,6 +70,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const senderNameColor = getSenderNameColor(message);
   const imageCaption = (message.content || '').trim();
   const showImageCaption = imageCaption.length > 0 && imageCaption.toLowerCase() !== 'photo';
+  const metadataLabel =
+    typeof message.metadataLabel === 'string' && message.metadataLabel.trim().length > 0
+      ? message.metadataLabel.trim()
+      : null;
 
   const rowTopSpacing = firstInCluster ? 6 : 2;
 
@@ -98,7 +103,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const bubbleClassName = [
     'relative overflow-hidden',
     isMe ? 'rounded-[18px] rounded-br-md' : 'rounded-[18px] rounded-bl-md',
-    message.messageType === 'image' ? '' : 'px-3 py-1.5',
+    message.messageType === 'image' ? '' : 'px-3 py-2',
     isListingIntro ? 'border-l-4 border-secondary-container' : '',
   ].join(' ');
 
@@ -108,9 +113,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         maxWidth: isDirectConversation ? '92%' as const : '87%' as const,
       }
     : {
-        backgroundColor: getCardSurfaceColor('subtle'),
+        backgroundColor: THEME_COLORS.white,
         borderWidth: 1,
-        borderColor: getCardBorderColor('default'),
+        borderColor: THEME_COLORS.chatBorder,
         maxWidth: isDirectConversation ? '90%' as const : '82%' as const,
       };
 
@@ -146,6 +151,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
         <View>
           <View className={bubbleClassName} style={bubbleStyle}>
+            {metadataLabel ? (
+              <View className="mb-1">
+                <Text className="text-[10px] font-bold uppercase tracking-wide text-neutralTextMuted">
+                  {metadataLabel}
+                </Text>
+              </View>
+            ) : null}
+
             {showSenderName && (
               <View className="mb-0.5">
                 <Text className="text-[14px] font-black leading-4" style={{ color: senderNameColor }}>
@@ -180,7 +193,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 <Text
                   className={isListingIntro ? 'text-[17px] leading-6 text-neutralTextStrong font-black' : 'text-[16px] leading-6 text-neutralTextStrong'}
                   style={{
-                    paddingBottom: SPACE.xxs,
+                    paddingBottom: SPACE.xs,
                   }}
                 >
                   {message.content}

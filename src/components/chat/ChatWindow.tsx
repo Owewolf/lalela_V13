@@ -2,13 +2,14 @@ import React, { useRef, useEffect, useMemo } from 'react';
 import { View, Text, FlatList, Animated, Platform } from 'react-native';
 import { Message, Conversation } from '../../types';
 import { MessageBubble } from './MessageBubble';
-import { THEME_COLORS } from '../../theme/colors';
+import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
 interface ChatWindowProps {
   messages: Message[];
   conversation: Conversation;
   isTyping?: boolean;
   emptyStateText?: string;
+  onScrollOffsetChange?: (offsetY: number) => void;
 }
 
 type TimelineItem =
@@ -32,6 +33,7 @@ const SPACE = {
 
 const isSameClusterMessage = (left?: Message, right?: Message) => {
   if (!left || !right) return false;
+  if (left.messageType === 'system' || right.messageType === 'system') return false;
   if (left.userId !== right.userId) return false;
 
   const leftTime = new Date(left.createdAt).getTime();
@@ -84,8 +86,8 @@ function TypingIndicator() {
   return (
     <View className="flex-row items-center gap-2 ml-1 mt-4 mb-2">
       <View
-        className="flex-row items-center gap-1 bg-surface-container px-3 py-2 rounded-full rounded-tl-none border"
-        style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+        className="flex-row items-center gap-1 px-3 py-2 rounded-full rounded-tl-none border"
+        style={{ borderColor: THEME_COLORS.chatBorder, backgroundColor: THEME_COLORS.white }}
       >
         {[dot1, dot2, dot3].map((dot, i) => (
           <Animated.View
@@ -95,7 +97,7 @@ function TypingIndicator() {
           />
         ))}
       </View>
-      <Text className="text-[10px] font-bold text-gray-400">Someone is typing...</Text>
+      <Text className="text-[10px] font-bold text-neutralTextMuted">Someone is typing...</Text>
     </View>
   );
 }
@@ -105,6 +107,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   conversation,
   isTyping,
   emptyStateText,
+  onScrollOffsetChange,
 }) => {
   const flatListRef = useRef<FlatList>(null);
   const timelineItems = useMemo<TimelineItem[]>(() => {
@@ -161,10 +164,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       return (
         <View className="items-center my-3">
           <View
-            className="bg-surface-container border rounded-full px-3 py-1"
-            style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+            className="border rounded-full px-3 py-1"
+            style={{
+              borderColor: THEME_COLORS.overlayBorder,
+              backgroundColor: THEME_COLORS.whiteOverlay90,
+            }}
           >
-            <Text className="text-[11px] font-semibold text-neutralTextMuted">{item.label}</Text>
+            <Text className="text-[11px] font-semibold" style={{ color: THEME_COLORS.slateWhatsapp }}>{item.label}</Text>
           </View>
         </View>
       );
@@ -178,6 +184,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         isMiddleInCluster={item.isMiddleInCluster}
         isLastInCluster={item.isLastInCluster}
         conversationType={conversation.type}
+        conversationMetadata={conversation.metadata}
       />
     );
   };
@@ -201,26 +208,30 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   );
 
   return (
-    <FlatList
-      ref={flatListRef}
-      data={timelineItems}
-      keyExtractor={(item) => item.id}
-      renderItem={renderItem}
-      ListEmptyComponent={ListEmptyComponent}
-      ListFooterComponent={ListFooterComponent}
-      contentContainerStyle={{
-        paddingLeft: SPACE.md,
-        paddingRight: SPACE.xxs,
-        paddingTop: SPACE.lg,
-        paddingBottom: SPACE.md,
-        flexGrow: 1,
-      }}
-      showsVerticalScrollIndicator={false}
-      onContentSizeChange={() => {
-        if (messages.length > 0) {
-          flatListRef.current?.scrollToEnd({ animated: false });
-        }
-      }}
-    />
+    <View className="flex-1" style={{ backgroundColor: APP_SHELL_COLORS.body }}>
+      <FlatList
+        ref={flatListRef}
+        data={timelineItems}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListEmptyComponent={ListEmptyComponent}
+        ListFooterComponent={ListFooterComponent}
+        contentContainerStyle={{
+          paddingLeft: SPACE.md,
+          paddingRight: SPACE.xxs,
+          paddingTop: SPACE.lg,
+          paddingBottom: SPACE.md,
+          flexGrow: 1,
+        }}
+        showsVerticalScrollIndicator={false}
+        onScroll={(event) => onScrollOffsetChange?.(event.nativeEvent.contentOffset.y)}
+        scrollEventThrottle={16}
+        onContentSizeChange={() => {
+          if (messages.length > 0) {
+            flatListRef.current?.scrollToEnd({ animated: false });
+          }
+        }}
+      />
+    </View>
   );
 };

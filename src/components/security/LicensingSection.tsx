@@ -6,6 +6,7 @@ import { useCommunity } from '../../context/CommunityContext';
 import { useRouter } from 'expo-router';
 import { THEME_COLORS } from '../../theme/colors';
 import api from '../../lib/api';
+import { isCommunityActive } from '../../lib/licensing';
 
 const PRIMARY = THEME_COLORS.primary;
 const TYPE_SCALE = {
@@ -70,16 +71,20 @@ export const LicensingSection: React.FC = () => {
 
   const isActive = licenseStatus === 'ACTIVE' && userProfile?.subscriptionActive && renewalDate && renewalDate > now;
   const isTrial = licenseStatus === 'TRIAL' && trialExpiresAt && trialExpiresAt > now;
-  const isExpired = licenseStatus === 'EXPIRED' || (!isActive && !isTrial);
+  const trialViaCommunity = !isActive && !isTrial && isCommunityActive(currentCommunity);
+  const effectiveTrial = isTrial || trialViaCommunity;
+  const isExpired = !isActive && !effectiveTrial;
 
   const daysLeft = trialExpiresAt && isTrial
     ? Math.max(0, Math.ceil((trialExpiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
-    : null;
+    : trialViaCommunity
+      ? 365
+      : null;
 
-  const overallStatus = isActive ? 'Active' : isTrial ? 'Trial' : 'Expired';
-  const statusColor = isActive ? THEME_COLORS.successStrongAlt : isTrial ? THEME_COLORS.warning : THEME_COLORS.errorStrong;
-  const statusBg = isActive ? THEME_COLORS.successTintSoftAlt : isTrial ? THEME_COLORS.warningTintSoft : THEME_COLORS.errorTintSoft;
-  const statusBorder = isActive ? THEME_COLORS.successTintStrongAlt : isTrial ? THEME_COLORS.alias_rgba_245_158_11_0_2 : THEME_COLORS.alias_rgba_239_68_68_0_2;
+  const overallStatus = isActive ? 'Active' : effectiveTrial ? 'Trial' : 'Expired';
+  const statusColor = isActive ? THEME_COLORS.successStrongAlt : effectiveTrial ? THEME_COLORS.warning : THEME_COLORS.errorStrong;
+  const statusBg = isActive ? THEME_COLORS.successTintSoftAlt : effectiveTrial ? THEME_COLORS.warningTintSoft : THEME_COLORS.errorTintSoft;
+  const statusBorder = isActive ? THEME_COLORS.successTintStrongAlt : effectiveTrial ? THEME_COLORS.alias_rgba_245_158_11_0_2 : THEME_COLORS.alias_rgba_239_68_68_0_2;
 
   const handleCheckout = (type: 'membership' | 'community', targetId?: string) => {
     let path = `/checkout?type=${type}`;
@@ -231,16 +236,18 @@ export const LicensingSection: React.FC = () => {
             </Text>
           </View>
         )}
-        {isTrial && (
+        {effectiveTrial && (
           <View style={{ gap: SPACE.sm }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.md }}>
               <Calendar size={14} color={THEME_COLORS.warning} />
               <Text style={{ fontSize: TYPE_SCALE.lg, fontWeight: FONT_WEIGHT.bold, color: THEME_COLORS.neutralTextStrong }}>
-                Free trial — {daysLeft} day{daysLeft !== 1 ? 's' : ''} remaining
+                Trial platform license — {daysLeft ?? 365} day{(daysLeft ?? 365) !== 1 ? 's' : ''} remaining
               </Text>
             </View>
             <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.neutralTextSubtle, lineHeight: LINE_HEIGHT.compact }}>
-              Trial ends {formatDate(trialExpiresAt)}. After that, subscribe for R99/year to keep access.
+              {trialExpiresAt && isTrial
+                ? `Trial ends ${formatDate(trialExpiresAt)}. Then continue on R99/year.`
+                : 'Your platform trial is active for 365 days. Then continue on R99/year.'}
             </Text>
           </View>
         )}
@@ -263,7 +270,7 @@ export const LicensingSection: React.FC = () => {
             </TouchableOpacity>
           </View>
         )}
-        {isTrial && !isActive && (
+        {effectiveTrial && !isActive && (
           <TouchableOpacity
             onPress={() => handleCheckout('membership')}
             style={{ alignSelf: 'flex-start', backgroundColor: PRIMARY, paddingHorizontal: SPACE.xxl, paddingVertical: SPACE.lg, borderRadius: RADIUS.md }}

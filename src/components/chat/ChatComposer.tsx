@@ -8,7 +8,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { Send, Camera, ImageIcon } from 'lucide-react-native';
+import { Send, Camera, Plus, Mic } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { uploadImage } from '../../lib/uploadImage';
@@ -124,10 +124,12 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
 
   return (
     <View
-      className="bg-surface-container-low/95 px-3 pt-2 border-t"
+      className="px-2 pt-2"
       style={{
-        paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 12,
-        borderTopColor: THEME_COLORS.neutralBorderSoft,
+        backgroundColor: THEME_COLORS.chatSurface,
+        paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 10,
+        borderTopColor: THEME_COLORS.chatBorder,
+        borderTopWidth: 1,
       }}
     >
       {/* Upload error */}
@@ -135,26 +137,23 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
         <Text className="text-xs text-red-500 font-medium mb-1 px-1">{uploadError}</Text>
       ) : null}
 
-      <View className="flex-row items-center gap-2">
-        <View
-          className="flex-1 flex-row items-center gap-2 bg-surface-container-low border rounded-[26px] px-3 py-2 min-h-[48px]"
-          style={{ borderColor: THEME_COLORS.neutralBorderSoft }}
+      <View className="flex-row items-end gap-2">
+        <TouchableOpacity
+          onPress={handlePickPhoto}
+          activeOpacity={0.75}
+          className="w-10 h-10 rounded-full items-center justify-center"
+          style={{ backgroundColor: THEME_COLORS.white }}
         >
-          <TouchableOpacity
-            onPress={handlePickPhoto}
-            activeOpacity={0.7}
-            className="p-2 rounded-full"
-          >
-            <ImageIcon size={20} color={THEME_COLORS.neutralTextWhatsapp} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleTakePhoto}
-            activeOpacity={0.7}
-            className="p-2 rounded-full"
-          >
-            <Camera size={20} color={THEME_COLORS.neutralTextWhatsapp} />
-          </TouchableOpacity>
+          <Plus size={21} color={THEME_COLORS.neutralTextWhatsapp} />
+        </TouchableOpacity>
 
+        <View
+          className="flex-1 flex-row items-end gap-2 border rounded-[24px] px-3 py-2 min-h-[46px]"
+          style={{
+            borderColor: THEME_COLORS.chatBorder,
+            backgroundColor: THEME_COLORS.white,
+          }}
+        >
           <TextInput
             value={text}
             onChangeText={handleChangeText}
@@ -168,29 +167,35 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
               fontSize: TYPE_SCALE.input,
               color: THEME_COLORS.neutralTextStrong,
               maxHeight: 120,
-              alignSelf: 'center',
+              alignSelf: 'flex-end',
               paddingTop: SPACE.zero,
               paddingBottom: SPACE.zero,
             }}
             returnKeyType="default"
           />
+
+          <TouchableOpacity
+            onPress={handleTakePhoto}
+            activeOpacity={0.7}
+            className="p-1 rounded-full"
+          >
+            <Camera size={20} color={THEME_COLORS.neutralTextWhatsapp} />
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity
-          onPress={handleSend}
-          disabled={!text.trim() || uploading}
+          onPress={text.trim() ? handleSend : undefined}
+          disabled={uploading}
           activeOpacity={0.8}
-          className={[
-            'w-12 h-12 rounded-full items-center justify-center',
-            text.trim() && !uploading
-              ? 'bg-green-500'
-              : 'bg-surface-container',
-          ].join(' ')}
+          className="w-10 h-10 rounded-full items-center justify-center"
+          style={{ backgroundColor: text.trim() ? '#25d366' : THEME_COLORS.white }}
         >
           {uploading ? (
             <ActivityIndicator size="small" color={THEME_COLORS.primary} />
+          ) : text.trim() ? (
+            <Send size={18} color={THEME_COLORS.white} />
           ) : (
-            <Send size={19} color={text.trim() ? THEME_COLORS.white : THEME_COLORS.neutralTextSoft} />
+            <Mic size={18} color={THEME_COLORS.neutralTextWhatsapp} />
           )}
         </TouchableOpacity>
       </View>

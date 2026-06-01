@@ -25,6 +25,7 @@ import {
 } from 'lucide-react-native';
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
+import { useCommunity } from '../../context/CommunityContext';
 import { uploadImage } from '../../lib/uploadImage';
 import { useInvitePreview } from '../../hooks/queries/useInvitePreview';
 import { getCardBorderColor, getCardSurfaceColor } from '../../theme/cardStyles';
@@ -87,7 +88,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 // ─── Invited Member Onboarding ────────────────────────────────────────────────
 
 const OnboardingInvite: React.FC = () => {
-  const { userProfile, loading, updateUserProfile } = useAuth();
+  const { userProfile, loading, updateUserProfile, refreshProfile } = useAuth();
+  const { refreshCommunities } = useCommunity();
   const user = userProfile ? { uid: userProfile.id, email: userProfile.email, displayName: userProfile.name, photoURL: userProfile.profileImage } : null;
   const router = useRouter();
   // Invite code can arrive synchronously as a URL param (from join.tsx deep link)
@@ -270,6 +272,13 @@ const OnboardingInvite: React.FC = () => {
         defaultLocation: { name: locationName, latitude: locationLat, longitude: locationLng },
         ...(joinedCommunityId ? { lastCommunityId: joinedCommunityId } : {}),
       });
+
+      // Prevent post-join UI race: hydrate fresh profile/community state before
+      // the first Home render so header and Licensing use the same snapshot.
+      await refreshProfile();
+      if (joinedCommunityId) {
+        await refreshCommunities();
+      }
 
       await Promise.all([
         AsyncStorage.removeItem('pendingOnboardingName'),

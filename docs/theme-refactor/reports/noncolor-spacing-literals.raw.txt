@@ -1,41 +1,45 @@
-app/(tabs)/_layout.tsx:120:            marginHorizontal: 6,
-app/(tabs)/_layout.tsx:121:            paddingHorizontal: 0,
-app/(tabs)/_layout.tsx:126:            marginBottom: 2,
-app/(tabs)/_layout.tsx:129:            marginTop: 2,
-src/components/auth/LandingPage.tsx:289:          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+app/(tabs)/_layout.tsx:123:            marginHorizontal: 6,
+app/(tabs)/_layout.tsx:124:            paddingHorizontal: 0,
+app/(tabs)/_layout.tsx:129:            marginBottom: 2,
+app/(tabs)/_layout.tsx:132:            marginTop: 2,
+src/components/auth/LandingPage.tsx:277:          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/chat/TopicInfoModal.tsx:98:            <View className="px-6 pt-5 pb-6" style={{ gap: 14 }}>
+src/components/chat/TopicInfoModal.tsx:115:                <View className="px-4 pt-4 pb-4 bg-surface-container-low" style={{ gap: 10 }}>
+src/components/chat/TopicInfoModal.tsx:140:              <View className="rounded-2xl border p-4" style={{ borderColor: THEME_COLORS.neutralBorderSoft, gap: 8 }}>
+src/components/chat/TopicInfoModal.tsx:155:                <View className="rounded-2xl border p-4" style={{ borderColor: THEME_COLORS.neutralBorderSoft, gap: 6 }}>
 src/components/market/RecordSaleModal.tsx:68:        <View className="bg-surface-container-low rounded-t-[28px] px-6 pt-5 pb-8" style={{ gap: 16 }}>
 src/components/market/RecordSaleModal.tsx:80:          <View className="bg-surface-container rounded-2xl p-4 border" style={{ borderColor: THEME_COLORS.neutralBorderSoft, gap: 10 }}>
 src/components/market/RecordSaleModal.tsx:113:          <View className="bg-orange-50 rounded-2xl p-4 border border-orange-100" style={{ gap: 6 }}>
 src/components/security/LocationSettings.tsx:52:    <View style={{ gap: 16 }}>
-src/components/security/ProfileSection.tsx:169:    padding: 20,
-src/components/security/ProfileSection.tsx:191:    padding: 0,
-src/components/security/ProfileSection.tsx:197:    marginVertical: 12,
-src/components/security/ProfileSection.tsx:201:    <View style={{ gap: 12 }}>
-src/components/security/ProfileSection.tsx:208:            gap: 8,
-src/components/security/ProfileSection.tsx:210:            paddingHorizontal: 12,
-src/components/security/ProfileSection.tsx:211:            paddingVertical: 8,
-src/components/security/ProfileSection.tsx:227:      <View style={{ alignItems: 'center', paddingVertical: 8 }}>
-src/components/security/ProfileSection.tsx:271:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-src/components/security/ProfileSection.tsx:326:          <Text style={[rowLabel, { paddingTop: 2 }]}>Email</Text>
-src/components/security/ProfileSection.tsx:342:                  <View style={{ gap: 4, marginTop: 4 }}>
-src/components/security/ProfileSection.tsx:351:                        paddingHorizontal: 12,
-src/components/security/ProfileSection.tsx:352:                        paddingVertical: 6,
-src/components/security/ProfileSection.tsx:362:                  <Text style={{ fontSize: 10, color: THEME_COLORS.warningText, fontStyle: 'italic', marginTop: 4 }}>
-src/components/security/ProfileSection.tsx:366:                  <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, fontStyle: 'italic', marginTop: 4 }}>
-src/components/security/ProfileSection.tsx:372:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-src/components/security/ProfileSection.tsx:377:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: THEME_COLORS.surfaceContainerLow, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>
-src/components/security/ProfileSection.tsx:385:                    style={{ backgroundColor: THEME_COLORS.warningSurface, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}
-src/components/security/ProfileSection.tsx:418:        <View style={{ flexDirection: 'row', gap: 12 }}>
-src/components/security/ProfileSection.tsx:424:              paddingVertical: 14,
-src/components/security/ProfileSection.tsx:437:              paddingVertical: 14,
-src/components/security/ProfileSection.tsx:457:            padding: 16,
-src/components/security/ProfileSection.tsx:462:            gap: 8,
-src/components/settings/SettingsPage.tsx:256:        <View style={{ ...SETTINGS_CARD_SURFACE, position: 'relative', marginTop: SPACE.s32, borderRadius: 34, padding: SPACE.s14, paddingTop: 0, gap: SPACE.md, ...SETTINGS_SHADOW_SOFT }}>
-src/components/settings/SettingsPage.tsx:298:                      paddingHorizontal: SPACE.md, paddingVertical: 2, borderRadius: RADIUS.panel, borderWidth: 1,
-src/components/settings/SettingsPage.tsx:309:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: rc.bg }}>
-src/components/settings/SettingsPage.tsx:316:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
-src/components/settings/SettingsPage.tsx:502:                <Sparkles size={18} color={THEME_COLORS.warningBorderStrong} style={{ marginTop: 1 }} />
-src/components/settings/SettingsPage.tsx:543:                <Plus size={18} color={THEME_COLORS.success} style={{ marginTop: 1 }} />
+src/components/security/ProfileSection.tsx:176:    padding: 20,
+src/components/security/ProfileSection.tsx:198:    padding: 0,
+src/components/security/ProfileSection.tsx:204:    marginVertical: 12,
+src/components/security/ProfileSection.tsx:208:    <View style={{ gap: 12 }}>
+src/components/security/ProfileSection.tsx:215:            gap: 8,
+src/components/security/ProfileSection.tsx:217:            paddingHorizontal: 12,
+src/components/security/ProfileSection.tsx:218:            paddingVertical: 8,
+src/components/security/ProfileSection.tsx:234:      <View style={{ alignItems: 'center', paddingVertical: 8 }}>
+src/components/security/ProfileSection.tsx:278:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+src/components/security/ProfileSection.tsx:333:          <Text style={[rowLabel, { paddingTop: 2 }]}>Email</Text>
+src/components/security/ProfileSection.tsx:349:                  <View style={{ gap: 4, marginTop: 4 }}>
+src/components/security/ProfileSection.tsx:358:                        paddingHorizontal: 12,
+src/components/security/ProfileSection.tsx:359:                        paddingVertical: 6,
+src/components/security/ProfileSection.tsx:369:                  <Text style={{ fontSize: 10, color: THEME_COLORS.warningText, fontStyle: 'italic', marginTop: 4 }}>
+src/components/security/ProfileSection.tsx:373:                  <Text style={{ fontSize: 10, color: THEME_COLORS.neutralTextSoft, fontStyle: 'italic', marginTop: 4 }}>
+src/components/security/ProfileSection.tsx:379:              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+src/components/security/ProfileSection.tsx:384:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: THEME_COLORS.surfaceContainerLow, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>
+src/components/security/ProfileSection.tsx:392:                    style={{ backgroundColor: THEME_COLORS.warningSurface, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}
+src/components/security/ProfileSection.tsx:425:        <View style={{ flexDirection: 'row', gap: 12 }}>
+src/components/security/ProfileSection.tsx:431:              paddingVertical: 14,
+src/components/security/ProfileSection.tsx:444:              paddingVertical: 14,
+src/components/security/ProfileSection.tsx:464:            padding: 16,
+src/components/security/ProfileSection.tsx:469:            gap: 8,
+src/components/settings/SettingsPage.tsx:259:        <View style={{ ...SETTINGS_CARD_SURFACE, position: 'relative', marginTop: SPACE.s32, borderRadius: 34, padding: SPACE.s14, paddingTop: 0, gap: SPACE.md, ...SETTINGS_SHADOW_SOFT }}>
+src/components/settings/SettingsPage.tsx:326:                      paddingHorizontal: SPACE.md, paddingVertical: 2, borderRadius: RADIUS.panel, borderWidth: 1,
+src/components/settings/SettingsPage.tsx:337:                <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: rc.bg }}>
+src/components/settings/SettingsPage.tsx:344:                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl, paddingVertical: 4, borderRadius: 18, backgroundColor: THEME_COLORS.infoTintSoft, borderWidth: 1, borderColor: THEME_COLORS.alias_rgba_37_99_235_0_2 }}>
+src/components/settings/SettingsPage.tsx:530:                <Sparkles size={18} color={THEME_COLORS.warningBorderStrong} style={{ marginTop: 1 }} />
+src/components/settings/SettingsPage.tsx:571:                <Plus size={18} color={THEME_COLORS.success} style={{ marginTop: 1 }} />
 src/components/shared/EmergencyResponderCard.tsx:97:          padding: 20,
 src/components/shared/EmergencyResponderCard.tsx:103:        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
 src/components/shared/EmergencyResponderCard.tsx:124:            paddingHorizontal: 20,

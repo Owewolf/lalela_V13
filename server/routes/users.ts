@@ -86,6 +86,26 @@ router.put('/me', async (req, res) => {
   }
 
   const user = await prisma.user.update({ where: { id: req.auth!.userId }, data });
+
+  // Keep denormalized community/member image caches in sync with the canonical
+  // users.profileImage value so all member placeholders update immediately.
+  if ('profileImage' in data) {
+    await prisma.$transaction([
+      prisma.communityMember.updateMany({
+        where: { userId: req.auth!.userId },
+        data: { image: user.profileImage ?? null },
+      }),
+      prisma.memberLocation.updateMany({
+        where: { userId: req.auth!.userId },
+        data: { image: user.profileImage ?? null },
+      }),
+      prisma.securityLocation.updateMany({
+        where: { userId: req.auth!.userId },
+        data: { image: user.profileImage ?? null },
+      }),
+    ]);
+  }
+
   // Reconstruct defaultLocation from flat lat/lng columns
   const defaultLocation =
     user.latitude != null && user.longitude != null

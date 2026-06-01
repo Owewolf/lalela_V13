@@ -24,6 +24,9 @@ type UserLike = {
   trialExpiresAt?: string | Date | null;
 } | null | undefined;
 
+export type PlatformMembershipStatus = 'ACTIVE' | 'TRIAL' | 'EXPIRED';
+export type CommunityLicenseStatus = 'ACTIVE' | 'TRIAL' | 'EXPIRED';
+
 /** True when the community is permanently activated OR inside its 30-day trial window. */
 export function isCommunityActive(c: CommunityLike): boolean {
   if (!c) return false;
@@ -55,6 +58,13 @@ export function isCommunityLicensed(c: CommunityLike): boolean {
   return c.isPaid === true || c.type === 'ACTIVE';
 }
 
+/** Canonical selected-community status for status chips (Active/Trial/Expired). */
+export function getCommunityLicenseStatus(c: CommunityLike): CommunityLicenseStatus {
+  if (isCommunityLicensed(c)) return 'ACTIVE';
+  if (isCommunityTrial(c)) return 'TRIAL';
+  return 'EXPIRED';
+}
+
 /** True when the user's *own* platform membership is active (paid R99/year, not expired). */
 export function isUserSubscriptionActive(u: UserLike): boolean {
   if (!u) return false;
@@ -83,4 +93,27 @@ export function isUserLicensed(u: UserLike, c?: CommunityLike): boolean {
   if (isUserTrial(u)) return true;
   if (c && isCommunityActive(c)) return true;
   return false;
+}
+
+/** True when the user has an active paid platform membership (R99/year). */
+export function isUserPaidMembershipActive(u: UserLike): boolean {
+  return isUserSubscriptionActive(u);
+}
+
+/**
+ * Returns the canonical platform membership status used by UI surfaces.
+ *
+ * Rules:
+ * - ACTIVE: user has an active paid membership.
+ * - TRIAL: user has a valid personal trial OR is in an active community.
+ * - EXPIRED: neither paid membership nor trial access is active.
+ */
+export function getPlatformMembershipStatus(
+  u: UserLike,
+  c?: CommunityLike,
+): PlatformMembershipStatus {
+  if (isUserSubscriptionActive(u)) return 'ACTIVE';
+  if (isUserTrial(u)) return 'TRIAL';
+  if (c && isCommunityActive(c)) return 'TRIAL';
+  return 'EXPIRED';
 }

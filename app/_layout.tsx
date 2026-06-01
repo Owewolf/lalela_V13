@@ -17,6 +17,7 @@ import { ThemeProvider } from '../src/context/ThemeContext';
 import { GoogleMapsProvider } from '../src/context/GoogleMapsContext';
 import { CallProvider } from '../src/context/CallContext';
 import { IncomingCallOverlay } from '../src/components/call/IncomingCallOverlay';
+import { TopicChatGateProvider } from '../src/components/chat/TopicChatGateProvider';
 import { THEME_COLORS } from '../src/theme/colors';
 import { queryClient } from '../src/lib/queryClient';
 import { useRealtimeSync } from '../src/hooks/useRealtimeSync';
@@ -322,27 +323,29 @@ export default function RootLayout() {
               <ThemeProvider>
                 <GoogleMapsProvider>
                   <CallProvider>
-                    <RealtimeSyncGate />
-                    <AppGuard />
-                    <Stack screenOptions={{ headerShown: false }}>
-                      <Stack.Screen name="(tabs)" />
-                      <Stack.Screen name="landing" />
-                      <Stack.Screen name="onboarding" />
-                      <Stack.Screen name="onboarding-create" />
-                      <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
-                      <Stack.Screen name="security" options={{ presentation: 'modal' }} />
-                      <Stack.Screen name="notifications-settings" options={{ presentation: 'modal' }} />
-                      <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
-                      <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
-                      <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
-                      <Stack.Screen name="create-business" options={{ presentation: 'modal' }} />
-                      <Stack.Screen name="join" options={{ headerShown: false }} />
-                      <Stack.Screen name="chat/[id]" />
-                      <Stack.Screen name="emergency/[id]" />
-                      <Stack.Screen name="call/[id]" options={{ animation: 'fade' }} />
-                    </Stack>
-                    <IncomingCallOverlay />
-                    <LoadingOverlay />
+                    <TopicChatGateProvider>
+                      <RealtimeSyncGate />
+                      <AppGuard />
+                      <Stack screenOptions={{ headerShown: false }}>
+                        <Stack.Screen name="(tabs)" />
+                        <Stack.Screen name="landing" />
+                        <Stack.Screen name="onboarding" />
+                        <Stack.Screen name="onboarding-create" />
+                        <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
+                        <Stack.Screen name="security" options={{ presentation: 'modal' }} />
+                        <Stack.Screen name="notifications-settings" options={{ presentation: 'modal' }} />
+                        <Stack.Screen name="checkout" options={{ presentation: 'modal' }} />
+                        <Stack.Screen name="pricing" options={{ presentation: 'modal' }} />
+                        <Stack.Screen name="create-post" options={{ presentation: 'modal' }} />
+                        <Stack.Screen name="create-business" options={{ presentation: 'modal' }} />
+                        <Stack.Screen name="join" options={{ headerShown: false }} />
+                        <Stack.Screen name="chat/[id]" />
+                        <Stack.Screen name="emergency/[id]" />
+                        <Stack.Screen name="call/[id]" options={{ animation: 'fade' }} />
+                      </Stack>
+                      <IncomingCallOverlay />
+                      <LoadingOverlay />
+                    </TopicChatGateProvider>
                   </CallProvider>
                 </GoogleMapsProvider>
               </ThemeProvider>

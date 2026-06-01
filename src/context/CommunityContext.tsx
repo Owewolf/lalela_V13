@@ -12,6 +12,7 @@ import React, {
 } from 'react';
 import { useAuth } from './AuthContext';
 import api from '../lib/api';
+import { resolveMediaUrl } from '../lib/config';
 import { queryClient } from '../lib/queryClient';
 import { queryKeys } from '../lib/queryKeys';
 import { useCommunityBootstrap } from '../hooks/queries/useCommunityBootstrap';
@@ -59,10 +60,48 @@ function mapServerCommunity(raw: any): Community {
   return { ...raw, coverageArea };
 }
 
+function normalizePostMedia(post: CommunityNotice): CommunityNotice {
+  const listingImage = post.type === 'listing'
+    ? (post.postsImage ?? (post as any).imageUrl ?? null)
+    : (post.postsImage ?? null);
+  const normalizedPostsImage = resolveMediaUrl(listingImage) ?? listingImage;
+  const normalizedAuthorImage = resolveMediaUrl(post.authorImage ?? null) ?? post.authorImage ?? null;
+
+  return {
+    ...post,
+    postsImage: normalizedPostsImage,
+    authorImage: normalizedAuthorImage,
+  };
+}
+
+function normalizePostsMedia(posts: CommunityNotice[]): CommunityNotice[] {
+  return posts.map(normalizePostMedia);
+}
+
+function appendUniqueMessages(existing: Message[], incoming: Message[]): Message[] {
+  if (incoming.length === 0) return existing;
+
+  const seen = new Set(existing.map((item) => item.id));
+  const additions: Message[] = [];
+
+  for (const item of incoming) {
+    if (!item?.id) {
+      additions.push(item);
+      continue;
+    }
+    if (seen.has(item.id)) continue;
+    seen.add(item.id);
+    additions.push(item);
+  }
+
+  if (additions.length === 0) return existing;
+  return [...existing, ...additions];
+}
+
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { userProfile, updateUserProfile } = useAuth();
+  const { userProfile, updateUserProfile, refreshProfile } = useAuth();
   const userId = userProfile?.id ?? null;
   const currentCommunityId = userProfile?.lastCommunityId ?? null;
   const bootstrapQuery = useCommunityBootstrap(userId);
@@ -120,9 +159,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       const n = conv.unreadCount || 0;
       if (n <= 0) continue;
       totals.totalMessages += n;
+      const contextType = (conv.metadata?.type as string | undefined) ?? null;
       switch (conv.type) {
         case 'direct':
-          totals.direct += n;
+          if (contextType === 'listing') totals.listing += n;
+          else if (contextType === 'notice') totals.notice += n;
+          else totals.direct += n;
           break;
         case 'listing':
           if (conv.metadata?.source === 'marketplace') totals.marketplace += n;
@@ -173,7 +215,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
 
     setMembers(bundleQuery.data?.members ?? []);
-    setPosts(bundleQuery.data?.posts ?? []);
+    setPosts(normalizePostsMedia(bundleQuery.data?.posts ?? []));
     setCharities(bundleQuery.data?.charities ?? []);
     setCharitySuggestions(bundleQuery.data?.charitySuggestions ?? []);
     const allBusinesses = bundleQuery.data?.businesses ?? [];
@@ -206,10 +248,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
       // ── Inbound events ──
       socket.on('post:new', (post: CommunityNotice) => {
-        setPosts((prev) => [post, ...prev.filter((p) => p.id !== post.id)]);
+        const normalizedPost = normalizePostMedia(post);
+        setPosts((prev) => [normalizedPost, ...prev.filter((p) => p.id !== normalizedPost.id)]);
       });
       socket.on('post:updated', (post: CommunityNotice) => {
-        setPosts((prev) => prev.map((p) => (p.id === post.id ? post : p)));
+        const normalizedPost = normalizePostMedia(post);
+        setPosts((prev) => prev.map((p) => (p.id === normalizedPost.id ? normalizedPost : p)));
       });
       socket.on('post:deleted', ({ id }: { id: string }) => {
         setPosts((prev) => prev.filter((p) => p.id !== id));
@@ -220,7 +264,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
         const senderId = (msg as any).userId as string | undefined;
         const activeId = activeConversationIdRef.current;
         // Only append to in-memory messages list if it belongs to the open conversation.
-        setMessages((prev) => (convId && convId === activeId ? [...prev, msg] : prev));
+        setMessages((prev) => (convId && convId === activeId ? appendUniqueMessages(prev, [msg]) : prev));
         setConversations((prev) =>
           prev.map((c) => {
             if (c.id !== convId) return c;
@@ -370,7 +414,23 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const removeCommunityBusiness = useCallback(async (_communityId: string, businessId: string) => {
     await api.delete(`/businesses/${businessId}`);
     setCommunityBusinesses((prev) => prev.filter((b) => b.id !== businessId));
-  }, []);
+    setUserBusinesses((prev) => prev.filter((b) => b.id !== businessId));
+    setCommunities((prev) => prev.map((community) => {
+      const communityBusinesses = Array.isArray((community as any).businesses)
+        ? (community as any).businesses.filter((b: any) => b?.id !== businessId)
+        : (community as any).businesses;
+      return { ...community, businesses: communityBusinesses };
+    }));
+    if (currentCommunityId) {
+      queryClient.setQueryData(queryKeys.communityBundle(currentCommunityId), (prev: any) => {
+        if (!prev) return prev;
+        const bundleBusinesses = Array.isArray(prev.businesses)
+          ? prev.businesses.filter((b: any) => b?.id !== businessId)
+          : prev.businesses;
+        return { ...prev, businesses: bundleBusinesses };
+      });
+    }
+  }, [currentCommunityId]);
 
   const bulkAddCommunityBusinesses = useCallback(async (communityId: string, businesses: Business[]) => {
     await api.post('/businesses/import', { communityId, businesses });
@@ -398,7 +458,23 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const removeUserBusiness = useCallback(async (id: string) => {
     await api.delete(`/businesses/${id}`);
     setUserBusinesses((prev) => prev.filter((b) => b.id !== id));
-  }, []);
+    setCommunityBusinesses((prev) => prev.filter((b) => b.id !== id));
+    setCommunities((prev) => prev.map((community) => {
+      const communityBusinesses = Array.isArray((community as any).businesses)
+        ? (community as any).businesses.filter((b: any) => b?.id !== id)
+        : (community as any).businesses;
+      return { ...community, businesses: communityBusinesses };
+    }));
+    if (currentCommunityId) {
+      queryClient.setQueryData(queryKeys.communityBundle(currentCommunityId), (prev: any) => {
+        if (!prev) return prev;
+        const bundleBusinesses = Array.isArray(prev.businesses)
+          ? prev.businesses.filter((b: any) => b?.id !== id)
+          : prev.businesses;
+        return { ...prev, businesses: bundleBusinesses };
+      });
+    }
+  }, [currentCommunityId]);
 
   const deleteUserBusiness = removeUserBusiness;
 
@@ -521,7 +597,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     const { data } = await api.post(`/communities/${currentCommunityId}/posts/${postId}/sold`, { quantity: safeQuantity });
     const soldPost = data?.post;
     if (soldPost?.id) {
-      setPosts((prev) => prev.map((post) => (post.id === soldPost.id ? soldPost : post)));
+      const normalizedPost = normalizePostMedia(soldPost);
+      setPosts((prev) => prev.map((post) => (post.id === normalizedPost.id ? normalizedPost : post)));
     }
     return {
       catTriggered: Boolean(data?.catTriggered),
@@ -584,19 +661,30 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       throw new Error('No active community selected');
     }
     const { data } = await api.post(`/communities/${currentCommunityId}/posts`, post);
-    setPosts((prev) => [data, ...prev]);
+    const normalizedPost = normalizePostMedia(data);
+    setPosts((prev) => [normalizedPost, ...prev]);
     return data.id;
   }, [currentCommunityId]);
 
   const updatePost = useCallback(async (post: CommunityNotice) => {
     if (!currentCommunityId) return;
     const { data } = await api.put(`/communities/${currentCommunityId}/posts/${post.id}`, post);
-    setPosts((prev) => prev.map((p) => p.id === post.id ? data : p));
+    const normalizedPost = normalizePostMedia(data);
+    setPosts((prev) => prev.map((p) => p.id === post.id ? normalizedPost : p));
   }, [currentCommunityId]);
 
   const removePost = useCallback(async (id: string) => {
     if (!currentCommunityId) return;
-    await api.delete(`/communities/${currentCommunityId}/posts/${id}`);
+    try {
+      await api.delete(`/communities/${currentCommunityId}/posts/${id}`);
+    } catch (error: any) {
+      const status = error?.response?.status;
+      // Idempotent delete on client: if the post is already gone (or was deleted
+      // in another session/community context), treat this as success and keep UI in sync.
+      if (status !== 404) {
+        throw error;
+      }
+    }
     setPosts((prev) => prev.filter((p) => p.id !== id));
   }, [currentCommunityId]);
 
@@ -726,17 +814,39 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const startConversation = useCallback(async (params: Parameters<CommunityContextType['startConversation']>[0]): Promise<string> => {
     let endpoint: string;
     let body: object;
-    if (params.type === 'direct') {
+    const myUserId = userProfile?.id ?? null;
+    const candidateOtherId = params.participants.find((id) => id !== myUserId) ?? null;
+    const shouldUseDirectResolver =
+      params.type === 'direct' ||
+      ((params.type === 'listing' || params.type === 'notice') && params.participants.length === 2 && !!candidateOtherId);
+
+    if (shouldUseDirectResolver) {
       endpoint = '/conversations/direct';
-      body = { otherUserId: params.participants[1] };
+      body = {
+        otherUserId: candidateOtherId,
+        communityId: params.communityId,
+        listingId: params.listingId,
+        noticeId: params.noticeId,
+        metadata: params.metadata,
+        contextType: params.type,
+      };
     } else {
       endpoint = '/conversations';
       body = params;
     }
     const { data } = await api.post(endpoint, body);
-    setConversations((prev) => prev.find((c) => c.id === data.id) ? prev : [data, ...prev]);
-    return data.id;
-  }, []);
+    const payload = (data as { conversation?: Conversation })?.conversation ?? data;
+
+    setConversations((prev) => {
+      const existingIndex = prev.findIndex((c) => c.id === payload.id);
+      if (existingIndex === -1) return [payload, ...prev];
+      const next = [...prev];
+      next[existingIndex] = payload;
+      return next;
+    });
+
+    return payload.id;
+  }, [userProfile?.id]);
 
   const sendMessage = useCallback(async (
     text: string,
@@ -747,8 +857,16 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     if (!activeConversationId) return;
     const msg = { content: text, type, attachmentUrl: attachmentUrl, file_name: fileName };
     const { data } = await api.post(`/conversations/${activeConversationId}/messages`, msg);
-    setMessages((prev) => [...prev, data]);
-    socketRef.current?.emit('message:send', { conversationId: activeConversationId, ...msg });
+    const persistedMessage = data as Message;
+
+    setMessages((prev) => appendUniqueMessages(prev, [persistedMessage]));
+    socketRef.current?.emit('message:send', {
+      conversationId: activeConversationId,
+      content: persistedMessage.content,
+      type: persistedMessage.messageType,
+      attachmentUrl: persistedMessage.attachmentUrl,
+      fileName: persistedMessage.fileName,
+    });
   }, [activeConversationId]);
 
   const markAsRead = useCallback(async (conversationId: string) => {
@@ -793,8 +911,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     );
     // Select the joined community immediately
     await updateUserProfile({ lastCommunityId: data.communityId } as any);
+    await refreshProfile();
     return data.communityId;
-  }, [updateUserProfile]);
+  }, [refreshProfile, updateUserProfile]);
 
   // ── Invitations ───────────────────────────────────────────────────────────
   const inviteMember = useCallback(async (toUserId: string, role: 'MEMBER' | 'MODERATOR') => {

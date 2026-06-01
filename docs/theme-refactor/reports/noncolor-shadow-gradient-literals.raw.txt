@@ -5,5 +5,5 @@ app/(tabs)/_layout.tsx:45:          shadowRadius: 16,
 app/(tabs)/_layout.tsx:46:          elevation: 10,
 app/(tabs)/_layout.tsx:56:            elevation: 0,
 app/(tabs)/_layout.tsx:57:            shadowOpacity: 0,
-src/components/auth/LandingPage.tsx:289:          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
-src/components/home/HomePage.tsx:964:          ...(activeMenuId === listing.id ? { zIndex: 80, elevation: 20 } : null),
+src/components/auth/LandingPage.tsx:277:          <View style={{ backgroundColor: THEME_COLORS.surface, borderRadius: 40, padding: 24, shadowColor: THEME_COLORS.black, borderWidth: 1, borderColor: THEME_COLORS.overlayBorderSoft }}>
+src/components/home/HomePage.tsx:972:          ...(activeMenuId === listing.id ? { zIndex: 80, elevation: 20 } : null),

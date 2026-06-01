@@ -27,7 +27,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
-import { isCommunityActive, isCommunityTrial, isCommunityLicensed, isUserLicensed } from '../../lib/licensing';
+import { getCommunityLicenseStatus, getPlatformMembershipStatus, isCommunityLicensed, isCommunityTrial, isUserPaidMembershipActive } from '../../lib/licensing';
 import { NotificationPreferences } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { getCardBorderColor, getCardShadow, getCardSurfaceColor } from '../../theme/cardStyles';
@@ -234,8 +234,11 @@ const SettingsPage: React.FC = () => {
 
   const rc = roleColor();
 
-  const isLicensed = isUserLicensed(userProfile, currentCommunity);
-  const ringColor = isLicensed ? THEME_COLORS.success : THEME_COLORS.error;
+  const platformStatus = getPlatformMembershipStatus(userProfile, currentCommunity);
+  const communityStatus = getCommunityLicenseStatus(currentCommunity);
+  const userHasPaidMembership = isUserPaidMembershipActive(userProfile);
+  const ringColor = userHasPaidMembership ? THEME_COLORS.primary : THEME_COLORS.error;
+  const isPlatformActive = platformStatus === 'ACTIVE';
 
   return (
     <View style={{ flex: 1, backgroundColor: APP_SHELL_COLORS.body }}>
@@ -261,8 +264,29 @@ const SettingsPage: React.FC = () => {
             style={{ position: 'relative', alignItems: 'center', gap: SPACE.md }}
           >
             <View style={{ position: 'absolute', top: -AVATAR_RADIUS, left: '50%', marginLeft: -AVATAR_RADIUS }}>
-              <View style={{ width: AVATAR_SIZE, height: AVATAR_SIZE, borderRadius: AVATAR_RADIUS, overflow: 'hidden', borderWidth: 4, borderColor: ringColor, backgroundColor: THEME_COLORS.surface }}>
-                <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+              <View style={{ width: AVATAR_SIZE, height: AVATAR_SIZE, borderRadius: AVATAR_RADIUS, overflow: 'visible' }}>
+                <View style={{ width: AVATAR_SIZE, height: AVATAR_SIZE, borderRadius: AVATAR_RADIUS, overflow: 'hidden', borderWidth: 4, borderColor: ringColor, backgroundColor: THEME_COLORS.surface }}>
+                  <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                </View>
+                {currentCommunity?.isSecurityMember && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      bottom: 0,
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
+                      backgroundColor: THEME_COLORS.brandBlueText,
+                      borderWidth: 2,
+                      borderColor: THEME_COLORS.surface,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Shield size={12} color={THEME_COLORS.white} />
+                  </View>
+                )}
               </View>
             </View>
             <View style={{ alignItems: 'center', width: '100%', marginTop: SPACE.s48 }}>
@@ -283,15 +307,19 @@ const SettingsPage: React.FC = () => {
               {/* License + role badges */}
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: SPACE.sm, marginTop: SPACE.md }}>
                 {(() => {
-                  // Profile pill is binary: ACTIVE (paid) vs UNLICENSED (trial /
-                  // expired / never-paid). The community-switcher row below shows
-                  // the finer-grained Active/Trial/Expired distinction.
-                  const licensed = isCommunityLicensed(currentCommunity);
-                  const label = licensed ? 'Active' : 'Unlicensed';
-                  const palette = licensed
-                    ? { bg: THEME_COLORS.successTintSoftAlt, border: THEME_COLORS.successTintStrongAlt, fg: THEME_COLORS.successStrongAlt }
-                    : { bg: THEME_COLORS.warningTintSoft, border: THEME_COLORS.alias_rgba_245_158_11_0_2, fg: THEME_COLORS.warning };
-                  const Icon = licensed ? ShieldCheck : AlertCircle;
+                  const label =
+                    communityStatus === 'ACTIVE'
+                      ? 'Active'
+                      : communityStatus === 'TRIAL'
+                        ? 'Trial'
+                        : 'Expired';
+                  const palette =
+                    communityStatus === 'ACTIVE'
+                      ? { bg: THEME_COLORS.successTintSoftAlt, border: THEME_COLORS.successTintStrongAlt, fg: THEME_COLORS.successStrongAlt }
+                      : communityStatus === 'TRIAL'
+                        ? { bg: THEME_COLORS.warningTintSoft, border: THEME_COLORS.alias_rgba_245_158_11_0_2, fg: THEME_COLORS.warning }
+                        : { bg: THEME_COLORS.errorTintSoft, border: THEME_COLORS.alias_rgba_239_68_68_0_2, fg: THEME_COLORS.errorStrong };
+                  const Icon = communityStatus === 'ACTIVE' ? ShieldCheck : AlertCircle;
                   return (
                     <View style={{
                       flexDirection: 'row', alignItems: 'center', gap: SPACE.xs,
@@ -388,8 +416,8 @@ const SettingsPage: React.FC = () => {
                           {c.userRole || 'MEMBER'}
                         </Text>
                         {(() => {
-                          const active = isCommunityLicensed(c);
                           const trial = isCommunityTrial(c);
+                          const active = isCommunityLicensed(c);
                           const label = active ? 'Active' : trial ? 'Trial' : 'Expired';
                           const color = active ? THEME_COLORS.successStrongAlt : trial ? THEME_COLORS.warning : THEME_COLORS.error;
                           return (
@@ -548,19 +576,30 @@ const SettingsPage: React.FC = () => {
                       flexDirection: 'row', alignItems: 'center', gap: SPACE.lg,
                       paddingHorizontal: SPACE.xxxl, paddingVertical: SPACE.xs, borderRadius: RADIUS.panel,
                       borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20,
-                      backgroundColor: THEME_COLORS.successTintSoft,
+                      backgroundColor: isPlatformActive ? THEME_COLORS.successTintSoft : THEME_COLORS.alias_rgba_245_158_11_0_25,
                     }}>
-                      <View style={{ width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.md, backgroundColor: THEME_COLORS.success }} />
+                      <View style={{ width: SPACE.xl, height: SPACE.xl, borderRadius: RADIUS.md, backgroundColor: isPlatformActive ? THEME_COLORS.success : THEME_COLORS.warningBorderStrong }} />
                       <Text style={{ fontSize: TYPE_SCALE.sm, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
-                        Ready
+                        {isPlatformActive ? 'Licensed' : 'License Now'}
                       </Text>
                     </View>
                   </View>
                   <Text style={{ fontSize: TYPE_SCALE.md, color: THEME_COLORS.whiteOverlay70, marginTop: SPACE.xs, lineHeight: LINE_HEIGHT.compact }}>
-                    Start a new community space with its own members, moderation, and activity feed in minutes.
+                    License yourself now (R99/year), or create a community which includes platform access context while setting up your new space.
                   </Text>
                 </View>
               </View>
+              {!isPlatformActive && (
+                <TouchableOpacity
+                  onPress={() => router.push({ pathname: '/checkout', params: { type: 'membership' } })}
+                  activeOpacity={0.8}
+                  style={{ backgroundColor: THEME_COLORS.alias_rgba_245_158_11_0_25, paddingVertical: SPACE.xxxl, borderRadius: RADIUS.s14, alignItems: 'center', borderWidth: 1, borderColor: THEME_COLORS.whiteOverlay20 }}
+                >
+                  <Text style={{ fontSize: TYPE_SCALE.body, fontWeight: FONT_WEIGHT.extrabold, color: THEME_COLORS.white, textTransform: 'uppercase', letterSpacing: LETTER_SPACING.normal }}>
+                    License Myself (R99/year)
+                  </Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 onPress={() => router.push('/onboarding-create')}
                 activeOpacity={0.8}

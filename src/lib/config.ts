@@ -4,7 +4,7 @@
 // On web, 10.0.2.2 is unreachable (Android emulator alias); fall back to localhost.
 import { Platform } from 'react-native';
 
-const rawUrl = process.env.EXPO_PUBLIC_API_URL ?? 'https://lalela.net/api';
+const rawUrl = process.env.EXPO_PUBLIC_API_URL ?? 'https://api.wolfslair.cc/api';
 
 export const API_BASE_URL =
   Platform.OS === 'web' && rawUrl.includes('10.0.2.2')

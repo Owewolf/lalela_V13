@@ -5,7 +5,7 @@ import { Bell, Shield, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react-
 import { useRouter } from 'expo-router';
 import { useCommunity } from '../../context/CommunityContext';
 import { useAuth } from '../../context/AuthContext';
-import { isUserLicensed, isCommunityLicensed, isCommunityTrial } from '../../lib/licensing';
+import { getCommunityLicenseStatus, isUserPaidMembershipActive } from '../../lib/licensing';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 
 const APP_LOGO_PATH = require('../../../assets/icon.png');
@@ -75,6 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
   const primaryColor = THEME_COLORS.primary;
   const headerChromeColor = APP_SHELL_COLORS.chrome;
   const headerBorderColor = THEME_COLORS.neutralBorder;
+  const isSecurityMemberForSelectedCommunity = !!currentCommunity?.isSecurityMember;
 
   const userRole = currentCommunity?.userRole || 'Member';
   const now = new Date();
@@ -92,15 +93,15 @@ export const Header: React.FC<HeaderProps> = ({
     currentCommunity?.isPaid === true ||
     currentCommunity?.type === 'ACTIVE' ||
     !!communityTrialActive;
-  const isLicensed = isActive || isTrial || communityActive;
-  // Avatar ring reflects whether the user currently has platform access —
-  // either via their own active subscription / trial, or via the community
-  // they are currently viewing being active. Uses the shared predicate so all
-  // surfaces (Header, Sidebar, Settings) stay in sync with the new pricing model.
-  const userIsLicensed = isUserLicensed(userProfile, currentCommunity);
-  const ringColor = userIsLicensed ? THEME_COLORS.success : THEME_COLORS.errorStrong;
+  const communityStatus = getCommunityLicenseStatus(currentCommunity);
+  const effectiveTrial = communityStatus === 'TRIAL';
+  // Header ring reflects paid platform membership only.
+  // Trial and expired accounts keep the red ring.
+  const userHasPaidMembership = isUserPaidMembershipActive(userProfile);
+  const userIsLicensed = userHasPaidMembership;
+  const ringColor = userIsLicensed ? THEME_COLORS.primary : THEME_COLORS.errorStrong;
   // Read-only only if the user's own license is expired AND the community itself is not active
-  const isReadOnly = licenseStatus === 'EXPIRED' || ((!isActive && !isTrial) && !communityActive);
+  const isReadOnly = licenseStatus === 'EXPIRED' || ((!isActive && !effectiveTrial) && !communityActive);
   // Warn when trial expires within 5 days
   const daysUntilTrialExpiry = trialExpiresAt && isTrial
     ? Math.ceil((trialExpiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
@@ -125,16 +126,11 @@ export const Header: React.FC<HeaderProps> = ({
   };
   const roleColor = roleColors[userRole] ?? roleColors.Member;
 
-  const communityType = currentCommunity?.type;
-  // Badge in the header shows ACTIVE only when the community has been paid
-  // for (R999). A community still in its 30-day trial reads TRIAL. Other
-  // states read EXPIRED. Access/read-only logic continues to use
-  // `communityActive` so trial users keep their permissions.
-  const communityLicensed = isCommunityLicensed(currentCommunity);
-  const communityInTrial = isCommunityTrial(currentCommunity);
-  const typeBadgeBg = communityLicensed ? THEME_COLORS.successSurfaceSoft : communityInTrial ? THEME_COLORS.warningSurface : THEME_COLORS.errorSurface;
-  const typeBadgeText = communityLicensed ? THEME_COLORS.primaryContainer : communityInTrial ? THEME_COLORS.warningText : THEME_COLORS.errorStrong;
-  const typeBadgeBorder = communityLicensed ? THEME_COLORS.tertiaryFixed : communityInTrial ? THEME_COLORS.warningBorder : THEME_COLORS.errorBorder;
+  // Primary badge in header reflects selected community license status.
+  const statusLabel = communityStatus === 'ACTIVE' ? 'Active' : communityStatus === 'TRIAL' ? 'Trial' : 'Expired';
+  const typeBadgeBg = communityStatus === 'ACTIVE' ? THEME_COLORS.successSurfaceSoft : communityStatus === 'TRIAL' ? THEME_COLORS.warningSurface : THEME_COLORS.errorSurface;
+  const typeBadgeText = communityStatus === 'ACTIVE' ? THEME_COLORS.primaryContainer : communityStatus === 'TRIAL' ? THEME_COLORS.warningText : THEME_COLORS.errorStrong;
+  const typeBadgeBorder = communityStatus === 'ACTIVE' ? THEME_COLORS.tertiaryFixed : communityStatus === 'TRIAL' ? THEME_COLORS.warningBorder : THEME_COLORS.errorBorder;
 
   const profileImageUri =
     userProfile?.profileImage ||
@@ -173,13 +169,13 @@ export const Header: React.FC<HeaderProps> = ({
                   { backgroundColor: typeBadgeBg, borderColor: typeBadgeBorder },
                 ]}
               >
-                {communityLicensed ? (
+                {communityStatus === 'ACTIVE' ? (
                   <ShieldCheck size={9} color={typeBadgeText} />
                 ) : (
                   <AlertCircle size={9} color={typeBadgeText} />
                 )}
                 <Text style={[styles.badgeText, { color: typeBadgeText }]}>
-                  {communityLicensed ? 'Active' : communityInTrial ? 'Trial' : 'Expired'}
+                  {statusLabel}
                 </Text>
               </View>
               {/* Role badge */}
@@ -217,14 +213,16 @@ export const Header: React.FC<HeaderProps> = ({
                   resizeMode="cover"
                 />
               </View>
-              <View
-                style={[
-                  styles.shieldBadge,
-                  { backgroundColor: userIsLicensed ? THEME_COLORS.secondaryContainer : THEME_COLORS.errorStrong },
-                ]}
-              >
-                <Shield size={8} color={THEME_COLORS.white} />
-              </View>
+              {isSecurityMemberForSelectedCommunity && (
+                <View
+                  style={[
+                    styles.shieldBadge,
+                    { backgroundColor: THEME_COLORS.brandBlueText },
+                  ]}
+                >
+                  <Shield size={8} color={THEME_COLORS.white} />
+                </View>
+              )}
             </View>
           </View>
         </View>
@@ -323,7 +321,7 @@ const styles = StyleSheet.create({
     minWidth: 18,
     height: SPACE.s18,
     borderRadius: RADIUS.md,
-    backgroundColor: THEME_COLORS.aliasHex_22c55e,
+    backgroundColor: THEME_COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: SPACE.md,
@@ -332,7 +330,7 @@ const styles = StyleSheet.create({
   },
   bellBadgeText: {
     color: THEME_COLORS.white,
-    fontSize: TYPE_SCALE.sm,
+    fontSize: 9,
     fontWeight: FONT_WEIGHT.black,
     lineHeight: LINE_HEIGHT.compact,
   },

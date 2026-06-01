@@ -36,12 +36,14 @@ import { resolveMediaUrl } from '../../lib/config';
 import { resolveActiveCharity } from '../../lib/activeCharity';
 import { useFeaturedCharity } from '../../hooks/queries/useFeaturedCharity';
 import { InteractiveCoverageMap } from './InteractiveCoverageMap';
+import { ListingHeroMedia } from '../shared/ListingHeroMedia';
 import { useCommunityMap } from '../../hooks/useCommunityMap';
 import { CommunityNotice } from '../../types';
 import { APP_SHELL_COLORS, THEME_COLORS } from '../../theme/colors';
 import { createShadow } from '../../theme/shadows';
 import RecordSaleModal from '../market/RecordSaleModal';
 import { OpenExchangeBadge } from '../shared/OpenExchangeBadge';
+import { useTopicChatGate } from '../chat/TopicChatGateProvider';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -197,54 +199,27 @@ export const HomePage: React.FC<HomePageProps> = ({
     charities,
     removePost,
     markPostSold,
-    startConversation,
-    setActiveConversation,
   } = useCommunity();
+  const { openTopicChat } = useTopicChatGate();
 
   const { userProfile } = useAuth();
 
   const handleOpenContextChat = useCallback(
-    async (post: CommunityNotice) => {
+    (post: CommunityNotice) => {
       if (!userProfile?.id || !post.authorId) return;
-
-      try {
-        const participantSet = new Set((members || []).map((m) => m.userId));
-        if (post.authorId) participantSet.add(post.authorId);
-        participantSet.add(userProfile?.id);
-        const participants =
-          post.type === 'listing'
-            ? Array.from(new Set([userProfile?.id, post.authorId]))
-            : Array.from(participantSet);
-
-        const conversationId = await startConversation({
-          participants,
-          type: post.type === 'listing' ? 'listing' : 'notice',
-          communityId: currentCommunity?.id,
-          listingId: post.type === 'listing' ? post.id : undefined,
-          noticeId: post.type === 'notice' ? post.id : undefined,
-          metadata: {
-            title: post.title,
-            image: post.postsImage || undefined,
-            price: post.type === 'listing' ? post.price?.toString() : undefined,
-            description: post.description,
-            author: post.authorName,
-            authorImage: post.authorImage,
-            authorId: post.authorId,
-            authorRole: post.authorRole,
-            location: post.locationName,
-            urgency: post.urgency,
-            urgencyLevel: post.urgencyLevel,
-          },
-        });
-
-        setActiveConversation(conversationId);
-        router.push(`/chat/${conversationId}` as any);
-      } catch (error) {
-        console.error('Failed to open contextual chat:', error);
-      }
+      openTopicChat({ post, communityId: currentCommunity?.id });
     },
-    [currentCommunity?.id, router, setActiveConversation, startConversation, userProfile?.id, members]
+    [currentCommunity?.id, openTopicChat, userProfile?.id]
   );
+
+  const handleNoticeCommunicationTap = (notice: CommunityNotice) => {
+    const level = resolvedUrgency(notice.urgencyLevel, notice.urgency);
+    if (level === 'warning') {
+      openEmergencyHub(notice);
+      return;
+    }
+    handleOpenContextChat(notice);
+  };
 
   // ─── local state ──────────────────────────────────────────────────────────
   const {
@@ -265,6 +240,16 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
   const [saleListing, setSaleListing] = useState<CommunityNotice | null>(null);
+  const [brokenNoticeAuthorImageKeys, setBrokenNoticeAuthorImageKeys] = useState<Record<string, true>>({});
+  const [brokenListingAuthorImageIds, setBrokenListingAuthorImageIds] = useState<Record<string, true>>({});
+
+  const markNoticeAuthorImageBroken = useCallback((noticeImageKey: string) => {
+    setBrokenNoticeAuthorImageKeys((prev) => (prev[noticeImageKey] ? prev : { ...prev, [noticeImageKey]: true }));
+  }, []);
+
+  const markListingAuthorImageBroken = useCallback((listingId: string) => {
+    setBrokenListingAuthorImageIds((prev) => (prev[listingId] ? prev : { ...prev, [listingId]: true }));
+  }, []);
 
   // Progress bar animation value
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -307,12 +292,10 @@ export const HomePage: React.FC<HomePageProps> = ({
     [posts]
   );
 
-  // Emergency/warning/caution notices fill the row; info & general are 2-up.
+  // Only emergency notices fill the row; warning/info/general can render 2-up.
   const isFullWidthNotice = (n: CommunityNotice) =>
     n.urgency === 'emergency' ||
-    n.urgencyLevel === 'emergency' ||
-    n.urgencyLevel === 'warning' ||
-    n.urgency === 'high';
+    n.urgencyLevel === 'emergency';
 
   const fullWidthNotices = useMemo(
     () => notices.filter(isFullWidthNotice),
@@ -391,6 +374,11 @@ export const HomePage: React.FC<HomePageProps> = ({
     typeof communityData.charity_description === 'string'
       ? communityData.charity_description
       : selectedCharity?.description;
+  const normalizedCharityDescription = charityDescription
+    ? charityDescription
+        .replace(/Community Assistance Tax baseline chartiy/gi, 'Community Assisted Tax')
+        .replace(/Community Assistance Tax baseline charity/gi, 'Community Assisted Tax')
+    : charityDescription;
   const charityImage =
     typeof communityData.charity_image === 'string'
       ? communityData.charity_image
@@ -531,32 +519,46 @@ export const HomePage: React.FC<HomePageProps> = ({
   // ─── render helpers ───────────────────────────────────────────────────────
 
   const renderNoticeCard = ({ item: notice }: { item: CommunityNotice }) => {
-    const isEmergencyOrWarning =
-      notice.urgency === 'emergency' ||
-      notice.urgencyLevel === 'emergency' ||
-      notice.urgencyLevel === 'warning' ||
-      notice.urgency === 'high';
+    const isEmergencyNotice =
+      notice.urgency === 'emergency' || notice.urgencyLevel === 'emergency';
 
     const borderColor = urgencyBorderColor(notice.urgencyLevel, notice.urgency);
     const bgColor = urgencyBgColor(notice.urgencyLevel, notice.urgency);
     const textColor = urgencyTextColor(notice.urgencyLevel, notice.urgency);
     const dist = calculateDistance(notice.latitude, notice.longitude);
+    const hasNoticeCoordinates = Boolean(notice.latitude && notice.longitude);
+    const noticeAuthorImageUri = resolveMediaUrl(notice.authorImage ?? null) ?? notice.authorImage ?? null;
+    const noticeImageKey = `${notice.id}:${noticeAuthorImageUri ?? ''}`;
+    const hasNoticeAuthorImage =
+      typeof noticeAuthorImageUri === 'string' &&
+      noticeAuthorImageUri.trim().length > 0 &&
+      !brokenNoticeAuthorImageKeys[noticeImageKey];
+
+    const focusNoticeOnMap = () => {
+      if (!hasNoticeCoordinates) return;
+      setMapFilterOverride('notices');
+      setMapCenter({
+        latitude: notice.latitude!,
+        longitude: notice.longitude!,
+      });
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    };
 
     return (
       <View
         key={notice.id}
         className={cn(
           'rounded-3xl border overflow-hidden mb-4',
-          !isEmergencyOrWarning && 'flex-1'
+          !isEmergencyNotice && 'flex-1'
         )}
         style={{
           borderColor,
           backgroundColor: bgColor,
-          ...(isEmergencyOrWarning ? HOME_SHADOW_HERO : HOME_SHADOW_DEFAULT),
+          ...(isEmergencyNotice ? HOME_SHADOW_HERO : HOME_SHADOW_DEFAULT),
         }}
       >
-        {/* Mini map for emergency/warning with location */}
-        {isEmergencyOrWarning && notice.latitude && notice.longitude && (
+        {/* Emergency notices keep the live situation map preview */}
+        {isEmergencyNotice && notice.latitude && notice.longitude && (
           <View className="w-full overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
             <InteractiveCoverageMap
               center={{ latitude: notice.latitude, longitude: notice.longitude }}
@@ -575,35 +577,29 @@ export const HomePage: React.FC<HomePageProps> = ({
             <View
               className="absolute top-2 right-2 px-2 py-0.5 rounded-full"
               style={{
-                backgroundColor:
-                  notice.urgency === 'emergency' ||
-                  notice.urgencyLevel === 'emergency'
-                    ? THEME_COLORS.error
-                    : THEME_COLORS.warningStrong,
+                backgroundColor: THEME_COLORS.error,
               }}
             >
               <Text className="text-white text-[8px] font-bold uppercase tracking-widest">
-                {notice.urgency === 'emergency' ||
-                notice.urgencyLevel === 'emergency'
-                  ? 'Live Situation'
-                  : 'Warning Zone'}
+                Live Situation
               </Text>
             </View>
           </View>
         )}
 
-        {/* Attached image (non-emergency) layout at top */}
-        {notice.postsImage && !isEmergencyOrWarning && (
-          <View className="w-full h-24 border-b overflow-hidden" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
-            <Image
-              source={{ uri: resolveMediaUrl(notice.postsImage) }}
-              className="w-full h-full"
-              resizeMode="cover"
+        {/* Warning/info/general notices use the standard notice hero media rules */}
+        {!isEmergencyNotice && (
+          <View className="w-full border-b overflow-hidden" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
+            <ListingHeroMedia
+              imageUrl={notice.postsImage}
+              latitude={notice.latitude}
+              longitude={notice.longitude}
+              imageHeight={96}
             />
           </View>
         )}
 
-        {isEmergencyOrWarning ? (
+        {isEmergencyNotice ? (
         <View className="p-5 flex-1">
           {/* Title and Context Menu Row */}
           <View className="flex-row items-start justify-between gap-3 mb-2">
@@ -676,26 +672,41 @@ export const HomePage: React.FC<HomePageProps> = ({
             </View>
           </View>
 
-            {/* Urgency badge */}
-            <View
-              className="self-start flex-row items-center gap-1.5 px-3 py-1 rounded-full border mb-3"
-              style={{ borderColor, backgroundColor: `${textColor}15` }}
-            >
-              <UrgencyIcon
-                level={notice.urgencyLevel}
-                urgency={notice.urgency}
-                size={10}
-              />
-              <Text
-                className="text-[9px] font-black uppercase tracking-widest"
-                style={{ color: textColor }}
+            {/* Urgency badge + distance */}
+            <View className="flex-row items-center justify-between gap-3 mb-3">
+              <View
+                className="self-start flex-row items-center gap-1.5 px-3 py-1 rounded-full border"
+                style={{ borderColor, backgroundColor: `${textColor}15` }}
               >
-                {notice.urgencyLevel || notice.urgency || 'Info'}
-              </Text>
+                <UrgencyIcon
+                  level={notice.urgencyLevel}
+                  urgency={notice.urgency}
+                  size={10}
+                />
+                <Text
+                  className="text-[9px] font-black uppercase tracking-widest"
+                  style={{ color: textColor }}
+                >
+                  {notice.urgencyLevel || notice.urgency || 'Info'}
+                </Text>
+              </View>
+
+              {!isEmergencyNotice && hasNoticeCoordinates ? (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="flex-row items-center gap-1.5 bg-surface-container-low px-2 py-1 rounded-md"
+                  onPress={focusNoticeOnMap}
+                >
+                  <MapPin size={10} color={THEME_COLORS.secondaryContainer} />
+                  <Text className="text-[10px] font-bold" style={{ color: THEME_COLORS.secondaryContainer }}>
+                    {dist ? `${dist}km` : 'Location'}
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
 
           {/* Location chip */}
-          {(notice.locationName || notice.latitude) && (
+          {isEmergencyNotice && (notice.locationName || notice.latitude) && (
             <TouchableOpacity
               activeOpacity={0.7}
               disabled={!notice.latitude || !notice.longitude}
@@ -731,11 +742,12 @@ export const HomePage: React.FC<HomePageProps> = ({
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
               <View className="w-9 h-9 rounded-full bg-surface-container overflow-hidden">
-                {notice.authorImage ? (
+                {hasNoticeAuthorImage ? (
                   <Image
-                    source={{ uri: notice.authorImage }}
+                    source={{ uri: noticeAuthorImageUri as string }}
                     className="w-full h-full"
                     resizeMode="cover"
+                    onError={() => markNoticeAuthorImageBroken(noticeImageKey)}
                   />
                 ) : (
                   <View className="w-full h-full items-center justify-center">
@@ -769,7 +781,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <TouchableOpacity
                 activeOpacity={0.7}
                 className="p-2 rounded-full bg-surface-container-low"
-                onPress={() => onOpenChat ? onOpenChat(notice) : handleOpenContextChat(notice)}
+                onPress={() => handleNoticeCommunicationTap(notice)}
               >
                 <MessageSquare size={16} color={THEME_COLORS.primary} />
               </TouchableOpacity>
@@ -846,51 +858,38 @@ export const HomePage: React.FC<HomePageProps> = ({
             </View>
           </View>
 
-          {/* Urgency badge (info / general) */}
-          <View
-            className="self-start flex-row items-center gap-1 px-2 py-0.5 rounded-full border"
-            style={{ borderColor, backgroundColor: `${textColor}15` }}
-          >
-            <UrgencyIcon
-              level={notice.urgencyLevel}
-              urgency={notice.urgency}
-              size={8}
-            />
-            <Text
-              className="text-[8px] font-black uppercase tracking-widest"
-              style={{ color: textColor }}
+          {/* Urgency badge (info / general) + distance */}
+          <View className="flex-row items-center justify-between gap-2">
+            <View
+              className="self-start flex-row items-center gap-1 px-2 py-0.5 rounded-full border"
+              style={{ borderColor, backgroundColor: `${textColor}15` }}
             >
-              {notice.urgencyLevel || notice.urgency || 'Info'}
-            </Text>
-          </View>
-
-          {/* Location chip */}
-          {(notice.locationName || notice.latitude) && (
-            <TouchableOpacity
-              activeOpacity={0.7}
-              disabled={!notice.latitude || !notice.longitude}
-              onPress={() => {
-                if (!notice.latitude || !notice.longitude) return;
-                setMapFilterOverride('notices');
-                setMapCenter({
-                  latitude: notice.latitude,
-                  longitude: notice.longitude,
-                });
-                scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-              }}
-              className="flex-row items-center gap-1 bg-surface-container-low self-start px-2 py-0.5 rounded-md"
-            >
-              <MapPin size={10} color={THEME_COLORS.primary} />
-              <Text className="text-[10px] font-bold text-primary" numberOfLines={1}>
-                {notice.locationName || 'Location Provided'}
+              <UrgencyIcon
+                level={notice.urgencyLevel}
+                urgency={notice.urgency}
+                size={8}
+              />
+              <Text
+                className="text-[8px] font-black uppercase tracking-widest"
+                style={{ color: textColor }}
+              >
+                {notice.urgencyLevel || notice.urgency || 'Info'}
               </Text>
-              {dist && (
-                <Text className="text-[10px] text-gray-400 ml-1">
-                  • {dist}km
+            </View>
+
+            {hasNoticeCoordinates ? (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                className="flex-row items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-md"
+                onPress={focusNoticeOnMap}
+              >
+                <MapPin size={10} color={THEME_COLORS.secondaryContainer} />
+                <Text className="text-[10px] font-bold" style={{ color: THEME_COLORS.secondaryContainer }}>
+                  {dist ? `${dist}km` : 'Location'}
                 </Text>
-              )}
-            </TouchableOpacity>
-          )}
+              </TouchableOpacity>
+            ) : null}
+          </View>
 
           {/* Description */}
           <Text className="text-xs text-gray-500 leading-snug" numberOfLines={2}>
@@ -900,11 +899,12 @@ export const HomePage: React.FC<HomePageProps> = ({
           {/* Footer: author + chat */}
           <View className="flex-row items-center gap-2 pt-1 mt-1 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
             <View className="w-6 h-6 rounded-full bg-surface-container overflow-hidden">
-              {notice.authorImage ? (
+                {hasNoticeAuthorImage ? (
                 <Image
-                  source={{ uri: notice.authorImage }}
+                    source={{ uri: noticeAuthorImageUri as string }}
                   className="w-full h-full"
                   resizeMode="cover"
+                    onError={() => markNoticeAuthorImageBroken(noticeImageKey)}
                 />
               ) : (
                 <View className="w-full h-full items-center justify-center">
@@ -923,9 +923,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             <TouchableOpacity
               activeOpacity={0.7}
               className="w-7 h-7 rounded-full bg-surface-container-low items-center justify-center"
-              onPress={() =>
-                onOpenChat ? onOpenChat(notice) : handleOpenContextChat(notice)
-              }
+              onPress={() => handleNoticeCommunicationTap(notice)}
             >
               <MessageSquare size={14} color={THEME_COLORS.primary} />
             </TouchableOpacity>
@@ -956,13 +954,16 @@ export const HomePage: React.FC<HomePageProps> = ({
       listing.price != null &&
       publicPrice > localPrice;
     const catPullLabel = linkedCharity?.name || 'CAT Pull';
-    const hasListingImage = typeof listing.postsImage === 'string' && listing.postsImage.trim().length > 0;
     const hasCoordinates = Boolean(listing.latitude && listing.longitude);
+    const hasAuthorImage =
+      typeof listing.authorImage === 'string' &&
+      listing.authorImage.trim().length > 0 &&
+      !brokenListingAuthorImageIds[listing.id];
 
     return (
       <TouchableOpacity
         activeOpacity={0.9}
-        onPress={() => router.push(`/market?listingId=${listing.id}`)}
+        onPress={() => handleOpenContextChat(listing)}
         key={listing.id}
         className="flex-1 mx-0.5 mb-3 bg-surface-container-low rounded-3xl border"
         style={{
@@ -972,15 +973,14 @@ export const HomePage: React.FC<HomePageProps> = ({
           overflow: 'visible',
         }}
       >
-        {hasListingImage ? (
-          <View className="w-full aspect-[4/3] bg-surface-container overflow-hidden rounded-t-3xl">
-            <Image
-              source={{ uri: resolveMediaUrl(listing.postsImage as string) }}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
-          </View>
-        ) : null}
+        <View className="w-full rounded-t-3xl overflow-hidden">
+          <ListingHeroMedia
+            imageUrl={listing.postsImage}
+            latitude={listing.latitude}
+            longitude={listing.longitude}
+            soldStateLabel={isSold ? 'Sold Out' : soldQuantity > 0 ? 'Partially Sold' : null}
+          />
+        </View>
 
         <View className="p-3 gap-1.5 flex-1">
           <View className="flex-row items-start justify-between gap-2">
@@ -1109,7 +1109,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     backgroundColor: THEME_COLORS.primaryTintSoft,
                     borderColor: THEME_COLORS.primary,
                   }}
-                  onPress={() => router.push(`/market?listingId=${listing.id}`)}
+                  onPress={() => handleOpenContextChat(listing)}
                 >
                   <Text className="text-[11px] font-bold" style={{ color: THEME_COLORS.primary }} numberOfLines={1}>
                     {catPullLabel}
@@ -1139,11 +1139,12 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           <View className="flex-row items-center gap-2 mt-auto pt-1">
             <View className="w-7 h-7 rounded-full bg-surface-container overflow-hidden border" style={{ borderColor: THEME_COLORS.neutralBorderSoft }}>
-              {listing.authorImage ? (
+              {hasAuthorImage ? (
                 <Image
-                  source={{ uri: listing.authorImage }}
+                  source={{ uri: listing.authorImage as string }}
                   className="w-full h-full"
                   resizeMode="cover"
+                  onError={() => markListingAuthorImageBroken(listing.id)}
                 />
               ) : (
                 <View className="w-full h-full items-center justify-center bg-surface-container">
@@ -1608,7 +1609,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     className="text-sm text-gray-500 leading-relaxed"
                     numberOfLines={3}
                   >
-                    {charityDescription ||
+                    {normalizedCharityDescription ||
                       'Supporting this month as a community-backed initiative.'}
                   </Text>
 

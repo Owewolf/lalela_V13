@@ -455,7 +455,7 @@ router.get('/:id/members', async (req, res) => {
   return res.json(members.map(({ user, ...m }) => ({
     ...m,
     name: m.name || user?.name || null,
-    image: m.image || user?.profileImage || null,
+    image: user?.profileImage ?? m.image ?? null,
     email: m.email || user?.email || null,
     latitude: user?.latitude ?? null,
     longitude: user?.longitude ?? null,
@@ -636,7 +636,15 @@ router.post('/join/:code', async (req, res) => {
 
   const joiner = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
-    select: { name: true, profileImage: true, email: true, licenseStatus: true, trialExpiresAt: true },
+    select: {
+      name: true,
+      profileImage: true,
+      email: true,
+      licenseStatus: true,
+      trialExpiresAt: true,
+      subscriptionActive: true,
+      subscriptionRenewalDate: true,
+    },
   });
 
   let memberTrialExpiresAt = joiner?.trialExpiresAt ?? null;
@@ -661,8 +669,20 @@ router.post('/join/:code', async (req, res) => {
   // Always update lastCommunityId so the client knows which community to show
   const userDataUpdate: Record<string, unknown> = { lastCommunityId: link.communityId };
 
-  // Grant the joining user a 1-year trial if they don't already have a license
-  if (!joiner?.licenseStatus || joiner.licenseStatus === 'NONE') {
+  // Grant a 1-year trial whenever the joiner does not currently have an
+  // active paid membership and no valid trial window.
+  const now = new Date();
+  const hasActivePaidMembership =
+    joiner?.licenseStatus === 'ACTIVE' &&
+    joiner.subscriptionActive === true &&
+    !!joiner.subscriptionRenewalDate &&
+    new Date(joiner.subscriptionRenewalDate) > now;
+  const hasValidTrial =
+    joiner?.licenseStatus === 'TRIAL' &&
+    !!joiner.trialExpiresAt &&
+    new Date(joiner.trialExpiresAt) > now;
+
+  if (!hasActivePaidMembership && !hasValidTrial) {
     memberTrialExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
     userDataUpdate.licenseStatus = 'TRIAL';
     userDataUpdate.trialExpiresAt = memberTrialExpiresAt;
@@ -801,6 +821,7 @@ router.get('/:id/posts', async (req, res) => {
 
       return {
         ...withInventoryFields,
+        postsImage: p.type === 'listing' ? (p.postsImage ?? p.imageUrl ?? null) : p.postsImage,
         timestamp: p.createdAt,
         authorName: p.authorName || author?.name || null,
         authorImage: p.authorImage || author?.profileImage || null,
@@ -895,7 +916,7 @@ router.post('/:id/posts', async (req, res) => {
       title: title.trim(),
       description,
       imageUrl: imageUrl ?? image_url ?? null,
-      postsImage: postsImage ?? null,
+      postsImage: type === 'listing' ? (postsImage ?? imageUrl ?? image_url ?? null) : (postsImage ?? null),
       urgency: urgency ?? 'LOW',
       urgencyLevel: urgencyLevel ?? null,
       latitude,
@@ -987,6 +1008,7 @@ router.post('/:id/posts', async (req, res) => {
 
   broadcastPostEvent('post:new', req.params.id, {
     ...post,
+    postsImage: post.type === 'listing' ? (post.postsImage ?? post.imageUrl ?? null) : post.postsImage,
     timestamp: post.createdAt,
     authorName: post.authorName,
     authorImage: post.authorImage,
@@ -996,6 +1018,7 @@ router.post('/:id/posts', async (req, res) => {
 
   return res.status(201).json({
     ...post,
+    postsImage: post.type === 'listing' ? (post.postsImage ?? post.imageUrl ?? null) : post.postsImage,
     timestamp: post.createdAt,
     authorName: post.authorName,
     authorImage: post.authorImage,
@@ -1040,6 +1063,9 @@ router.put('/:id/posts/:postId', async (req, res) => {
   }
   if ('communityPrice' in data && !('price' in data)) {
     data.price = data.communityPrice;
+  }
+  if (existingPost.type === 'listing' && !('postsImage' in data) && 'imageUrl' in data) {
+    data.postsImage = data.imageUrl;
   }
 
   if (existingPost.type === 'listing' && 'initialQuantity' in data) {
@@ -1113,6 +1139,7 @@ router.put('/:id/posts/:postId', async (req, res) => {
   const { author, ...rest } = post;
   broadcastPostEvent('post:updated', req.params.id, {
     ...rest,
+    postsImage: post.type === 'listing' ? (post.postsImage ?? post.imageUrl ?? null) : post.postsImage,
     timestamp: post.createdAt,
     authorName: post.authorName || author?.name || null,
     authorImage: post.authorImage || author?.profileImage || null,
@@ -1121,6 +1148,7 @@ router.put('/:id/posts/:postId', async (req, res) => {
   await broadcastFeaturedCharityUpdate(req.params.id);
   return res.json({
     ...rest,
+    postsImage: post.type === 'listing' ? (post.postsImage ?? post.imageUrl ?? null) : post.postsImage,
     timestamp: post.createdAt,
     authorName: post.authorName || author?.name || null,
     authorImage: post.authorImage || author?.profileImage || null,
@@ -1375,13 +1403,13 @@ router.put('/:id/location', async (req, res) => {
     await prisma.securityLocation.upsert({
       where: { communityId_userId: { communityId: req.params.id, userId: req.auth!.userId } },
       create: { communityId: req.params.id, userId: req.auth!.userId, latitude: parsedLatitude, longitude: parsedLongitude, name: user?.name, image: user?.profileImage },
-      update: { latitude: parsedLatitude, longitude: parsedLongitude, timestamp: new Date() },
+      update: { latitude: parsedLatitude, longitude: parsedLongitude, name: user?.name, image: user?.profileImage, timestamp: new Date() },
     });
   } else {
     await prisma.memberLocation.upsert({
       where: { communityId_userId: { communityId: req.params.id, userId: req.auth!.userId } },
       create: { communityId: req.params.id, userId: req.auth!.userId, latitude: parsedLatitude, longitude: parsedLongitude, name: user?.name, image: user?.profileImage, role: member?.role ?? 'Member' },
-      update: { latitude: parsedLatitude, longitude: parsedLongitude, timestamp: new Date() },
+      update: { latitude: parsedLatitude, longitude: parsedLongitude, name: user?.name, image: user?.profileImage, timestamp: new Date() },
     });
   }
 

@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     right: -SPACE.xs,
     width: SPACE.s16,
     height: SPACE.s16,
-    backgroundColor: THEME_COLORS.errorStrong,
+    backgroundColor: THEME_COLORS.primary,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',

@@ -12,6 +12,7 @@ import { User, CheckCircle2, Camera } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+import { uploadImage } from '../../lib/uploadImage';
 import EmergencyResponderCard from '../shared/EmergencyResponderCard';
 import { LocationSettings } from './LocationSettings';
 import { THEME_COLORS } from '../../theme/colors';
@@ -66,6 +67,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
     isLocationDirty;
 
   const handleImagePick = async () => {
+    if (!userProfile) {
+      Alert.alert('Sign in required', 'You need to be signed in to upload a profile image.');
+      return;
+    }
+
     const { status: perm } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (perm !== 'granted') {
       Alert.alert('Permission required', 'Please allow photo access to upload a profile image.');
@@ -81,7 +87,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ initialEdit = tr
       const uri = result.assets[0].uri;
       setIsUploading(true);
       try {
-        setFormData((prev) => ({ ...prev, profileImage: uri }));
+        const uploadedUrl = await uploadImage(uri, 'profiles', userProfile.id);
+        setFormData((prev) => ({ ...prev, profileImage: uploadedUrl }));
       } finally {
         setIsUploading(false);
       }

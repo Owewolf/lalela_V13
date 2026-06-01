@@ -2,7 +2,7 @@
   "expo": {
     "name": "lalela",
     "slug": "lalela",
-    "version": "1.70",
+    "version": "1.73",
     "scheme": "lalela",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,7 +19,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "70"
+      "buildNumber": "73"
     },
     "android": {
       "adaptiveIcon": {
@@ -51,7 +51,7 @@
           "apiKey": ""
         }
       },
-      "versionCode": 70
+      "versionCode": 73
     },
     "web": {
       "output": "single",

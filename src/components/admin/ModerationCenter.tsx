@@ -245,6 +245,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       charitySuggestions,
       removePost,
       updatePost,
+      updateUserBusiness,
       removeCommunityBusiness,
       updateCommunityCoverage,
       communityBusinesses,
@@ -296,7 +297,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       message: string;
     } | null>(null);
     const [contentFilter, setContentFilter] = useState<
-      'all' | 'notices' | 'listings' | 'businesses'
+      'all' | 'notices' | 'listings'
     >('all');
     const [themeDraft, setThemeDraft] = useState<ThemeDraft>({
       presetId: 'lalela-light',
@@ -519,27 +520,9 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         Alert.alert('Delete failed', 'This post cannot be deleted because its ID is missing.');
         return;
       }
+      const post = posts.find((p: any) => p.id === postId);
       try {
-        const post = posts.find((p: any) => p.id === postId);
         await removePost(postId);
-        if (currentCommunity?.id) {
-          await api.post(`/communities/${currentCommunity.id}/moderation-logs`, {
-            communityId: currentCommunity.id,
-            moderator_id: currentUserProfile?.id,
-            action: 'delete',
-            target_id: postId,
-            target_type: 'post',
-          });
-          queryClient.invalidateQueries({ queryKey: ['moderation-logs', currentCommunity.id] });
-          if (post?.authorId && post.authorId !== currentUserProfile?.id) {
-            await addNotification(post.authorId, {
-              title: 'Post Removed',
-              message: `Your post "${post.title}" has been removed by an admin.`,
-              type: 'system',
-              metadata: { action: 'post_deleted', postId, communityId: currentCommunity.id },
-            });
-          }
-        }
       } catch (e: any) {
         const status = e?.response?.status;
         const message =
@@ -552,6 +535,48 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             : 'Unable to delete post right now. Please try again.');
         Alert.alert('Delete failed', message);
         console.warn('Delete post request failed:', { status, postId });
+        return;
+      }
+
+      if (!currentCommunity?.id) {
+        return;
+      }
+
+      // Non-critical side effects should never report delete failure to users.
+      try {
+        await api.post(`/communities/${currentCommunity.id}/moderation-logs`, {
+          communityId: currentCommunity.id,
+          moderator_id: currentUserProfile?.id,
+          action: 'delete',
+          target_id: postId,
+          target_type: 'post',
+        });
+        queryClient.invalidateQueries({ queryKey: ['moderation-logs', currentCommunity.id] });
+      } catch (error: any) {
+        const status = error?.response?.status;
+        if (status !== 404) {
+          console.warn('Post deleted but moderation log failed:', {
+            status,
+            postId,
+          });
+        }
+      }
+
+      if (post?.authorId && post.authorId !== currentUserProfile?.id) {
+        try {
+          await addNotification(post.authorId, {
+            title: 'Post Removed',
+            message: `Your post "${post.title}" has been removed by an admin.`,
+            type: 'system',
+            metadata: { action: 'post_deleted', postId, communityId: currentCommunity.id },
+          });
+        } catch (error: any) {
+          console.warn('Post deleted but notification failed:', {
+            status: error?.response?.status,
+            postId,
+            authorId: post.authorId,
+          });
+        }
       }
     };
 
@@ -581,6 +606,16 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
           await removeCommunityBusiness(currentCommunity.id, business.id);
         }
       } catch (e) { console.error('Failed to remove business:', e); }
+    };
+
+    const handleToggleBusinessPin = async (business: any) => {
+      try {
+        const currentStatus = String(business?.status || '').toUpperCase();
+        const nextStatus = currentStatus === 'PINNED' ? 'ACTIVE' : 'PINNED';
+        await updateUserBusiness({ ...business, status: nextStatus } as any);
+      } catch (e) {
+        console.error('Failed to toggle business pin:', e);
+      }
     };
 
     const handleApprovePublicListing = async (post: any) => {
@@ -1536,13 +1571,11 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
       const isDeleted = (p: any) => String(p?.status || '').toUpperCase() === 'DELETED';
       const isSold = (p: any) => String(p?.status || '').toUpperCase() === 'SOLD';
       const activePosts = allPosts.filter((p: any) => !isDeleted(p));
-      const businesses = Array.isArray(currentCommunity?.businesses) ? currentCommunity.businesses : [];
 
       const filteredItems = (() => {
         switch (contentFilter) {
           case 'notices': return activePosts.filter((p: any) => p.type === 'notice');
           case 'listings': return activePosts.filter((p: any) => p.type === 'listing');
-          case 'businesses': return [];
           default: return activePosts;
         }
       })();
@@ -1554,7 +1587,6 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         { key: 'all' as const, label: 'All', count: activePosts.length },
         { key: 'notices' as const, label: 'Notices', count: activePosts.filter((p: any) => p.type === 'notice').length },
         { key: 'listings' as const, label: 'Listings', count: listingsAll.length, sublabel: listingsSold > 0 ? `${listingsSold} sold` : undefined },
-        { key: 'businesses' as const, label: 'Businesses', count: businesses.length },
       ];
 
       return (
@@ -1587,24 +1619,8 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             ))}
           </View>
 
-          {contentFilter === 'businesses' ? (
-            businesses.map((biz: any) => (
-              <View key={biz.id} style={styles.contentItem}>
-                <View style={[styles.contentIcon, { backgroundColor: THEME_COLORS.brandPurpleSurface }]}>
-                  <Store size={18} color={SECONDARY} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.contentTitle}>{biz.name}</Text>
-                  <Text style={styles.contentSub}>{biz.category} • Live in Marketplace</Text>
-                </View>
-                <View style={[styles.statusChip, { backgroundColor: THEME_COLORS.successSurface }]}>
-                  <Text style={[styles.statusChipText, { color: THEME_COLORS.primaryContainer }] }>
-                    Live
-                  </Text>
-                </View>
-              </View>
-            ))
-          ) : (
+          {
+            (
             filteredItems.map((notice: any, index: number) => {
               const rawStatus = String(notice?.status || '').toUpperCase();
               const isListing = notice?.type === 'listing';
@@ -1710,7 +1726,7 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             })
           )}
 
-          {filteredItems.length === 0 && contentFilter !== 'businesses' && (
+          {filteredItems.length === 0 && (
             <View style={styles.emptyState}>
               <FileText size={32} color={THEME_COLORS.neutralBorderStrong} />
               <Text style={styles.emptyStateText}>No content to display</Text>
@@ -1725,8 +1741,21 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
         return <BusinessImportTool onBack={() => setShowImportTool(false)} />;
       }
 
-      const userCommunityBizs = (communityBusinesses || []).filter(b => b.source !== 'IMPORT');
-      const importedBizs = (communityBusinesses || []).filter(b => b.source === 'IMPORT');
+      const businesses = (() => {
+        const fromBundle = Array.isArray(communityBusinesses) ? communityBusinesses : [];
+        const fromCommunity = Array.isArray(currentCommunity?.businesses) ? currentCommunity.businesses : [];
+        const merged = [...fromBundle, ...fromCommunity];
+        const seen = new Set<string>();
+        return merged.filter((biz: any) => {
+          const id = String(biz?.id || '');
+          if (!id || seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
+      })();
+
+      const userCommunityBizs = businesses.filter((b: any) => b.source !== 'IMPORT');
+      const importedBizs = businesses.filter((b: any) => b.source === 'IMPORT');
       const activeBizs = bizFilter === 'user' ? userCommunityBizs : importedBizs;
 
       const renderBizCard = (biz: any, idx: number) => (
@@ -1739,8 +1768,29 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             <Text style={styles.bizName}>{biz.name}</Text>
             <Text style={styles.bizCategory}>{biz.category}</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm, marginTop: SPACE.sm }}>
-              <View style={{ backgroundColor: THEME_COLORS.successSurfaceStrong, paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, borderRadius: RADIUS.chip }}>
-                <Text style={{ fontSize: TYPE_SCALE.sm, color: THEME_COLORS.successStrong, fontWeight: FONT_WEIGHT.bold }}>Live in Marketplace</Text>
+              <View
+                style={{
+                  backgroundColor:
+                    String(biz?.status || '').toUpperCase() === 'PINNED'
+                      ? THEME_COLORS.warningSurface
+                      : THEME_COLORS.successSurfaceStrong,
+                  paddingHorizontal: SPACE.md,
+                  paddingVertical: SPACE.xxs,
+                  borderRadius: RADIUS.chip,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: TYPE_SCALE.sm,
+                    color:
+                      String(biz?.status || '').toUpperCase() === 'PINNED'
+                        ? THEME_COLORS.warningText
+                        : THEME_COLORS.successStrong,
+                    fontWeight: FONT_WEIGHT.bold,
+                  }}
+                >
+                  {String(biz?.status || '').toUpperCase() === 'PINNED' ? 'Pinned' : 'Live in Marketplace'}
+                </Text>
               </View>
               <View style={{ backgroundColor: biz.source === 'IMPORT' ? THEME_COLORS.brandPurpleSurface : THEME_COLORS.infoSurfaceSoft, paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, borderRadius: RADIUS.chip }}>
                 <Text style={{ fontSize: TYPE_SCALE.sm, color: biz.source === 'IMPORT' ? THEME_COLORS.brandPurple : THEME_COLORS.brandBlueText, fontWeight: FONT_WEIGHT.bold }}>
@@ -1753,6 +1803,12 @@ export const ModerationCenter = forwardRef<ModerationCenterHandle, ModerationCen
             ) : null}
           </View>
           <View style={styles.bizActions}>
+            <TouchableOpacity style={styles.iconBtn} onPress={() => handleToggleBusinessPin(biz)}>
+              <Bookmark
+                size={18}
+                color={String(biz?.status || '').toUpperCase() === 'PINNED' ? PRIMARY : THEME_COLORS.neutralTextMuted}
+              />
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.removeBtn}
               onPress={() => setPendingRemoveBusiness(biz)}

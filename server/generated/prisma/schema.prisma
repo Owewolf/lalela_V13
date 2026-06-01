@@ -614,9 +614,11 @@ model CommunityInviteLink {
 model Conversation {
   id            String    @id @default(cuid())
   type          String    @default("direct")
+  pairKey       String?   @unique @map("pair_key")
   listingId     String?   @map("listing_id")
   noticeId      String?   @map("notice_id")
   communityId   String?   @map("community_id")
+  metadata      Json?
   lastMessage   String?   @map("last_message")
   lastMessageAt DateTime? @map("last_message_at")
   createdAt     DateTime  @default(now()) @map("created_at")
@@ -626,6 +628,7 @@ model Conversation {
   messages     Message[]
 
   @@index([communityId])
+  @@index([pairKey])
   @@map("conversations")
 }
 

@@ -159,8 +159,11 @@ export const ChatList: React.FC<ChatListProps> = ({ conversations, onSelect, act
             {formatRelativeTime(conv.lastMessageAt)}
           </Text>
           {unreadCount > 0 && (
-            <View className="bg-green-500 rounded-full h-5 min-w-[20px] px-1.5 items-center justify-center">
-              <Text className="text-[10px] text-white font-bold">{unreadCount}</Text>
+            <View
+              className="rounded-full h-5 min-w-[20px] px-1.5 items-center justify-center"
+              style={{ backgroundColor: THEME_COLORS.primary }}
+            >
+              <Text className="text-[9px] text-white font-bold">{unreadCount}</Text>
             </View>
           )}
         </View>

@@ -12,5 +12,17 @@ export function useConversationMessages(conversationId?: string | null) {
       return Array.isArray(data) ? data : [];
     },
     initialData: [],
+    staleTime: 30_000,
+  });
+}
+
+export async function prefetchConversationMessages(queryClient: import('@tanstack/react-query').QueryClient, conversationId: string) {
+  await queryClient.prefetchQuery({
+    queryKey: queryKeys.conversationMessages(conversationId),
+    queryFn: async () => {
+      const { data } = await api.get(`/conversations/${conversationId}/messages`);
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 30_000,
   });
 }

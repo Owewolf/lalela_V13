@@ -8,7 +8,6 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
-  TextInput,
   Image,
   StatusBar,
   Modal,
@@ -17,7 +16,6 @@ import {
 } from 'react-native';
 import {
   Plus,
-  Search,
   Tag,
   CheckCircle2,
   AlertTriangle,
@@ -42,6 +40,8 @@ import { getCardBorderColor, getCardShadow } from '../../theme/cardStyles';
 import { createShadow } from '../../theme/shadows';
 import RecordSaleModal from '../market/RecordSaleModal';
 import { OpenExchangeBadge } from '../shared/OpenExchangeBadge';
+import { ListingHeroMedia } from '../shared/ListingHeroMedia';
+import { useTopicChatGate } from '../chat/TopicChatGateProvider';
 
 const PRIMARY = THEME_COLORS.primary;
 const SPACE = {
@@ -155,17 +155,27 @@ function calculateDistance(lat?: number, lng?: number, baseLat?: number, baseLng
 
 export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   const router = useRouter();
-  const { posts, currentCommunity, removePost, charities, startConversation, setActiveConversation, members, markPostSold } = useCommunity();
+  const { posts, currentCommunity, removePost, charities, markPostSold } = useCommunity();
   const { userProfile } = useAuth();
+  const { openTopicChat } = useTopicChatGate();
   const [filter, setFilter] = useState<'all' | 'listing' | 'notice' | 'openExchange'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [mapPost, setMapPost] = useState<CommunityNotice | null>(null);
   const [highlightedNoticeId, setHighlightedNoticeId] = useState<string | null>(null);
+  const [brokenNoticeAuthorImageKeys, setBrokenNoticeAuthorImageKeys] = useState<Record<string, true>>({});
   const [markingSoldId, setMarkingSoldId] = useState<string | null>(null);
   const [saleListing, setSaleListing] = useState<CommunityNotice | null>(null);
+  const [brokenListingAuthorImageIds, setBrokenListingAuthorImageIds] = useState<Record<string, true>>({});
   const feedListRef = useRef<FlatList<FeedSection> | null>(null);
+
+  const markNoticeAuthorImageBroken = useCallback((noticeImageKey: string) => {
+    setBrokenNoticeAuthorImageKeys((prev) => (prev[noticeImageKey] ? prev : { ...prev, [noticeImageKey]: true }));
+  }, []);
+
+  const markListingAuthorImageBroken = useCallback((postId: string) => {
+    setBrokenListingAuthorImageIds((prev) => (prev[postId] ? prev : { ...prev, [postId]: true }));
+  }, []);
 
   const baseLat = currentCommunity?.coverageArea?.latitude;
   const baseLng = currentCommunity?.coverageArea?.longitude;
@@ -181,11 +191,6 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
 
   const listings = posts
     .filter(p => p.type === 'listing' && String(p.status || '').toUpperCase() !== 'SOLD')
-    .filter(
-      p =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase())
-    )
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   const openExchangeListings = listings.filter((post) => post.isOpenExchange);
@@ -279,62 +284,36 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
   );
 
   const handleOpenContextChat = useCallback(
-    async (post: CommunityNotice) => {
-      const isEmergencyNotice =
+    (post: CommunityNotice) => {
+      const isEmergencyOrWarningNotice =
         post.type === 'notice' &&
         (post.urgency === 'emergency' ||
           post.urgencyLevel === 'emergency' ||
+          post.urgency === 'high' ||
+          post.urgencyLevel === 'warning' ||
           post.priority === 'emergency');
 
-      if (isEmergencyNotice) {
+      if (isEmergencyOrWarningNotice) {
         router.push(`/emergency/${post.id}`);
         return;
       }
 
       if (!userProfile?.id || !post.authorId) return;
 
-      try {
-        const participantSet = new Set((members || []).map((m) => m.userId));
-        if (post.authorId) participantSet.add(post.authorId);
-        participantSet.add(userProfile?.id);
-        const participants =
-          post.type === 'listing'
-            ? Array.from(new Set([userProfile?.id, post.authorId]))
-            : Array.from(participantSet);
-
-        const conversationId = await startConversation({
-          participants,
-          type: post.type === 'listing' ? 'listing' : 'notice',
-          communityId: currentCommunity?.id,
-          listingId: post.type === 'listing' ? post.id : undefined,
-          noticeId: post.type === 'notice' ? post.id : undefined,
-          metadata: {
-            title: post.title,
-            type: post.type,
-            image: post.postsImage,
-            author: post.authorName,
-            authorImage: post.authorImage,
-            authorId: post.authorId,
-            authorRole: post.authorRole,
-            location: post.locationName,
-            urgency: post.urgency,
-            urgencyLevel: post.urgencyLevel,
-            description: post.description,
-            price: post.type === 'listing' && post.price !== undefined ? `R${(post.communityPrice || post.price).toLocaleString()}` : undefined,
-          },
-        });
-        setActiveConversation(conversationId);
-        router.push(`/chat/${conversationId}`);
-      } catch (error) {
-        console.error('Failed to open contextual chat:', error);
-      }
+      openTopicChat({ post, communityId: currentCommunity?.id });
     },
-    [currentCommunity?.id, router, setActiveConversation, startConversation, userProfile?.id, members]
+    [currentCommunity?.id, openTopicChat, router, userProfile?.id]
   );
 
   const renderNotice = useCallback(
     ({ item: notice }: { item: CommunityNotice }) => {
       const urgencyColors = getUrgencyColors(notice.urgencyLevel, notice.urgency);
+      const noticeAuthorImageUri = resolveMediaUrl(notice.authorImage ?? null) ?? notice.authorImage ?? null;
+      const noticeImageKey = `${notice.id}:${noticeAuthorImageUri ?? ''}`;
+      const hasNoticeAuthorImage =
+        typeof noticeAuthorImageUri === 'string' &&
+        noticeAuthorImageUri.trim().length > 0 &&
+        !brokenNoticeAuthorImageKeys[noticeImageKey];
       const borderColor = getPostBorderColor(notice);
       const isEmergency =
         notice.urgency === 'emergency' || notice.urgencyLevel === 'emergency';
@@ -401,13 +380,14 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             </TouchableOpacity>
           ) : null}
 
-          {/* Image (non-emergency) edge-to-edge layout at top */}
-          {notice.postsImage && !showMap ? (
-            <View className="w-full aspect-video border-b overflow-hidden" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
-              <Image
-                source={{ uri: resolveMediaUrl(notice.postsImage) }}
-                className="w-full h-full"
-                resizeMode="cover"
+          {/* Non-emergency notices use shared hero media rules (image first, map fallback) */}
+          {!showMap ? (
+            <View className="w-full border-b overflow-hidden" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
+              <ListingHeroMedia
+                imageUrl={notice.postsImage}
+                latitude={notice.latitude}
+                longitude={notice.longitude}
+                imageHeight={160}
               />
             </View>
           ) : null}
@@ -469,35 +449,36 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               </View>
             </View>
 
-            {/* Urgency badge */}
-            <View
-              className="self-start flex-row items-center gap-1.5 px-3 py-1 rounded-full border"
-              style={{
-                backgroundColor: urgencyColors.bg,
-                borderColor: urgencyColors.border,
-              }}
-            >
-              <UrgencyIcon level={notice.urgencyLevel} urgency={notice.urgency} size={9} />
-              <Text
-                className="text-[9px] font-black uppercase tracking-widest"
-                style={{ color: urgencyColors.text }}
+            {/* Urgency badge + distance */}
+            <View className="flex-row items-center justify-between gap-3">
+              <View
+                className="self-start flex-row items-center gap-1.5 px-3 py-1 rounded-full border"
+                style={{
+                  backgroundColor: urgencyColors.bg,
+                  borderColor: urgencyColors.border,
+                }}
               >
-                {getUrgencyLabel(notice.urgencyLevel, notice.urgency)}
-              </Text>
-            </View>
-
-            {/* Location tag */}
-            {notice.locationName || notice.latitude ? (
-              <View className="flex-row items-center gap-1.5 bg-orange-50 self-start px-2 py-1 rounded-md">
-                <MapPin size={12} color={THEME_COLORS.secondaryContainer} />
-                <Text className="text-[10px] font-bold text-orange-500">
-                  {notice.locationName || 'Location Provided'}
+                <UrgencyIcon level={notice.urgencyLevel} urgency={notice.urgency} size={9} />
+                <Text
+                  className="text-[9px] font-black uppercase tracking-widest"
+                  style={{ color: urgencyColors.text }}
+                >
+                  {getUrgencyLabel(notice.urgencyLevel, notice.urgency)}
                 </Text>
-                {dist ? (
-                  <Text className="text-[10px] text-gray-400 ml-1">• {dist}km away</Text>
-                ) : null}
               </View>
-            ) : null}
+
+              {dist ? (
+                <View className="flex-row items-center gap-1.5 bg-orange-50 px-2 py-1 rounded-md">
+                  <MapPin size={12} color={THEME_COLORS.secondaryContainer} />
+                  <Text
+                    className="text-[10px] font-bold"
+                    style={{ color: THEME_COLORS.secondaryContainer }}
+                  >
+                    {dist}km
+                  </Text>
+                </View>
+              ) : null}
+            </View>
 
             <Text className="text-gray-500 text-sm leading-relaxed" numberOfLines={2}>
               {notice.description}
@@ -507,15 +488,20 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             <View className="flex-row items-center justify-between pt-2 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
               <View className="flex-row items-center gap-3">
                 <View className="w-10 h-10 rounded-full bg-surface-container overflow-hidden border" style={SURFACE_BORDER_STYLE}>
-                  <Image
-                    source={{
-                      uri:
-                        notice.authorImage ||
-                        `https://picsum.photos/seed/${notice.authorId}/50/50`,
-                    }}
-                    className="w-full h-full"
-                    resizeMode="cover"
-                  />
+                  {hasNoticeAuthorImage ? (
+                    <Image
+                      source={{ uri: noticeAuthorImageUri as string }}
+                      className="w-full h-full"
+                      resizeMode="cover"
+                      onError={() => markNoticeAuthorImageBroken(noticeImageKey)}
+                    />
+                  ) : (
+                    <View className="w-full h-full items-center justify-center bg-surface-container">
+                      <Text className="text-[10px] font-bold" style={{ color: THEME_COLORS.neutralTextMuted }}>
+                        {(notice.authorName || 'C').trim().charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
                 </View>
                 <View>
                   <Text className="text-xs font-bold text-gray-800">{notice.authorName}</Text>
@@ -546,7 +532,16 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         </View>
       );
     },
-    [activeMenuId, userProfile?.id, currentCommunity?.userRole, baseLat, baseLng, highlightedNoticeId]
+    [
+      activeMenuId,
+      userProfile?.id,
+      currentCommunity?.userRole,
+      baseLat,
+      baseLng,
+      highlightedNoticeId,
+      brokenNoticeAuthorImageKeys,
+      markNoticeAuthorImageBroken,
+    ]
   );
 
   const renderListing = useCallback(
@@ -561,12 +556,15 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       const remainingQuantity = Math.max(0, Number(post.remainingQuantity ?? (initialQuantity - soldQuantity)));
       const perUnitCharityImpact = Math.max(0, Number(post.charityAmount ?? 0));
       const remainingPotentialCat = perUnitCharityImpact * remainingQuantity;
-      const hasListingImage = post.type === 'listing' && typeof post.postsImage === 'string' && post.postsImage.trim().length > 0;
       const saleActionLabel = remainingQuantity > 1 ? 'Record Sale' : 'Mark as Sold';
       const localPrice = Number(post.price ?? 0);
       const publicPrice = Number(post.publicPrice ?? localPrice);
       const formattedLocalPrice = localPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const formattedPublicPrice = publicPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const hasListingAuthorImage =
+        typeof post.authorImage === 'string' &&
+        post.authorImage.trim().length > 0 &&
+        !brokenListingAuthorImageIds[post.id];
 
       return (
         <View className="bg-surface-container-low rounded-[2.2rem] overflow-hidden border mb-6" style={{ ...POSTS_SHADOW_HERO, ...SURFACE_BORDER_STYLE }}>
@@ -595,52 +593,39 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                 </Text>
               </View>
             </View>
-          ) : hasListingImage ? (
-            <View className="w-full aspect-[4/3] overflow-hidden border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
-              <Image
-                source={{ uri: resolveMediaUrl(post.postsImage) }}
-                className="w-full h-full"
-                resizeMode="cover"
+          ) : post.type === 'listing' ? (
+            <View className="w-full border-b" style={{ borderBottomColor: THEME_COLORS.neutralBorderSoft }}>
+              <ListingHeroMedia
+                imageUrl={post.postsImage}
+                latitude={post.latitude}
+                longitude={post.longitude}
+                soldStateLabel={isSold ? 'Sold Out' : soldQuantity > 0 ? 'Partially Sold' : null}
               />
-              <View
-                className="absolute inset-0"
-                style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_15 }}
-                pointerEvents="none"
-              />
-              {isSold ? (
-                <View
-                  className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
-                  style={{ backgroundColor: THEME_COLORS.alias_rgba_0_0_0_0_75 }}
-                >
-                  <Text className="text-white text-[10px] font-black uppercase tracking-widest">Sold Out</Text>
-                </View>
-              ) : soldQuantity > 0 ? (
-                <View
-                  className="absolute top-4 right-4 px-4 py-1.5 rounded-full"
-                  style={{ backgroundColor: THEME_COLORS.warning }}
-                >
-                  <Text className="text-white text-[10px] font-black uppercase tracking-widest">Partially Sold</Text>
-                </View>
-              ) : null}
             </View>
           ) : null}
 
-          <View className="p-6 gap-6">
+          <View className="p-4 gap-6">
             {/* Title + menu */}
             <View className="flex-row justify-between items-start gap-3">
               <View className="flex-1">
                 <View className="flex-row items-center gap-2 mb-3 flex-wrap">
                   {post.isCommunityPick ? (
-                    <View className="bg-orange-500 px-3 py-1 rounded-full flex-row items-center gap-1">
-                      <View className="w-1.5 h-1.5 bg-surface-container-low rounded-full" />
-                      <Text className="text-white text-[10px] font-bold uppercase tracking-widest">
+                    <View
+                      className="px-3 py-1 rounded-full flex-row items-center gap-1"
+                      style={{ backgroundColor: THEME_COLORS.primary }}
+                    >
+                      <View className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: THEME_COLORS.surfaceContainerLow }} />
+                      <Text
+                        className="text-[10px] font-bold uppercase tracking-widest"
+                        style={{ color: THEME_COLORS.white }}
+                      >
                         Pick
                       </Text>
                     </View>
                   ) : null}
                 </View>
                 <View className="flex-row items-start justify-between gap-3">
-                  <Text className="text-[30px] font-black text-primary leading-tight flex-1" numberOfLines={2}>
+                  <Text className="text-[28px] font-black text-primary leading-tight flex-1" numberOfLines={2}>
                     {post.title}
                   </Text>
                   {isSold ? (
@@ -690,7 +675,9 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         activeOpacity={0.8}
                       >
                         <AlertTriangle size={16} color={THEME_COLORS.errorStrong} />
-                        <Text className="text-red-600 text-sm font-bold">Delete Listing</Text>
+                        <Text className="text-sm font-bold" style={{ color: THEME_COLORS.errorStrong }}>
+                          Delete Listing
+                        </Text>
                       </TouchableOpacity>
                     )}
                     {isOwner && !isSold && (
@@ -704,7 +691,7 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         disabled={isMarkingSold}
                       >
                         <CheckCircle2 size={16} color={THEME_COLORS.successStrongAlt} />
-                        <Text className="text-green-600 text-sm font-bold">
+                        <Text className="text-sm font-bold" style={{ color: THEME_COLORS.successStrongAlt }}>
                           {isMarkingSold ? 'Saving...' : saleActionLabel}
                         </Text>
                       </TouchableOpacity>
@@ -719,7 +706,9 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
                         activeOpacity={0.8}
                       >
                         <Share2 size={16} color={THEME_COLORS.neutralTextSubtle} />
-                        <Text className="text-gray-500 text-sm font-bold">Share</Text>
+                        <Text className="text-sm font-bold" style={{ color: THEME_COLORS.neutralTextMuted }}>
+                          Share
+                        </Text>
                       </TouchableOpacity>
                     )}
                   </View>
@@ -727,66 +716,65 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
               </View>
             </View>
 
-            <Text className="text-gray-500 font-medium text-[12px] leading-relaxed -mt-2">
+            <Text
+              className="font-medium text-[12px] leading-relaxed -mt-2"
+              style={{ color: THEME_COLORS.neutralTextMuted }}
+            >
               {post.description}
             </Text>
 
             {/* Price block */}
             {post.type === 'listing' && post.price !== undefined ? (
-              <View className="bg-surface-container p-5 rounded-2xl border gap-5" style={{ ...POSTS_SHADOW_SOFT, ...SURFACE_BORDER_STYLE }}>
-                <View className="items-center">
-                  <Text className="text-primary text-[30px] font-black leading-none text-center">
-                    R{formattedLocalPrice}
-                  </Text>
-                </View>
-
-                {post.charityId && perUnitCharityImpact > 0 ? (
-                  <View className="bg-surface-container-low px-4 py-3 rounded-2xl border gap-2" style={SURFACE_BORDER_STYLE}>
-                    <Text className="text-[13px] font-black text-primary text-center">
-                      CAT Potential: R{remainingPotentialCat.toFixed(2)}
+              <View className="bg-surface-container p-4 rounded-2xl border gap-3" style={{ ...POSTS_SHADOW_SOFT, ...SURFACE_BORDER_STYLE }}>
+                <View className="flex-row items-start justify-between gap-4">
+                  <View className="flex-1">
+                    <Text className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: THEME_COLORS.neutralTextSoft }}>
+                      Local Price
                     </Text>
-                    {(post.isOpenExchange || initialQuantity > 1) ? (
-                      <View className="flex-row items-center justify-center gap-3">
-                        {post.isOpenExchange ? <OpenExchangeBadge /> : null}
-                        {initialQuantity > 1 && remainingQuantity > 0 ? (
-                          <Text className="text-[12px] font-black text-primary text-center">
-                            Qty: {remainingQuantity}
-                          </Text>
-                        ) : null}
-                      </View>
-                    ) : null}
+                    <Text className="text-primary text-[30px] font-black leading-none">
+                      R{formattedLocalPrice}
+                    </Text>
                   </View>
-                ) : null}
-
-                <View className="items-center">
-                  <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                    Public Price
-                  </Text>
-                  <Text className="text-gray-500 font-black text-[30px] leading-none text-center">
-                    R{formattedPublicPrice}
-                  </Text>
+                  <View className="items-end flex-1">
+                    <Text className="text-[10px] font-black uppercase tracking-widest" style={{ color: THEME_COLORS.neutralTextSoft }}>
+                      Public Price
+                    </Text>
+                    <Text className="text-[22px] font-black leading-none text-right" style={{ color: THEME_COLORS.neutralTextMuted }}>
+                      R{formattedPublicPrice}
+                    </Text>
+                  </View>
                 </View>
 
-                {initialQuantity > 1 && !(post.charityId && perUnitCharityImpact > 0) ? (
-                  <View className="bg-surface-container-low px-4 py-3 rounded-2xl border" style={SURFACE_BORDER_STYLE}>
-                    <View className="flex-row items-center justify-between">
-                      <Text className="text-[12px] font-bold text-gray-500">
-                        Initial: {initialQuantity} {post.quantityType || 'items'}
-                      </Text>
-                      <Text className="text-[12px] font-black text-primary">
-                        {initialQuantity > 1 ? 'Qty' : 'Left'}: {remainingQuantity}
-                      </Text>
-                    </View>
+                <View className="flex-row items-end justify-between gap-3">
+                  <Text className="text-[12px] font-bold" style={{ color: THEME_COLORS.neutralTextMuted }}>
+                    Qty {remainingQuantity}
+                  </Text>
+                  <View className="items-end">
+                    <Text className="text-[10px] font-black uppercase tracking-widest" style={{ color: THEME_COLORS.neutralTextSoft }}>
+                      CAT Potential
+                    </Text>
+                    <Text className="text-[24px] font-black leading-none text-right" style={{ color: THEME_COLORS.primary }}>
+                      R{remainingPotentialCat.toFixed(2)}
+                    </Text>
+                    <Text className="text-[12px] font-bold text-right mt-1" style={{ color: THEME_COLORS.neutralTextMuted }}>
+                      {post.isOpenExchange ? 'Open Exchange' : post.quantityType || 'items'}
+                    </Text>
                   </View>
-                ) : null}
+                </View>
               </View>
             ) : null}
 
             {/* Location */}
             {post.locationName ? (
-              <View className="flex-row items-center gap-2 bg-orange-50 self-start px-4 py-2 rounded-full border border-orange-100">
+              <View
+                className="flex-row items-center gap-2 self-start px-4 py-2 rounded-full border"
+                style={{
+                  backgroundColor: THEME_COLORS.primaryTintSoft,
+                  borderColor: THEME_COLORS.alias_rgba_13_61_71_0_12,
+                }}
+              >
                 <MapPin size={14} color={THEME_COLORS.secondaryContainer} />
-                <Text className="text-[11px] font-extrabold text-orange-500" numberOfLines={1}>
+                <Text className="text-[11px] font-extrabold" style={{ color: THEME_COLORS.primary }} numberOfLines={1}>
                   {post.locationName}
                 </Text>
               </View>
@@ -796,21 +784,29 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             <View className="flex-row items-center justify-between pt-4 border-t" style={{ borderTopColor: THEME_COLORS.neutralBorderSoft }}>
               <View className="flex-row items-center gap-3">
                 <View className="w-10 h-10 rounded-full bg-surface-container overflow-hidden border" style={SURFACE_BORDER_STYLE}>
-                  <Image
-                    source={{
-                      uri:
-                        post.authorImage ||
-                        `https://picsum.photos/seed/${post.authorId}/100/100`,
-                    }}
-                    className="w-full h-full"
-                    resizeMode="cover"
-                  />
+                  {hasListingAuthorImage ? (
+                    <Image
+                      source={{ uri: post.authorImage as string }}
+                      className="w-full h-full"
+                      resizeMode="cover"
+                      onError={() => markListingAuthorImageBroken(post.id)}
+                    />
+                  ) : (
+                    <View className="w-full h-full items-center justify-center bg-surface-container">
+                      <Text className="text-[10px] font-bold" style={{ color: THEME_COLORS.neutralTextMuted }}>
+                        {(post.authorName || 'C').trim().charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
                 </View>
                 <View>
                   <Text className="text-sm font-bold text-primary">{post.authorName}</Text>
                   <View className="flex-row items-center gap-1.5">
                     <Clock size={12} color={THEME_COLORS.neutralTextSoft} />
-                    <Text className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                    <Text
+                      className="text-[10px] font-semibold uppercase tracking-wider"
+                      style={{ color: THEME_COLORS.neutralTextSoft }}
+                    >
                       {new Date(post.timestamp).toLocaleDateString()}
                     </Text>
                   </View>
@@ -837,6 +833,8 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
       handleOpenContextChat,
       handleMarkListingSold,
       handleShareListing,
+      brokenListingAuthorImageIds,
+      markListingAuthorImageBroken,
       markingSoldId,
       router,
     ]
@@ -955,14 +953,9 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
             </Text>
             <Text className="text-sm text-gray-400 text-center max-w-[240px]">
               {filter === 'openExchange'
-                ? 'Try another search or switch back to all listings to browse the full feed.'
-                : 'Try adjusting your search query to find what you\'re looking for.'}
+                ? 'Try switching back to all listings to browse the full feed.'
+                : 'Try switching tabs to browse more posts.'}
             </Text>
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-                <Text className="text-orange-500 font-bold text-sm">Clear search</Text>
-              </TouchableOpacity>
-            )}
           </View>
         );
       default:
@@ -979,23 +972,6 @@ export default function PostsPage({ initialNoticeId }: PostsPageProps) {
         className="border-b px-6 py-4 gap-4"
         style={{ backgroundColor: APP_SHELL_COLORS.body, borderBottomColor: THEME_COLORS.neutralBorderSoft }}
       >
-        {/* Search */}
-        <View className="flex-row items-center bg-surface-container rounded-2xl px-4 py-3 gap-3" style={POSTS_SHADOW_SOFT}>
-          <Search size={16} color={THEME_COLORS.neutralTextSoft} />
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search community listings..."
-            placeholderTextColor={THEME_COLORS.neutralTextSoft}
-            className="flex-1 text-sm font-medium text-gray-800"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-              <X size={16} color={THEME_COLORS.neutralTextSoft} />
-            </TouchableOpacity>
-          )}
-        </View>
-
         {/* Filter chips */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="gap-2">
           {filterTabs.map(tab => (

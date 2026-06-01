@@ -102,9 +102,16 @@ export interface Message {
   userId: string;
   content: string;
   messageType: 'text' | 'image' | 'file' | 'system';
+  metadataLabel?: string;
   isListingIntro?: boolean;
   attachmentUrl?: string;
   fileName?: string;
+  snapshotContext?: {
+    sourcePostId?: string;
+    type?: 'listing' | 'notice';
+    locationName?: string;
+    category?: string;
+  };
   createdAt: string;
   readBy: string[];
   status: 'sent' | 'delivered' | 'read';
@@ -127,21 +134,42 @@ export interface Conversation {
   priority: 'normal' | 'high';
   /** Unread message count for the current viewer (server-derived from ConversationParticipant.unreadCount). */
   unreadCount: number;
-  metadata?: {
-    type?: 'listing' | 'notice' | 'emergency';
-    title?: string;
-    image?: string;
-    price?: string;
-    author?: string;
-    authorImage?: string;
-    location?: string;
-    description?: string;
-    urgency?: string;
-    urgencyLevel?: string;
-    [key: string]: any;
-  };
+  metadata?: ConversationMetadata;
   // UI helper fields
   otherParticipant?: UserProfile;
+}
+
+export interface ConversationMetadataCharity {
+  supported_short?: string;
+  contribution_per_item?: number;
+}
+
+export interface ConversationMetadata {
+  type?: 'listing' | 'notice' | 'emergency' | 'direct' | 'community' | 'security';
+  title?: string;
+  image?: string;
+  price?: string;
+  author?: string;
+  authorImage?: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
+  description?: string;
+  urgency?: string;
+  urgencyLevel?: string;
+  isOpenExchange?: boolean;
+  exchangePreference?: string;
+  listing_id?: string;
+  notice_id?: string;
+  listing_title?: string;
+  notice_title?: string;
+  thumbnail_url?: string;
+  community_price?: number;
+  public_price?: number;
+  currency_symbol?: string;
+  charity_price?: number;
+  charity?: ConversationMetadataCharity;
+  [key: string]: any;
 }
 
 export interface ChatMessage {
@@ -197,38 +225,46 @@ export interface UserProfile {
   profileImage?: string;
   agreedToTerms?: boolean;
   marketingConsent?: boolean;
-  // Aligned with `Pricing Licensing Model.md`. Legacy 'LICENSED' has been
-  // retired in favour of 'ACTIVE' (paid R99/year subscription).
-  licenseStatus: 'UNLICENSED' | 'TRIAL' | 'EXPIRED' | 'ACTIVE';
-  status: 'ACTIVE' | 'READ-ONLY';
-  twoFactorEnabled?: boolean;
-  twoFactorMethod?: 'SMS' | 'App';
-  loginAlertsEnabled?: boolean;
-  lastPasswordChanged?: any;
-  securityScore?: 'Low' | 'Medium' | 'High';
-  accessType?: 'Trial' | '1-Year Member' | 'Lifetime Access';
-  expiryDate?: any;
-  createdAt?: any;
+  onboardingCommunityCreated?: boolean;
+  onboardingCompleted?: boolean;
+  communityCreationDeniedReason?: string;
+  profileCompleted?: boolean;
+  role?: UserRole;
   locationSharing?: boolean;
-  isSecurityMember?: boolean;
-  emergencyLocationOptIn?: boolean;
-  liveLocation?: {
-    latitude: number;
-    longitude: number;
-    timestamp: string;
-  };
+  locationSharingEnabled?: boolean;
   defaultLocation?: {
     name: string;
     latitude: number;
     longitude: number;
   };
+  liveLocation?: {
+    latitude: number;
+    longitude: number;
+    timestamp?: string;
+  };
+  badge?: string;
+  rating?: number;
+  joinedDate?: string;
+  totalListings?: number;
+  activeListings?: number;
+  businessName?: string;
+  businessCategory?: string;
+  referralCode?: string;
+  referredBy?: string;
+  referralCount?: number;
   lastCommunityId?: string;
-  // Onboarding state flags
-  profileCompleted?: boolean;
-  onboardingCompleted?: boolean;
-  communityCreated?: boolean;
-  memberExpiryDate?: any;
-  licenseType?: 'SELF' | 'COMMUNITY_GRANTED';
+  trialStartDate?: string;
+  trialEndDate?: string;
+  licenseStatus?: 'TRIAL' | 'ACTIVE' | 'EXPIRED';
+  twoFactorEnabled?: boolean;
+  twoFactorMethod?: string;
+  loginAlertsEnabled?: boolean;
+  lastPasswordChanged?: string;
+  bio?: string;
+  language?: string;
+  timezone?: string;
+  subscriptionPlan?: string;
+  availableForExchange?: boolean;
   fcmToken?: string;
   notificationPreferences?: any;
   // Trial & subscription dates
@@ -601,7 +637,7 @@ export interface CommunityContextType {
     listingId?: string;
     noticeId?: string;
     emergencyId?: string;
-    metadata?: any;
+    metadata?: ConversationMetadata;
   }) => Promise<string>;
   markAsRead: (conversationId: string) => Promise<void>;
   isTyping: boolean;

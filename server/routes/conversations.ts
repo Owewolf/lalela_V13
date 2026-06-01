@@ -6,11 +6,32 @@ const router = Router();
 
 router.use(requireAuth);
 
+const buildPairKey = (leftUserId: string, rightUserId: string): string => {
+  return [leftUserId, rightUserId].sort().join(':');
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null;
+};
+
 // ─── List conversations ───────────────────────────────────────────────────────
 
 router.get('/', async (req, res) => {
+  const parsedLimit = Number(req.query.limit ?? 50);
+  const safeLimit = Number.isFinite(parsedLimit)
+    ? Math.max(1, Math.min(100, Math.trunc(parsedLimit)))
+    : 50;
+  const beforeRaw = typeof req.query.before === 'string' ? req.query.before : null;
+  const beforeDate = beforeRaw ? new Date(beforeRaw) : null;
+  const hasValidBeforeDate = Boolean(beforeDate && !Number.isNaN(beforeDate.getTime()));
+
   const participations = await prisma.conversationParticipant.findMany({
-    where: { userId: req.auth!.userId },
+    where: {
+      userId: req.auth!.userId,
+      ...(hasValidBeforeDate
+        ? { conversation: { lastMessageAt: { lt: beforeDate! } } }
+        : {}),
+    },
     include: {
       conversation: {
         include: {
@@ -21,6 +42,7 @@ router.get('/', async (req, res) => {
       },
     },
     orderBy: { conversation: { lastMessageAt: 'desc' } },
+    take: safeLimit,
   });
 
   return res.json(
@@ -34,43 +56,119 @@ router.get('/', async (req, res) => {
 // ─── Get or create direct conversation ───────────────────────────────────────
 
 router.post('/direct', async (req, res) => {
-  const { otherUserId } = req.body as { otherUserId?: string };
+  const { otherUserId, communityId, listingId, noticeId, metadata, contextType } = req.body as {
+    otherUserId?: string;
+    communityId?: string;
+    listingId?: string;
+    noticeId?: string;
+    metadata?: Record<string, unknown>;
+    contextType?: 'listing' | 'notice' | 'direct';
+  };
   if (!otherUserId) return res.status(400).json({ error: 'otherUserId is required' });
 
   const me = req.auth!.userId;
+  if (me === otherUserId) return res.status(400).json({ error: 'Cannot start a direct conversation with yourself' });
 
-  // Check if direct conversation already exists between these two users
-  const existing = await prisma.conversation.findFirst({
-    where: {
-      type: 'direct',
-      participants: { every: { userId: { in: [me, otherUserId] } } },
-    },
-    include: { participants: { include: { user: { select: { id: true, name: true, profileImage: true } } } } },
-  });
+  const pairKey = buildPairKey(me, otherUserId);
+  const resolvedContextType = contextType === 'listing' || contextType === 'notice' ? contextType : 'direct';
+  const metadataPatch = isRecord(metadata) ? metadata : {};
+  const mergedMetadata = {
+    ...metadataPatch,
+    type: resolvedContextType,
+  };
+  const shouldPatchContext = Boolean(
+    listingId ||
+    noticeId ||
+    communityId ||
+    Object.keys(metadataPatch).length > 0 ||
+    contextType,
+  );
 
-  if (existing) return res.json(existing);
+  const includeParticipants = { participants: { include: { user: { select: { id: true, name: true, profileImage: true } } } } } as const;
 
-  const conversation = await prisma.conversation.create({
-    data: {
-      type: 'direct',
-      participants: {
-        create: [
-          { userId: me },
-          { userId: otherUserId },
-        ],
-      },
-    },
-    include: { participants: { include: { user: { select: { id: true, name: true, profileImage: true } } } } },
-  });
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const existing = await tx.conversation.findFirst({
+        where: {
+          type: 'direct',
+          pairKey,
+        },
+        include: includeParticipants,
+      });
 
-  return res.status(201).json(conversation);
+      let conversation = existing;
+      let wasCreated = false;
+
+      if (conversation) {
+        if (shouldPatchContext) {
+          conversation = await tx.conversation.update({
+            where: { id: conversation.id },
+            data: {
+              communityId: communityId ?? conversation.communityId,
+              listingId: resolvedContextType === 'listing'
+                ? (listingId ?? conversation.listingId)
+                : null,
+              noticeId: resolvedContextType === 'notice'
+                ? (noticeId ?? conversation.noticeId)
+                : null,
+              metadata: mergedMetadata,
+            },
+            include: includeParticipants,
+          });
+        }
+      } else {
+        wasCreated = true;
+        conversation = await tx.conversation.create({
+          data: {
+            type: 'direct',
+            pairKey,
+            communityId,
+            listingId,
+            noticeId,
+            metadata: mergedMetadata,
+            participants: {
+              create: [
+                { userId: me },
+                { userId: otherUserId },
+              ],
+            },
+          },
+          include: includeParticipants,
+        });
+      }
+
+      return {
+        conversation,
+        wasCreated,
+      };
+    });
+
+    const statusCode = result.wasCreated ? 201 : 200;
+    return res.status(statusCode).json({
+      ...result.conversation,
+    });
+  } catch (error: any) {
+    if (error?.code !== 'P2002') throw error;
+
+    const existing = await prisma.conversation.findFirst({
+      where: { type: 'direct', pairKey },
+      include: includeParticipants,
+    });
+    if (!existing) throw error;
+    return res.json(existing);
+  }
 });
 
 // ─── Create conversation ──────────────────────────────────────────────────────
 
 router.post('/', async (req, res) => {
-  const { type, participantIds, listingId, noticeId, communityId } = req.body as {
-    type: string; participantIds: string[]; listingId?: string; noticeId?: string; communityId?: string;
+  const { type, participantIds, listingId, noticeId, communityId, metadata } = req.body as {
+    type: string;
+    participantIds: string[];
+    listingId?: string;
+    noticeId?: string;
+    communityId?: string;
+    metadata?: Record<string, unknown>;
   };
 
   const allParticipants = [...new Set([req.auth!.userId, ...(participantIds ?? [])])];
@@ -81,6 +179,7 @@ router.post('/', async (req, res) => {
       listingId,
       noticeId,
       communityId,
+      metadata,
       participants: { create: allParticipants.map((uid) => ({ userId: uid })) },
     },
     include: { participants: { include: { user: { select: { id: true, name: true, profileImage: true } } } } },
@@ -109,32 +208,49 @@ router.get('/:id/messages', async (req, res) => {
 
 router.post('/:id/messages', async (req, res) => {
   const { content, type, attachmentUrl } = req.body as { content?: string; type?: string; attachmentUrl?: string };
+  const conversationId = req.params.id;
+  const requestedType = (type ?? 'text').trim() || 'text';
+  const userId = req.auth!.userId;
 
-  const message = await prisma.message.create({
-    data: {
-      conversationId: req.params.id,
-      userId: req.auth!.userId,
-      content,
-      messageType: type as never ?? 'text',
-      attachmentUrl,
-      readBy: [req.auth!.userId],
-    },
-    include: { user: { select: { id: true, name: true, profileImage: true } } },
+  const result = await prisma.$transaction(async (tx) => {
+    const conversation = await tx.conversation.findFirst({
+      where: {
+        id: conversationId,
+        participants: { some: { userId } },
+      },
+      select: { id: true },
+    });
+
+    if (!conversation) return null;
+
+    const message = await tx.message.create({
+      data: {
+        conversationId,
+        userId,
+        content,
+        messageType: requestedType as never,
+        attachmentUrl,
+        readBy: [userId],
+      },
+      include: { user: { select: { id: true, name: true, profileImage: true } } },
+    });
+
+    await tx.conversation.update({
+      where: { id: conversationId },
+      data: { lastMessage: content ?? requestedType, lastMessageAt: message.createdAt },
+    });
+
+    await tx.conversationParticipant.updateMany({
+      where: { conversationId, userId: { not: userId } },
+      data: { unreadCount: { increment: 1 } },
+    });
+
+    return { message };
   });
 
-  // Update conversation last_message
-  await prisma.conversation.update({
-    where: { id: req.params.id },
-    data: { lastMessage: content ?? (type ?? 'attachment'), lastMessageAt: message.createdAt },
-  });
+  if (!result) return res.status(404).json({ error: 'Conversation not found' });
 
-  // Increment unread count for all other participants
-  await prisma.conversationParticipant.updateMany({
-    where: { conversationId: req.params.id, userId: { not: req.auth!.userId } },
-    data: { unreadCount: { increment: 1 } },
-  });
-
-  return res.status(201).json(message);
+  return res.status(201).json(result.message);
 });
 
 // ─── Mark conversation as read ────────────────────────────────────────────────

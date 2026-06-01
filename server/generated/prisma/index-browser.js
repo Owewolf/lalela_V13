@@ -512,9 +512,11 @@ exports.Prisma.CommunityInviteLinkScalarFieldEnum = {
 exports.Prisma.ConversationScalarFieldEnum = {
   id: 'id',
   type: 'type',
+  pairKey: 'pairKey',
   listingId: 'listingId',
   noticeId: 'noticeId',
   communityId: 'communityId',
+  metadata: 'metadata',
   lastMessage: 'lastMessage',
   lastMessageAt: 'lastMessageAt',
   createdAt: 'createdAt',

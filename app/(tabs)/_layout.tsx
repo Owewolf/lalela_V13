@@ -70,8 +70,11 @@ function ChatTabIcon({ color, focused }: { color: string; focused: boolean }) {
     <View>
       <MessageCircle size={24} color={color} />
       {unread > 0 && (
-        <View className="absolute -top-1 -right-1 bg-green-500 rounded-full min-w-[16px] h-4 items-center justify-center px-1">
-          <Text className="text-white text-[10px] font-bold">{unread > 99 ? '99+' : unread}</Text>
+        <View
+          className="absolute -top-1 -right-1 rounded-full min-w-[16px] h-4 items-center justify-center px-1"
+          style={{ backgroundColor: THEME_COLORS.primary }}
+        >
+          <Text className="text-white text-[9px] font-bold">{unread > 99 ? '99+' : unread}</Text>
         </View>
       )}
     </View>

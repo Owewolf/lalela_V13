@@ -269,18 +269,6 @@ const LandingPage: React.FC = () => {
           </View>
         </View>
 
-        {/* ── Hero ── */}
-        <View className="px-6 pt-10 pb-8">
-          <Text style={{ fontSize: Platform.OS === 'web' ? TYPE_SCALE.h2Web : TYPE_SCALE.h2Mobile, fontWeight: FONT_WEIGHT.black, color: THEME_COLORS.primary, lineHeight: Platform.OS === 'web' ? LINE_HEIGHT.h2Web : LINE_HEIGHT.h2Mobile, marginBottom: SPACE.md }}>
-            no more talk talk —{'\n'}
-            <Text style={{ color: THEME_COLORS.aliasHex_f97316 }}>it's listen, listen, do.</Text>
-          </Text>
-          <Text className="text-base text-gray-500 font-medium leading-relaxed mb-8">
-            join your community. trade safely.{'\n'}give back with every deal.
-          </Text>
-        </View>
-
-
         {/* ── Auth Form ── */}
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
