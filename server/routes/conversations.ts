@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import type { Prisma } from '../generated/prisma/index.js';
 import prisma from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 
@@ -171,6 +172,10 @@ router.post('/', async (req, res) => {
     metadata?: Record<string, unknown>;
   };
 
+  const normalizedMetadata = isRecord(metadata)
+    ? (metadata as Prisma.InputJsonValue)
+    : undefined;
+
   const allParticipants = [...new Set([req.auth!.userId, ...(participantIds ?? [])])];
 
   const conversation = await prisma.conversation.create({
@@ -179,7 +184,7 @@ router.post('/', async (req, res) => {
       listingId,
       noticeId,
       communityId,
-      metadata,
+      metadata: normalizedMetadata,
       participants: { create: allParticipants.map((uid) => ({ userId: uid })) },
     },
     include: { participants: { include: { user: { select: { id: true, name: true, profileImage: true } } } } },
